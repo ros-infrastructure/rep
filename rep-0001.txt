@@ -245,16 +245,16 @@ There are two REP formats available to authors: plaintext and
 reStructuredText_.  Both are UTF-8-encoded text files.
 
 Plaintext REPs are written with minimal structural markup that adheres
-to a rigid style.  REP 9 contains a instructions and a template [3]_
+to a rigid style.  REP 9 contains a instructions and a template [2]_
 you can use to get started writing your plaintext REP.
 
 ReStructuredText_ REPs allow for rich markup that is still quite easy
 to read, but results in much better-looking and more functional HTML.
-REP 12 contains instructions and a template [4]_ for reStructuredText
+REP 12 contains instructions and a template [3]_ for reStructuredText
 REPs.
 
-There is a ROS script that converts both styles of REPs to HTML for
-viewing on the web [5]_.  Parsing and conversion of plaintext REPs is
+There is a Python script that converts both styles of REPs to HTML for
+viewing on the web.  Parsing and conversion of plaintext REPs is
 self-contained within the script.  reStructuredText REPs are parsed
 and converted by Docutils_ code called from the script.
 
@@ -319,8 +319,8 @@ The Type header specifies the type of REP: Standards Track,
 Informational, or Process.
 
 The format of a REP is specified with a Content-Type header.  The
-acceptable values are "text/plain" for plaintext REPs (see REP 9 [3]_)
-and "text/x-rst" for reStructuredText REPs (see REP 12 [4]_).
+acceptable values are "text/plain" for plaintext REPs (see REP 9 [2]_)
+and "text/x-rst" for reStructuredText REPs (see REP 12 [3]_).
 Plaintext ("text/plain") is the default if no Content-Type header is
 present.
 
@@ -458,8 +458,11 @@ References and Footnotes
    the SVN tree, you can browse the current and past REP revisions here:
    https://code.ros.org/gf/project/rep/scmsvn/?action=browse&path=/trunk/
 
-.. [2] PEP 1, PEP Purpose and Guidelines, Warsaw
-   (http://www.python.org/dev/peps/pep-0001)
+.. [2] REP 9, Sample Plaintext REP Template
+   (http://ros.org/rep/rep-0009.html)
+
+.. [3] REP 12, Sample reStructuredText REP Template
+   (http://ros.org/rep/rep-0012.html)
 
 .. _issue tracker:
    http://code.ros.org/trac/ros/

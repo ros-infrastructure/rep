@@ -1,0 +1,230 @@
+REP: 9
+Title: Sample Plaintext REP Template
+Version: $Revision$
+Last-Modified: $Date$
+Author: Ken Conley (by way of Barry Warsaw)
+Status: Active
+Type: Process
+Content-Type: text/plain
+Created: 14-Aug-2001
+Post-History:
+
+
+Abstract
+
+    This REP provides a boilerplate or sample template for creating
+    your own plaintext REPs.  In conjunction with the content
+    guidelines in REP 1 [1], this should make it easy for you to
+    conform your own REPs to the format outlined below.
+
+    Note: if you are reading this REP via the web, you should first
+    grab the plaintext source of this REP in order to complete the
+    steps below.  DO NOT USE THE HTML FILE AS YOUR TEMPLATE!
+
+    To get the source this (or any) REP, look at the top of the HTML
+    page and click on the date & time on the "Last-Modified" line.  It
+    is a link to the source text in the ROS repository.
+
+    If you would prefer to use lightweight markup in your REP, please
+    see REP 12, "Sample reStructuredText REP Template" [2].
+
+    This REP is entirely based on REP 12 by Barry Warsaw.
+
+
+Rationale
+
+    REP submissions come in a wide variety of forms, not all adhering
+    to the format guidelines set forth below.  Use this template, in
+    conjunction with the content guidelines in REP 1, to ensure that
+    your REP submission won't get automatically rejected because of
+    form.
+
+
+How to Use This Template
+
+    To use this template you must first decide whether your REP is
+    going to be an Informational or Standards Track REP.  Most REPs
+    are Standards Track because they propose a new feature for the
+    ROS client libraries or standard libraries.  When in doubt, read REP 1
+    for details or contact the ROS developers ros-developers@code.ros.org.
+
+    Once you've decided which type of REP yours is going to be, follow
+    the directions below.
+
+    - Make a copy of this file (.txt file, not HTML!) and perform the
+      following edits.
+
+    - Replace the "REP: 9" header with "REP: XXX" since you don't yet
+      have a REP number assignment.
+
+    - Change the Title header to the title of your REP.
+
+    - Leave the Version and Last-Modified headers alone; we'll take
+      care of those when we check your REP into ROS's 'rep'
+      repository.  These headers consist of keywords ("Revision" and
+      "Date" enclosed in "$"-signs) which are automatically expanded
+      by the repository.  Please do not edit the expanded date or
+      revision text.
+
+    - Change the Author header to include your name, and optionally
+      your email address.  Be sure to follow the format carefully:
+      your name must appear first, and it must not be contained in
+      parentheses.  Your email address may appear second (or it can be
+      omitted) and if it appears, it must appear in angle brackets.
+      It is okay to obfuscate your email address.
+
+    - If there is a mailing list for discussion of your new feature,
+      add a Discussions-To header right after the Author header.  You
+      should not add a Discussions-To header if the mailing list to be
+      used is either ros-users@code.ros.org or ros-developers@code.ros.org,
+      or if discussions should be sent to you directly.  Most
+      Informational REPs don't have a Discussions-To header.
+
+    - Change the Status header to "Draft".
+
+    - For Standards Track REPs, change the Type header to "Standards
+      Track".
+
+    - For Informational REPs, change the Type header to
+      "Informational".
+
+    - For Standards Track REPs, if your feature depends on the
+      acceptance of some other currently in-development REP, add a
+      Requires header right after the Type header.  The value should
+      be the REP number of the REP yours depends on.  Don't add this
+      header if your dependent feature is described in a Final REP.
+
+    - Change the Created header to today's date.  Be sure to follow
+      the format carefully: it must be in dd-mmm-yyyy format, where
+      the mmm is the 3 English letter month abbreviation, e.g. one of
+      Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec.
+
+    - For Standards Track REPs, after the Created header, add a
+      ROS-Version header and set the value to the next planned
+      version of ROS, i.e. the one your new feature will hopefully
+      make its first appearance in.  Do not use an alpha or beta
+      release designation here.  Thus, if the last version of ROS
+      was 1.2.2 and you're hoping to get your new feature into
+      ROS 1.4, set the header to:
+
+      ROS-Version: 1.4
+
+      You may also refer to the name of an upcoming ROS distribution, 
+      e.g. "Diamondback".
+
+    - Leave Post-History alone for now; you'll add dates to this
+      header each time you post your REP to ros-users@code.ros.org or
+      ros-developers@code.ros.org.  E.g. if you posted your REP to the lists
+      on August 14, 2001 and September 3, 2001, the Post-History
+      header would look like:
+
+      Post-History: 14-Aug-2001, 03-Sept-2001
+
+      You must manually add new dates and check them in.  If you don't
+      have check-in privileges, send your changes to the REP editor.
+
+    - Add a Replaces header if your REP obsoletes an earlier REP.  The
+      value of this header is the number of the REP that your new REP
+      is replacing.  Only add this header if the older REP is in
+      "final" form, i.e. is either Accepted, Final, or Rejected.  You
+      aren't replacing an older open REP if you're submitting a
+      competing idea.
+
+    - Now write your Abstract, Rationale, and other content for your
+      REP, replacing all this gobbledygook with your own text. Be sure
+      to adhere to the format guidelines below, specifically on the
+      prohibition of tab characters and the indentation requirements.
+
+    - Update your References and Copyright section.  Usually you'll
+      place your REP into the public domain, in which case just leave
+      the "Copyright" section alone.  Alternatively, you can use the
+      Open Publication License[3], but public domain is still strongly
+      preferred.
+
+    - Leave the little Emacs turd at the end of this file alone,
+      including the formfeed character ("^L", or \f).
+
+    - Send your REP submission to the ROS developers (ros-developers@code.ros.org),
+
+
+Plaintext REP Formatting Requirements
+
+    REP headings must begin in column zero and the initial letter of
+    each word must be capitalized as in book titles.  Acronyms should
+    be in all capitals.  The body of each section must be indented 4
+    spaces.  Code samples inside body sections should be indented a
+    further 4 spaces, and other indentation can be used as required to
+    make the text readable.  You must use two blank lines between the
+    last line of a section's body and the next section heading.
+
+    You must adhere to the Emacs convention of adding two spaces at
+    the end of every sentence.  You should fill your paragraphs to
+    column 70, but under no circumstances should your lines extend
+    past column 79.  If your code samples spill over column 79, you
+    should rewrite them.
+
+    Tab characters must never appear in the document at all.  A REP
+    should include the standard Emacs stanza included by example at
+    the bottom of this REP.
+
+    When referencing an external web page in the body of a REP, you
+    should include the title of the page in the text, with a
+    footnote reference to the URL.  Do not include the URL in the body
+    text of the REP.  E.g.
+
+        Refer to the RO web site [1] for more details.
+        ...
+        [1] http://www.ros.org
+
+    When referring to another REP, include the REP number in the body
+    text, such as "REP 1".  The title may optionally appear.  Add a
+    footnote reference, a number in square brackets.  The footnote
+    body should include the REP's title and author.  It may optionally
+    include the explicit URL on a separate line, but only in the
+    References section.  Note that the pep2html.py script will
+    calculate URLs automatically.  For example:
+
+            ...
+            Refer to REP 1 [7] for more information about REP style
+            ...
+
+        References
+
+            [7] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
+                http://ros.org/rep/rep-0001.html
+
+    If you decide to provide an explicit URL for a REP, please use
+    this as the URL template:
+
+        http://ros.org/rep/rep-xxxx.html
+
+    REP numbers in URLs must be padded with zeros from the left, so as
+    to be exactly 4 characters wide, however REP numbers in the text
+    are never padded.
+
+
+References
+
+    [1] REP 1, REP Purpose and Guidelines
+        http://ros.org/rep/rep-0001.html
+
+    [2] REP 12, Sample reStructuredText REP Template
+        http://ros.org/rep/rep-0012.html
+
+    [3] http://www.opencontent.org/openpub/
+
+
+
+Copyright
+
+    This document has been placed in the public domain.
+
+
+
+Local Variables:
+mode: indented-text
+indent-tabs-mode: nil
+sentence-end-double-space: t
+fill-column: 70
+coding: utf-8
+End:
