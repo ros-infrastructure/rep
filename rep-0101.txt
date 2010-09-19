@@ -1,0 +1,140 @@
+REP: 101
+Title: ROS 1.4 Release Schedule
+Version: $Revision$
+Last-Modified: $Date$
+Author: Ken Conley <kwc@willowgarage.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 18-Sep-2010
+Post-History: 18-Sep-2010
+
+
+Abstract
+========
+
+This REP describes the ROS 1.4 release schedule. The schedule
+primarily concerns itself with large-impact additions. For general
+high-level planning, see the ROS Roadmap [1]_. As per general ROS
+stack development guidelines, features for ROS 1.4 will be developed
+in the ROS 1.3.x release cycle and finalized for ROS 1.4.0.
+
+Release Schedule
+================
+
+The schedule below is tentative. The target date for the ROS
+Diamondback distribution in February, 2011. Features for ROS 1.4 may
+be shifted to ROS 1.6 as appropriate to meet the Diamondback
+distribution release schedule.
+
+* Early September, 2010: rx stack release, new release system testing
+* Late September, 2010: First rosh release
+* Mid October, 2010: ros/ros_comm separation, roslisp message generator rewrite
+* November, 2010: ros and ros_comm stacks feature freeze
+* December, 2010: First rxlab release
+* January, 2010: rx stack feature freeze, ros_realtime stack
+* Release candidate
+
+Features for ROS 1.4
+====================
+
+* ROS stack separation into ros, rx, ros_comm, and documentation stacks (REP 100 [#REP100]_, tfoote, kwc)
+* New `external stack release system`_, new rosdistro format (leibs, kwc, tfoote)
+* rosh_ : basic release with support for topics, services, and parameters (kwc)
+* rxlab_ GUI tool (tfield)
+* rospy client reconnection (kwc)
+* rosbuild install target prototype (gerkey)
+* ros_realtime_ stack (jfaust, possibly delay to post-Diamondback)
+* Python message generators for roslisp (bhaskara)
+* rosbag speed optimization (lazy index loading; multi-threaded
+  read/write) and compression (message reordering; gzip) (leibs,
+  tfield)
+* rosbag service APIs (leibs, tfield)
+
+Optional Features for ROS 1.4
+=============================
+
+Optional features are "nice-to-haves" but are not considered critical
+path for this release, nor do they impact downstream components. They
+will be scheduled if time permits.
+
+* roslaunch-console_ (kwc)
+* ROS master Redis-protoype with TTL and master replication (kwc)
+* redo ROS/OS X platform integration to use easy_install for Python dependencies, drop support for OSX 10.4 (kwc, tfoote)
+
+Motivation
+==========
+
+The ROS 1.4 release has several main thrusts:
+
+- Separating the ROS stack into smaller components
+- Incorporating community stacks into ROS distributions
+- New rapid prototyping tools for ROS-based code (rosh, rxlab)
+
+Of these thrusts, separation of the ROS stack is expected to have the
+broadest impact. It should enable the ROS packaging and build system
+to be used outside of ROS, and it will also help with integration on
+other platforms (e.g. embedded, OS X, Windows). The motivation and
+rationale are better described in REP 100 [#REP100]_.
+
+Incorporating community stacks is a priority as there are over 30 ROS
+repositories now. Having a shared mechanism for release and
+distribution will enable the community to more easily exchange
+libraries, including helping address issues of versioning and system
+configuration. This will also be a test for future developments in the
+release system, such as supporting alternate distributions
+(e.g. distributions for specific robot platforms or research areas).
+
+rosh and rxlab are being designed as complementary tools for rapid
+prototyping. rosh is a Python- and IPython-based framework with that
+enables tab-completion on ROS resources (e.g. topics, services,
+parameters, actions, transforms. rxlab is a Python GUI framework that
+enables creation of "networks" within a single Python process to do a
+variety of tasks, such as creating image-processing pipelines. It is
+similar to frameworks such as Simulink, but is targeted at ROS
+libraries like OpenCV. rosh and rxlab are being built on top of the
+existing Python toolchain as they provide many of the necessary
+libraries for dynamic introspection in a ROS graph.
+
+
+Backwards Compatibility
+=======================
+
+The ROS backwards compatibility guidelines require that ROS 1.4 being
+fully backwards compatible with ROS 1.2. The main concern for this
+release will be ensuring that the separation of the ROS stack into
+three stacks will not an existing code to break. This will likely
+require additional resources and files to remain with the base "ros"
+stack in the 1.4 release, but deprecated so that they can be removed
+in the 1.6 release.
+
+
+References
+==========
+
+.. [1] ROS Roadmap
+   (http://ros.org/wiki/ROS/Roadmap)
+.. [#REP100] REP 100 (FIXME)
+   (http://ros.org/FIXME)
+
+.. _rosh: http://ros.org/wiki/rosh
+.. _rxlab: http://ros.org/wiki/rxlab
+.. _ros_realtime: http://ros.org/wiki/ros_realtime
+.. _external stack release system: http://ros.org/wiki/release
+.. _roslaunch-console: https://code.ros.org/trac/ros/ticket/1179
+   
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:

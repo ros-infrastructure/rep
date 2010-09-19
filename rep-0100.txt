@@ -1,0 +1,288 @@
+REP: 100
+Title: ROS Stack Separation
+Version: $Revision$
+Last-Modified: $Date$
+Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 18-Sep-2010
+Post-History: 18-Sep-2010
+
+
+Abstract
+========
+
+The monolithic ROS stack, as released in ROS 1.0 and ROS 1.2, is being
+separated into several, smaller stacks: ros, ros_comm, rx, and
+documentation. These smaller stacks will enable installation on more
+platforms, better decoupling of design, and easier release. It is also
+hoped that the base ros stack, which will contain the packaging and
+build system, will be useful in other software projects that don't
+make use of the ROS communication system.
+
+Specification
+=============
+
+ros stack
+---------
+
+- gtest
+- mk
+- rosbuild
+- rosboost_cfg
+- roscreate
+- rosdep
+- roslib
+- rospack
+- rosmake
+
+ros_comm stack
+--------------
+
+ROS client libraries
+
+- roslang
+- roscpp
+- rospy
+- roslisp
+
+Support libraries
+
+- xmlrpcpp
+
+ROS graph tools
+
+- rosbag
+- rosbagmigration
+- rosconsole
+- rosemacs
+- rosgraph
+- roslaunch
+- rosmsg
+- rosmaster
+- rosnode
+- rosout
+- rosparam
+- rosservice
+- rostest
+- rostopic
+- topic_tools
+
+ROS core ontology
+
+- std_msgs
+- std_srvs
+- roscore_migration_rules
+
+Libraries and Utilities
+
+- message_filters
+- rosbash
+- rosclean
+- roswtf
+
+rx stack
+--------
+
+The rx stack contains GUI-related tools for ROS, which are generally
+wxWindows-based. The 'rx' prefix is commonly used to denote ROS tools
+that provide a graphical user interface.
+
+- rxbag
+- rxdeps
+- rxgraph
+- rxtools
+- wxPython_swig_interface
+- wxswig
+- xdot
+
+documentation stack
+-------------------
+
+The documentation stack will only contain the rosdoc package in the
+initial release. It is expected to have more packages in the future.
+
+Deleted Packages
+----------------
+
+The following packages will be removed as part of this separation. The
+rosrecord package was superceded by rosbag in ROS 1.2. The genmsg_cpp
+stack is being removed in favor of Python-based message
+generators. This is discussed further in the backward compatibility
+section.
+
+- genmsg_cpp
+- rosrecord
+
+Header, Clock, and Log
+----------------------
+
+Header, Clock, and Log will be moved from the roslib package to the
+roslang package. For backwards compatibility, the generated source
+code files for these messages will be released with the roslib package
+in ROS 1.4 but marked as deprecated.
+
+Moving roslib python modules
+----------------------------
+
+Several roslib python modules will be moved to rosgraph and elsewhere. The old
+modules will be marked as deprecated for ROS 1.4 and removed in ROS
+1.6.
+
+The following modules will be moved to rosgraph:
+
+- roslib.genpy
+- roslib.gentools
+- roslib.message
+- roslib.msgs
+- roslib.network
+- roslib.rostime
+- roslib.srvs
+- roslib.xmlrpc
+
+The following modules will be moved to rosdistro (new package):
+
+- roslib.distro
+
+The following modules will be heavily refactored:
+
+- roslib.scriptutil
+
+The following modules will be removed (already deprecated):
+
+- roslib.masterapi
+
+
+Motivation
+==========
+
+Several main motivations have been identified for this separation
+
+- Making the "core" ROS lighter weight, which enables
+  - Easier porting to other platforms
+  - Smaller footprint 
+- Enabling projects to use the ROS packaging and build system separate from the communication infrastructure
+- Easier maintainability 
+- Better decoupling of design interests between the packaging and communication architectures
+
+Rationale
+=========
+
+Header, Clock, and Log
+----------------------
+
+Three msg IDL files are currently stored in the roslib package as they
+are common to all ROS client libraries. The roslib package must go
+into the base ros stack as it contains many of the libraries used by
+the package and build tools, but we wish to keep the ros stack
+decoupled from client libraries issues.
+
+The roslang package is a suitable place for these messages as it is
+currently a "flag" package that identifies a ROS package as being a
+client library. 
+
+The impact of changing the location of these messages requires further
+study.  The Header message is generally not referred to as
+"roslib/Header", which will hopefully minimize the impact in the ROS
+code base, despite it being commonly used. The Clock and Log messages
+generally have limited use outside of ROS client libraries
+(e.g. simulators, GUI tools), and will hopefully be easy to migrate.
+
+Moving of roslib python modules
+-------------------------------
+
+The roslib libraries selected for moving are generally to support ROS
+communication. Leaving them in the ros stack would create a coupling
+between ros_comm and the ros stack that would make future development
+difficult.  Moving of roslib python modules is expected to have low
+external impact as these libraries are generally for internal use. It
+is expected to have high impact internally as many tool make use of
+these representations.
+
+genmsg_cpp deletion
+-------------------
+
+The genmsg_cpp package currently lives at the root of the ROS
+dependency tree so that it can be compiled before any messages are
+generated. This design causes many problems, though the main one of
+concern is that it introduces client-library-specific information in
+the base ROS stack. In order to meet our goals of decoupling the ROS
+packaging system from the ROS communication system, this
+implementation artifact needs to be removed. Despite its name,
+genmsg_cpp is no longer used for roscpp and only affects roslisp,
+rosoct, and rosjava. The effect on these packages is described in the
+Backwards Compatibility section.
+
+Client libraries are instead expected to develop Python-based message
+generators (e.g. rospy and roscpp) or dynamically convert the msg IDL
+to code (e.g. roslua).
+
+documentation stack
+-------------------
+
+The placement of the rosdoc package was considered for both the ros
+and documentation stacks. The rosdoc tool is a generally useful tool
+as it provides a mechanism for auto-generating documentation across a
+ROS-package-based code base. Comparison to similar tools, like
+javadoc, shows that these documentation tools are generally
+distributed with the main system.
+
+Thus, moving the rosdoc package to its own, separate "documentation"
+stack does generate problems from a user perspective. In particular,
+they may be confused that it is missing from the ros stack. This
+concern is balanced by multiple motivations:
+
+- rosdoc has heavy-weight dependencies (rxdeps, graphviz, doxygen,
+  sphinx, latex).
+- Future implementations of rosdoc will likely break it into multiple
+  packages in a plugin model (e.g. rosdoc_sphinx, rosdoc_rosorg,
+  etc...).
+- The ROS Distribution system and packaging system can provide the
+  documentation stack in common configurations.
+
+Backwards Compatibility
+=======================
+
+This separation is expected to break the existing, experimental rosoct
+and rosjava libraries due to the removal of the genmsg_cpp removal.
+
+The roslisp message generator is currently implemented in genmsg_cpp,
+but is in the process of being converted to the Python-based approach.
+
+For additional backwards compatibility, libraries for msg handling as
+well as core msg types (Header, Log, and Clock) will be left in the
+roslib package for the ROS 1.4 release. These will be marked as
+deprecated and removed in the ROS 1.5 release.
+
+Scheduling
+==========
+
+Early planning and cleanup for this separation went into the ROS 1.2
+release, including rewriting the roscpp message generator in
+Python. For the ROS 1.4 release, the rx and documentation stacks are
+expected to be cleanly separated. For reasons discussed above, clean
+separation of the ros and ros_comm stacks are not expected for the ROS
+1.4 release. 
+
+All preference will be given to maintaining a stable system over the
+separation. Although it is desirable to have a perfectly clean
+separation, the majority of our design goals even if this is not
+acheieved in the ROS 1.4 release.
+
+   
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
