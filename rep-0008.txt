@@ -1,4 +1,4 @@
-PEP: 8
+REP: 8
 Title: Style Guide for Python Code
 Version: $Revision$
 Last-Modified: $Date$

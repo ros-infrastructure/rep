@@ -1,5 +1,5 @@
-PEP: 1
-Title: PEP Purpose and Guidelines
+REP: 1
+Title: REP Purpose and Guidelines
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley (by way of Barry Warsaw, Jeremy Hylton, David Goodger)
@@ -266,8 +266,8 @@ Each REP must begin with an RFC 822 style header preamble.  The headers
 must appear in the following order.  Headers marked with "*" are
 optional and are described below.  All other headers are required. ::
 
-    REP: <pep number>
-    Title: <pep title>
+    REP: <rep number>
+    Title: <rep title>
     Version: <svn version string>
     Last-Modified: <svn date string>
     Author: <list of authors' real names and optionally, email addrs>
@@ -276,12 +276,12 @@ optional and are described below.  All other headers are required. ::
              Withdrawn | Final | Replaced>
     Type: <Standards Track | Informational | Process>
   * Content-Type: <text/plain | text/x-rst>
-  * Requires: <pep numbers>
+  * Requires: <rep numbers>
     Created: <date created on, in dd-mmm-yyyy format>
   * ROS-Version: <version number>
     Post-History: <dates of postings to python-list and python-dev>
-  * Replaces: <pep number>
-  * Replaced-By: <pep number>
+  * Replaces: <rep number>
+  * Replaced-By: <rep number>
   * Resolution: <url>
 
 The Author header lists the names, and optionally the email addresses
@@ -347,7 +347,7 @@ Auxiliary Files
 ===============
 
 REPs may include auxiliary files such as diagrams.  Such files must be
-named ``pep-XXXX-Y.ext``, where "XXXX" is the REP number, "Y" is a
+named ``rep-XXXX-Y.ext``, where "XXXX" is the REP number, "Y" is a
 serial number (starting at 1), and "ext" is replaced by the actual
 file extension (e.g. "png").
 
@@ -430,8 +430,9 @@ Once the REP is ready for the repository, the REP editor will:
 * Send email back to the REP author with next steps (post to
   ros-users & ros-developers).
 
-Updates to existing REPs also come in to peps@python.org.  Many REP
-authors are not SVN committers yet, so we do the commits for them.
+Updates to existing REPs also come in to ros-developers@code.ros.org.
+Many REP authors are not SVN committers yet, so we do the commits for
+them.
 
 Many REPs are written and maintained by developers with write access
 to the ROS codebase.  The REP editors monitor the python-checkins
