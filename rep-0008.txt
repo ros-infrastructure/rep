@@ -1,0 +1,123 @@
+PEP: 8
+Title: Style Guide for Python Code
+Version: $Revision$
+Last-Modified: $Date$
+Author: Ken Conley <kwc@willowgarage.com>
+Status: Active
+Type: Process
+Content-Type: text/x-rst
+Created: 18-Sep-2010
+Post-History: 18-Sep-2010
+
+
+Abstract
+========
+
+This document gives coding conventions for the Python code comprising
+the standard library in the main ROS distribution.
+
+Coding Style
+============
+
+Please follow Python's PEP 8 [1]_ for guidelines on formatting, naming, etc...
+
+The Loader
+==========
+
+roslib is the only ROS Python package you can automatically assume to
+be importable other than your local files. If your Python package has
+dependencies, you must include the following header at the top::
+
+    import roslib
+    roslib.load_manifest('your_package_name')
+
+roslib.load_manifest looks at your manifest.xml and places your
+dependencies on your Python path. DO NOT use multiple load_manifest
+calls. If you need multiple calls, it's probably because you're
+missing the correct dependencies in your manifest.
+
+
+Package/Module Names (__init__.py files)
+========================================
+
+All python code must be placed within a module namespace. ROS exports
+your Python source directory to be on the path of any of your
+dependencies, so it is important not to accidentally clobber someone
+else's import. We strongly recommend that this module name be the same
+as your ROS package name.
+
+There are two recommended code layouts:
+
+Small modules with no msg/srvs::
+
+    packagename
+     |- nodes/
+        |- ROS node executable files
+     |- src/
+        |- packagename.py
+     |- scripts/
+        |- non-exported python files
+
+Module with msgs/srvs::
+
+    packagename
+     |- nodes/
+        |- ROS node executable files
+     |- src/
+        |- packagename/
+          |- __init__.py
+          |- yourfiles.py
+     |- scripts/
+        |- non-exported python files
+    
+We distinguish between "nodes" and "scripts" for clarity to
+users. Nodes are executable Python files that conform to the ROS node
+API. Scripts are executable Python files that do not conform to the
+ROS node API.
+           
+If you don't know what an __init__.py file is, we recommend that you
+read `What is init py used for?
+<http://effbot.org/pyfaq/what-is-init-py-used-for.htm>`_?
+
+The more complicated layout for msg/srv files is required as the
+Python msg/srv generators will need to generate files into your
+package's namespace.
+
+In the rare case that you can't place your source code in src/
+(e.g. thirdparty code), you can override the Python export path of
+your package by editing your manifest.
+
+Node Files
+==========
+
+In ROS, the name of a node type is the same as its executable
+name. Typically, for python files, this means including #!/usr/bin/env
+python at the top of your main code file.
+
+If your node is simple, this file may contain the entire code for
+it. Otherwise, the node file will likely do an import packagename and
+invoke code there.
+
+NOTE: we strive to keep ROS-specific code separate from reusable,
+generic code. The separation of 'node files' and files you place in
+src/packagename helps encourage this.
+
+
+References
+==========
+
+.. [1] PEP 8, Style Guide for Python Code, van Rossum
+   http://www.python.org/dev/peps/pep-0008/
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+Local Variables:
+mode: indented-text
+indent-tabs-mode: nil
+End:
