@@ -1,0 +1,81 @@
+REP: 102
+Title: ROS Install Target
+Version: $Revision: 4 $
+Last-Modified: $Date: 2010-09-18 18:36:21 -0700 (Sat, 18 Sep 2010) $
+Author: Brian Gerkey <gerkey@willowgarage.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 19-Sep-2010
+Post-History: 19-Sep-2010
+
+Abstract
+========
+
+This REP describes an 'install' target for ROS.  This proposal describes a
+file/directory layout policy and extensions to the rosbuild API to support
+installation.  It also notes some known and expected issues with installation,
+particularly regarding updating existing code to support installation.
+
+History
+=======
+
+To date, there has been no 'make install' for ROS code.  The ROS
+build system and associated tools were designed to support building in and
+running from a packages source tree.  This design works well in
+research-like environments, where everybody has his or her own copy of
+the code checked out from version control.  But it is not appropriate for
+providing system installations of ROS, e.g., as Debian packages (.debs).
+The current best practice for such installations is to recursively copy
+from a built package source tree, combined with heuristic filtering and
+rpath-rewriting.
+
+Goals
+=====
+
+The overall goal of install target is to allow for the installation of
+ROS code.  More specifically, the install target should:
+* install only what is needed at runtime;
+* not rely on RPATH or RUNPATH settings;
+* conform to accepted filesystem layouts (e.g., the Filesystem Heirarchy
+  Standard [1])
+* provide developers with sufficient control over what is installed
+  and where it goes;
+* simplify common installation tasks; and
+* have minimal impact on the ROS codebase.
+
+To understand the implications of these specific goals, we'll take a couple
+of strawman examples:
+* A very simple installation method is to recursively copy everything from a 
+  package source tree.  This method is disqualified because it is not
+  minimal, and does not resolve the use of RPATH.
+* One installation method is do away with the ROS package tree, putting
+  the various pieces of each package into the best-fit locations in the
+  system directory hierarchy: put libraries in /usr/lib, 
+  executables in /usr/bin, .launch/.urdf/.mesh files in /usr/share,
+  Python modules in /usr/lib/site-packages, etc.  This method is
+  disqualified because a great deal of ROS code relies on the package
+  tree to find and refer to resources in a package-relative manner;
+  getting rid of the package tree would be hugely disruptive.
+
+
+References
+==========
+
+.. [1] Filesystem Heirarchy Standard
+   (http://www.pathname.com/fhs/)
+   
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
