@@ -149,11 +149,12 @@ def fixfile(inpath, input_lines, outfile):
     from email.Utils import parseaddr
     basename = os.path.basename(inpath)
     infile = iter(input_lines)
-    # convert plaintext rep to minimal XHTML markup
-    print >> outfile, DTD
-    print >> outfile, '<html>'
-    print >> outfile, COMMENT
-    print >> outfile, '<head>'
+    if 0:
+        # convert plaintext rep to minimal XHTML markup
+        print >> outfile, DTD
+        print >> outfile, '<html>'
+        print >> outfile, COMMENT
+        print >> outfile, '<head>'
     # head
     header = []
     rep = ""
@@ -178,30 +179,57 @@ def fixfile(inpath, input_lines, outfile):
             rep = value
     if rep:
         title = "REP " + rep + " -- " + title
-    if title:
-        print >> outfile, '  <title>%s</title>' % cgi.escape(title)
-    r = random.choice(range(64))
-    print >> outfile, (
-        '  <link rel="STYLESHEET" href="style.css" type="text/css" />\n'
-        '</head>\n'
-        '<body bgcolor="white">\n'
-        '<table class="navigation" cellpadding="0" cellspacing="0"\n'
-        '       width="100%%" border="0">\n'
-        '<tr><td class="navicon" width="150" height="35">\n'
-        '<a href="../" title="ROS Home Page">ROS</a></td>\n'
-        '<td class="textlinks" align="left">\n'
-        '[<b><a href="../">ROS Home</a></b>]')
-    if basename <> 'rep-0000.txt':
-        print >> outfile, '[<b><a href=".">REP Index</a></b>]'
-    if rep:
-        try:
-            print >> outfile, ('[<b><a href="rep-%04d.txt">REP Source</a>'
-                               '</b>]' % int(rep))
-        except ValueError, error:
-            print >> sys.stderr, ('ValueError (invalid REP number): %s'
-                                  % error)
-    print >> outfile, '</td></tr></table>'
-    print >> outfile, '<div class="header">\n<table border="0">'
+
+    # remove nav to rep index
+    f = open('rep-html-template', 'r')
+    tmpl = f.read()
+    f.close()
+    if int(rep) == 0:
+        tmpl = tmpl.replace('[<b><a href="%(repindex)s">REP Index</a></b>]', '')
+    tmpl_vars = {
+        'repindex': 'rep-0000.html',
+        'rep': title,
+        'repnum': "%04d"%int(rep),
+        'rephome': '/reps',
+        'encoding': 'utf-8',
+        'version': '',
+        'title': 'REP '+rep+" -- "+title,
+        'stylesheet': '<link rel="stylesheet" href="rep.css" type="text/css" />',
+        }
+
+    if 0:
+        if title:
+            print >> outfile, '  <title>%s</title>' % cgi.escape(title)
+
+        print >> outfile, (
+            '  <link rel="STYLESHEET" href="style.css" type="text/css" />\n'
+            '</head>\n'
+            '<body bgcolor="white">\n'
+            '<table class="navigation" cellpadding="0" cellspacing="0"\n'
+            '       width="100%%" border="0">\n'
+            '<tr><td class="navicon" width="150" height="35">\n'
+            '<a href="../" title="ROS Home Page">ROS</a></td>\n'
+            '<td class="textlinks" align="left">\n'
+            '[<b><a href="../">ROS Home</a></b>]')
+        if basename <> 'rep-0000.txt':
+            print >> outfile, '[<b><a href=".">REP Index</a></b>]'
+        if rep:
+            try:
+                print >> outfile, ('[<b><a href="rep-%04d.txt">REP Source</a>'
+                                   '</b>]' % int(rep))
+            except ValueError, error:
+                print >> sys.stderr, ('ValueError (invalid REP number): %s'
+                                      % error)
+        print >> outfile, '</td></tr></table>'
+
+    real_outfile = outfile
+    
+    import cStringIO
+    outfile = cStringIO.StringIO()
+    print >> outfile, """<div class="header">\n<table border="0" class="rfc2822 docutils field-list" frame="void" rules="none">
+<col class="field-name" /> 
+<col class="field-body" /> 
+<tbody valign="top">"""
     for k, v in header:
         if k.lower() in ('author', 'discussions-to'):
             mailtos = []
@@ -240,7 +268,7 @@ def fixfile(inpath, input_lines, outfile):
             v = '<a href="%s">%s</a> ' % (url, cgi.escape(rep_type))
         else:
             v = cgi.escape(v)
-        print >> outfile, '  <tr><th>%s:&nbsp;</th><td>%s</td></tr>' \
+        print >> outfile, '  <tr class="field"><th class="field-name">%s:&nbsp;</th><td class="field-body">%s</td></tr>' \
               % (cgi.escape(k), v)
     print >> outfile, '</table>'
     print >> outfile, '</div>'
@@ -290,9 +318,14 @@ def fixfile(inpath, input_lines, outfile):
             outfile.write(line)
     if not need_pre:
         print >> outfile, '</pre>'
+
     print >> outfile, '</div>'
-    print >> outfile, '</body>'
-    print >> outfile, '</html>'
+
+    tmpl_vars['body'] = outfile.getvalue()
+    print >> real_outfile, tmpl%tmpl_vars
+    if 0:
+        print >> outfile, '</body>'
+        print >> outfile, '</html>'
 
 docutils_settings = None
 """Runtime settings object used by Docutils.  Can be set by the client
