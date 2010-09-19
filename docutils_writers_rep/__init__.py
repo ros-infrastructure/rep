@@ -71,7 +71,7 @@ class Writer(html4css1.Writer):
         if roshome == '..':
             subs['repindex'] = '.'
         else:
-            subs['repindex'] = roshome + '/dev/reps'
+            subs['repindex'] = roshome + '/reps/rep-0000.html'
         index = self.document.first_child_matching_class(nodes.field_list)
         header = self.document[index]
         self.repnum = header[0][1].astext()

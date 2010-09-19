@@ -2,7 +2,7 @@ REP: 9
 Title: Sample Plaintext REP Template
 Version: $Revision$
 Last-Modified: $Date$
-Author: Ken Conley (by way of Barry Warsaw)
+Author: Ken Conley
 Status: Active
 Type: Process
 Content-Type: text/plain
@@ -28,7 +28,9 @@ Abstract
     If you would prefer to use lightweight markup in your REP, please
     see REP 12, "Sample reStructuredText REP Template" [2].
 
-    This REP is entirely based on REP 12 by Barry Warsaw.
+    This REP is entirely based on REP 12 by Barry Warsaw. The Author
+    field of this document has been changed in order to denote
+    reponsibility for maintenance, not credit.
 
 
 Rationale

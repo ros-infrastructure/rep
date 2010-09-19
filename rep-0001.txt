@@ -2,7 +2,7 @@ REP: 1
 Title: REP Purpose and Guidelines
 Version: $Revision$
 Last-Modified: $Date$
-Author: Ken Conley (by way of Barry Warsaw, Jeremy Hylton, David Goodger)
+Author: Ken Conley
 Status: Active
 Type: Process
 Content-Type: text/x-rst
@@ -31,9 +31,13 @@ feature proposal [1]_.
 
 The REP process is based on the Python PEP process. We are thankful to
 the Python REP contributors for providing a process, tools, and
-templates for community participation in a design process. This
-initial document is based on a search-and-replace of PEP 1. Over time,
-it will incorporate ROS-specific changes to this process.
+templates for community participation in a design process. 
+
+This initial document is based on a search-and-replace of PEP 1 by
+Barry Warsaw, Jeremy Hylton, David Goodger. Over time, it will
+incorporate ROS-specific changes to this process. The Author field of
+this document has been changed in order to denote reponsibility for
+maintenance, not credit.
 
 
 REP Types
