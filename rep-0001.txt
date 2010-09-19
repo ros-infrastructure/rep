@@ -30,14 +30,14 @@ repository, their revision history is the historical record of the
 feature proposal [1]_.
 
 The REP process is based on the Python PEP process. We are thankful to
-the Python REP contributors for providing a process, tools, and
-templates for community participation in a design process. 
+the Python PEP contributors for providing a process, tools, and
+templates for community participation in a design process.
 
 This initial document is based on a search-and-replace of PEP 1 by
 Barry Warsaw, Jeremy Hylton, David Goodger. Over time, it will
 incorporate ROS-specific changes to this process. The Author field of
 this document has been changed in order to denote reponsibility for
-maintenance, not credit.
+maintenance, not credit for original authorship.
 
 
 REP Types
@@ -155,10 +155,10 @@ For a REP to be accepted it must meet certain minimum criteria.  It
 must be a clear and complete description of the proposed enhancement.
 The enhancement must represent a net improvement.  The proposed
 implementation, if applicable, must be solid and must not complicate
-the interpreter unduly.  Finally, a proposed enhancement must be
-"ROSish" in order to be accepted by the MDFN.  (However, "ROSish"
-is an imprecise term; it may be defined as whatever is acceptable to
-the MDFN.  This logic is intentionally circular.)  
+existing libraries unduly.  Finally, a proposed enhancement must be
+"ROSonic".  (However, "ROSonic" is an imprecise term; it may be
+defined as whatever is acceptable to ROS Developers.  This logic is
+intentionally circular.)
 
 Once a REP has been accepted, the reference implementation must be
 completed.  When the reference implementation is complete and accepted
@@ -203,14 +203,14 @@ Each REP should have the following parts:
    example) or licensed under the `Open Publication License`_.
 
 4. Specification -- The technical specification should describe the
-   syntax and semantics of any new language feature.  The
-   specification should be detailed enough to allow competing,
-   interoperable implementations for any of the current ROS
-   platforms (CROS, Jython, ROS .NET).
+   syntax and semantics of any new feature.  The specification should
+   be detailed enough to allow competing, interoperable
+   implementations for any of the current ROS client libraries, if
+   applicable (roscpp, rospy, roslisp, etc...).
 
 5. Motivation -- The motivation is critical for REPs that want to
    change the ROS APIs.  It should clearly explain why the existing
-   language specification is inadequate to address the problem that
+   API specification is inadequate to address the problem that
    the REP solves.  REP submissions without sufficient motivation may
    be rejected outright.
 
@@ -237,30 +237,20 @@ Each REP should have the following parts:
    the specification and rationale first and reach consensus on it
    before writing code.
 
-   The final implementation must include test code and documentation
-   appropriate for either the ROS language reference or the
-   standard library reference.
+   The final implementation must include test code and documentation.
 
 
 REP Formats and Templates
 =========================
 
-There are two REP formats available to authors: plaintext and
-reStructuredText_.  Both are UTF-8-encoded text files.
+All REP are expected to be formatted in reStructuredText_ with
+UTF-8-encoding.  reStructuredText_ REPs allow for rich markup that is
+still quite easy to read.  REP 12 contains instructions and a template
+[2]_ for reStructuredText.
 
-Plaintext REPs are written with minimal structural markup that adheres
-to a rigid style.  REP 9 contains a instructions and a template [2]_
-you can use to get started writing your plaintext REP.
-
-ReStructuredText_ REPs allow for rich markup that is still quite easy
-to read, but results in much better-looking and more functional HTML.
-REP 12 contains instructions and a template [3]_ for reStructuredText
-REPs.
-
-There is a Python script that converts both styles of REPs to HTML for
-viewing on the web.  Parsing and conversion of plaintext REPs is
-self-contained within the script.  reStructuredText REPs are parsed
-and converted by Docutils_ code called from the script.
+There is a Python script that converts REPs to HTML for viewing on the
+web.  reStructuredText REPs are parsed and converted by Docutils_ code
+called from the script.
 
 
 REP Header Preamble
@@ -283,7 +273,7 @@ optional and are described below.  All other headers are required. ::
   * Requires: <rep numbers>
     Created: <date created on, in dd-mmm-yyyy format>
   * ROS-Version: <version number>
-    Post-History: <dates of postings to python-list and python-dev>
+    Post-History: <dates of postings to ros-users and ros-developers>
   * Replaces: <rep number>
   * Replaced-By: <rep number>
   * Resolution: <url>
@@ -322,16 +312,14 @@ email addresses in the Discussions-To header will not be obscured.
 The Type header specifies the type of REP: Standards Track,
 Informational, or Process.
 
-The format of a REP is specified with a Content-Type header.  The
-acceptable values are "text/plain" for plaintext REPs (see REP 9 [2]_)
-and "text/x-rst" for reStructuredText REPs (see REP 12 [3]_).
-Plaintext ("text/plain") is the default if no Content-Type header is
-present.
+The format of a REP is specified with a Content-Type header.  The only
+supported values is "text/x-rst", which designates reStructuredText
+encoding (see REP 12 [2]_).
 
 The Created header records the date that the REP was assigned a
 number, while Post-History is used to record the dates of when new
 versions of the REP are posted to ros-users and/or ros-developers.  Both
-headers should be in dd-mmm-yyyy format, e.g. 14-Aug-2001.
+headers should be in dd-mmm-yyyy format, e.g. 14-Aug-2010.
 
 Standards Track REPs must have a ROS-Version header which indicates
 the version/distribution of ROS that the feature will be released with.
@@ -400,7 +388,7 @@ REP Editor Responsibilities & Workflow
 ======================================
 
 All REP-related correspondence should be sent (or CC'd) to
-<ros-developers@python.org>.
+<ros-developers@code.ros.org>.
 
 For each new REP that comes in an editor does the following:
 
@@ -439,9 +427,9 @@ Many REP authors are not SVN committers yet, so we do the commits for
 them.
 
 Many REPs are written and maintained by developers with write access
-to the ROS codebase.  The REP editors monitor the ros-rep-commits
-list for REP changes, and correct any structure, grammar, spelling, or
-markup mistakes we see.
+to the ROS codebase.  The REP editors monitor the rep-commits list for
+REP changes, and correct any structure, grammar, spelling, or markup
+mistakes we see.
 
 The editors don't pass judgement on REPs.  We merely do the
 administrative & editorial part.  Except for times like this, there's
@@ -462,10 +450,7 @@ References and Footnotes
    the SVN tree, you can browse the current and past REP revisions here:
    https://code.ros.org/gf/project/rep/scmsvn/?action=browse&path=/trunk/
 
-.. [2] REP 9, Sample Plaintext REP Template
-   (http://ros.org/reps/rep-0009.html)
-
-.. [3] REP 12, Sample reStructuredText REP Template
+.. [2] REP 12, Sample reStructuredText REP Template
    (http://ros.org/reps/rep-0012.html)
 
 .. _issue tracker:
