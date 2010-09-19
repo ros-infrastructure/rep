@@ -439,7 +439,7 @@ Many REP authors are not SVN committers yet, so we do the commits for
 them.
 
 Many REPs are written and maintained by developers with write access
-to the ROS codebase.  The REP editors monitor the python-checkins
+to the ROS codebase.  The REP editors monitor the ros-rep-commits
 list for REP changes, and correct any structure, grammar, spelling, or
 markup mistakes we see.
 
