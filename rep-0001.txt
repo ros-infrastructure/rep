@@ -459,10 +459,10 @@ References and Footnotes
    https://code.ros.org/gf/project/rep/scmsvn/?action=browse&path=/trunk/
 
 .. [2] REP 9, Sample Plaintext REP Template
-   (http://ros.org/rep/rep-0009.html)
+   (http://ros.org/reps/rep-0009.html)
 
 .. [3] REP 12, Sample reStructuredText REP Template
-   (http://ros.org/rep/rep-0012.html)
+   (http://ros.org/reps/rep-0012.html)
 
 .. _issue tracker:
    http://code.ros.org/trac/ros/

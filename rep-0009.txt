@@ -191,12 +191,12 @@ Plaintext REP Formatting Requirements
         References
 
             [7] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
-                http://ros.org/rep/rep-0001.html
+                http://ros.org/reps/rep-0001.html
 
     If you decide to provide an explicit URL for a REP, please use
     this as the URL template:
 
-        http://ros.org/rep/rep-xxxx.html
+        http://ros.org/reps/rep-xxxx.html
 
     REP numbers in URLs must be padded with zeros from the left, so as
     to be exactly 4 characters wide, however REP numbers in the text
@@ -206,10 +206,10 @@ Plaintext REP Formatting Requirements
 References
 
     [1] REP 1, REP Purpose and Guidelines
-        http://ros.org/rep/rep-0001.html
+        http://ros.org/reps/rep-0001.html
 
     [2] REP 12, Sample reStructuredText REP Template
-        http://ros.org/rep/rep-0012.html
+        http://ros.org/reps/rep-0012.html
 
     [3] http://www.opencontent.org/openpub/
 
