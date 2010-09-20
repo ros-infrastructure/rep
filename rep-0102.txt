@@ -239,8 +239,10 @@ Backwards Compatibility
 If nothing is done to an existing package, then what happens during 'make
 install' will depend on what kind of package it is:
 
-- rosbuild-controlled packages: The package manifest.xml will be installed
-  to ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>.  Nothing more.
+- rosbuild-controlled packages: The package manifest.xml, msg and msg_gen
+  (if rosbuild_genmsg() was called), and srv ang srv_gen (if
+  rosbuild_gensrv() was called)  will be installed
+  to ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>
 - non-rosbuild-controlled packages: As specified above, the entire package 
   directory will be recursively copied to 
   ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>.
