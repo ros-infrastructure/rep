@@ -17,8 +17,180 @@ file/directory layout policy and extensions to the rosbuild API to support
 installation.  It also notes some known and expected issues with installation,
 particularly regarding updating existing code to support installation.
 
-History
-=======
+Specification
+=============
+
+The install prefix: ROS_INSTALL_PREFIX
+--------------------------------------
+
+Installation is done relative to a prefix, ROS_INSTALL_PREFIX, which is
+an absolute path.  The prefix is specified externally (e.g., by the user
+doing the install, or by a packaging tool like pbuilder).  For system
+installs, ROS_INSTALL_PREFIX is often /usr, sometimes /usr/local.
+For a non-system install, it might be anything.
+
+The stack is the installation unit
+----------------------------------
+
+In ROS code, the stack is the installation unit; it is at the stack level
+that we make releases, check versions, create binary packages, etc.  So
+the install target also works at a stack level.  To install a stack:
+
+::
+
+  roscd <stack>
+  make install
+
+The install target is not supported at the level of an individual package
+(though an install target does exist there, for use by the stack-level
+install target).
+
+Filesystem layout
+-----------------
+
+The overall layout is:
+
+::
+
+  ROS_INSTALL_PREFIX/
+    bin/          : "important" executables, such as rospack and rostopic
+    lib/          : all C/C++ shared and static libraries from all packages
+      ros/        : the ROS package tree, grouped into stacks
+      ros/ros     : the ros stack; ROS_ROOT points here
+      ros/<stack> : other stacks are siblings to the ros stack
+
+So a package 'foo', contained in a stack 'bar', can be found at
+ROS_INSTALL_PREFIX/lib/ros/bar/foo.  And ROS_ROOT is always
+ROS_INSTALL_PREFIX/lib/ros/ros.
+
+Within a package, the layout is:
+
+::
+
+  ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/
+    bin/ : C/C++ executables
+
+Other package content can be organized in whatever way is convenient.
+
+What gets installed
+-------------------
+
+The installation system takes a "whitelist" approach.  Only those
+elements that are specifically called out for installation via the
+rosbuild installation API (see below) are installed.  The following package
+elements are installed automatically, into the package directory:
+
+- manifest.xml
+- If rosbuild_genmsg() was called, then the msg and msg_gen directories
+  are installed via recursive copy, preserving file permissions.
+- If rosbuild_gensrv() was called, then the srv and srv_gen directories
+  are installed via recursive copy, preserving file permissions.
+
+Nothing else is installed automatically.  So, for example, if you want
+to install a library, you need to call rosbuild_install_library();
+see below for details.
+
+RPATH handling
+--------------
+
+So that executables can be used from a package source tree, rosbuild
+makes extensive use of RPATH entries.  These entries are added at link
+time, and constitute paths to be searched at runtime for libraries that
+are needed by the executable.  Reliance on RPATHS is unusual, brittle
+(e.g., a built ROS tree can't be moved and reused without cleaning and
+rebuilding), and discouraged by distribution maintainers (e.g., Debian's
+stance [#debrpath]_, which is probably inherited by Ubuntu).
+
+The proposed install target will strip RPATH entries from all
+executables (including shared libraries).  This is done via CMake's
+support for modifying RPATH during installation [#cmakerpath]_.  Because all
+libraries are installed into ROS_INSTALL_PREFIX/lib, the installed
+RPATH-less executables can be used so long as ROS_INSTALL_PREFIX/lib
+is in the dynamic linker's search path.  For a system install, where
+ROS_INSTALL_PREFIX is something like /usr, ROS_INSTALL_PREFIX/lib is in
+the standard search path.  For a custom install, the user might need to
+add ROS_INSTALL_PREFIX/lib to LD_LIBRARY_PATH (or equivalent).
+
+
+rosbuild API changes
+--------------------
+
+The macros below will be added to rosbuild.  These macros can be called
+from a package's CMakeLists.txt file.
+
+- rosbuild_install_executable(exe [INSTALL_TO_ROOT]): Install the
+  C/C++ executable exe, stripped of RPATH entries, to the bin subdirectory
+  of the package (i.e., ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/bin).
+  If the INSTALL_TO_ROOT option is given, the executable is instead
+  installed to ROS_INSTALL_PREFIX/bin; this option is intended only for
+  "important" executables, such as rospack and rostopic.
+- rosbuild_install_library(lib [INSTALL_TO_PACKAGE]): Install the C/C++
+  library lib, stripped of RPATH entries, to ROS_INSTALL_PREFIX/lib.
+  If the INSTALL_TO_PACKAGE option is given, then the library is
+  instead installed to the lib subdirectory of the package (i.e.,
+  ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/lib); use of this option
+  is discouraged, as it puts the library in a non-standard place.
+- rosbuild_install_files(files...): Install the listed files to the
+  package directory.  Each file is installed in the same package-relative
+  location that it currently occupies.  Intermediate directories are
+  created automatically if needed.  Files are installed without execute
+  permission.  For example:
+
+  ::
+
+    rosbuild_install_files(foo/bar/bat)
+
+  would install the file bat to the directory
+  ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/foo/bar/.
+- rosbuild_install_programs(programs...): Same as
+  rosbuild_install_files(), but the files are installed with execute
+  permission.
+- rosbuild_install_directory(dir): Recursively install the directory
+  dir to the package directory.  The directory is installed to the same
+  package-relative location that it currently occupies.  Intermediate
+  directories are created automatically if needed.  Directories and files
+  are installed using the same permissions that they currently have.  For
+  examples:
+
+  ::
+
+    rosbuild_install_directory(foo/bar/baz)
+
+  would install the directory baz, and all of its contents, to the
+  directory ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/foo/bar.
+
+Non-rosbuild-controlled packages
+--------------------------------
+
+Some packages don't use rosbuild, and so can't make use of the installation
+API described above.  The installation system identifies a package as
+rosbuild-controlled if there is a CMakeLists.txt file in the top of the
+package directory; otherwise, the package is considered to be
+non-rosbuild-controlled.
+
+There are two general categories of non-rosbuild-controlled packages:
+
+- 3rdparty packages, such as gtest; and 
+- packages that don't build anything, such as roslaunch.
+
+Both kinds of packages are handled in the same fashion, which is to
+recursively copy the entire package directory from the source tree to the
+install tree (directories named build and .svn are filtered out during the
+copy).
+
+**KNOWN ISSUE**: 3rdparty packages can include C/C++ shared libraries,
+which should be moved to ROS_INSTALL_PREFIX/lib.  The details for doing
+that move are TBD.  One possibility is to move anything that's found in a
+directory that the package exports as a library search (-L) directory.
+Just moving "\*.so" isn't good enough, because it's often a symlink, and you
+need want the various versioned files (libfoo.so.0, libfoo.so.0.0.0, etc.).
+A further point is that, if a 3rdparty package depends on another ROS
+package (which should be rare), then the executables (including shared 
+libraries) that are produced by that 3rdparty package might have RPATH
+entries, which should be stripped.
+
+Motivation
+==========
 
 To date, there has been no 'make install' for ROS code.  The ROS
 build system and associated tools were designed to support building in and
@@ -28,10 +200,10 @@ the code checked out from version control.  But it is not appropriate for
 providing system installations of ROS, e.g., as Debian packages (.debs).
 The current best practice for such installations is to recursively copy
 from a built package source tree, combined with heuristic filtering and
-rpath-rewriting.
+RPATH-rewriting.
 
-Goals
-=====
+Rationale
+=========
 
 The overall goal of install target is to allow for the installation of
 ROS code.  More specifically, the install target should:
@@ -60,120 +232,156 @@ of strawman examples:
   tree to find and refer to resources in a package-relative manner;
   getting rid of the package tree would be hugely disruptive.
 
-The install prefix: ROS_INSTALL_PREFIX
-======================================
 
-Installation is done relative to a prefix, ROS_INSTALL_PREFIX, which is
-an absolute path.  The prefix is specified externally (e.g., by the user
-doing the install, or by a packaging tool like pbuilder).  For system
-installs, ROS_INSTALL_PREFIX is often /usr, sometimes /usr/local.
-For a non-system install, it might be anything.
+Backwards Compatibility
+=======================
+
+If nothing is done to an existing package, then what happens during 'make
+install' will depend on what kind of package it is:
+
+- rosbuild-controlled packages: The package manifest.xml will be installed
+  to ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>.  Nothing more.
+- non-rosbuild-controlled packages: As specified above, the entire package 
+  directory will be recursively copied to 
+  ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>.
+
+Updating existing packages: the right way
+-----------------------------------------
+
+The right way to add installation support to an existing package is
+to call the appropriate rosbuild_install_*() macros for each of the
+package elements that are required at runtime.  A common list of things to
+consider for installation
+
+- C/C++ libraries
+- C/C++ executables
+- C/C++ header files, usually in <package>/include
+- Python modules, usually in <package>/src/<package>
+- Helper scripts, usually in <package>/scripts
+- roslaunch files, usually in <package>/launch
+- other data/configuration files (.urdf, .mesh, .xml, etc.)
+
+In the end, it is up to the package or stack maintainer to decide what
+should be installed, and there are some gray areas (e.g., small example
+files that aren't strictly needed, but are obtrusive and might be useful).
+
+Updating existing packages: the INSTALL_EVERYTHING option
+---------------------------------------------------------------
+
+Recognizing that it will be a significant effort to update all packages'
+CMakeLists.txt to enumerate what needs to be installed, an option was added
+to rosbuild_init.  This option enables an easy, automatable way of
+adding naive installation support to existing packages.
+
+- rosbuild_init([INSTALL_EVERYTHING]): If the INSTALL_EVERYTHING option is
+  given, then the install target will recursively copy the entire package
+  contents to the install location (directories called build or .svn are
+  filtered out).
+
+The INSTALL_EVERYTHING option essentially treats the package as
+non-rosbuild-controlled, but it is implemented in such a way that C/C++
+libraries and executables are stripped of RPATH entries and relocated
+(i.e., libraries go to ROS_INSTALL_PREFIX/lib and executables go to
+ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/bin).
+
+The INSTALL_EVERYTHING option is a crutch, and should not live long.
+In fact, it may be removed before deployment, depending on how many
+problems arise from using it.
+
+Target names with slashes
+-------------------------
+
+CMake doesn't like target names with slashes in them (I believe that this
+is official policy, but can't find a reference for it).  We often use
+slashes when asking to build executables in subdirectories, e.g.:
+
+::
+
+  rosbuild_add_executable(bin/drop src/drop.cpp)
+  target_link_libraries(bin/drop topic_tools)
+
+Until now, this usage has caused problems only in isolated circumstances,
+usually involving CMakeLists.txt in subdirectories.  But CMake's
+installation system does not properly treat executables with target names
+that have slashes.  In particular, it doesn't remove RPATH entries from
+them during installation.  For example, asking to install the executable:
+
+::
+
+  rosbuild_install_executable(bin/drop)
+
+will simply copy it, without removing the RPATH entry.
+
+So existing packages must also be updated to not use slashes in
+target names.  This can be done either via the per-target
+RUNTIME_OUTPUT_DIRECTORY property:
+
+::
+
+  rosbuild_add_executable(drop src/drop.cpp)
+  target_link_libraries(drop topic_tools)
+  set_target_properties(drop PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin)
+  rosbuild_install_executable(drop)
+
+or via the global EXECUTABLE_OUTPUT_PATH variable:
+
+::
+
+  set(EXECUTABLE_OUTPUT_PATH bin)
+  rosbuild_add_executable(drop src/drop.cpp)
+  target_link_libraries(drop topic_tools)
+  rosbuild_install_executable(drop)
 
 Reference implementation
 ========================
 
 An implementation is in progress at
-https://code.ros.org/svn/ros/stacks/ros/branches/install_target .  That
-installation...
-
-The stack is the installation unit
-==================================
-
-In ROS code, the stack is the installation unit; it is at the stack level
-that we make releases, check versions, create binary packages, etc.  So
-the install target also works at a stack level.  To install a stack:
+https://code.ros.org/svn/ros/stacks/ros/branches/install_target (rev 11159
+at time of writing).  To try
+the implementation:
 
 ::
 
-  roscd <stack>
+  svn co https://code.ros.org/svn/ros/stacks/ros/branches/install_target ros
+  export ROS_ROOT=`pwd`/ros
+  export PATH=$ROS_ROOT/bin:$PATH
+  export PYTHONPATH=$ROS_ROOT/core/roslib/src
+  unset ROS_PACKAGE_PATH
+  cd ros
   make install
 
-The install target is not supported at the level of an individual package.
-
-Filesystem layout
-=================
-
-The overall layout is:
+The ROS_INSTALL_PREFIX is currently hardcoded as /tmp/ros-installed.  To
+use the installation, configure your environment, including LD_LIBRARY_PATH
+(needed because ROS_INSTALL_PREFIX is not a system location, such as /usr):
 
 ::
 
-  ROS_INSTALL_PREFIX/
-    bin/          : "important" executables, such as rospack and rostopic
-    lib/          : all C/C++ shared and static libraries from all packages
-      ros/        : the ROS package tree, grouped into stacks
-      ros/ros     : the ros stack; ROS_ROOT points here
-      ros/<stack> : other stacks are siblings to the ros stack
+  export ROS_MASTER_URI=http://localhost:11311
+  export ROS_ROOT=/tmp/ros-installed/lib/ros/ros
+  export PATH=/tmp/ros-installed/bin:$PATH
+  unset ROS_PACKAGE_PATH
+  source $ROS_ROOT/tools/rosbash/rosbash
+  export PYTHONPATH=$ROS_ROOT/core/roslib/src:$PYTHONPATH
+  export LD_LIBRARY_PATH=/tmp/ros-installed/lib
 
-So a package 'foo', contained in a stack 'bar', can be found at
-ROS_INSTALL_PREFIX/lib/ros/bar/foo.  And ROS_ROOT is always
-ROS_INSTALL_PREFIX/lib/ros/ros.
+Notes (valid at the time of writing):
 
-Within a package, the layout is:
+- Most packages use the INSTALL_EVERYTHING option, and so are naively
+  installed.
+- A handful of packages have been updated to use the new rosbuild
+  installation API:
 
-::
+  - roscpp
+  - roslib
+  - rosout
+  - rospy
+  - topic_tools
 
-  ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/
-    bin/ : C/C++ executables
-
-Other package content can be organized in whatever way is convenient.
-
-
-RPATH handling
-==============
-
-So that executables can be used from a package source tree, rosbuild
-makes extensive use of RPATH entries.  These entries are added at link
-time, and constitute paths to be searched at runtime for libraries that
-are needed by the executable.  Reliance on RPATHS is unusual, brittle
-(e.g., a built ROS tree can't be moved and reused without cleaning and
-rebuilding), and discouraged by distribution maintainers (e.g., Debian's
-stance [#debrpath]_, which is probably inherited by Ubuntu).
-
-The proposed install target will strip RPATH entries from all
-executables (including shared libraries).  This is done via CMake's
-support for modifying RPATH during installation [#cmakerpath]_.  Because all
-libraries are installed into ROS_INSTALL_PREFIX/lib, the installed
-RPATH-less executables can be used so long as ROS_INSTALL_PREFIX/lib
-is in the dynamic linker's search path.  For a system install, where
-ROS_INSTALL_PREFIX is something like /usr, ROS_INSTALL_PREFIX/lib is in
-the standard search path.  For a custom install, the user might need to
-add ROS_INSTALL_PREFIX/lib to LD_LIBRARY_PATH (or equivalent).
-
-
-rosbuild API
-============
-
-The macros below will be added to rosbuild.  These macros can be called
-from a package's CMakeLists.txt file.
-
-- rosbuild_install_executable(exe [INSTALL_TO_ROOT]) : Install the
-  C/C++ executable exe, stripped of RPATH entries, to the bin subdirectory
-  of the package (i.e., ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/bin).
-  If the INSTALL_TO_ROOT option is given, the executable is instead
-  installed to ROS_INSTALL_PREFIX/bin; this option is intended only for
-  "important" executables, such as rospack and rostopic.
-- rosbuild_install_library(lib [INSTALL_TO_PACKAGE]): Install the C/C++
-  library lib, stripped of RPATH entries, to ROS_INSTALL_PREFIX/lib.
-  If the INSTALL_TO_PACKAGE option is given, then the library is
-  instead installed to the lib subdirectory of the package (i.e.,
-  ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/lib); use of this option
-  is discouraged, as it puts the library in a non-standard place.
-- rosbuild_install_files(files...)
-- rosbuild_install_programs(programs...)
-- rosbuild_install_directory(dir)
-
-
-Updating existing packages: the right way
-=========================================
-
-Updating existing packages: the INSTALL_EVERYTHING option
-===============================================================
-
-Non-rosbuild-controlled packages
-================================
-
-Known / open issues
-===================
+- While other stacks should be installable, only the ros stack has
+  been tested.
+- The implementation is missing the calls to install_name_tool needed for
+  proper OSX support.
+- Nothing has been tested on Windows.
 
 References
 ==========
