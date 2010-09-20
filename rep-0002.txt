@@ -1,0 +1,167 @@
+REP: 2
+Title: Scope of REP Process
+Version: $Revision$
+Last-Modified: $Date$
+Author: Ken Conley
+Status: Draft
+Type: Process
+Content-Type: text/x-rst
+Created: 20-Sep-2010
+Post-History: 20-Sep-2010
+
+
+Abstract
+========
+
+This REP defines the scope of the REP process defined in [1]_. It
+provides a list of `REP Stacks`_ that are considered to be
+within the scope of the REP process. It also defines the process of
+including or removing stacks from this list.
+
+Motivation
+==========
+
+At the time of this writing, there are over 1000 ROS packages
+contributed by over 30 institutions. It would be onerous, encumbering
+and unenforceable to apply the REP process to all existing ROS-based
+software. Conversely, if we limit the scope of the REP process to ROS
+itself, i.e. the packaging, build, and communication libraries, we
+miss the opportunity to engage the community in designing
+robot-specific capabilities.
+
+In order to seek a balance between these two, we designate a list of
+ROS stacks that are open to the REP process, and we provide a
+lightweight mechanism by which new stacks can easily be added to this
+list.
+
+Specification
+=============
+
+REP Stacks
+----------
+
+We enumerate here the list of stacks considered to be within the scope
+of the REP process.
+
+ROS stacks:
+
+- ros
+- roslisp_support
+- ros_comm
+- ros_realtime
+- ros_release
+- rx
+
+Base stacks:
+
+- camera_drivers
+- common
+- common_msgs
+- diagnostics
+- driver_common
+- geometry
+- image_common
+- image_pipeline
+- image_transport_plugins
+- imu_drivers
+- joystick_drivers
+- laser_drivers
+- laser_pipeline
+- navigation
+- point_cloud_perception
+- robot_model
+- sound_drivers
+- visualization_common
+- visualization
+
+Process for inclusion/removal
+-----------------------------
+
+Stacks may be added to or removed from the list above by sending an
+email to ros-developers@code.ros.org with "REP 2" in the Subject
+line. If the voting process [2]_ shows clear favor the list can be
+quickly updated. Otherwise, acceptance follows a similar process to
+those for accepting PEPs [1]_. The Stack Maintainer has final veto
+power over inclusion on this list.
+
+Rationale
+=========
+
+"REP Stacks" vs. "Base"
+-----------------------
+
+The `REP Stacks`_ generally match those installed in the "base"
+variant of the ROS turtle distributions (e.g. boxturtle-base,
+cturtle-base). We do not use the name "base" here because we do not
+wish to conflate the distribution of a stack with the process by which
+a stack is reviewed. 
+
+For example, a stack not within base may be included in the standard
+stack list. Similarly, we exclude stacks from "base" that have
+development processes external to ROS, i.e. thirdparty
+libraries. These stacks include:
+
+- physics_ode
+- simulator_gazebo
+- simulator_stage
+- vision_opencv
+
+
+Stacks vs. packages
+-------------------
+
+We define this process at the stack level as that is the unit of
+distribution for ROS software. Although a package-specific approach
+would provide more fine-grained control over this process, ROS users
+generally only interact with packages as a stack unit and thus
+experience these libraries collectively.
+
+Process for other stacks
+------------------------
+
+We do not define the process for stacks not included on this
+list. Institutions and individuals are free to follow their own
+development practices for the design and development of new
+capabilities.
+
+There are many reasons why the REP process may not be appropriate for
+a library. For example, we encourage the release of code to accompany
+research papers, and we do not wish to discourage this by placing
+research code within the scope of the REP process.
+
+Similarly, many of the current ROS libraries have gone through
+multiple stages of prototyping and use to improve their design. Often,
+the best way of understanding the design flaws of software is through
+experimention and use, rather than e-mail dicussions.
+
+As an example alternate process for REPs, Willow Garage follows an
+internal review process that allows for multiple iterations of "API
+review" followed by a "Documentation review". These reviews are
+announced on the ros-review mailing list and are open to participants,
+but they are not required to circulate REPs.
+
+References and Footnotes
+========================
+
+.. [1] REP 1, REP Purpose and Guidelines
+   (http://ros.org/reps/rep-0001.html)
+   
+.. [2] REP 10, Voting Guidelines
+   (http://ros.org/reps/rep-0010.html)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
