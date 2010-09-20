@@ -189,6 +189,24 @@ package (which should be rare), then the executables (including shared
 libraries) that are produced by that 3rdparty package might have RPATH
 entries, which should be stripped.
 
+Installations of multiple distributions
+---------------------------------------
+
+ROS code is organized into distributions (e.g., boxturtle, cturtle).  It
+may be desirable to maintain installations of multiple distributions on a
+single system.  The current binary .debs allow this kind of installation by
+segmenting each distribution into its own subdirectory (e.g.,
+/opt/ros/boxturtle, /opt/ros/cturtle).  That approach could be taken for the
+installed package tree (e.g., ROS_INSTALL_PREFIX/lib/ros/boxturtle,
+ROS_INSTALL_PREFIX/lib/ros/cturtle), but the C/C++ libraries would still
+conflict with each other in ROS_INSTALL_PREFIX/lib.
+
+The present proposal envisions a single ROS installation in any given
+ROS_INSTALL_PREFIX.  No support is provided for multiple installation in
+one prefix.  Multiple installations would have to go into multiple
+ROS_INSTALL_PREFIXes, which would likely entail the use of LD_LIBRARY_PATH
+at runtime.
+
 Motivation
 ==========
 
