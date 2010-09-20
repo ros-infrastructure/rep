@@ -74,6 +74,23 @@ Base stacks:
 - visualization_common
 - visualization
 
+Limited-REP Stacks
+------------------
+
+The following stacks have *limited* REP status as their development is
+mainly external to ROS. REPs would expected to be scoped to
+integration issues, such as updating the version of a thirdparty of a
+library or updating the bridging libraries.
+
+- physics_ode
+- simulator_gazebo
+- simulator_stage
+- slam_gmapping
+- slam_karto
+- vision_opencv
+
+
+
 Process for inclusion/removal
 -----------------------------
 
@@ -95,17 +112,6 @@ variant of the ROS turtle distributions (e.g. boxturtle-base,
 cturtle-base). We do not use the name "base" here because we do not
 wish to conflate the distribution of a stack with the process by which
 a stack is reviewed. 
-
-For example, a stack not within base may be included in the standard
-stack list. Similarly, we exclude stacks from "base" that have
-development processes external to ROS, i.e. thirdparty
-libraries. These stacks include:
-
-- physics_ode
-- simulator_gazebo
-- simulator_stage
-- vision_opencv
-
 
 Stacks vs. packages
 -------------------
