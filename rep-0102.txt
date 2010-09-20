@@ -1,7 +1,7 @@
 REP: 102
 Title: ROS Install Target
-Version: $Revision: 4 $
-Last-Modified: $Date: 2010-09-18 18:36:21 -0700 (Sat, 18 Sep 2010) $
+Version: $Revision: 4$
+Last-Modified: $Date: 2010-09-18 18:36:21 -0700 (Sat, 18 Sep 2010)$
 Author: Brian Gerkey <gerkey@willowgarage.com>
 Status: Draft
 Type: Standards Track
