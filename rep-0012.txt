@@ -29,10 +29,9 @@ link to the source text in the ROS repository.
 If you would prefer not to use markup in your REP, please see REP 9,
 "Sample Plaintext REP Template" [2]_.
 
-This template is entirely based on the PEP 9 template way of David
-Goodger and Barry Warsaw.  Over time, it will incorporate ROS-specific
-changes to this process. The Author field of this document has been
-changed in order to denote reponsibility for maintenance, not credit.
+This template is entirely based on the PEP 9 template by David Goodger
+and Barry Warsaw.  The Author field of this document has been changed
+in order to reflect reponsibility for maintenance.
 
 Rationale
 =========
