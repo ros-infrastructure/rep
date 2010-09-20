@@ -257,10 +257,9 @@ Backwards Compatibility
 If nothing is done to an existing package, then what happens during 'make
 install' will depend on what kind of package it is:
 
-- rosbuild-controlled packages: The package manifest.xml, msg and msg_gen
-  (if rosbuild_genmsg() was called), and srv ang srv_gen (if
-  rosbuild_gensrv() was called)  will be installed
-  to ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>
+- rosbuild-controlled packages: See above (basically manifest.xml,
+  message and service directories will be installed to
+  ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>).
 - non-rosbuild-controlled packages: As specified above, the entire package 
   directory will be recursively copied to 
   ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>.
@@ -271,7 +270,7 @@ Updating existing packages: the right way
 The right way to add installation support to an existing package is
 to call the appropriate rosbuild_install_*() macros for each of the
 package elements that are required at runtime.  A common list of things to
-consider for installation
+consider for installation:
 
 - C/C++ libraries
 - C/C++ executables
@@ -283,7 +282,8 @@ consider for installation
 
 In the end, it is up to the package or stack maintainer to decide what
 should be installed, and there are some gray areas (e.g., small example
-files that aren't strictly needed, but are obtrusive and might be useful).
+files that aren't strictly needed, but are not obtrusive and might
+be useful).
 
 Updating existing packages: the INSTALL_EVERYTHING option
 ---------------------------------------------------------------
