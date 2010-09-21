@@ -118,8 +118,12 @@ section.
 Header, Clock, and Log
 ----------------------
 
-Header, Clock, and Log will be moved from the roslib package to the
-roslang package. For backwards compatibility, the generated source
+Header will be moved from roslib into the std_msgs package.
+
+Clock, and Log will be moved from the roslib package to the
+roslang_msgs package.
+
+For backwards compatibility, the generated source
 code files for these messages will be released with the roslib package
 in ROS 1.4 but marked as deprecated.
 
@@ -153,6 +157,42 @@ The following modules will be removed (already deprecated):
 
 - roslib.masterapi
 
+testing
+-------
+
+The testing package will get the following resources from rostest:
+
+- ``rostest/bin/test-results-dirs``
+- ``rostest/bin/coverage-html``
+- ``rostest/bin/rostest-check-results``
+
+The following script will be refactored, with some of its required
+routines moved to testing:
+
+- ``rostest/src/rostest/rostestutil.py``
+
+rosbuild
+--------
+
+rosbuild will be converted to use scripts moved to the testing package.
+
+For scripts that currently cannot be moved to the testing package
+(e.g. rostest itself), the behaviors are defined below.
+
+``rosbuild_add_roslaunch_check()``: this macro requires use of the
+roslaunch-check.py. This script will be moved to the roslaunch
+package, which remains with the ros_comm stack. To minimize impact on
+existing packages, rosbuild will continue to provide the
+``rosbuild_add_roslaunch_check()`` macro, but it will throw an error if it
+cannot find roslaunch.
+
+``rosbuild_add_gtest*()``, ``rosbuild_add_pyunit*()``: rosbuild requires the
+rostest tool and its ``--bare`` option. If rostest is not available,
+rosbuild will throw an error.
+
+There is more discussion of these issues, see `rosbuild testing
+features`.
+
 
 Motivation
 ==========
@@ -169,6 +209,49 @@ Several main motivations have been identified for this separation
 Rationale
 =========
 
+rosbuild testing features
+-------------------------
+
+rosbuild explicitly uses the following packages:
+
+- rosbuild
+- rospack
+- gtest
+- roslib
+- rostest
+
+The use of rostest is an issue, because rostest will be in the ros_comm
+stack, while rosbuild will be in the ros stack.  rosbuild uses the
+following tools from rostest:
+
+- (*) ``bin/rostest-check-results``
+- (*) ``bin/test-results-dir``
+- (*) ``bin/rostest-results``
+- (*) ``bin/coverage-html``
+- (+) ``bin/roslaunch-check.py``
+- (\X) ``bin/rostest``
+
+The tools marked (*) will be moved to the new testing package, but the
+rest will remain in ros_comm packages.
+
+Options for handling this separation include:
+
+ 1. Follow the ``rosbuild_add_roslaunch_check()`` model: leave everything where
+    it is, and if ``bin/rostest`` isn't available, throw an error if the user calls
+    any of ``rosbuild_add_gtest*()`` or ``rosbuild_add_pyunit*()``.
+ 2. Separate out the ``bin/rostest --bare`` behavior and put it somewhere lower,
+    such as roslib.
+
+Option 2 would require significant and destabilizing work to be done
+in the roslaunch and rostest toolchains to provide implementations
+that are independent of the ros_comm libraries and assumptions.
+
+Although Option 1 results in missing testing functionality for the
+'ros' stack, this functionality can be added back in the future. Thus,
+the preference is to achieve stack separation now rather than block on
+this particular functionality being refactored.
+
+
 Header, Clock, and Log
 ----------------------
 
@@ -178,9 +261,18 @@ into the base ros stack as it contains many of the libraries used by
 the package and build tools, but we wish to keep the ros stack
 decoupled from client libraries issues.
 
-The roslang package is a suitable place for these messages as it is
-currently a "flag" package that identifies a ROS package as being a
-client library. 
+The Clock and Log msg files are not considered to be user facing. They
+are also specific to the ROS middleware implementation and would
+pollute a more generic ontology like std_msgs. The designation of a
+new roslang_msgs package clearly associates these msg files as being
+specific to ROS client library implementations (roslang is the common
+dependency of all ROS client libraries). The msg files cannot go in
+the roslang package itself as depending on the roslang package is used
+to flag packages as being ROS client libraries.
+
+The Header msg file is user facing and will go into std_msgs. It would
+be preferable to be able to move the Header msg out of the ROS stacks
+entirely, but that is out of scope for this proposal.
 
 The impact of changing the location of these messages requires further
 study.  The Header message is generally not referred to as
