@@ -36,6 +36,7 @@ C Turtle (Aug 2010)
 - Ubuntu Jaunty
 - Ubuntu Karmic
 - Ubuntu Lucid
+- Ubuntu Maverick
 - Python 2.5
 
 Diamondback (Feb 2011)
