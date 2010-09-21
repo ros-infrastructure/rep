@@ -68,27 +68,27 @@ Base stacks:
 - laser_drivers
 - laser_pipeline
 - navigation
+- physics_ode
 - point_cloud_perception
 - robot_model
-- sound_drivers
-- visualization_common
-- visualization
-
-Limited-REP Stacks
-------------------
-
-The following stacks have *limited* REP status as their development is
-mainly external to ROS. REPs would expected to be scoped to
-integration issues, such as updating the version of a thirdparty of a
-library or updating the bridging libraries.
-
-- physics_ode
 - simulator_gazebo
 - simulator_stage
 - slam_gmapping
 - slam_karto
+- sound_drivers
 - vision_opencv
+- visualization_common
+- visualization
 
+
+Third-party code
+----------------
+
+Many ROS stacks include externally developed, or third-party, code.
+Enhancements to third-party code are out of the scope of a REP and
+should be requested directly to the third-party developers.  REPs can
+propose changes to the way that third-party code is integrated (e.g.,
+updating the version of a third-party library that is pulled in).
 
 
 Process for inclusion/removal
