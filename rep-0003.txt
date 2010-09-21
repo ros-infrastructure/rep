@@ -1,0 +1,111 @@
+REP: 3
+Title: Target Platforms
+Version: $Revision$
+Last-Modified: $Date$
+Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 21-Sep-2010
+Post-History: 21-Sep-2010
+
+
+Abstract
+========
+
+This REP defines target platforms for each ROS Distribution Release.
+We define platforms to include both operating system releases (Ubuntu
+Lucid) as well as major language releases (e.g. Python 2.5). The
+target platforms represent the set on which all stable, released
+stacks are expected to work. Exceptions can be made for stacks that are
+intentionally platform-specific.
+
+Platforms by Distribution
+=========================
+
+Box Turtle (Feb 2010)
+---------------------
+- Ubuntu Hardy
+- Ubuntu Intrepid
+- Ubuntu Jaunty
+- Ubuntu Karmic
+- Python 2.5
+
+C Turtle (Aug 2010)
+-------------------
+- Ubuntu Jaunty
+- Ubuntu Karmic
+- Ubuntu Lucid
+- Python 2.5
+
+Diamondback (Feb 2011)
+----------------------
+- Ubuntu Lucid
+- Ubuntu Maverick
+- Ubuntu Natty
+- Python 2.5
+
+Electric Emys (Aug 2011)
+------------------------
+- Ubuntu Lucid
+- Ubuntu Maverick
+- Ubuntu Natty
+- Ubuntu O
+- Python TBD
+
+F Turtle (Feb 2012)
+-------------------
+- TBD: This release will be used to plan migratation to a new Ubuntu LTS
+
+Motivation
+==========
+
+This document is provided to help plan future development for
+libraries. The primary platforms for ROS are Canonical's Ubuntu
+releases, and our intent is to track these releases as best as
+possible while also allowing for current, thirdparty libraries to be
+used.
+
+Rationale
+=========
+
+Target platforms for future releases are speculative and are based on
+consulting Ubuntu's release and end-of-life schedule [1]_. 
+
+We generally expect to use the ROS Distribution release prior to an
+Ubuntu LTS release to transition to newer libraries and drop support
+for older platforms. Our past experience with Ubuntu releases is that
+the release prior to an LTS release (e.g. Karmic) incorporates major
+jumps in library versions; also, this release is generally very
+similar to the LTS release. Requiring that all stacks be compatible
+across a wide spread of Ubuntu releases can be very difficult,
+especially for libraries like Boost that do not provide for backwards
+compatibility.
+
+Our intent with Python support is to track the minimum Python version
+provided in the supported Ubuntu platforms, as well as survey other
+commonly used OS platforms that support ROS to determine a reasonable
+minimum target. There is currently no plan to jump to Python 3k.
+
+References and Footnotes
+========================
+
+.. [1] Ubuntu Releases with End-of-Life Dates
+   (https://wiki.ubuntu.com/Releases)
+   
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
