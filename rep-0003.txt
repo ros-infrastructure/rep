@@ -23,6 +23,9 @@ intentionally platform-specific.
 Platforms by Distribution
 =========================
 
+If planned support for a target platform is changed, notice will be
+sent to ros-developers to enable discussion of this issue.
+
 Box Turtle (Feb 2010)
 ---------------------
 - Ubuntu Hardy
@@ -72,6 +75,30 @@ Rationale
 
 Target platforms for future releases are speculative and are based on
 consulting Ubuntu's release and end-of-life schedule [1]_. 
+
+The approximate formula for choosing target platforms is:
+
+1st after LTS, e.g. C Turtle:
+    LTS +/- 1
+
+2nd after LTS, e.g. Diamondback:
+    LTS +2
+
+3rd after LTS, e.g. Electric:
+    LTS +3
+
+4th after LTS, 1st before next LTS:
+    Rebase: target platforms selected to enable migration to next LTS
+
+Any "formula" requires making assumptions about future Ubuntu library
+choices and other crystal-ball projections. While we will do our best
+to follow the assumed target schedule, we reserve the right to change
+support targets based on Ubuntu library choices or other
+considerations. For example, the formula above assumes that a ROS
+distribution release can be made compatible with *future* Ubuntu
+releases. In the event that forward integration cannot be done without
+introducing destabilizing changes, preference will always be given to
+maintaining stability of the existing release.
 
 We generally expect to use the ROS Distribution release prior to an
 Ubuntu LTS release to transition to newer libraries and drop support
