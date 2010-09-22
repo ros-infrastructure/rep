@@ -32,7 +32,7 @@ distribution release schedule.
 * Mid October, 2010: ros/ros_comm separation, roslisp message generator rewrite
 * November, 2010: ros and ros_comm stacks feature freeze
 * December, 2010: First rxlab release
-* January, 2010: rx stack feature freeze, ros_realtime stack
+* January, 2010: rx stack feature freeze
 * Release candidate
 
 Features for ROS 1.4
@@ -44,7 +44,6 @@ Features for ROS 1.4
 * rxlab_ GUI tool (tfield)
 * rospy client reconnection (kwc)
 * rosbuild install target prototype (gerkey)
-* ros_realtime_ stack (jfaust, possibly delay to post-Diamondback)
 * Python message generators for roslisp (bhaskara)
 * rosbag speed optimization (lazy index loading; multi-threaded
   read/write) and compression (message reordering; gzip) (leibs,
@@ -119,7 +118,6 @@ References
 
 .. _rosh: http://ros.org/wiki/rosh
 .. _rxlab: http://ros.org/wiki/rxlab
-.. _ros_realtime: http://ros.org/wiki/ros_realtime
 .. _external stack release system: http://ros.org/wiki/release
 .. _roslaunch-console: https://code.ros.org/trac/ros/ticket/1179
    
