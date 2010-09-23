@@ -3,11 +3,11 @@ Title: ROS 1.4 Release Schedule
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
-Created: 18-Sep-2010
-Post-History: 18-Sep-2010
+Created: 23-Sep-2010
+Post-History: 23-Sep-2010
 
 
 Abstract
