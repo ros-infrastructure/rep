@@ -81,10 +81,20 @@ rosbuild installation API (see below) are installed.  The following package
 elements are installed automatically, into the package directory:
 
 - manifest.xml
-- If rosbuild_genmsg() was called, then the msg and msg_gen directories
-  are installed via recursive copy, preserving file permissions.
-- If rosbuild_gensrv() was called, then the srv and srv_gen directories
-  are installed via recursive copy, preserving file permissions.
+- If rosbuild_genmsg() was called, then .msg files and source files that
+  are generated from them are installed.
+- If rosbuild_gensrv() was called, then .srv files and source files that
+  are generated from them are installed.
+- Other generators must arrange for installation of their outputs (e.g.,
+  actionlib_msgs should arrange to install .action files and possibly the
+  .msg files that result, though those might be handled by rosbuild).
+
+NOTE: while rosbuild will install the .msg and .srv files, the
+individual client libraries' CMake code that arranges for code generation
+should install the generated files.  It's the client libraries that know
+exactly which files will be generated.  In this way, we can avoid the
+recursive copy.  This behavior is not currently present in the reference
+implementation.
 
 Nothing else is installed automatically.  So, for example, if you want
 to install a library, you need to call rosbuild_install_library();
