@@ -59,7 +59,7 @@ Electric Emys (Aug 2011)
 
 F Turtle (Feb 2012)
 -------------------
-- TBD: This release will be used to plan migratation to a new Ubuntu LTS
+- TBD: This release will be used to plan migration to a new Ubuntu LTS
 
 Motivation
 ==========
