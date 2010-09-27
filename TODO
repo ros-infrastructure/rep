@@ -1,0 +1,31 @@
+
+REP 1, REP Purpose and Guidelines
+REP 2, Scope of REP Process, REP Stacks
+REP 3, Target Platforms
+REP 4, Versioning and Deprecation Process (Tick-Tock)
+REP 5, Recommendations for Code Repository Layout
+(REP 6) 
+REP 7, Style Guide for C++ Code
+REP 8, Style Guide for Python Code
+(REP 9)
+REP 10, Voting Guidelines
+(REP 11)
+REP 12, Sample reStructuredText REP Template
+
+Not yet written:
+REP 5, Recommendations for Repository Layout
+ - sandbox
+ - graveyard
+ - flat layout
+ - per-stack layout
+ - svn externals (support scripts)
+ 
+REP 6, Versioning and Deprecation Process (Tick-Tock)
+REP 7, Style Guide for C++ Code
+
+Not yet circulated:
+
+REP 3, Target Platforms
+REP 10, Voting Guidelines
+REP 12, Sample reStructuredText REP Template
+
