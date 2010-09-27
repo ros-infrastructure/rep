@@ -25,7 +25,7 @@ maintenance.
 Rationale
 =========
 
-When a new idea, feature, patch, etc. is floated in the Python
+When a new idea, feature, patch, etc. is floated in the ROS
 community, either through a REP or on the mailing lists (most likely
 on ros-developers), it is sometimes helpful to gauge the community's
 general sentiment.  Sometimes people just want to register their
