@@ -43,8 +43,8 @@ C Turtle (Aug 2010)
 - Ubuntu Lucid
 - Ubuntu Maverick
 - C++03
-- Python 2.5
 - Lisp SBCL 1.0.38
+- Python 2.5
 
 Diamondback (Feb 2011)
 ----------------------
