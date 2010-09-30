@@ -128,7 +128,7 @@ rosbuild API changes
 The macros below will be added to rosbuild.  These macros can be called
 from a package's CMakeLists.txt file.
 
-- rosbuild_install_executable(exe [INSTALL_TO_ROOT]): Install the
+- ``rosbuild_install_executable(exe [INSTALL_TO_ROOT])``: Install the
   C/C++ executable exe, stripped of RPATH entries, to the bin subdirectory
   of the package (i.e., ROS_INSTALL_PREFIX/lib/ros/<stack>/<package>/bin).
   If the INSTALL_TO_ROOT option is given, the executable is instead
