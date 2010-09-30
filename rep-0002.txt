@@ -3,7 +3,7 @@ Title: Scope of REP Process, REP Stacks
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley
-Status: Accepted
+Status: Active
 Type: Process
 Content-Type: text/x-rst
 Created: 20-Sep-2010
