@@ -119,7 +119,14 @@ compatibility.
 C++
 ---
 
-We use the C++03 (ISO/IEC 14882:2003) standard.
+We use the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.  
+While we mainly develop with gcc, no use of compiler-specific features is allowed
+without proper use of macros to allow use on other platforms.
+
+Use of C++[0|1]x or tr1 features are only allowed if support for that feature is checked
+at compile time, and equivalent functionality exists without requiring C++[0|1]x
+code.  A wholesale jump to C++[0|1]x will not happen until all commonly used 
+OS platforms fully support it.
 
 Python
 ------
