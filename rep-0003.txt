@@ -62,8 +62,8 @@ Electric Emys (Aug 2011)
 - Ubuntu Natty
 - Ubuntu O
 - C++03
-- Python TBD
 - Lisp SBCL 1.0.x(TBD)
+- Python TBD
 
 F Turtle (Feb 2012)
 -------------------
@@ -129,6 +129,12 @@ at compile time, and equivalent functionality exists without requiring C++[0|1]x
 code.  A wholesale jump to C++[0|1]x will not happen until all commonly used 
 OS platforms fully support it.
 
+
+Lisp
+----
+
+We use Steel Bank Common Lisp as our ANSI Common Lisp implementation. We are currently tracking SBCL 1.0.38 and will track future updates in the 1.0.x series as appropriate.
+
 Python
 ------
 
@@ -136,11 +142,6 @@ Our intent with Python support is to track the minimum Python version
 provided in the supported Ubuntu platforms, as well as survey other
 commonly used OS platforms that support ROS to determine a reasonable
 minimum target. There is currently no plan to jump to Python 3k.
-
-Lisp
-----
-
-We use Steel Bank Common Lisp as our ANSI Common Lisp implementation. We are currently tracking SBCL 1.0.38 and will track future updates in the 1.0.x series as appropriate.
 
 References and Footnotes
 ========================
