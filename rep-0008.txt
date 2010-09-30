@@ -103,12 +103,47 @@ generic code. The separation of 'node files' and files you place in
 src/packagename helps encourage this.
 
 
+Python Features and Version
+===========================
+
+The current target platform is Python 2.5 [2]_, though we wish to make
+code that is easily transitioned to Python 2.6, 2.7, and, more
+importantly, Python 3000 [3]_.
+
+This means:
+
+- Use new-style classes 
+- No ``reduce()``. ``sum()`` works in most cases and ``for`` loops are often as fast or faster
+- Try to avoid ``map()`` or ``filter()`` as they are on Guido's hit list. Use list comprehensions.
+- Use ``raise Exception("msg")`` instead of ``raise Exception, msg``
+- No backticks as a shortcut for ``repr``
+- No ``<>``, use ``!=``
+- Use ``from __future__ import division`` so that you're using true division, not floor division [4]_
+- Use ``subprocess`` instead of ``popen2``, ``os.popen``
+- Avoid ``dict.has_key()``, use ``key in dict`` instead.
+- Try to avoid using the results of ``zip()``, ``range()``, ``map()``, or ``filter()`` as a list as these will return iterators in the future
+
+All the above are on this list either because:
+
+- They are not compatible with Python 2.5
+- They will potentially be eliminated in Python 3000. 
+
+Also, be careful not to introduce Python 2.6 features, such as ``Exception as ex``.
+
 References
 ==========
 
 .. [1] PEP 8, Style Guide for Python Code, van Rossum
    http://www.python.org/dev/peps/pep-0008/
 
+.. [2] REP 3, Target Platforms, Foote, Conley
+   http://www.ros.org/reps/rep-0003.html
+
+.. [3] PEP 3100, Miscellaneous Python 3.0 Plans, Cannon
+   http://www.python.org/dev/peps/pep-3100
+
+.. [4] PEP 238, Changing the Division Operator, Zadka
+   http://www.python.org/dev/peps/pep-0238
 
 Copyright
 =========
