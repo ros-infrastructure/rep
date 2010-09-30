@@ -12,20 +12,21 @@ PYTHON=python
 .txt.html:
 	@$(PYTHON) $(REP2HTML) $<
 
-TARGETS=$(patsubst %.txt,%.html,$(wildcard rep-????.txt)) rep-0000.html
+REPS=$(filter-out rep-0000.txt,$(wildcard rep-????.txt))
+
+TARGETS=$(REPS:.txt=.html) rep-0000.html
 
 all: rep-0000.txt $(TARGETS)
 
-$(TARGETS): rep2html.py
+$(TARGETS) rep-0000.html1: rep2html.py
 
-rep-0000.txt: $(wildcard rep-????.txt)
+rep-0000.txt: $(REPS)
 	$(PYTHON) genrepindex.py .
 
 install:
 	echo "Installing is not necessary anymore. It will be done in post-commit."
 
 clean:
-	-rm rep-0000.txt
 	-rm *.html
 
 update:
