@@ -33,6 +33,7 @@ Box Turtle (Feb 2010)
 - Ubuntu Jaunty
 - Ubuntu Karmic
 - C++03
+- Lisp SBCL 1.0.38
 - Python 2.5
 
 C Turtle (Aug 2010)
@@ -42,8 +43,8 @@ C Turtle (Aug 2010)
 - Ubuntu Lucid
 - Ubuntu Maverick
 - C++03
-- SBCL 1.0.38
 - Python 2.5
+- Lisp SBCL 1.0.38
 
 Diamondback (Feb 2011)
 ----------------------
@@ -51,7 +52,7 @@ Diamondback (Feb 2011)
 - Ubuntu Maverick
 - Ubuntu Natty
 - C++03
-- SBCL 1.0.38
+- Lisp SBCL 1.0.38
 - Python 2.5
 
 Electric Emys (Aug 2011)
@@ -61,8 +62,8 @@ Electric Emys (Aug 2011)
 - Ubuntu Natty
 - Ubuntu O
 - C++03
-- SBCL 1.0.x (TBD)
 - Python TBD
+- Lisp SBCL 1.0.x(TBD)
 
 F Turtle (Feb 2012)
 -------------------
