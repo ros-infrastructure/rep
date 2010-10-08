@@ -28,6 +28,7 @@ install:
 
 clean:
 	-rm *.html
+	-rm rep-0000.txt
 
 update:
 	svn update

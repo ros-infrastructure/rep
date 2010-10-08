@@ -1,0 +1,164 @@
+REP: 103
+Title: Standard Units of Measure and Coordinate Conventions
+Version: $Revision: 28 $
+Last-Modified: $Date: 2010-09-20 23:58:20 -0700 (Mon, 20 Sep 2010) $
+Author: Tully Foote
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 07-Oct-201-
+Post-History: 30-Aug-2002
+
+
+Abstract
+========
+
+This REP provides a reference for the units and coordinate conventions
+used withing ROS.
+
+These are not binding in any way however choosing a different unit
+representation should be justified by a measurable gain.
+
+
+Rationale
+=========
+
+If everyone uses different units and conventions then whenever a topic
+is recieved it must be tested and converted to the preferred
+conventions of the node.  However if all nodes use the same
+conventions these checks can be avoided.  This saves time,
+computation, and complexity, all of which make it easier to write
+reliable readable code.
+
+
+Units
+=====
+
+When using units we have chosen to standardize on SI units.  These
+units are the most consistent international standard.  
+
+These units are maintained by Bureau International des Poids et Mesures. [1]_
+There is good documentation on Wikipedia for `International System Of Units`_
+
+.. _International System of Units: http://en.wikipedia.org/wiki/International_System_of_Units
+
+Base Units
+----------
+These are the base units which are commonly used
+
+=======  ========
+Quanity  Unit
+=======  ========
+length   meter
+mass     kilogram
+time     second
+current  ampere
+=======  ========
+
+Derived Units
+-------------
+SI defines 7 base units and many derived units.  Good documentation can be found on Wikipedia `SI derived units`_
+
+If you are not using SI base units you should use SI derived units.  
+
+Commonly used SI derived units in ROS are:
+
+===========   =======
+Quanity       Unit
+===========   =======
+angle         radian
+frequency     hertz
+force         newton
+power         watt
+voltage       volt
+temperature   celsius
+===========   =======
+
+.. _SI derived units: http://en.wikipedia.org/wiki/SI_derived_units
+
+
+
+Coordinate Frame Conventions
+============================
+
+For standardization and communication all coordinate frames should follow these convetions.  
+
+Chirality
+---------
+
+All systems are right handed.  This means they comply with the `right hand rule`_
+
+.. _right hand rule: http://en.wikipedia.org/wiki/Right-hand_rule
+
+
+Axis Orientation
+----------------
+In relation to a body the standard is 
+
+* x forward
+* y left
+* z up
+
+Orientation of frames with optical in the name with respect to the camera.
+
+* z forward
+* x right
+* y down
+
+Rotation Representation
+-----------------------
+There are many ways to represent rotations the order of preference is as follows:
+
+1. quaternion
+2. rotation matrix
+3. fixed axis roll, pitch, yaw about X, Y, Z axes respectivly
+4. euler angles yaw, pitch, and roll about Z, Y, X axes respectivly
+
+Covariance Representation
+-------------------------
+Linear
+::
+
+    float64[9] linear_acceleration_covariance # 3x3 row major matrix in x, y z order
+
+Angular
+
+::
+
+    float64[9] angular_velocity_covariance # 3x3 row major matrix about x, y, z order with fixed axes
+
+Six Dimensional
+
+::
+
+    # Row-major representation of the 6x6 covariance matrix
+    # The orientation parameters use a fixed-axis representation.
+    # In order, the parameters are:
+    # (x, y, z, rotation about X axis, rotation about Y axis, rotation about Z axis)
+    float64[36] covariance
+
+
+
+
+References
+==========
+
+.. [1] Bureau International des Poids et Mesures
+   (http://www.bipm.org/en/home/)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
