@@ -65,10 +65,12 @@ current  ampere
 =======  ========
 
 Derived Units
--------------
-SI defines 7 base units and many derived units.  Good documentation can be found on Wikipedia `SI derived units`_
+-------------\
 
-If you are not using SI base units you should use SI derived units.  
+SI defines 7 base units and many derived units.  If you are not using
+SI base units you should use SI derived units.
+
+Good documentation can be found on Wikipedia about `SI derived units`_
 
 Commonly used SI derived units in ROS are:
 
@@ -114,13 +116,26 @@ Orientation of frames with optical in the name with respect to the camera.
 * x right
 * y down
 
+
+
 Rotation Representation
 -----------------------
-There are many ways to represent rotations the order of preference is as follows:
+There are many ways to represent rotations the order of preference is listed below with the primary reasons.
 
 1. quaternion
+
+  * Compact representation
+  * No singularities
+
 2. rotation matrix
+
+  * No singularities
+
 3. fixed axis roll, pitch, yaw about X, Y, Z axes respectivly
+
+  * No ambiguity on order
+  * Used for angular velocities
+
 4. euler angles yaw, pitch, and roll about Z, Y, X axes respectivly
 
 Covariance Representation
