@@ -33,6 +33,7 @@ Box Turtle (Feb 2010)
 - Ubuntu Jaunty
 - Ubuntu Karmic
 - C++03
+- Boost 1.37
 - Lisp SBCL 1.0.38
 - Python 2.5
 
@@ -43,6 +44,7 @@ C Turtle (Aug 2010)
 - Ubuntu Lucid
 - Ubuntu Maverick
 - C++03
+- Boost 1.37
 - Lisp SBCL 1.0.38
 - Python 2.5
 
@@ -52,6 +54,7 @@ Diamondback (Feb 2011)
 - Ubuntu Maverick
 - Ubuntu Natty
 - C++03
+- Boost 1.40
 - Lisp SBCL 1.0.38
 - Python 2.5
 
@@ -62,6 +65,7 @@ Electric Emys (Aug 2011)
 - Ubuntu Natty
 - Ubuntu O
 - C++03
+- Boost 1.40
 - Lisp SBCL 1.0.x(TBD)
 - Python TBD
 
@@ -129,6 +133,8 @@ at compile time, and equivalent functionality exists without requiring C++[0|1]x
 code.  A wholesale jump to C++[0|1]x will not happen until all commonly used 
 OS platforms fully support it.
 
+For a given release we allow use of Boost libraries that match the version provided in our 
+low-water-mark Ubuntu version.
 
 Lisp
 ----
