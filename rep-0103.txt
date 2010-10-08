@@ -65,7 +65,7 @@ current  ampere
 =======  ========
 
 Derived Units
--------------\
+-------------
 
 SI defines 7 base units and many derived units.  If you are not using
 SI base units you should use SI derived units.
