@@ -16,20 +16,29 @@ Abstract
 This REP provides a reference for the units and coordinate conventions
 used withing ROS.
 
-These are not binding in any way however choosing a different unit
-representation should be justified by a measurable gain.
-
 
 Rationale
 =========
 
-If everyone uses different units and conventions then whenever a topic
-is recieved it must be tested and converted to the preferred
-conventions of the node.  However if all nodes use the same
-conventions these checks can be avoided.  This saves time,
-computation, and complexity, all of which make it easier to write
-reliable readable code.
+If developers use different units and conventions whenever code
+interacts with different conventions compatibility must be tested and
+converted to the preferred conventions of the other interface.  However if all
+nodes use the same conventions these checks can be avoided.  This
+saves time, computation, and complexity, all of which make it easier
+to write reliable readable code.
 
+Exceptions
+==========
+
+There are domains where the default conventions are not appropriate.
+An example is that interstellar lengths are not appropriately measured
+in meters.  In these cases choosing a different unit is valid.
+However make sure to clearly document the non standard convention
+usage.
+
+Adhearing to this REP is not required.  However choosing a different
+conventions should be justified by a measurable gain during a API
+review.
 
 Units
 =====
