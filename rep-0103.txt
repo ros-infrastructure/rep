@@ -37,7 +37,7 @@ However make sure to clearly document the non standard convention
 usage.
 
 Adhearing to this REP is not required.  However choosing a different
-conventions should be justified by a measurable gain during a API
+conventions should be justified by a measurable gain during an API
 review.
 
 Units
