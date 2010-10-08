@@ -23,7 +23,7 @@ Rationale
 If developers use different units and conventions whenever code
 interacts with different conventions compatibility must be tested and
 converted to the preferred conventions of the other interface.  However if all
-nodes use the same conventions these checks can be avoided.  This
+code use the same conventions these checks can be avoided.  This
 saves time, computation, and complexity, all of which make it easier
 to write reliable readable code.
 
