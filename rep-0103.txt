@@ -108,7 +108,9 @@ In relation to a body the standard is :
 * y left
 * z up
 
-Orientation of frames with optical in the name with respect to the camera.
+In the case of cameras there is often a 2nd frame defined with the
+ending"_optical" attached which provides a slightly different
+convetion:
 
 * z forward
 * x right
