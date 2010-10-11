@@ -14,40 +14,38 @@ Abstract
 ========
 
 This REP provides a reference for the units and coordinate conventions
-used withing ROS.
+used within ROS.
 
 
 Rationale
 =========
 
-If developers use different units and conventions whenever code
-interacts with different conventions compatibility must be tested and
-converted to the preferred conventions of the other interface.  However if all
-code use the same conventions these checks can be avoided.  This
-saves time, computation, and complexity, all of which make it easier
-to write reliable readable code.
+Inconsistency in units and conventions is a common source of
+integration issues for developers and can also lead to software
+bugs. It can also create unnecessary computation due to data
+conversion. This REP documents the standard conventions for ROS in
+order to lessen these issues.
 
 Exceptions
 ==========
 
-There are domains where the default conventions are not appropriate.
-An example is that interstellar lengths are not appropriately measured
-in meters.  In these cases choosing a different unit is valid.
-However make sure to clearly document the non standard convention
-usage.
+The scope of potential robotics software is too broad to require all
+ROS to follow the guidelines of this REP.  However, choosing different
+conventions should be well justified and well documented.
 
-Adhearing to this REP is not required.  However choosing a different
-conventions should be justified by a measurable gain during an API
-review.
+For example, there are domains where the default conventions are not
+appropriate. Interstellar lengths are not appropriately measured in
+meters, and space-oriented libraries may wish to choose a different
+convention. There are other exceptions that different domains may wish
+to address.
 
 Units
 =====
 
-When using units we have chosen to standardize on SI units.  These
-units are the most consistent international standard.  
-
-These units are maintained by Bureau International des Poids et Mesures. [1]_
-There is good documentation on Wikipedia for `International System Of Units`_
+We have chosen to standardize on SI units.  These units are the most
+consistent international standard. SI units are maintained by Bureau
+International des Poids et Mesures. [1]_ There is good documentation
+on Wikipedia for `International System Of Units`_
 
 .. _International System of Units: http://en.wikipedia.org/wiki/International_System_of_Units
 
@@ -67,12 +65,12 @@ current  ampere
 Derived Units
 -------------
 
-SI defines 7 base units and many derived units.  If you are not using
-SI base units you should use SI derived units.
+SI defines seven base units and many derived units.  If you are not using
+SI base units, you should use SI-derived units.
 
 Good documentation can be found on Wikipedia about `SI derived units`_
 
-Commonly used SI derived units in ROS are:
+Commonly used SI-derived units in ROS are:
 
 ===========   =======
 Quanity       Unit
@@ -92,19 +90,19 @@ temperature   celsius
 Coordinate Frame Conventions
 ============================
 
-For standardization and communication all coordinate frames should follow these convetions.  
+All coordinate frames should follow these conventions.  
 
 Chirality
 ---------
 
-All systems are right handed.  This means they comply with the `right hand rule`_
+All systems are right handed.  This means they comply with the `right hand rule`_.
 
 .. _right hand rule: http://en.wikipedia.org/wiki/Right-hand_rule
 
 
 Axis Orientation
 ----------------
-In relation to a body the standard is 
+In relation to a body the standard is :
 
 * x forward
 * y left
@@ -120,7 +118,8 @@ Orientation of frames with optical in the name with respect to the camera.
 
 Rotation Representation
 -----------------------
-There are many ways to represent rotations the order of preference is listed below with the primary reasons.
+
+There are many ways to represent rotations. The preferred order is listed below, along with rationale.
 
 1. quaternion
 
@@ -131,19 +130,19 @@ There are many ways to represent rotations the order of preference is listed bel
 
   * No singularities
 
-3. fixed axis roll, pitch, yaw about X, Y, Z axes respectivly
+3. fixed axis roll, pitch, yaw about X, Y, Z axes respectively
 
   * No ambiguity on order
   * Used for angular velocities
 
-4. euler angles yaw, pitch, and roll about Z, Y, X axes respectivly
+4. euler angles yaw, pitch, and roll about Z, Y, X axes respectively
 
 Covariance Representation
 -------------------------
 Linear
 ::
 
-    float64[9] linear_acceleration_covariance # 3x3 row major matrix in x, y z order
+    float64[9] linear_acceleration_covariance # 3x3 row major matrix in x, y, z order
 
 Angular
 
