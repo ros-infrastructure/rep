@@ -53,14 +53,14 @@ Base Units
 ----------
 These are the base units which are commonly used
 
-=======  ========
-Quanity  Unit
-=======  ========
-length   meter
-mass     kilogram
-time     second
-current  ampere
-=======  ========
+========  ========
+Quantity  Unit
+========  ========
+length    meter
+mass      kilogram
+time      second
+current   ampere
+========  ========
 
 Derived Units
 -------------
@@ -73,7 +73,7 @@ Good documentation can be found on Wikipedia about `SI derived units`_
 Commonly used SI-derived units in ROS are:
 
 ===========   =======
-Quanity       Unit
+Quantity      Unit
 ===========   =======
 angle         radian
 frequency     hertz
