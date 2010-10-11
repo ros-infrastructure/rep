@@ -108,9 +108,8 @@ In relation to a body the standard is :
 * y left
 * z up
 
-In the case of cameras there is often a 2nd frame defined with the
-ending"_optical" attached which provides a slightly different
-convetion:
+In the case of cameras, there is often a second frame defined with a
+"_optical" suffix. This uses a slightly different convention:
 
 * z forward
 * x right
