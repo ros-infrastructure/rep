@@ -138,6 +138,10 @@ There are many ways to represent rotations. The preferred order is listed below,
 
 4. euler angles yaw, pitch, and roll about Z, Y, X axes respectively
 
+  * Euler angles are generally discouraged due to having 24 'valid'
+    conventions with different domains using different conventions by
+    default.  
+
 Covariance Representation
 -------------------------
 Linear
