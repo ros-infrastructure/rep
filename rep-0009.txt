@@ -1,0 +1,205 @@
+REP: 9
+Title: ABI Compatibility
+Version: $Revision: 28 $
+Last-Modified: $Date: 2010-09-20 23:58:20 -0700 (Mon, 20 Sep 2010) $
+Author: Josh Faust
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 08-Oct-2010
+Post-History:
+
+
+Abstract
+========
+
+This REP describes the requirements for Application Binary Interface
+(ABI) compatibility for ROS stack releases.  To keep this reasonable,
+only even-cycle patch releases for stacks whose versions are >1.0 are
+required to be ABI compatible.  For information on what defines a
+patch release, see the Stack Version Policy [1]_ page.
+
+Motivation
+==========
+
+Without ABI compatibility between patch versions, any released
+software building on top of that stack needs to be re-released for
+every patch version.  This means, for example, any time the ROS stack
+releases a patch version, every other stack needs to be released as
+well.  With ABI compatibility for even-cycle patches this would no
+longer be true.  While this is a win for our deb-building process, it
+also means that external people can release binary versions of
+software against, say, cturtle, and be guaranteed that it will work
+with all future cturtle versions, as long as it is only depending on
+stable stacks.
+
+ABI Compatibility Requirements
+==============================
+
+ABI compatibility applies only to compiled/linked languages such as C or C++.
+
+ABI compatibility is required only for even-cycle [1]_ patch releases.
+For example, ROS 1.2.N must be fully ABI compatible with ROS 1.2.0.
+This requirement is true for every stack whose version is greater than
+1.0.
+
+ABI compatibility is only required for **public facing** API.  If a
+piece of an API is marked as internal and is only used in definition
+files (i.e. not included in any public-facing header files), its ABI
+may change, because it is not part of the public ABI.
+
+Note that this requirement is "best effort".  If a fix for a serious
+bug requires ABI changes, it will be evaluated on a case-by-case
+basis.
+
+Definition
+==========
+
+The Application Binary Interface [2]_ describes the binary interface
+to a library, and should not be confused with the API.  A library is
+*binary compatible* if a program linked to a previous version of the
+library continues to work with a newer version without being
+recompiled.
+
+Much of the information in this section is based on:
+
+ * KDE's binary compatibility page [3]_
+ * ABI compatibility checker's page [4]_
+
+What's allowed
+--------------
+
+Note that this may not be an exhaustive list.  Anything with a large
+caveat has not been included.
+
+You can...
+
+ * Add new non-virtual functions
+ * Add a new enum to a class
+ * Append new enumerations to an existing enum
+ * Remove private non-virtual functions **if** they are not called by
+   any inline functions (and never have been)
+ * Remove private static members **if** they are not used by any
+   inline functions (and never have been)
+ * Add new **static** data members
+ * Add new classes/structs
+ * Add or remove friend declarations to classes
+
+What's not allowed
+------------------
+
+Note that this may not be an exhaustive list.  There may be things not
+on this list that cause an ABI breakage.
+
+You cannot...
+
+ * For an existing class or struct
+
+   - Remove the class
+   - Change a class hierarchy in any way (add, remove or reorder base
+     classes)
+   - Change class template arguments in any way, including adding an
+     argument with a default value
+   - Add new non-static data members, even if they are protected or
+     private
+   - Remove existing data members
+   - Change the order of declaration of non-static data members, even
+     if they are protected or private
+   - Change the type of a data member
+
+ * For an existing function of any type
+
+   - Remove it
+   - inline it (this includes moving a member function's body to the
+     class definition, even without the inline keyword)
+   - Add an overload, if that function did not already have at least
+     one overload
+   - Change its signature in any way.  This includes:
+
+     + Adding a parameter, even if it has a default value
+     + Removing a parameter, even if it has a default value
+     + Changing the type of any of the parameters, including
+       const/volatile qualifiers
+     + Changing the return type in any way
+     + Changing the const/volatile qualifiers of a member function
+     + Changing the access rights to functions or data members, for
+       example from ``public`` to ``private``.  If you need to make a
+       private function protected or public, add a new function that
+       calls the private one.
+
+   - If inline, make certain changes to its implementation
+
+ * For virtual member functions
+
+   - Add new virtual functions
+   - Change the order of virtual functions in the class declaration
+   - Override an existing virtual function if that function is not in
+     the top-level base class that has virtual functions
+   - Override an existing virtual function if it has a covariant
+     return type [5]_
+   - Remove a virtual function, even if it is a reimplementation of a
+     virtual function from the base class
+
+ * For static non-private members or global variables
+
+   - Remove it
+   - Change its type
+   - Change its const/volatile qualifiers
+
+ * Change ``#defined`` constants
+ * For enumerations
+
+   - Change values of members
+   - Remove members
+   - Add members anywhere but the end of the list
+   - Rename members
+
+ * Change function calling conventions [6]_
+
+Checking Compatibility
+======================
+
+ABI compatibility problems will often but not always cause crashes
+with client code.  They may also cause data corruption, or nothing at
+all.  Because of this they can be difficult to catch if you're not
+careful.
+
+The ABI compatibility checker [4]_ is an easy way to check most ABI
+compatibility issues.
+
+Future-proofing
+===============
+
+It is possible in many cases to future-proof classes to allow changes
+to internal structure without breaking ABI compatibility.  Techniques
+like pimpl (also known as d-pointer) [7]_ and opaque pointers [8]_ are
+recommended for these cases.  The performance implications of these
+techniques should be weighed for each specific use case.
+
+References
+==========
+
+.. [1] Stack versioning policy (http://www.ros.org/wiki/StackVersionPolicy)
+.. [2] Application binary interface, Wikipedia, (http://en.wikipedia.org/wiki/Application_binary_interface)
+.. [3] KDE's binary compatibility page, (http://techbase.kde.org/Policies/Binary_Compatibility_Issues_With_C++)
+.. [4] ABI compatibility checker, (http://ispras.linux-foundation.org/index.php/ABI_compliance_checker)
+.. [5] Covariant Return Types, (http://www.tolchz.net/?p=33)
+.. [6] Calling convention, Wikipedia, (http://en.wikipedia.org/wiki/Calling_convention)
+.. [7] Compilation Firewalls, Herb Sutter, (http://www.gotw.ca/gotw/024.htm)
+.. [8] Opaque pointer, Wikipedia, (http://en.wikipedia.org/wiki/Opaque_pointer)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
