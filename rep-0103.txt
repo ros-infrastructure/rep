@@ -30,7 +30,7 @@ Exceptions
 ==========
 
 The scope of potential robotics software is too broad to require all
-ROS to follow the guidelines of this REP.  However, choosing different
+ROS software to follow the guidelines of this REP.  However, choosing different
 conventions should be well justified and well documented.
 
 For example, there are domains where the default conventions are not
