@@ -1,0 +1,680 @@
+REP: 104
+Title: CameraInfo updates for Diamondback
+Version: $Revision: 28 $
+Last-Modified: $Date: 2010-09-20 23:58:20 -0700 (Mon, 20 Sep 2010) $
+Author: Patrick Mihelich <mihelich@willowgarage.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 11-Oct-2010
+ROS-Version: Diamondback
+Post-History: 15-Oct-2010
+
+
+Abstract
+========
+
+This REP adds support for binning and alternative distortion models to
+``sensors_msgs/CameraInfo``.  It clarifies the correct interpretation
+of region of interest (ROI), including how it interacts with binning
+and distortion.
+
+In this REP, ``sensor_msgs/CameraInfo`` acquires ``binning_x`` and
+``binning_y`` fields.  The distortion parameter array ``D`` is made
+variable-length, its meaning specified by an enum.  This REP clarifies
+ROI to mean the raw image region as captured by the camera and
+introduces a distinction between raw ROI and rectified ROI.  It adds
+appropriate new methods to the camera model classes in image_geometry_,
+the recommended API for using ``CameraInfo``.
+
+Motivation
+==========
+
+The ``CameraInfo`` message is used ubiquitously in ROS vision code and
+commonly archived in bag files, so it is not to be changed lightly.
+``CameraInfo`` is based on a well-established mathematical camera model
+[#CameraInfo]_.  It already works well for by far the most common
+use case, capturing full-resolution images from a camera with
+less-than-extreme distortion.
+
+Even so, experience from developing on top of ``CameraInfo`` in Box
+Turtle and C Turtle has revealed several limitations of the current
+message.  There is no support for binning, a common and useful camera
+feature.  The distortion model has room for improvement when it comes
+to wide angle or fisheye lenses with severe distortion.  The existing
+ROI support in ``CameraInfo`` was not adequately thought out, limiting
+its usefulness in practice.
+
+It's debatable whether any of these issues individually merit a
+breaking change to ``CameraInfo``.  This REP batches together fixes for
+the major known problems with ``CameraInfo``, so that users need only
+update code and bag files once.  We believe that together these
+changes represent a significant improvement.  We expect the revised
+``CameraInfo`` to remain stable for at least another 2-3 ROS
+distributions.
+
+Binning
+-------
+
+Binning is the process of summing small neighborhoods of pixels on chip
+into larger "bins."  For example, 2x2 binning reduces the resolution of
+the camera by half both horizontally and vertically.  The chief
+advantage of binning is to increase the signal to noise ratio (SNR).
+This is especially useful in low-light environments.  A second benefit
+is that decimating the resolution may allow for increased frame rate.
+
+Giving up resolution for increased SNR and/or frame rate is a useful
+trade-off in many vision applications.  The utility of binning, combined
+with its wide availability in camera hardware, makes this a particularly
+valuable feature to support in ``CameraInfo``.
+
+The correct geometric interpretation of a binned image requires scaling
+the focal lengths and principal point calculated during calibration at
+full resolution.  The current ``CameraInfo`` message unfortunately has no
+way to encode the binning parameters.
+
+Alternate Distortion Models
+---------------------------
+
+Currently ``CameraInfo`` assumes the "Plumb Bob" model of distortion
+[#PlumbBob]_, a 5-parameter polynomial approximation of radial and
+tangential distortion.  Recently OpenCV has added support for an
+8-parameter rational polynomial distortion model.  This new model
+offers improved stability and accuracy for wide angle and fisheye
+lenses, which can severely distort the image.  Unfortunately the size
+of the distortion parameter array ``D`` in ``CameraInfo`` is fixed at
+5, so there is currently no way to support more complex models.
+
+This REP makes ``D`` variable-length and introduces an enum to
+distinguish which distortion model was used in the calibration.  These
+changes also accommodate adding other camera models in the future,
+should we find it necessary.
+
+Region of Interest
+------------------
+
+Region of interest is another common camera feature, allowing the user
+to instruct the imager to only capture a desired sub-rectangle of its
+full resolution.  This may be used to reduce bandwidth, particularly
+with high-definition cameras that could overwhelm a network connection
+at full resolution.  Like binning, it may increase the frame rate for
+some cameras.  Finally, it may improve the imagery of the object we
+are interested in by applying smart camera features such as
+auto-exposure only to the relevant image patch.
+
+Applications of ROI to vision include performing high-speed tracking
+of an object, or acquiring a high-resolution close-up of an object with
+known location.
+
+``CameraInfo`` already supports ROI in that it contains fields for the
+sub-rectangle captured by the imager.  This ROI is given in raw image
+coordinates, as supplied to the imager, as that is all the camera
+driver is expected to know and care about.  Given the ROI and the
+camera calibration, we (or rather image_geometry) can rectify the
+image patch.  But what is the ROI of the rectified patch in rectified
+coordinates; that is, given the full rectified image, what
+sub-rectangle inside of it corresponds to the rectified patch?
+
+Currently image_geometry (by extension, image_proc_) assumes that the
+ROI in rectified coordinates is the same as the ROI in raw (unrectified)
+coordinates.  This behavior is broken.  For small ROIs and/or large
+amounts of distortion, the raw patch (once rectified) may not even
+coincide with the same ROI in rectified coordinates.  In that case the
+rectified image patch is set to all black, as the data required to fill
+it was not even captured [#RoiTicket]_.  Therefore we must introduce a
+mapping between the ROI in raw coordinates and the corresponding ROI in
+rectified coordinates.
+
+Specification
+=============
+
+CameraInfo Message
+------------------
+
+The proposed ``CameraInfo`` message is listed (stripped of comments)
+below.  Additions and changes are noted on the right.
+
+::
+
+    Header header
+      uint32 seq
+      time stamp
+      string frame_id
+
+    uint32 height
+    uint32 width
+
+    # roi used to be located here.
+    # I've moved it to after the calibration parameters.
+
+    int32 UNKNOWN             = 0      # New constant
+    int32 PLUMB_BOB           = 1      # New constant
+    int32 RATIONAL_POLYNOMIAL = 2      # New constant
+    int32 distortion_model             # New field
+
+    float64[] D                        # Made variable-length
+    float64[9] K
+    float64[9] R
+    float64[12] P
+
+    uint32 binning_x                   # New field
+    uint32 binning_y                   # New field
+
+    sensor_msgs/RegionOfInterest roi   # Moved field
+      uint32 x_offset
+      uint32 y_offset
+      uint32 height
+      uint32 width
+      bool do_rectify                  # New field
+
+Interpretation
+--------------
+
+There are three parts to ``CameraInfo``.
+
+* ROS header.  The time stamp is the time at which the image was
+  captured.  ``frame_id`` is the name of the optical coordinate frame
+  with origin at the optical center of the camera.
+* Calibration parameters.  These are fixed during camera calibration.
+  Their values will be the same in all messages until the camera is
+  recalibrated.  Note that self-calibrating systems may "recalibrate"
+  frequently.
+* Operational parameters.  These define the image region actually
+  captured by the camera driver.  Although they affect the geometry of
+  the output image, they may be changed freely without recalibrating
+  the camera.
+
+======================  ======================
+Calibration Parameters  Operational Parameters
+======================  ======================
+height                  binning_x
+width                   binning_y
+D                       roi
+K
+R
+P
+======================  ======================
+
+Calibration Parameters
+''''''''''''''''''''''
+
+The ``height`` and ``width`` fields always contain the image
+dimensions with which the camera was calibrated; normally this will
+be the full resolution of the camera.
+
+The arrays of calibration parameters ``D``, ``K``, ``R`` and ``P`` are
+interpreted as described in [#CameraInfo]_ [#OpenCV]_.  ``D`` contains
+the parameters of the model given by the ``distortion_model`` enum.
+Values ``PLUMB_BOB`` and ``RATIONAL_POLYNOMIAL`` signify offically
+recognized models as described in `Alternate Distortion Models`_.  A
+value of ``UNKNOWN`` indicates that the ``CameraInfo`` cannot be used
+to rectify points or images, either because the camera is not
+calibrated or because the rectified image was produced using an
+unsupported distortion model, e.g. the proprietary one used by
+Bumblebee cameras [#Bumblebee]_.
+
+Operational Parameters
+''''''''''''''''''''''
+
+Binning reduces the resolution of the output image to
+``(width / binning_x)`` x ``(height / binning_y)``.  Consumers of
+``CameraInfo`` (such as image_geometry) must scale the focal lengths
+and principal point of the camera model.  Both supported distortion
+models operate on normalized image coordinates (independent of focal
+length and principal point), and the rotation matrix ``R`` on 3D world
+coordinates, so binning does not affect these parameters.
+
+The ROI is specified in the binned image coordinates.  A 200x300 ROI
+at offset (50, 70) in the full image corresponds to a 100x150 ROI at
+offset (25, 35) in a 2x2 binned image.  ``x_offset`` and ``y_offset``
+are the offset from the top-left corner of the full image to the
+top-left corner of the region of interest.
+
+As a convenience, setting ``roi.x_offset``, ``roi.y_offset``,
+``roi.width`` and ``roi.height`` all to 0 has a special meaning; it is
+the same as the full resolution.  This is especially useful to users
+of the polled camera interface [#PolledCamera]_, who can request a
+full resolution image despite not knowing ahead of time what that
+resolution is.  It also means that authors of camera drivers that do
+not support ROI can safely ignore the ``CameraInfo/roi`` fields, which
+default to 0.
+
+The new field ``roi.do_rectify`` is discussed in the next section.
+
+Raw and Rectified ROI
+---------------------
+
+When working with distorted images, a desired raw ROI can be given
+directly to the camera driver.  More commonly, however, the consumer
+wants the camera to provide an ROI in the rectified image, and does not
+particularly care how the rectified image patch is acquired.  To bridge
+the gap between user (who works in rectified coordinates) and camera
+driver (which understands only raw coordinates), we define a mapping
+between raw and rectified ROI.
+
+Given a rectified ROI, the corresponding raw ROI is the smallest
+sub-rectangle such that every pixel in the rectified ROI maps to a
+point inside the raw ROI.  In other words, the raw ROI must contain
+all the information needed to fill the rectified ROI.  Geometrically,
+if we distort the outline of the rectified ROI into raw coordinates,
+the raw ROI circumscribes the resulting curve.
+
+Likewise, given a raw ROI, the corresponding rectified ROI is the
+largest sub-rectangle such that every pixel in the rectified ROI maps
+to a point inside the raw ROI.  If we rectify the outline of the raw
+ROI, the rectified ROI inscribes the resulting curve.
+
+When a full resolution image is captured, the behavior is different.
+During the camera calibration process, the user chooses a scaling
+which trades off between having all valid pixels in the rectified
+image (but discarding some pixels from the raw image) versus discarding
+no raw image pixels (but permitting invalid pixels in the rectified
+image).  The assumption that all rectified pixels should be valid does
+not necessarily hold; that is up to the user to decide during calibration.
+The raw and rectified images have the same resolution, and hence the
+same "ROI" (the full image).  ``roi.do_rectify`` is set to ``False``
+to indicate that no ROI mapping should be done.
+
+When the raw ROI is only part of the full resolution, ``roi.do_rectify``
+is set to ``True``.  The raw ROI is mapped to the rectified ROI as
+described above.
+
+It is permitted to set ``roi.do_rectify = False`` when the ROI is
+not actually the same as the full image resolution to suppress the
+ROI mapping.  This feature can be useful in special situations.  See
+for example use case `#3 Cropped Video Mode`_ below.
+
+To complete the set of possibilities, the user could request an ROI
+of the full image resolution but with ``roi.do_rectify = True``.
+This ensures that the rectified image contains no invalid pixels, but
+it will also discard pixels from the raw image.
+
+..
+    Diagrams!!
+
+image_geometry API
+------------------
+
+Several new methods will be added to image_geometry's
+``PinholeCameraModel`` class [#pinhole]_.  The signatures below are
+for C++; the Python API will be equivalent.
+
+::
+
+    class PinholeCameraModel
+    {
+      // Resolution of the camera when it was calibrated
+      cv::Size fullResolution() const;
+
+      // Current resolution. May be reduced by binning, or by ROI
+      // when roi.do_rectify == False
+      cv::Size currentResolution() const;
+
+      // The current binning settings
+      int binningX() const;
+      int binningY() const;
+
+      // The current raw and rectified ROIs
+      cv::Rect rawRoi() const;
+      cv::Rect rectRoi() const;
+
+      // Compute the rectified ROI corresponding to a given raw ROI
+      cv::Rect rectifyRoi(cv::Rect roi_raw) const;
+
+      // Compute the raw ROI corresponding to a given rectified ROI.
+      // The second overload is more convenient for use with the
+      // polled_camera interface.
+      cv::Rect unrectifyRoi(cv::Rect roi_rect) const;
+      void unrectifyRoi(cv::Rect roi_rect,
+                        sensor_msgs::RegionOfInterest& roi_raw) const;
+    };
+
+Internally, ``PinholeCameraModel`` will be updated to compute the
+rectified ROI from ``CameraInfo/roi``, and will use it when
+(un)rectifying points and images.
+
+Use Cases
+=========
+
+Here we examine how a camera driver might fill the ``CameraInfo`` message
+in different modes of operation, roughly increasing in complexity.
+We use the WGE100 camera [#WGE100]_ as an example.  This camera has
+752x480 resolution, but is commonly used in 640x480 mode, which crops
+the left-most and right-most 56 columns of the imager.  It supports
+both binning and ROI.
+
+The camera is calibrated only once, in full 752x480 resolution.  The
+same camera parameters (``height``, ``width``, ``D``, ``K``, ``R``,
+``P``) are reused in all cases.  They are combined with the driver's
+current operational parameters (``binning_x``, ``binning_y``, ``roi``)
+to derive the geometry of the output images.
+
+#1 Full Resolution
+------------------
+
+The most basic case - we capture full 752x480 images.  The relevant
+``CameraInfo`` settings are::
+
+    height: 480
+    width:  752
+    binning_x: 1
+    binning_y: 1
+    roi
+        offset_x:   0
+        offset_y:   0
+        height:     480
+        width:      752
+        do_rectify: False
+
+The ROI is the same as the full resolution.  In this special case, it
+is also permitted to set both ``roi.height`` and ``roi.width`` to 0.
+The rectified image should have the same dimensions, so
+``roi.do_rectify = False``.
+
+#2 Region of Interest
+---------------------
+
+Let's capture a 200x300 ROI with top left corner (50, 70)::
+
+    height: 480
+    width:  752
+    binning_x: 1
+    binning_y: 1
+    roi
+        offset_x:   50
+        offset_y:   70
+        height:     300
+        width:      200
+        do_rectify: True
+
+The driver simply needs to fill in the ``roi`` field.
+``roi.do_rectify`` is now set to ``True``, as the best-fitting
+rectified ROI may overlap poorly with the original raw ROI.
+
+#3 Cropped Video Mode
+---------------------
+
+Now we change the camera to 640x480 mode, cropping 56 columns on each
+side::
+
+    height: 480
+    width:  752
+    binning_x: 1
+    binning_y: 1
+    roi
+        offset_x:   56
+        offset_y:   0
+        height:     480
+        width:      640
+        do_rectify: False
+
+The cropping effect of the lower-resolution mode is encoded in
+``CameraInfo`` as a ROI.  ``roi.do_rectify = False`` because we wish
+to pretend that we are in fact running a 640x480 camera at full
+resolution.  The rectified image will also be 640x480.
+
+#4 Cropped Video Mode with ROI
+------------------------------
+
+Again capturing a 200x300 ROI with top left corner (50, 70), this time
+with respect to the 640x480 image::
+
+    height: 480
+    width:  752
+    binning_x: 1
+    binning_y: 1
+    roi
+        offset_x:   106
+        offset_y:   70
+        height:     300
+        width:      200
+        do_rectify: True
+
+Notice that the ROI in ``CameraInfo`` is actually specified in the full
+752x480 resolution we calibrated with.  ``roi.offset_x = 106 = 56 + 50``.
+
+#5 Binned, Cropped Video Mode
+-----------------------------
+
+Staying in 640x480 cropped video mode, we enable 2x2 binning::
+
+    height: 480
+    width:  752
+    binning_x: 2
+    binning_y: 2
+    roi
+        offset_x:   28
+        offset_y:   0
+        height:     240
+        width:      320
+        do_rectify: False
+
+The output resolution is reduced to 320x240.  Since ROI is specified
+in binned coordinates, the ``roi`` fields are halved from #3.
+
+#6 Binned, Cropped Video Mode with ROI
+--------------------------------------
+
+Finally, we capture the same ROI as in #4::
+
+    height: 480
+    width:  752
+    binning_x: 2
+    binning_y: 2
+    roi
+        offset_x:   53
+        offset_y:   35
+        height:     150
+        width:      100
+        do_rectify: True
+
+Again, the ``roi`` fields are halved from #4.
+
+Rationale
+=========
+
+In defining ``CameraInfo``, we have included both calibration parameters
+(fixed until the next calibration) and operational parameters (set by
+the camera driver, may change freely).  The `Use Cases`_ section
+demonstrates how the operational parameters can be used to describe a
+variety of useful capture modes without recalibrating.
+
+One could ask, however, why include the operational parameters in
+``CameraInfo`` at all?  Binning rescales the focal lengths and principal
+point.  The ROI offset shifts the principal point.  A major alternative
+approach is to modify the projection matrix in the camera driver to
+describe the geometry of the individual output image.  We have three
+objections to this approach.
+
+First is separation of concerns.  In ROS we consider camera drivers to
+have a very specific function: read pixels off the imager, shove them
+directly into a ``sensor_msgs/Image`` message, and publish.  They are
+not expected to understand the camera model at all, merely regurgitate
+the calibration parameters provided to them externally.  This keeps
+drivers simple and focused, and avoids requiring external dependencies
+such as OpenCV.
+
+Second, the operational parameters are useful information in certain
+vision tasks, particularly ones which actively interact with the
+camera.  The initial motivation for including ROI in ``CameraInfo`` was an
+application which tracked a small object at high speed by updating the
+ROI of a high-definition camera after each detection [#Milestone2]_.
+In this case, we needed to know the ROI of the incoming image to
+calculate the updated ROI.
+
+Third, ``CameraInfo`` as specified permits some convenient optimizations.
+Without getting deeply into implementation details, rectifying a full
+resolution image for the first time is a fairly heavyweight operation.
+It involves generating matrices mapping each rectified pixel to a
+location in the raw image.  These maps can be reused, however, on
+subsequent images, greatly reducing the expense of rectification.
+Furthermore, when ROI is used you can cheaply extract and use the
+same ROI from the full resolution map; this is a nice win when the
+ROI is frequently changing, as in the tracking application mentioned
+above.  With the alternate approach, changing the ROI likely entails
+generating a new map specific to that ROI.
+
+Rejected Features
+-----------------
+
+Some requested features are not included in this REP, generally
+because we do not see enough benefit to justify the added complexity.
+
+Different Dimensions for Rectified Image
+''''''''''''''''''''''''''''''''''''''''
+
+At least one user has wanted to make the dimensions of the rectified
+image larger than those of the raw image [#Resize]_.  The advantage is
+that the rectified image can contain all of the pixels from the raw
+image without under-sampling them.  When packing all of the original
+pixels into a rectified image with the same dimensions, some details
+can be lost, especially when there is significant radial distortion.
+
+Implementation-wise, this is not particularly difficult.  It requires
+adding fields to ``CameraInfo`` for the dimensions of the rectified image
+at full resolution, analogous to ``height`` and ``width``.
+image_geometry would use these fields when creating the rectification
+maps.  We would add some way to select different dimensions in
+camera_calibration_.
+
+While potentially nice to have, we need more convincing that this
+feature is actually necessary.  camera_calibration's alpha slider
+[#CalibTut]_ already allows the user to choose a trade-off between
+using all of the original pixels and preserving detail.  The cost of
+adding this feature is some measure of additional complexity, and it
+is likely to cause confusion.  It might break code that assumes the
+rectified image has the same dimensions as the raw image at full
+resolution.
+
+Publish CameraInfo Only When Parameters Change
+''''''''''''''''''''''''''''''''''''''''''''''
+
+One FAQ is, "Why send ``CameraInfo`` with every Image message?  Why not
+only once?"  The main answer is that operational parameters (binning,
+ROI) may change, perhaps rapidly, from image to image.  Even the
+calibration parameters may be updated regularly in self-calibrating
+systems.
+
+The natural follow-up question is, "Why not send ``CameraInfo`` only when
+it changes?"  The biggest issue is that when the ``CameraInfo`` does
+change, how do you synchronize that change with the Image stream on
+the client side?  Either you go ahead with the most recent parameters,
+risking garbage interpretation if the new ``CameraInfo`` has not arrived
+yet, or you wait for a ``CameraInfo`` that most of the time will not be
+sent.  Worst of all, what if a ``CameraInfo`` update gets dropped?  In any
+case, the potential savings are meager, as ``CameraInfo`` is much smaller
+than the typical ``Image`` message.
+
+To be fair, this question most recently came up in the context of a
+camera with a proprietary (and large) distortion model [#Bumblebee]_.
+Including this model in every ``CameraInfo`` message would indeed waste
+a large amount of bandwidth.  Obviously, though, we can't support this
+proprietary model, and the thread suggested good alternative
+solutions.  As long as ``CameraInfo`` remains small relative to an
+``Image``, we see no reason to complicate matters in pursuit of tiny
+bandwidth optimizations.
+
+Mirroring
+'''''''''
+
+Some cameras [#WGE100]_ support effects such as flipping the image
+horizontally or vertically, or rotating the entire image 180 degrees.
+With flags for these settings in ``CameraInfo``, it would be possible to
+update the calibration parameters with respect to the mirroring.
+However, this adds complexity in support of a relatively rare feature,
+and we do not see a compelling use case for changing the mirroring
+settings after calibrating the camera.  The user should look at the
+raw images, mirror them into the desired orientation, and then consider
+those settings fixed prior to calibration.
+
+Backwards Compatibility
+=======================
+
+Nodes exclusively using image_geometry to interface with ``CameraInfo``
+(as recommended) should continue to work with no changes.  In fact,
+they will gain support for binning.
+
+Nodes actively using ROI with rectified images, especially if they use
+the polled camera interface [#PolledCamera]_, will need to be updated.
+In fact we are not aware of any such nodes in current use.  People trying
+to write them tend to get stymied by the issues with rectifying ROI
+image patches [#RoiTicket]_.  We are not concerned about breaking
+backwards compatibility with the old rectified ROI, because the old
+behavior is already broken and therefore little-used.
+
+The biggest pain point is that previously recorded bag files
+containing ``CameraInfo`` will need to be migrated before they work
+with Diamondback nodes.  Still, this is easily accomplished using
+``rosbag fix``.  The migration rule will fill in the new / modified
+fields as follows::
+
+    binning_x = 1
+    binning_y = 1
+    roi.do_rectify = (roi.width > 0 && roi.width < width) ||
+                     (roi.height > 0 && roi.height < height)
+    distortion_model = PLUMB_BOB
+    D copied as-is
+
+Reference Implementation
+========================
+
+The new features are not yet implemented in image_geometry.  I'd like
+to reach consensus before investing the coding effort.
+
+References
+==========
+
+.. [#CameraInfo] CameraInfo and the Image Pipeline, Konolige
+   (http://www.ros.org/wiki/image_pipeline/CameraInfo)
+
+.. [#PlumbBob] Camera Calibration Toolbox, Bouguet
+   (http://www.vision.caltech.edu/bouguetj/calib_doc/htmls/parameters.html)
+
+.. [#RoiTicket] Prosilica rectification is wrong when an ROI is specified
+   (https://code.ros.org/trac/ros-pkg/ticket/4206)
+
+.. [#OpenCV] OpenCV Camera Calibration
+   (http://opencv.willowgarage.com/documentation/cpp/camera_calibration_and_3d_reconstruction.html)
+
+.. [#Bumblebee] Using Bumblebee Xb3 with image_pipeline, ros-users ML
+   (https://code.ros.org/lurker/message/20100922.120620.d371903e.en.html)
+
+.. [#PolledCamera] polled_camera Package, Mihelich
+   (http://www.ros.org/wiki/polled_camera)
+
+.. [#pinhole] image_geometry::PinholeCameraModel Class Reference
+   (http://www.ros.org/doc/api/image_geometry/html/c++/classimage__geometry_1_1PinholeCameraModel.html)
+
+.. [#WGE100] wge100_camera Package, Gassend
+   (http://www.ros.org/wiki/wge100_camera)
+
+.. [#Milestone2] Milestone 2 Explained
+   (http://www.willowgarage.com/blog/2009/07/02/milestone-2-explained)
+
+.. [#Resize] Allow image_proc to resize an image
+   (https://code.ros.org/trac/ros-pkg/ticket/3965)
+
+.. [#CalibTut] How to Calibrate a Monocular Camera, Bowman
+   (http://www.ros.org/wiki/camera_calibration/Tutorials/MonocularCalibration#Calibration_Results)
+
+.. _image_geometry: http://www.ros.org/wiki/image_geometry
+
+.. _image_proc: http://www.ros.org/wiki/image_proc
+
+.. _camera_calibration: http://www.ros.org/wiki/camera_calibration
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
