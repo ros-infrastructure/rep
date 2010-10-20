@@ -2,7 +2,7 @@ REP: 100
 Title: ROS Stack Separation
 Version: $Revision$
 Last-Modified: $Date$
-Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>
+Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>, Brian Gerkey <gerkey@willowgarage.com>
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
@@ -27,12 +27,14 @@ Specification
 ros stack
 ---------
 
-- gtest
 - mk
+- rosbash
 - rosbuild
 - rosboost_cfg
+- rosclean
 - roscreate
 - rosdep
+- rosemacs
 - roslib
 - rospack
 - rosmake
@@ -56,7 +58,6 @@ ROS graph tools
 - rosbag
 - rosbagmigration
 - rosconsole
-- rosemacs
 - rosgraph
 - roslaunch
 - rosmsg
@@ -64,6 +65,7 @@ ROS graph tools
 - rosnode
 - rosout
 - rosparam
+- rosrecord
 - rosservice
 - rostest
 - rostopic
@@ -78,8 +80,6 @@ ROS core ontology
 Libraries and Utilities
 
 - message_filters
-- rosbash
-- rosclean
 - roswtf
 
 rx stack
@@ -113,7 +113,7 @@ generators. This is discussed further in the backward compatibility
 section.
 
 - genmsg_cpp
-- rosrecord
+- gtest
 
 Header, Clock, and Log
 ----------------------
@@ -360,7 +360,7 @@ separation of the ros and ros_comm stacks are not expected for the ROS
 All preference will be given to maintaining a stable system over the
 separation. Although it is desirable to have a perfectly clean
 separation, the majority of our design goals even if this is not
-acheieved in the ROS 1.4 release.
+achieved in the ROS 1.4 release.
 
    
 Copyright
