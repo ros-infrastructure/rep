@@ -8,7 +8,7 @@ Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Oct-2010
 ROS-Version: Diamondback
-Post-History: 15-Oct-2010
+Post-History: 15-Oct-2010, 22-Oct-2010
 
 
 Abstract
@@ -21,7 +21,7 @@ and distortion.
 
 In this REP, ``sensor_msgs/CameraInfo`` acquires ``binning_x`` and
 ``binning_y`` fields.  The distortion parameter array ``D`` is made
-variable-length, its meaning specified by an enum.  This REP clarifies
+variable-length, its meaning specified by a string.  This REP clarifies
 ROI to mean the raw image region as captured by the camera and
 introduces a distinction between raw ROI and rectified ROI.  It adds
 appropriate new methods to the camera model classes in image_geometry_,
@@ -85,10 +85,10 @@ lenses, which can severely distort the image.  Unfortunately the size
 of the distortion parameter array ``D`` in ``CameraInfo`` is fixed at
 5, so there is currently no way to support more complex models.
 
-This REP makes ``D`` variable-length and introduces an enum to
-distinguish which distortion model was used in the calibration.  These
-changes also accommodate adding other camera models in the future,
-should we find it necessary.
+This REP makes ``D`` variable-length and introduces a string
+``distortion_model`` to distinguish which distortion model was used in
+the calibration.  These changes also accommodate adding other
+distortion models in the future, should we find it necessary.
 
 Region of Interest
 ------------------
@@ -147,10 +147,7 @@ below.  Additions and changes are noted on the right.
     # roi used to be located here.
     # I've moved it to after the calibration parameters.
 
-    int32 UNKNOWN             = 0      # New constant
-    int32 PLUMB_BOB           = 1      # New constant
-    int32 RATIONAL_POLYNOMIAL = 2      # New constant
-    int32 distortion_model             # New field
+    string distortion_model            # New field
 
     float64[] D                        # Made variable-length
     float64[9] K
@@ -204,14 +201,16 @@ be the full resolution of the camera.
 
 The arrays of calibration parameters ``D``, ``K``, ``R`` and ``P`` are
 interpreted as described in [#CameraInfo]_ [#OpenCV]_.  ``D`` contains
-the parameters of the model given by the ``distortion_model`` enum.
-Values ``PLUMB_BOB`` and ``RATIONAL_POLYNOMIAL`` signify offically
-recognized models as described in `Alternate Distortion Models`_.  A
-value of ``UNKNOWN`` indicates that the ``CameraInfo`` cannot be used
-to rectify points or images, either because the camera is not
-calibrated or because the rectified image was produced using an
-unsupported distortion model, e.g. the proprietary one used by
-Bumblebee cameras [#Bumblebee]_.
+the parameters of the model named by the ``distortion_model`` string.
+
+Recognized ``distortion_model`` names are given in the new header
+``sensor_msgs/distortion_models.h``.  For Diamondback these will be
+"plumb_bob" and "rational_polynomial", as described in
+`Alternate Distortion Models`_.  Empty ``D`` and ``distortion_model``
+indicate that the ``CameraInfo`` cannot be used to rectify points or
+images, either because the camera is not calibrated or because the
+rectified image was produced using an unsupported distortion model,
+e.g. the proprietary one used by Bumblebee cameras [#Bumblebee]_.
 
 Operational Parameters
 ''''''''''''''''''''''
@@ -224,11 +223,17 @@ models operate on normalized image coordinates (independent of focal
 length and principal point), and the rotation matrix ``R`` on 3D world
 coordinates, so binning does not affect these parameters.
 
-The ROI is specified in the binned image coordinates.  A 200x300 ROI
-at offset (50, 70) in the full image corresponds to a 100x150 ROI at
-offset (25, 35) in a 2x2 binned image.  ``x_offset`` and ``y_offset``
-are the offset from the top-left corner of the full image to the
-top-left corner of the region of interest.
+For the sake of backwards compatibility, ``binning_x = binning_y = 0``
+(the default values) is considered the same as
+``binning_x = binning_y = 1``, or no binning.
+
+The ROI is specified in the full (unbinned) image coordinates.  For
+example, the 100x150 sub-rectangle at offset (25, 35) in a 2x2 binned
+image is represented as a ROI with dimensions 200x300 and offset (50,
+70).  The ROI specifies a sub-rectangle of pixels on the imager,
+independent of binning.  ``x_offset`` and ``y_offset`` are the offset
+from the top-left corner of the full image to the top-left corner of
+the region of interest.
 
 As a convenience, setting ``roi.x_offset``, ``roi.y_offset``,
 ``roi.width`` and ``roi.height`` all to 0 has a special meaning; it is
@@ -281,8 +286,10 @@ described above.
 
 It is permitted to set ``roi.do_rectify = False`` when the ROI is
 not actually the same as the full image resolution to suppress the
-ROI mapping.  This feature can be useful in special situations.  See
-for example use case `#3 Cropped Video Mode`_ below.
+ROI mapping.  This feature can be useful in special situations, for
+example if the camera supports particular video modes with the
+resolution cropped to a smaller field of view.  See use case
+`#3 Cropped Video Mode`_ below.
 
 To complete the set of possibilities, the user could request an ROI
 of the full image resolution but with ``roi.do_rectify = True``.
@@ -291,6 +298,71 @@ it will also discard pixels from the raw image.
 
 ..
     Diagrams!!
+
+Polled Camera Interface
+-----------------------
+
+The ``polled_camera/GetPolledImage`` service is updated as below::
+
+    string response_namespace
+
+    uint32 binning_x                   # New field
+    uint32 binning_y                   # New field
+
+    sensor_msgs/RegionOfInterest roi
+      uint32 x_offset
+      uint32 y_offset
+      uint32 height
+      uint32 width
+      bool do_rectify                  # New field
+    ---
+    bool success                       # New field
+    string status_message              # New field
+    time stamp
+
+This revision allows users to specify the binning as well as the ROI.
+It also allows the camera driver to return failure (and an explanatory
+message) if the request could not be met; see `Guidelines for Camera
+Drivers`_ below.
+
+Guidelines for Camera Drivers
+-----------------------------
+
+The main purpose of a camera driver is to expose useful functions of
+the camera hardware.  If a camera does not support binning or ROI in
+hardware, the driver has no obligation to implement these features in
+software; indeed, that might mislead users as to the camera's actual
+capabilities.  Such post-processing can always be performed by a
+separate node.
+
+`Raw and Rectified ROI`_ described a range of ways in which the ROI
+fields may be set for different purposes.  In practice most camera
+drivers only need one or two behaviors.  When capturing at full
+resolution, ``CameraInfo/roi`` can be left at the default of all zeros
+to signify full resolution.  Drivers that do not support ROI need not
+touch ``CameraInfo/roi`` at all.  When the user has requested some
+ROI (perhaps through ``dynamic_reconfigure``), the driver should set
+``CameraInfo/roi`` with the ROI offsets and size used and
+``do_rectify = True``.
+
+Drivers are not obligated to implement the polled camera interface
+[#PolledCamera]_.  This feature is most useful for cameras that
+support software triggering or one-shot capture, and especially
+high-resolution cameras that may be expensive to stream at full
+resolution.
+
+If a ``GetPolledImage`` request asks for binning settings that the
+camera does not support, the driver shall return failure
+(``success = False``).  If the request asks for a ROI that is not
+full resolution and the camera does not support ROI, or if the
+requested ROI does not match any available camera resolution, the
+driver shall return failure.  There may be cases when the camera
+supports ROI but cannot achieve precisely the ROI requested, e.g. if
+the camera requires the ROI offsets to be multiples of the binning
+sizes.  In that situation the driver should *expand* the requested ROI
+to one attainable by the camera, return success, and set
+``CameraInfo/roi`` to the expanded ROI.  ``roi.do_rectify`` should
+always be copied as-is from the request to the output ``CameraInfo``.
 
 image_geometry API
 ------------------
@@ -357,6 +429,22 @@ The most basic case - we capture full 752x480 images.  The relevant
 
     height: 480
     width:  752
+    binning_x: 0
+    binning_y: 0
+    roi
+        offset_x:   0
+        offset_y:   0
+        height:     0
+        width:      0
+        do_rectify: False
+
+For this example we have left the binning and ROI fields at their
+defaults of 0.  Drivers that do not support binning and/or ROI do not
+need to touch these fields at all.  The above message has the same
+meaning as::
+
+    height: 480
+    width:  752
     binning_x: 1
     binning_y: 1
     roi
@@ -365,11 +453,6 @@ The most basic case - we capture full 752x480 images.  The relevant
         height:     480
         width:      752
         do_rectify: False
-
-The ROI is the same as the full resolution.  In this special case, it
-is also permitted to set both ``roi.height`` and ``roi.width`` to 0.
-The rectified image should have the same dimensions, so
-``roi.do_rectify = False``.
 
 #2 Region of Interest
 ---------------------
@@ -443,14 +526,14 @@ Staying in 640x480 cropped video mode, we enable 2x2 binning::
     binning_x: 2
     binning_y: 2
     roi
-        offset_x:   28
+        offset_x:   56
         offset_y:   0
-        height:     240
-        width:      320
+        height:     480
+        width:      640
         do_rectify: False
 
 The output resolution is reduced to 320x240.  Since ROI is specified
-in binned coordinates, the ``roi`` fields are halved from #3.
+in unbinned coordinates, the ``roi`` fields are unchanged from #3.
 
 #6 Binned, Cropped Video Mode with ROI
 --------------------------------------
@@ -462,16 +545,19 @@ Finally, we capture the same ROI as in #4::
     binning_x: 2
     binning_y: 2
     roi
-        offset_x:   53
-        offset_y:   35
-        height:     150
-        width:      100
+        offset_x:   106
+        offset_y:   70
+        height:     300
+        width:      200
         do_rectify: True
 
-Again, the ``roi`` fields are halved from #4.
+Again, the ``roi`` fields are unchanged from #4.
 
 Rationale
 =========
+
+Why Include Operational Parameters
+----------------------------------
 
 In defining ``CameraInfo``, we have included both calibration parameters
 (fixed until the next calibration) and operational parameters (set by
@@ -496,9 +582,9 @@ such as OpenCV.
 
 Second, the operational parameters are useful information in certain
 vision tasks, particularly ones which actively interact with the
-camera.  The initial motivation for including ROI in ``CameraInfo`` was an
-application which tracked a small object at high speed by updating the
-ROI of a high-definition camera after each detection [#Milestone2]_.
+camera.  The initial motivation for including ROI in ``CameraInfo`` was
+an application which tracked a small object at high speed by updating
+the ROI of a high-definition camera after each detection [#Milestone2]_.
 In this case, we needed to know the ROI of the incoming image to
 calculate the updated ROI.
 
@@ -513,6 +599,25 @@ same ROI from the full resolution map; this is a nice win when the
 ROI is frequently changing, as in the tracking application mentioned
 above.  With the alternate approach, changing the ROI likely entails
 generating a new map specific to that ROI.
+
+Unbinned Coordinates for ROI
+----------------------------
+
+The original draft of this REP expressed ROI in binned coordinates with
+the theory that this is slightly more intuitive to the user.  One
+problem is that binned coordinates are less expressive than the full
+resolution coordinates; they do not allow bins that start at
+coordinates that are not multiples of the binning factor.  Another
+advantage of using unbinned coordinates is that the ROI represents the
+same field of view regardless of the binning settings.
+
+The IIDC (DCAM) 1394 specification [#IIDC1394]_ uses unbinned
+coordinates and explicitly does allow "off-grid" ROIs in ``Format_7``
+(Partial Image Size Format) modes.  In contrast, the GenICam Standard
+Features Naming Convention [#GenICam]_ uses binned coordinates for
+ROI.  Thus there is some disagreement among standards, but in the
+absence of any strong argument for using binned coordinates we opt for
+the technical advantages of unbinned coordinates.
 
 Rejected Features
 -----------------
@@ -545,6 +650,12 @@ adding this feature is some measure of additional complexity, and it
 is likely to cause confusion.  It might break code that assumes the
 rectified image has the same dimensions as the raw image at full
 resolution.
+
+Finally, if truly needed, this behavior could be implemented as a node
+publishing the enlarged and rectified image and a tweaked ``CameraInfo``
+to a separate namespace.  This solution loses the ability to unrectify
+points back to the original image resolution, but this a minor
+drawback.
 
 Publish CameraInfo Only When Parameters Change
 ''''''''''''''''''''''''''''''''''''''''''''''
@@ -587,6 +698,51 @@ settings after calibrating the camera.  The user should look at the
 raw images, mirror them into the desired orientation, and then consider
 those settings fixed prior to calibration.
 
+Other Camera Settings
+'''''''''''''''''''''
+
+Other settings came up in discussion such as exposure, gain, white
+balance, color calibration, etc.  However these settings are highly
+camera-dependent, and requiring drivers to convert camera-specific
+values into some canonical representation would be a significant
+burden.  Furthermore, the main purpose of ``CameraInfo`` is to
+describe the geometry of the captured image, which is not affected by
+settings such as exposure.
+
+Information such as color calibration could certainly be useful to
+post-processing nodes, but these settings could just as well be
+published on some other dedicated topic rather than including them
+in ``CameraInfo``.
+
+Focus and Zoom
+''''''''''''''
+
+Some cameras support auto-focus, or allow users to set focus/zoom
+programmatically.  These settings do change the optics of the camera,
+and thus the geometry of the image.  Unfortunately, describing the
+camera parameters as a function of focus is not a simple arithmetic
+operation as it is with binning or ROI.  As far as we are aware,
+calibrating for focus and zoom is still an open research area with no
+firmly established solution.  It's also unclear how to define focus in
+a camera-independent way.
+
+For now, camera drivers that expose focus and zoom capabilities will
+have to be "smarter" than the typical driver and update the camera
+parameters themselves.  Such a driver might store multiple calibrations
+for different focus settings, or use some more sophisticated model to
+interpolate the camera parameters to the current focus.
+
+Multiple Distortion Models
+''''''''''''''''''''''''''
+
+Storing multiple distortion models in ``CameraInfo`` was suggested, so
+that code not supporting some new distortion model could fall back to
+a simpler one such as "plumb_bob".  But there are other, simpler
+solutions to this problem, such as requiring users to upgrade their
+code (or else calibrate the camera themselves), or shipping multiple
+calibration files and allowing the user to select one compatible with
+his system.
+
 Backwards Compatibility
 =======================
 
@@ -608,12 +764,15 @@ with Diamondback nodes.  Still, this is easily accomplished using
 ``rosbag fix``.  The migration rule will fill in the new / modified
 fields as follows::
 
+    distortion_model = "plumb_bob"
+    D copied as-is
     binning_x = 1
     binning_y = 1
     roi.do_rectify = (roi.width > 0 && roi.width < width) ||
                      (roi.height > 0 && roi.height < height)
-    distortion_model = PLUMB_BOB
-    D copied as-is
+
+TODO: Define updates to the INI and YAML files used to store
+calibrations.
 
 Reference Implementation
 ========================
@@ -650,6 +809,12 @@ References
 
 .. [#Milestone2] Milestone 2 Explained
    (http://www.willowgarage.com/blog/2009/07/02/milestone-2-explained)
+
+.. [#IIDC1394] IIDC 1394 Specification v1.31
+   (http://damien.douxchamps.net/ieee1394/libdc1394/iidc/IIDC_1.31.pdf)
+
+.. [#GenICam] GenICam Standard Features Naming Convention v1.4
+   (http://www.genicam.org/files/u102/GenICam_SFNC_1_4.pdf)
 
 .. [#Resize] Allow image_proc to resize an image
    (https://code.ros.org/trac/ros-pkg/ticket/3965)
