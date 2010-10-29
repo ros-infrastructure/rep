@@ -23,10 +23,6 @@ REP 5, Recommendations for Repository Layout
 REP 6, Versioning and Deprecation Process (Tick-Tock)
 REP 7, Style Guide for C++ Code
 
-Not yet circulated:
-
-REP 12, Sample reStructuredText REP Template
-
 Would be good to write:
 Josh's RFC for Code Reviews as REP
 tf 2.0 REP coming soon

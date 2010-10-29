@@ -1,0 +1,142 @@
+REP: 105
+Title: Coordinate Frames for Mobile Platforms
+Version: $Revision: 1 $
+Last-Modified: $Date: 2010-10-27 00:00:00 -0700 (Wed, 27 Oct 2010) $
+Author: Wim Meeussen
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 27-Oct-2010
+Post-History: 27-Oct-2010
+
+
+Abstract
+========
+
+This REP specifies naming conventions and semantic meaning for
+coordinate frames of mobile platforms used with ROS.
+
+
+Motivation
+==========
+
+Developers of drivers, models, and libraries need a share convention
+for coordinate frames in order to better integrate and re-use software
+components. Shared conventions for coordinate frames provides a
+specification for developers creating drivers and models for mobile
+bases. Similarly, developers creating libraries and applications can
+more easily use their software with a variety of mobile bases that are
+compatible with this specification. For example, this REP specifies
+the frames necessary for writing a new localization component. It also
+specifies frames that can be used to refer to the mobile base of a
+robot.
+
+
+Specification
+=============
+
+Coordinate Frames
+-----------------
+
+map
+'''
+
+The coordinate frame called ``map`` is a world fixed frame, with its
+Z-axis pointing upwards. The pose of a mobile platform, relative to
+the ``map`` frame, should not significantly drift over time. The
+``map`` frame is not continuous, meaning the pose of a mobile platform
+in the ``map`` frame can change in discrete jumps at any time.
+
+In a typical setup, a localization component constantly re-computes
+the robot pose in the ``map`` frame based on sensor observations,
+therefore eliminating drift, but causing discrete jumps when new
+sensor information arrives.
+
+The ``map`` frame is useful as a long-term global reference, but
+discrete jumps make it a poor reference frame for local sensing and
+acting.
+
+
+odom
+''''
+
+The coordinate frame called ``odom`` is a world-fixed frame. The pose
+of a mobile platform in the ``odom`` frame can drift over time,
+without any bounds. This drift makes the ``odom`` frame useless as a
+long-term global reference. However, the pose of a robot in the
+``odom`` frame is guaranteed to be continuous, meaning that the pose
+of a mobile platform in the ``odom`` frame always evolves in a smooth
+way, without discrete jumps.
+
+In a typical setup the ``odom`` frame is computed based on an odometry
+source, such as wheel odometry, visual odometry or an inertia
+measurement unit.
+
+The ``odom`` frame is useful as an accurate, short-term local
+reference, but drift makes is a poor frame for long-term reference.
+
+
+base_link
+'''''''''
+
+The coordinate frame called ``base_link`` is rigidly attached to the
+mobile robot base. The ``base_link`` can be attached to the base in
+any arbitrary position or orienation; for every hardware platform there
+will be a different place on the base that provides an obvious point
+of reference.
+
+
+
+Relationship between Frames
+---------------------------
+
+We have chosen a tree representation to attach all coordinate frames
+in a robot system to each other. Therefore each coordinate frame has
+one parent coordinate frame, and any number of child coordinate
+frames. The frames described in this REP are attached as follows:
+
+``map`` --> ``odom`` --> ``base_link``
+
+The ``map`` frame is the parent of ``odom``, and ``odom`` is the
+parent of ``base_link``.  Although intuition would say that both
+``map`` and ``odom`` should be attached to ``base_link``, this is not
+allowed because each frame can only have one parent.
+
+
+Frame Authorities
+-----------------
+
+The transform from ``odom`` to ``base_link`` is computed and broadcast
+by one of the odometry sources.
+
+The transform from ``map`` to ``base_link`` is computed by a
+localization component. However, the localization component does not
+broadcast the transform from ``map`` to ``base_link``. Instead, it
+first receives the transform from ``odom`` to ``base_link``, and uses
+this information to broadcast the transform from ``map`` to ``odom``.
+
+
+Exceptions
+----------
+
+The scope of potential robotics software is too broad to require all
+ROS software to follow the guidelines of this REP.  However, choosing
+different conventions should be well justified and well documented.
+
+
+
+Compliance
+==========
+
+This REP depends on and is compliant with REP 103 [1].
+
+References
+==========
+
+.. [1] REP 103, Standard Units of Measure and Coordinate Conventions
+   (http://www.ros.org/reps/rep-0103.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
