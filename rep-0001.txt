@@ -417,7 +417,7 @@ Once the REP is ready for the repository, the REP editor will:
 
   The command to check out a read-only copy of the repository is::
 
-      svn checkout http://code.ros.org/svn/rep/trunk rep
+      svn checkout https://code.ros.org/svn/rep/trunk rep
 
 * Send email back to the REP author with next steps (post to
   ros-users & ros-developers).
