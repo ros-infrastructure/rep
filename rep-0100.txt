@@ -7,7 +7,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 18-Sep-2010
-Post-History: 18-Sep-2010, 20-Oct-2010
+Post-History: 18-Sep-2010, 20-Oct-2010, 20-Nov-2010
 
 
 Abstract
@@ -24,6 +24,8 @@ make use of the ROS communication system.
 Specification
 =============
 
+New packages are marked with an asterisk \*.
+
 ros stack
 ---------
 
@@ -38,6 +40,7 @@ ros stack
 - roslib
 - rospack
 - rosmake
+- rosunit*
 
 ros_comm stack
 --------------
@@ -45,13 +48,12 @@ ros_comm stack
 ROS client libraries
 
 - roslang
-- roscpp
 - rospy
 - roslisp
-
-Support libraries
-
-- xmlrpcpp
+- roscpp
+- roscpp_serialization*
+- roscpp_traits*
+- rostime*
 
 ROS graph tools
 
@@ -73,14 +75,27 @@ ROS graph tools
 
 ROS core ontology
 
+- roscore_migration_rules
+- rosgraph_msgs*
 - std_msgs
 - std_srvs
-- roscore_migration_rules
 
 Libraries and Utilities
 
 - message_filters
 - roswtf
+- xmlrpcpp
+
+ros_release stack
+-----------------
+
+ros_release is an existing ROS stack used to for libraries and scripts
+related to releasing and installing ROS stacks.  Two Python modules
+from roslib will be moved into it as new packages.
+
+- rosdistro*
+- vcstools*
+
 
 rx stack
 --------
@@ -100,8 +115,15 @@ that provide a graphical user interface.
 documentation stack
 -------------------
 
-The documentation stack will only contain the rosdoc package in the
-initial release. It is expected to have more packages in the future.
+- rosdoc
+
+The documentation stack will only contain the rosdoc codebase in the
+initial release.  Work is currently being done on rosdoc to separate
+it into a plugin-based model so that specific documentation
+capabilities can be added or removed as needed.  For example,
+documentation needs for ROS.org are being moved into the rosdoc_rosorg
+package and will migrate to another stack. This work is independent of
+this REP.
 
 Deleted Packages
 ----------------
@@ -121,18 +143,29 @@ Header, Clock, and Log
 Header will be moved from roslib into the std_msgs package.
 
 Clock, and Log will be moved from the roslib package to the
-roslang_msgs package.
+rosgraph_msgs package.
 
 For backwards compatibility, the generated source
 code files for these messages will be released with the roslib package
 in ROS 1.4 but marked as deprecated.
 
+Moving roslib C++ libraries
+---------------------------
+
+roscpp makes use of several header and cpp files in roslib.  These
+will be moved into new packages within the ros_comm stack.
+
+- roscpp_traits
+- roscpp_serialization
+- rostime
+
+These packages use the generic 'ros' namespace, so the expected impact
+on existing packages is expected to be minor.
+
 Moving roslib python modules
 ----------------------------
 
-Several roslib python modules will be moved to rosgraph and elsewhere. The old
-modules will be marked as deprecated for ROS 1.4 and removed in ROS
-1.6.
+Several roslib python modules will be moved to rosgraph and elsewhere. 
 
 The following modules will be moved to rosgraph:
 
@@ -149,6 +182,10 @@ The following modules will be moved to rosdistro (new package):
 
 - roslib.distro
 
+The following modules will be moved to vcstools (new package):
+
+- roslib.vcs
+
 The following modules will be heavily refactored:
 
 - roslib.scriptutil
@@ -157,26 +194,38 @@ The following modules will be removed (already deprecated):
 
 - roslib.masterapi
 
-testing
+rosunit
 -------
 
-The testing package will get the following resources from rostest:
+The main role of rosunit is to replace the bare test functionality of
+rostest.  The bare test function wraps unit tests when they are
+executed and adds a configurable timeout.  It also produces an Ant
+JUnit XML file from the results.  This functionality is generally
+useful in the ROS build system and is also necessary to run unit tests
+on the ros stack.
 
+The rosunit package will get the following resources from rostest:
+
+- ``rostest/bin/cleanunit``
 - ``rostest/bin/test-results-dirs``
 - ``rostest/bin/coverage-html``
 - ``rostest/bin/rostest-check-results``
 
+These scripts are used internally by build tools and do not have high
+visibility. They will be given newer, more descriptive names after the
+move.
+
 The following script will be refactored, with some of its required
-routines moved to testing:
+routines moved to rosunit:
 
 - ``rostest/src/rostest/rostestutil.py``
 
 rosbuild
 --------
 
-rosbuild will be converted to use scripts moved to the testing package.
+rosbuild will be converted to use scripts moved to the rosunit package.
 
-For scripts that currently cannot be moved to the testing package
+For scripts that currently cannot be moved to the rosunit package
 (e.g. rostest itself), the behaviors are defined below.
 
 ``rosbuild_add_roslaunch_check()``: this macro requires use of the
@@ -185,10 +234,6 @@ package, which remains with the ros_comm stack. To minimize impact on
 existing packages, rosbuild will continue to provide the
 ``rosbuild_add_roslaunch_check()`` macro, but it will throw an error if it
 cannot find roslaunch.
-
-``rosbuild_add_gtest*()``, ``rosbuild_add_pyunit*()``: rosbuild requires the
-rostest tool and its ``--bare`` option. If rostest is not available,
-rosbuild will throw an error.
 
 There is more discussion of these issues, see `rosbuild testing
 features`.
@@ -231,7 +276,7 @@ following tools from rostest:
 - (+) ``bin/roslaunch-check.py``
 - (\X) ``bin/rostest``
 
-The tools marked (*) will be moved to the new testing package, but the
+The tools marked (*) will be moved to the new rosunit package, but the
 rest will remain in ros_comm packages.
 
 Options for handling this separation include:
@@ -240,16 +285,16 @@ Options for handling this separation include:
     it is, and if ``bin/rostest`` isn't available, throw an error if the user calls
     any of ``rosbuild_add_gtest*()`` or ``rosbuild_add_pyunit*()``.
  2. Separate out the ``bin/rostest --bare`` behavior and put it somewhere lower,
-    such as roslib.
+    such as rosunit.
 
-Option 2 would require significant and destabilizing work to be done
-in the roslaunch and rostest toolchains to provide implementations
-that are independent of the ros_comm libraries and assumptions.
-
-Although Option 1 results in missing testing functionality for the
-'ros' stack, this functionality can be added back in the future. Thus,
-the preference is to achieve stack separation now rather than block on
-this particular functionality being refactored.
+We have chosen to implement Option 2, as it is the better long term
+solution. Conceptually, rosunit implements unit testing functionality,
+and rostest implements integration testing functionality.  rosunit has
+no graph dependencies, though it does make use of the roslaunch
+process manager.  This will be resolved in the short term by copying
+the process manager out of roslaunch.  In the future, we can envision
+an implementation of roslaunch that does not depend on the graph and
+could be used as a library for rosunit.
 
 
 Header, Clock, and Log
@@ -261,14 +306,14 @@ into the base ros stack as it contains many of the libraries used by
 the package and build tools, but we wish to keep the ros stack
 decoupled from client libraries issues.
 
-The Clock and Log msg files are not considered to be user facing. They
-are also specific to the ROS middleware implementation and would
-pollute a more generic ontology like std_msgs. The designation of a
-new roslang_msgs package clearly associates these msg files as being
-specific to ROS client library implementations (roslang is the common
-dependency of all ROS client libraries). The msg files cannot go in
-the roslang package itself as depending on the roslang package is used
-to flag packages as being ROS client libraries.
+The Clock and Log msg files are not considered to be user facing.
+They are also specific to the ROS middleware implementation and would
+pollute a more generic ontology like std_msgs.  The designation of a
+new rosgraph_msgs package clearly associates these msg files as being
+specific to representing state of the ROS graph.  We originally
+intended to create a roslang_msgs package, but decided that a
+rosgraph_msgs was a better categorization.  In the future, we might
+add messages for the ROS Master state and other graph data.
 
 The Header msg file is user facing and will go into std_msgs. It would
 be preferable to be able to move the Header msg out of the ROS stacks
@@ -355,7 +400,9 @@ release, including rewriting the roscpp message generator in
 Python. For the ROS 1.4 release, the rx and documentation stacks are
 expected to be cleanly separated. For reasons discussed above, clean
 separation of the ros and ros_comm stacks are not expected for the ROS
-1.4 release. 
+1.4 release. In particular, the changes related to 'moving of roslib
+Python modules' is not expected to be fully completed by the ROS 1.4
+release due to the difficulty in moving and renaming Python modules.
 
 All preference will be given to maintaining a stable system over the
 separation. Although it is desirable to have a perfectly clean
