@@ -239,6 +239,13 @@ There is more discussion of these issues, see `rosbuild testing
 features`.
 
 
+$ROS_ROOT/bin executables
+-------------------------
+
+All executables, unless otherwise marked for removal, currently in
+$ROS_ROOT/bin will remain there.  Binary executables will be converted
+to bash scripts using rosrun.
+
 Motivation
 ==========
 
@@ -378,6 +385,19 @@ concern is balanced by multiple motivations:
 - The ROS Distribution system and packaging system can provide the
   documentation stack in common configurations.
 
+Keeping $ROS_ROOT/bin executables
+---------------------------------
+
+The inclusion of ros_comm and rx executables with the ros stack is
+unfortunate.  It does not significantly increase the size of the ros
+stack as binary executables will be replaced with bash scripts, but it
+does add non-functioning executables to a bare ros installation.
+
+Our debian package system does not allow another ROS stack to build
+into $ROS_ROOT/bin.  Work on a ROS install target (REP 102 [#REP102]_)
+will hopefully provide a clean solution in the future.
+
+
 Backwards Compatibility
 =======================
 
@@ -409,7 +429,13 @@ separation. Although it is desirable to have a perfectly clean
 separation, the majority of our design goals even if this is not
 achieved in the ROS 1.4 release.
 
-   
+References
+==========
+
+.. [#REP102] REP 102
+   (http://ros.org/reps/rep-0102.html)
+
+
 Copyright
 =========
 
