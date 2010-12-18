@@ -36,5 +36,5 @@ update:
 propcheck:
 	$(PYTHON) propcheck.py
 
-upload:
+upload: all
 	rsync *.txt *.html wgs32.willowgarage.com:/var/www/www.ros.org/html/reps

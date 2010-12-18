@@ -3,7 +3,7 @@ Title: ROS Install Target
 Version: $Revision$
 Last-Modified: $Date$
 Author: Brian Gerkey <gerkey@willowgarage.com>
-Status: Draft
+Status: Withdrawn
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 19-Sep-2010
