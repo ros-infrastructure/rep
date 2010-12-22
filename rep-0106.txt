@@ -1,0 +1,209 @@
+REP: 106
+Title: Polled topics
+Version: $Revision$
+Last-Modified: $Date$
+Author: Dirk Thomas
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 20-Dec-2010
+ROS-Version: 1.6
+Post-History: 20-Dec-2010
+
+
+Abstract
+========
+
+This REP adds support for filtering messages directly at
+the publishing node.  The filtering configuration can be modified
+dynamically at runtime.  It does not require additional nodes to be
+integrated for performing the filtering.
+
+Motivation
+==========
+
+In several scenarios a subscriber needs only a subset of messages
+published on a particular topic.  Example use cases are:
+
+* Reduce frequency of messages, e.g., a lower number messages per
+  second might be sufficient for visualizing the information.
+
+* Polling messages from topics, e.g. requesting only a single
+  (or any other fixed number of) message(s).
+
+The filtering cannot be performed after receiving the messages since
+the available bandwidth between publisher (e.g. running on the mobile
+robot) and subscriber (e.g. the GUI) running on an external computer
+might be (severly) constrained.
+
+Use Cases
+=========
+
+Any scenario where a subscribing node does not require all messages
+from a particular topic.
+
+Since polling is only one use case of this proposal (the other is
+filtering data on a time- or count-base) the title should be
+reconsidered.  *Polled topics* is misleading if the filtering is used
+to receive every 10-th message (which is indeed the opposite:
+*pushed*).
+
+Rationale
+=========
+
+The utilization of an additional filter node is not an optimal
+solution.  Any topic in a large application might be subscribed to
+with particular filter constraints.  The filtering should solely
+depend on the subscriber:
+
+* Filtering should not require manual adaption of the communication
+  graph (e.g. by introducing a new filtering node).
+
+Currently the package message_filters is used to filter messages.
+Even when it is running on the same host as the publisher it
+implies an overhead which would be avoided with this REP:
+
+* All messages need to be marshaled and transfered to the filtering
+  node (even if skipped / not relayed by the filter).  For high
+  update rate topics, large complex messages or resource restricted
+  platforms the overhead is significant.
+
+* The publisher is not aware of the *real* current subscribers.
+  The (optional) awareness of the publisher of the subsequent
+  filtering enables skipping resource intensive computations.  E.g.
+  a node compresses images (received with 30fps) to JPG format, but
+  the GUI requests only one image per second.
+
+Implementation
+==============
+
+The described functionality has been implemented on-top of ROS in
+student work.  It is only a proof-of-concept and should not be
+applied to ROS as-is.
+
+Implementation on-top of ROS (proof-of-concept) customization
+-------------------------------------------------------------
+
+The pub/sub mechanism of ROS involves the three operations
+*advertise*, *subscribe* and *publish*:
+
+.. image:: http://ros.org/reps/rep-0106/ros-pub-sub.png
+
+The filter configuration is transfered from the subscriber-side to
+the publisher using an additional anti-parallel topic.  The filter
+configuration is sent at subscription time as well as when the filter
+configuration is changed.  The publisher side can then perform the
+requested filtering per subscriber.
+
+.. image:: http://ros.org/reps/rep-0106/ros-pub-sub-enh.png
+
+The interface for the suscriber is enhanced with an optional
+parameter during subscription as well as with an additional method
+for setting an filter configuration at runtime.
+
+As the filtering should not be performed by the publisher the
+behavior of the involved ROS classes needed to be modified.  Since
+these classes are not *friendly* to be exchanged/subclassed, several
+modifications have been applied in order to enable exchanging the
+classes with custom subclasses:
+
+.. image:: http://ros.org/reps/rep-0106/ros-class-hierarchy.png
+.. image:: http://ros.org/reps/rep-0106/ros-custom-class-hierarchy.png
+
+While this approach looked promising, several issues came up due to
+missing virtual functions, internal use of singletons etc.  It
+required extensive modifications of the ROS sources.
+
+The source code and the modification should only be viewed as a
+proof-of-concept and not as a patch sources_.
+
+Implementation in ROS
+---------------------
+
+For integration into ROS a better approach should be used.  The
+filter configuration may be sent using the already existing TCP
+connection between the publisher and the subscriber, avoiding an
+additional anti-parallel topic.
+
+The new features are not yet implemented in ROS.  First a consensus
+should be reached before investing the coding effort.
+
+API changed / enhancements
+==========================
+
+GenericFilter (new class)
+-------------------------
+
+The new class *GenericFilter* acts as the interface for the filter
+and contains the filter configuration.  This class is used by ROS
+and is subclassed for specific filter implementations.
+
+The following filters has been implemented for testing the behavior:
+
+* *PassThroughFilter* simply passes every messages.
+
+* *CounterFilter* passes every N-th message and skips the other.
+
+* *FrequencyFilter* passes one message every N milliseconds.  This
+  is similar to the CounterFilter but indepenent of the frequency of
+  the published messages.
+
+Another easy to implement filter (not implemented done):
+
+* *FixedNumberFilter* passes the first N messages and skips any
+  further.  This would fit the title polled topics.
+
+Subscriber
+----------
+
+The subscriber has a new public method *setFilter* which has a
+*GenericFilterPtr* as an argument.
+
+Internally it advertises the anti-parallel topic and publishes the
+filter configuration.  This has to be repeated when new publishers
+are registered or the filter configuration changes.
+
+Publisher
+---------
+
+Internally it subscribes to the anti-parallel topic and receives the
+filter configuration from each subscriber.  The method
+*passCurrentMessage* utilizes the filter configuration of each
+subscriber to decide if the message is passed to that endpoint.
+
+A public method *getCurrentNumSubscribers* can be introduced (not yet
+implemented) which returns the number of subscribers which would
+receive the next published message.  If this method returns zero the
+publisher could skip any computation to create the message as it
+would be skipped anyway.  This skipping must still be reflected in
+the current filter configuration.
+
+Backwards Compatibility
+=======================
+
+Existing nodes not using the newly introduced filtering functionality
+continue to work with no changes.
+
+The message_filters package might utilize this new functionality when
+appropriate.
+
+References
+==========
+
+.. _sources: http://ros.org/reps/rep-0106/rep-polled-topics-sources.zip
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
