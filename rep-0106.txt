@@ -88,6 +88,9 @@ The pub/sub mechanism of ROS involves the three operations
 *advertise*, *subscribe* and *publish*:
 
 .. image:: http://ros.org/reps/rep-0106/ros-pub-sub.png
+   :width: 1513
+   :height: 533
+   :scale: 45%
 
 The filter configuration is transfered from the subscriber-side to
 the publisher using an additional anti-parallel topic.  The filter
@@ -96,6 +99,9 @@ configuration is changed.  The publisher side can then perform the
 requested filtering per subscriber.
 
 .. image:: http://ros.org/reps/rep-0106/ros-pub-sub-enh.png
+   :width: 1817
+   :height: 896
+   :scale: 35%
 
 The interface for the suscriber is enhanced with an optional
 parameter during subscription as well as with an additional method
@@ -108,7 +114,13 @@ modifications have been applied in order to enable exchanging the
 classes with custom subclasses:
 
 .. image:: http://ros.org/reps/rep-0106/ros-class-hierarchy.png
+   :width: 1925
+   :height: 1100
+   :scale: 30%
 .. image:: http://ros.org/reps/rep-0106/ros-custom-class-hierarchy.png
+   :width: 2329
+   :height: 1346
+   :scale: 30%
 
 While this approach looked promising, several issues came up due to
 missing virtual functions, internal use of singletons etc.  It
