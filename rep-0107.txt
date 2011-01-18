@@ -1,5 +1,5 @@
 REP: 107
-Title: Diagnostic System for Robots running ROS
+Title: Diagnostic System for Robots Running ROS
 Version: $Revision$
 Last-Modified: $Date$
 Author: Tully Foote <tfoote@willowgarage.com>
