@@ -3,7 +3,7 @@ Title: CameraInfo updates for Diamondback
 Version: $Revision$
 Last-Modified: $Date$
 Author: Patrick Mihelich <mihelich@willowgarage.com>
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Oct-2010

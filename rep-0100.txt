@@ -3,7 +3,7 @@ Title: ROS Stack Separation
 Version: $Revision$
 Last-Modified: $Date$
 Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>, Brian Gerkey <gerkey@willowgarage.com>
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 18-Sep-2010
