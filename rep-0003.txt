@@ -7,7 +7,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 21-Sep-2010
-Post-History: 21-Sep-2010
+Post-History: 21-Sep-2010, 17-Jan-2011
 
 
 Abstract
@@ -16,8 +16,8 @@ Abstract
 This REP defines target platforms for each ROS Distribution Release.
 We define platforms to include both operating system releases (Ubuntu
 Lucid) as well as major language releases (e.g. Python 2.6). The
-target platforms represent the set on which all stable, released
-stacks are expected to work. Exceptions can be made for stacks that are
+target platforms represent the set on which all core stacks are
+expected to work. Exceptions can be made for stacks that are
 intentionally platform-specific.
 
 Platforms by Distribution
@@ -67,7 +67,7 @@ Electric Emys (Aug 2011)
 - C++03
 - Boost 1.40
 - Lisp SBCL 1.0.x(TBD)
-- Python TBD
+- Python 2.6
 
 F Turtle (Feb 2012)
 -------------------
@@ -106,7 +106,8 @@ Any "formula" requires making assumptions about future Ubuntu library
 choices and other crystal-ball projections. While we will do our best
 to follow the assumed target schedule, we reserve the right to change
 support targets based on Ubuntu library choices or other
-considerations. For example, the formula above assumes that a ROS distribution release can be made compatible with *future* Ubuntu
+considerations. For example, the formula above assumes that a ROS
+distribution release can be made compatible with *future* Ubuntu
 releases. In the event that forward integration cannot be done without
 introducing destabilizing changes, preference will always be given to
 maintaining stability of the existing release.
@@ -139,7 +140,9 @@ low-water-mark Ubuntu version.
 Lisp
 ----
 
-We use Steel Bank Common Lisp as our ANSI Common Lisp implementation. We are currently tracking SBCL 1.0.38 and will track future updates in the 1.0.x series as appropriate.
+We use Steel Bank Common Lisp as our ANSI Common Lisp
+implementation. We are currently tracking SBCL 1.0.38 and will track
+future updates in the 1.0.x series as appropriate.
 
 Python
 ------
@@ -147,21 +150,39 @@ Python
 Our intent with Python support is to track the minimum Python version
 provided in the supported Ubuntu platforms, as well as survey other
 commonly used OS platforms that support ROS to determine a reasonable
-minimum target. There is currently no plan to jump to Python 3k.
+minimum target. There is currently no plan to jump to Python 3k,
+though will accept patches that provide dual compatibility with Python
+2.x and Python 3k.
 
-Stacks in Scope
-===============
+Core Stacks
+===========
+
+Core stacks are required to comply with the target platforms listed
+here, though exceptions can be granted for core stacks that are
+inherently platform-specific.  The set of core stacks is currently
+defined by variants included with each ROS distribution release.
 
 C Turtle
 --------
 
-This REP applies to stacks in the 'base' variant for C Turtle.
+This REP applies to stacks in the `base` variant for C Turtle.
 
 Diamondback
 -----------
 
-This REP applies to stacks in the 'client-full' and 'pr2-client' variants for Diamondback.
+This REP applies to stacks in the `desktop-extras` variant [2]_ for Diamondback.
 
+Non-core Stacks
+===============
+
+    And thirdly, the code is more what you'd call "guidelines" than actual rules...
+
+We hope that ROS stack maintainers will make every effort to comply
+with the target platforms within this REP, but we recognize that ROS
+stacks represent a spectrum of development, from research prototypes
+to hardened libraries.  There are also cases where supporting target
+platforms may incur unnecessary effort, such as a set of drivers for a
+specific robot platform.
 
 References and Footnotes
 ========================
@@ -169,6 +190,8 @@ References and Footnotes
 .. [1] Ubuntu Releases with End-of-Life Dates
    (https://wiki.ubuntu.com/Releases)
    
+.. [2] REP 108, ROS Diamondback Variants
+   (http://www.ros.org/reps/rep-0108.html)
 
 Copyright
 =========
