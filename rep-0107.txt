@@ -1,0 +1,297 @@
+REP: 107
+Title: Diagnostic System for Robots running ROS
+Version: $Revision$
+Last-Modified: $Date$
+Author: Tully Foote <tfoote@willowgarage.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 027-Nov-2010
+ROS-Version: Cturtle
+Post-History: 30-Aug-2002
+
+
+Abstract
+========
+
+Monitoring and characterizing the functional state of a robot 
+is important at all times.  To be able to know this across multiple
+robot types and versions this REP lays out a standard way to report
+system diagnostics.  These diagnostics provide three capabilities, a
+quick glance method of knowing that all systems are operating
+nominally, a way to access detailed information for debugging, and a
+long term logging infrastructure for historical analysis.
+
+
+Rationale
+=========
+
+When operating a robot being aware that all the parts are running
+correctly is important.  To accomplish this there must be a consisten
+way to present the data to the user.  In this interface they need to
+be able to see a high level summary.  But in the case that they need
+details they need to be able to quickly see fine grained details of
+any specific component. 
+
+In addition to realtime viewing collecting historical data for offline
+analysis is also important.  This can be valuable to identify trends
+in data which can warn of future failures as well as help debug a
+failure which happened in the past but was not recognized until later.
+
+To be useful the diagnostic system must be flexible enough to work on
+different robots, in different configurations without changing the
+user experience.
+
+Approach
+========
+
+The core of the diagnostic system is the reporting mechanism.  The
+goal of providing a generic reporting mechanism means that the
+diagnostics uses weakly typed information unlike the rest of ROS
+because the intended consumer is a person. These data structures are
+designed for aggregation and presentation to a user to be able to
+quickly check that all systems are running correctly while suppressing
+the details.  And in the case they are not the user can quickly drill
+down and see all the details of any specific component.
+
+Data
+----
+For every component in the system the following data will be published:
+
+Component Name
+,,,,,,,,,,,,,,
+
+This is the name of the component or subcomponent in the system.  The
+component name is usually the node name of the driver node.  For
+example if the node prosilica_driver is running it would report as::
+
+     prosilica_driver
+    
+
+It may be the case that subcomponents should be split out if they have
+enough information to stand on their own and could be interpreted
+independently of other subcomponets. For example if a driver is
+providing multiple topics one subcomponent per topic can be useful,
+since this is created automatically by helpers in diagnostic_updater,
+and one for the node as a whole. This avoids mixing in detailed timing
+statistics for the topics with core information about the hardware.
+If publishing for a subcomponent the component name should be
+``component name: subcomponent name`` It might look like these to
+example subcomponets::
+
+    prosilica_driver: Packet Status
+    prosilica_driver: Frequency Status
+
+Another use case is if a driver provides an interface for multiple
+discrete components, such that providing seperate component names can
+be a useful distinction for the user.
+
+Operational Level
+,,,,,,,,,,,,,,,,,
+
+There are three levels of functionality defined: 
+    * OK
+        Everything is running as expected.  
+    * Warn
+        There is unexpected behavior it should be resolved and may affect operation
+    * Error
+        There is a problem which should be fixed, the component can not be relied upon to operate correctly.  
+
+These levels should be used to color GUI viewers with the designers
+equivilant of 'green', 'yellow', and 'red' symbols.
+
+Message
+,,,,,,,
+
+A human readable summary of the status of the device.  This is often a
+concatenation of any error messages or a default message.
+
+Hardware Id
+,,,,,,,,,,,
+
+If applicable this identifies the specific hardware running.  This is
+for things like serial numbers for devices so that a piece of hardware
+can be tracked between robots if it is moved between robots or moved
+within a robot.
+
+Hardware Specific Data
+,,,,,,,,,,,,,,,,,,,,,,
+
+As there is are uncountable types of hardware potentially added to the
+system each with their own specific pertinent information the hardware
+specific diagnostics data is captured in string key value pairs.  
+
+
+Common data to be published are settings, serial numbers, firmware
+versions, error counts, and information on latest errors or timeouts.
+
+Protocol
+--------
+
+Reporting is carried out by message publication on the topic
+``/diagnostics`` using the ``diagnostic_msgs/DiagnosticArray`` data
+type.  The default publication rate is 1Hz.  
+
+
+Diagnostics for Hardware Drivers
+================================
+
+Diagnostic outputs should be enabled for hardware components
+which are expect to be present whenever the robot is running.  
+
+The system is generic enough to handle all software components,
+however adding diagnostics to all software components creates too much
+noise for the core functionality to work consistently.  Setting up the
+analyzers to make sure that important messages are shown and there are
+not false positives of important errors is impossible for all users
+use cases. Also if all pieces of software log to the diagnostics
+system the burden of logging and analyzing the logs goes up
+significantly.
+
+There are possible solutions such as seperate topics for different
+types of diagnostics, however as this REP is targeted for hardware
+diagnostics only hardware based diagnostics sould be published over
+this protocol.
+
+Usage
+=====
+
+The diagnostic system has been designed to provide the operator with
+awareness of the current state of the system as well as provide a
+history of the state of the system for historical analysis.
+
+Best Practices
+--------------
+
+    * Whenever a robot is operating the operator should have an
+      instance of *robot_monitor* visible on a screen.  This may be
+      contained withing another app like pr2_dashboard.  This will
+      provide good situational awareness for the operator.
+
+    * In the default launchfile used to bring up the hardware there
+      should be a ``rosbag record`` instance setup to recored the
+      ``/diagnostics`` topic, and periodically uploaded off the robot. For example::
+
+           <!-- Runtime Diagnostics Logging -->
+           <node name="runtime_logger" machine="c1"  pkg="rosbag" type="record"
+             args="-O /hwlog/pr2_diagnostics /diagnostics --split=2000" />
+
+
+Improper Usage
+==============
+
+    * This is **not** designed to be a keepalive, it uses potentially
+      unreliable transports and does not have tight timeouts, and
+      there may be stale data due to aggregation.
+
+    * This is **not** going to halt the system in any way.  If there
+      is an unsafe condition it must be dealt with independently.
+      (For example on the PR2 in the case of a motor error, all motors
+      halt, in addition to sending an Error diagnostic message. ) The
+      diagnostic message is for operator awareness.
+
+Appendices:
+===========
+
+Diagnotic Tools
+---------------
+
+While user-end tools are not needed to generate and capture the
+diagnostic information, they perform a critical role in making the
+captured data accessible for analysis as well as making
+implementations of diagnostics much easier. More documentation can be
+found in the `diagnostics stack`_.
+
+
+Diagnostic Updater
+,,,,,,,,,,,,,,,,,,
+There are several tools to make publishing diagnositics easier.  See
+the `diagnostic_updater package`_ for a stable C++ API for publishing
+diagnostic data.
+
+Diagnostic Aggregator
+,,,,,,,,,,,,,,,,,,,,,
+
+When displaying diagnostic data there often some analysis to make data
+useful for a specific application.  The diagnostic_aggregator is
+designed to do just this.  It aggregates the latest information from
+each component and passes it to a configurable set of analyzers.  The
+analyzers are useful for doing things like grouping outputs,
+suppressing outputs which are invalid for a specific
+application or configuration. `diagnostic_aggregator wiki page`_
+
+Robot Monitor
+,,,,,,,,,,,,,
+
+Being able to quickly understand the status of all components in a
+system is important, and to do so a concise visualization tool was
+developed.  When use with the aggregator above it will pop up all
+warnings and errors to the top level as well as providing a
+higherarchical view of the system layed out by the aggregators.
+`robot_monitor wiki page`_
+
+
+Diagnostic Messages
+-------------------
+
+These are documented in the `diagnostic_msgs package`_. They are shown here for ease of reference. 
+
+diagnostic_msgs/DiagnosticArray.msg
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+::
+
+    # This message is used to send diagnostic information about the state of the robot
+    Header header #for timestamp
+    DiagnosticStatus[] status # an array of components being reported on 
+
+diagnostic_msgs/DiagnosticStatus.msg
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+::
+
+    # This message holds the status of an individual component of the robot.
+    # 
+    
+    # Possible levels of operations
+    byte OK=0
+    byte WARN=1
+    byte ERROR=2
+    
+    byte level # level of operation enumerated above 
+    string name # a description of the test/component reporting
+    string message # a description of the status
+    string hardware_id # a hardware unique string
+    KeyValue[] values # an array of values associated with the status
+
+diagnostic_msgs/KeyValue.msg
+,,,,,,,,,,,,,,,,,,,,,,,,,,,, 
+
+::
+
+    string key # what to label this value when viewing
+    string value # a value to track over time
+
+References
+==========
+.. _diagnostics stack: http://www.ros.org/wiki/diagnostics
+.. _diagnostic_updater package: http://www.ros.org/wiki/diagnostic_updater
+.. _diagnostic_aggregator wiki page: http://www.ros.org/wiki/diagnostic_aggregator
+.. _robot_monitor wiki page: http://www.ros.org/wiki/robot_monitor
+.. _diagnostic_msgs package: http://www.ros.org/wiki/diagnostic_msgs
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:

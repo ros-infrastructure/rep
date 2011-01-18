@@ -1,0 +1,320 @@
+REP: 108
+Title: ROS Diamondback Variants
+Version: $Revision: 36 $
+Last-Modified: $Date: 2010-09-23 10:24:11 -0700 (Thu, 23 Sep 2010) $
+Author: Ken Conley <kwc@willowgarage.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 17-Jan-2011
+Post-History: 17-Jan-2011
+
+
+Abstract
+========
+
+This REP describes the variants for the ROS Diamondback release.
+These new variants establish new entry points for the ROS installation
+process and provide organization of the ROS stack ecosystem.
+
+Motivation
+==========
+
+ROS variants provide several roles for the ROS distributions: 
+
+ * installation entry points for users
+ * installation entry points for robot configuration
+ * organize related stacks
+ * identity for institutions releasing stacks.
+
+The ROS C Turtle distribution defined three main variants: `base`,
+`pr2`, and `pr2all`.  These variants were originally established in
+the ROS Box Turtle release, when there were approximately only 30
+stacks.  Since then, the number of stacks has quadrupled to over 120.
+The number of institutions releasing stacks has also grown from one to
+seven.  This growth, both in code and the ROS developer base, requires
+re-evaluation of the current variant configuration.
+
+The growth of ROS and the related variants has also lead to the
+perception that ROS is bloated: users are not immediately aware that
+minimal configurations are possible.  Similarly, effort was made
+during the ROS Diamondback development cycle to separate GUI
+dependencies into separate stacks; this enables new, lighter-weight,
+GUI-less variants.  
+
+Although a new user should be exposed to the wealth of libraries and
+tools available in ROS, we wish to make the user aware when they are
+choosing "bloated" configurations.  GUI-less variants also enable
+lighter-weight "on robot" configurations, as well as easier porting of
+common ROS configurations to other platforms.
+
+Finally, with the ROS distributions containing stacks from more
+institutions, we wish to start exploring making it easier for
+institutions to promote their identity and have their own
+configurations, such as institution-specific or robot-specific setups.
+
+Specification
+=============
+
+End-user entry points
+---------------------
+
+We define three main entry points for ROS users:
+
+ * desktop-extras (recommended)
+ * desktop
+ * ros-base
+
+`desktop-extras` provides a "batteries included" experience for users.
+This is the recommended installation for users as it will enable
+novice users to complete most entry tutorials without knowledge of the
+underlying library structure.
+
+The `desktop` configuration is more minimal and collects the core
+robotics libraries and tools for users to use.
+
+The `ros-base` configuration is an entry point for users wishing to
+use a "bare bones" configuration of ROS, such as those on embedded
+platforms.
+
+Users may also choose robot-specific entry points, which simplify
+configuration when using ROS on a supported hardware platform.  The
+definition of these entry points is left to the software maintainers
+for those robot platforms.
+
+rosdistro format
+----------------
+
+The rosdistro [1]_ format will be upgrade to support `extends` of
+multiple variants.  If a variant `extends` another variant, it contains
+all of its stacks.  For example::
+
+  - desktop:
+      extends: [robot, rviz]
+
+This new feature will better enable composition for higher-level
+variants.
+
+Variants
+--------
+
+ROS variants
+''''''''''''
+
+The `ros-base` variant composes the `ros` and `ros_comm` stacks, which
+were separated as part of REP 100 [2]_.  This variant is not allowed to
+have any GUI dependencies.
+
+::
+
+  - ros-base:
+      stacks: [ros, ros_comm]
+
+The `ros-extras` variant adds the `rx` and `documentation` stacks,
+which provide useful tools that are not necessary for on-robot
+operation.
+
+::
+
+  - ros-extras:
+      extends: [ros-base]
+      stacks: [rx, documentation]
+
+Robot variant
+'''''''''''''
+
+The `robot` variant is defined to be core, stable, ROS libraries for
+any robot hardware.  It is the "general robotics" libraries of ROS.
+It may not contain any GUI dependencies.
+
+::
+
+  - robot:
+      extends: ros-base
+      stacks: [common_msgs, common, diagnostics, driver_common,
+        geometry, robot_model, executive_smach]
+
+
+Capability variants
+'''''''''''''''''''
+
+The capability variants organize commonly used libraries that are
+specific to a class of robots.  We also define a `simulators` variant
+that provides an organizational role for higher-level variants.  We
+discourage GUI dependencies in these stacks, if possible.
+
+::
+
+  - mobile:
+      extends: [robot]
+      stacks: [navigation, slam_gmapping]
+
+  - perception:
+      stacks: [image_common, image_transport_plugins, image_pipeline,
+        laser_pipeline, perception_pcl, vision_opencv]
+
+  - move-arm:
+      stacks: [arm_navigation, kinematics, motion_planners,
+        motion_planning_common,  object_manipulation,
+        trajectory_filters]
+
+  - simulators:
+      extends: [robot]
+      stacks: [simulator_stage, simulator_gazebo, physics_ode]
+
+Desktop variants
+''''''''''''''''
+
+The `desktop` variants are main entry points for users.  The
+`desktop-extras` is a "batteries included" experience for users and
+attempts to collect stable, well-documented libraries.  These
+libraries may be specific to certain classes of robots, such as mobile
+robots, though they are not specific to a particular robot.  The
+`desktop` variant is more minimal and only provides the stacks in the
+`robot` variant, plus visualization and debugging tools.  Both of these
+variants contain tutorials for the stacks they provide.
+
+::
+
+  - desktop:
+      extends: [robot, viz]
+      stacks: [ros_tutorials, common_tutorials, geometry_tutorials,
+        visualization_tutorials]
+
+  - desktop-extras:
+      extends: [desktop, mobile, perception, simulators]
+
+Institution-specific
+''''''''''''''''''''
+
+This REP also proposes the addition of institution-specific variants.
+Institution-specific variants must have the name of the institution to
+clearly identify them.  The best practice recommendation is to use the
+name of the institution's ros-pkg repository, e.g. "wg-ros-pkg".
+
+An institution is not required to have a variant, and they are mainly
+provided for convenience and identity.
+
+Robot-specific
+''''''''''''''
+
+Robot-specific variants may be defined.  These robot-specific variants
+may be used to define both on-robot and off-robot (developer/end-user)
+configurations.  At the time of this document, it is expected there
+will be variants for the Willow Garage PR2 and Fraunhofer IPA
+Care-O-bot, though more may be added during the Diamondback lifecycle.
+
+For the sake of best practices, we enumerate the PR2-specific variants
+below, though their specific contents are not considered within the
+scope of this REP.  
+
+::
+
+  - pr2-base:
+      extends: [mobile, perception, move-arm]
+      stacks: [pr2_common, pr2_controllers, pr2_mechanism, pr2_robot,
+        web_interface, pr2_calibration, pr2_navigation, pr2_kinematics,
+        pr2_arm_navigation, pr2_arm_navigation_tests,
+        pr2_object_manipulation, pr2_tabletop_manipulation_apps,
+        tabletop_object_perception, sql_database]
+  
+  - pr2
+      extends: [pr2-base]
+      stacks: [pr2_ethercat_drivers, pr2_power_drivers, camera_drivers,
+        laser_drivers, sound_drivers, wifi_drivers]
+
+  - pr2-desktop:
+      extends: [desktop-full, pr2-base]
+      stacks: [pr2_gui, pr2_simulator]
+
+  - pr2-applications:
+      extends: [pr2]
+      stacks: [pr2_apps, pr2_common_actions, pr2_doors, pr2_navigation_apps,
+        pr2_plugs, pr2_self_test, pr2_web_apps]
+
+
+
+Rationale
+=========
+
+On-robot vs. off-robot
+----------------------
+
+The variants have been defined to enable on-robot vs. off-robot
+configurations.  The main distinction between these configurations is
+the inclusion of GUI tools, which can be very heavyweight and
+unnecessary on the robot itself.  Also, we have found it desirable to
+remove GUI tools from robots to prevent users from accidentally
+running them there.
+
+Tutorials
+---------
+
+Tutorials are included in the `desktop` variants to provide a seamless
+experience for new users.  In the past, new users have been confused
+by the extra steps necessary for installing tutorials.  
+
+Removal of stacks from variants
+-------------------------------
+
+The C Turtle variants attempted to include nearly every stack within a
+variant.  The most notable example of this was the very inclusive
+`pr2all` variant.  The `pr2all` variant as very unstable, which
+creates confusion for end users.  For Diamondback, we have attempted
+to exclude unstable stacks from variants as it is simple to install
+these stacks separately.
+
+Similarly, several stacks, such as driver stacks, have little value as
+drivers are tied to a specific hardware platform.  We instead
+recommend that driver stacks only be included in variants that are
+robot specific.
+
+`robot` vs. `base`
+------------------
+
+C Turtle used the term `base` for general robotics libraries.  We have
+chosen to abandon this term as the `base` variant had grown to contain
+many stacks, both GUI and non-GUI, as well as drivers.  There is no
+equivalent variant in the Diamondback that containst the same set of
+stacks as drivers are now only included in robot-specific variants.
+
+`pr2all`
+--------
+
+The variant has been removed as the PR2 software ecosystem is now too
+large for it to be meaningfully useful.
+
+Backwards Compatibility
+=======================
+
+The rosdistro format will be upgraded to support `extends` of multiple
+variants.  As a result, old rosdistro libraries will not be able to
+read the new format.  This is not expected to have a big impact as
+there are a limited number of rosdistro files.  The Box Turtle release
+will no longer be supported after the Diamondback release, so there
+will be no effort to upgrade its separate toolchain.
+
+References
+==========
+
+.. [1] rosdistro
+   (http://ros.org/wiki/rosdistro)
+.. [2] REP 100
+   (http://ros.org/reps/rep-0100.html)
+
+   
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:

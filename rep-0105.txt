@@ -1,7 +1,7 @@
 REP: 105
 Title: Coordinate Frames for Mobile Platforms
-Version: $Revision: 1 $
-Last-Modified: $Date: 2010-10-27 00:00:00 -0700 (Wed, 27 Oct 2010) $
+Version: $Revision$
+Last-Modified: $Date$
 Author: Wim Meeussen
 Status: Draft
 Type: Informational

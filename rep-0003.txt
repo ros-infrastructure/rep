@@ -15,7 +15,7 @@ Abstract
 
 This REP defines target platforms for each ROS Distribution Release.
 We define platforms to include both operating system releases (Ubuntu
-Lucid) as well as major language releases (e.g. Python 2.5). The
+Lucid) as well as major language releases (e.g. Python 2.6). The
 target platforms represent the set on which all stable, released
 stacks are expected to work. Exceptions can be made for stacks that are
 intentionally platform-specific.
@@ -148,6 +148,20 @@ Our intent with Python support is to track the minimum Python version
 provided in the supported Ubuntu platforms, as well as survey other
 commonly used OS platforms that support ROS to determine a reasonable
 minimum target. There is currently no plan to jump to Python 3k.
+
+Stacks in Scope
+===============
+
+C Turtle
+--------
+
+This REP applies to stacks in the 'base' variant for C Turtle.
+
+Diamondback
+-----------
+
+This REP applies to stacks in the 'client-full' and 'pr2-client' variants for Diamondback.
+
 
 References and Footnotes
 ========================

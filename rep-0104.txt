@@ -1,7 +1,7 @@
 REP: 104
 Title: CameraInfo updates for Diamondback
-Version: $Revision: 28 $
-Last-Modified: $Date: 2010-09-20 23:58:20 -0700 (Mon, 20 Sep 2010) $
+Version: $Revision$
+Last-Modified: $Date$
 Author: Patrick Mihelich <mihelich@willowgarage.com>
 Status: Draft
 Type: Standards Track
