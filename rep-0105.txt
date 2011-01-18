@@ -3,7 +3,7 @@ Title: Coordinate Frames for Mobile Platforms
 Version: $Revision$
 Last-Modified: $Date$
 Author: Wim Meeussen
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 27-Oct-2010
