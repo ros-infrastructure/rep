@@ -3,7 +3,7 @@ Title: ROS Diamondback Variants
 Version: $Revision: 36 $
 Last-Modified: $Date: 2010-09-23 10:24:11 -0700 (Thu, 23 Sep 2010) $
 Author: Ken Conley <kwc@willowgarage.com>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 17-Jan-2011
@@ -221,7 +221,7 @@ scope of this REP.
   - pr2
       extends: [pr2-base]
       stacks: [pr2_ethercat_drivers, pr2_power_drivers, camera_drivers,
-        laser_drivers, sound_drivers, wifi_drivers]
+        laser_drivers, linux_networking, sound_drivers, wifi_drivers]
 
   - pr2-desktop:
       extends: [desktop-full, pr2-base]
@@ -257,12 +257,13 @@ by the extra steps necessary for installing tutorials.
 Removal of stacks from variants
 -------------------------------
 
-The C Turtle variants attempted to include nearly every stack within a
-variant.  The most notable example of this was the very inclusive
-`pr2all` variant.  The `pr2all` variant as very unstable, which
-creates confusion for end users.  For Diamondback, we have attempted
-to exclude unstable stacks from variants as it is simple to install
-these stacks separately.
+The C Turtle variants attempted to include most stacks within a
+variant.  A notable example of this was the very inclusive `pr2all`
+variant.  The `pr2all` variant was very volatile as its name implied
+that any PR2-related stack had to be added to it.  This instability
+creates confusion for both developers and end users.  For Diamondback,
+we have attempted to exclude unstable stacks from variants as it is
+simple to install these stacks separately.
 
 Similarly, several stacks, such as driver stacks, have little value as
 drivers are tied to a specific hardware platform.  We instead
@@ -275,14 +276,29 @@ robot specific.
 C Turtle used the term `base` for general robotics libraries.  We have
 chosen to abandon this term as the `base` variant had grown to contain
 many stacks, both GUI and non-GUI, as well as drivers.  There is no
-equivalent variant in the Diamondback that containst the same set of
-stacks as drivers are now only included in robot-specific variants.
+equivalent variant in the Diamondback that contains the same set of
+stacks.  For example, drivers are now only included in robot-specific
+variants.
+
+There is a now a variant called `robot`, which has a similar semantic
+role but is far more limited in scope than the `base` variant.  The
+`robot` variant contains stacks that are broadly useful robotics
+libraries, such as coordinate transform libraries and higher-level ROS
+concepts, like actions.  Hardware-specific robot libraries and tools,
+such as GUI displays, have been moved to other variants.  The goal of
+the `robot` variant is to remain small as it defines a minimum
+footprint of libraries for using ROS for robotics.  Thus, it is also
+serves as a useful target to support when porting ROS to other
+platforms.
+
 
 `pr2all`
 --------
 
 The variant has been removed as the PR2 software ecosystem is now too
-large for it to be meaningfully useful.
+large for it to be easily defined.  It was also frequently being used
+in non-PR2 configurations as it was often used to deploy more general
+research libraries.
 
 Backwards Compatibility
 =======================
