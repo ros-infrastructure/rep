@@ -90,7 +90,7 @@ multiple variants.  If a variant `extends` another variant, it contains
 all of its stacks.  For example::
 
   - desktop:
-      extends: [robot, rviz]
+      extends: [ros-full, robot, viz]
 
 This new feature will better enable composition for higher-level
 variants.
