@@ -53,6 +53,45 @@ institutions, we wish to start exploring making it easier for
 institutions to promote their identity and have their own
 configurations, such as institution-specific or robot-specific setups.
 
+Uses of Variants
+----------------
+
+Although the rosdistro format is most closely associated with the
+building of Debian packages, it is actually much more general.  The
+rosdistro format is a machine-readable specification of the software
+in a ROS distribution, how to access the source code for it, and the
+version information.  The information is useful in several toolchains:
+build, installation, testing, and documentation.  Variants play a role
+in most of these toolchains.
+
+In the build toolchain, variants are used to define Debian
+'metapackages'.  In this regard, they can be thought of as ROS 'meta
+stacks': they associate libraries together.  Similarly, in the installation
+toolchain, the variants are used as entrypoint for users.  
+
+There are two main installation toolchains: the Debian apt-get system
+and rosinstall.  The apt-get system has a built-in model for ensuring
+dependencies are installed.  rosinstall is currently agnostic to the
+code it installs: it does not know it is installing a stack, a
+package, or arbitrary code; it has no dependency information.
+
+The testing toolchain is used to provide continuous integration of the
+software in the distribution as it is developed.  Variants are
+currently not used here, though they may be used in the future to
+provide scoping for tests.  ROS stacks are currently tested against
+every stack that depends on them.  Popular stacks suffer from
+over-testing and also are the slowest to test as a result.
+
+There are currently no plans to use variants in the documentation
+(rosdoc, wiki) toolchain.  They could be used for categorization, but
+this is speculative.
+
+Within the rosdistro file itself, variants also provide an
+organizational role.  One variant can organize stacks together, while
+a higher-level variant can "extend" one or more variants to
+incorporate these stacks into its own definition.
+
+
 Specification
 =============
 
@@ -61,11 +100,11 @@ End-user entry points
 
 We define three main entry points for ROS users:
 
- * desktop-extras (recommended)
+ * desktop-full (recommended)
  * desktop
  * ros-base
 
-`desktop-extras` provides a "batteries included" experience for users.
+`desktop-full` provides a "batteries included" experience for users.
 This is the recommended installation for users as it will enable
 novice users to complete most entry tutorials without knowledge of the
 underlying library structure.
@@ -95,6 +134,21 @@ all of its stacks.  For example::
 This new feature will better enable composition for higher-level
 variants.
 
+Variant completeness
+--------------------
+
+Variants in Diamondback are required to be complete with respect to
+stack dependencies.  If a variant contains stack A, and stack A
+depends on stack B, then stack B must be in the variant or in one of
+the `extends` variants.
+
+Completeness can be tested with the variant_dependencies.py tool
+in the rosdistro package.
+
+::
+
+    rosrun rosdistro variant_dependencies.py <distro>
+
 Variants
 --------
 
@@ -110,14 +164,14 @@ have any GUI dependencies.
   - ros-base:
       stacks: [ros, ros_comm]
 
-The `ros-extras` variant adds the `rx` and `documentation` stacks,
+The `ros-full` variant adds the `rx` and `documentation` stacks,
 which provide useful tools that are not necessary for on-robot
 operation.
 
 ::
 
-  - ros-extras:
-      extends: [ros-base]
+  - ros-full:
+      extends: ros-base
       stacks: [rx, documentation]
 
 Robot variant
@@ -130,7 +184,7 @@ It may not contain any GUI dependencies.
 ::
 
   - robot:
-      extends: ros-base
+      extends: [ros-base]
       stacks: [common_msgs, common, diagnostics, driver_common,
         geometry, robot_model, executive_smach]
 
@@ -147,26 +201,39 @@ discourage GUI dependencies in these stacks, if possible.
 
   - mobile:
       extends: [robot]
-      stacks: [navigation, slam_gmapping]
+      stacks: [navigation, slam_gmapping, laser_pipeline,
+        perception_pcl]
 
   - perception:
       stacks: [image_common, image_transport_plugins, image_pipeline,
         laser_pipeline, perception_pcl, vision_opencv]
 
   - move-arm:
+      extends: [robot, viz]
       stacks: [arm_navigation, kinematics, motion_planners,
-        motion_planning_common,  object_manipulation,
-        trajectory_filters]
+        motion_planning_common, physics_ode, trajectory_filters,
+        perception_pcl, pr2_controllers, control, pr2_mechanism,
+        pr2_common]
 
+  - simulators:
+      extends: [robot]
+      stacks: [simulator_stage, simulator_gazebo, physics_ode,
+        visualization_common, rx]
+  
   - simulators:
       extends: [robot]
       stacks: [simulator_stage, simulator_gazebo, physics_ode]
 
+  - viz:
+      extends: [robot]
+      stacks: [visualization_common, visualization, rx, image_common, laser_pipeline,
+        executive_smach_visualization, diagnostics_monitors]
+  
 Desktop variants
 ''''''''''''''''
 
 The `desktop` variants are main entry points for users.  The
-`desktop-extras` is a "batteries included" experience for users and
+`desktop-full` is a "batteries included" experience for users and
 attempts to collect stable, well-documented libraries.  These
 libraries may be specific to certain classes of robots, such as mobile
 robots, though they are not specific to a particular robot.  The
@@ -177,12 +244,12 @@ variants contain tutorials for the stacks they provide.
 ::
 
   - desktop:
-      extends: [robot, viz]
+      extends: [ros-full, robot, viz]
       stacks: [ros_tutorials, common_tutorials, geometry_tutorials,
         visualization_tutorials]
-
-  - desktop-extras:
+  - desktop-full:
       extends: [desktop, mobile, perception, simulators]
+  
 
 Institution-specific
 ''''''''''''''''''''
@@ -212,30 +279,36 @@ scope of this REP.
 
   - pr2-base:
       extends: [mobile, perception, move-arm]
-      stacks: [pr2_common, pr2_controllers, pr2_mechanism, pr2_robot,
-        web_interface, pr2_calibration, pr2_navigation, pr2_kinematics,
-        pr2_arm_navigation, pr2_arm_navigation_tests,
-        pr2_object_manipulation, pr2_tabletop_manipulation_apps,
-        tabletop_object_perception, sql_database]
-  
-  - pr2
+      stacks: [control, object_manipulation, robot_calibration, point_cloud_perception,
+        pr2_common, pr2_controllers, pr2_mechanism, web_interface, pr2_calibration,
+        pr2_navigation, pr2_kinematics, pr2_arm_navigation, pr2_object_manipulation,
+        pr2_tabletop_manipulation_apps, ros_realtime, tabletop_object_perception, sql_database,
+        geometry_experimental]
+  - pr2:
       extends: [pr2-base]
-      stacks: [pr2_ethercat_drivers, pr2_power_drivers, camera_drivers,
-        laser_drivers, linux_networking, sound_drivers, wifi_drivers]
-
+      stacks: [pr2_robot, pr2_ethercat_drivers, pr2_power_drivers, camera_drivers, imu_drivers,
+        joystick_drivers, laser_drivers, linux_networking, sound_drivers, wifi_drivers]
   - pr2-desktop:
       extends: [desktop-full, pr2-base]
-      stacks: [pr2_gui, pr2_simulator]
-
+      stacks: [pr2_gui, pr2_simulator, pr2_power_drivers, pr2_ethercat_drivers, geometry_visualization]
   - pr2-applications:
-      extends: [pr2]
-      stacks: [pr2_apps, pr2_common_actions, pr2_doors, pr2_navigation_apps,
-        pr2_plugs, pr2_self_test, pr2_web_apps]
-
+      extends: [pr2, viz]
+      stacks: [pr2_apps, pr2_common_actions, pr2_doors, pr2_navigation_apps, pr2_plugs,
+        pr2_self_test, navigation_experimental]
 
 
 Rationale
 =========
+
+Completeness of Variants
+------------------------
+
+Variant completeness is currently necessary due to rosinstall.  As
+rosinstall is not aware of stack dependencies, it does not compute the
+transitive closure of dependencies for a stack.  We anticipate
+upgrading rosinstall or the rosinstall-generation tools to compute
+this dependency information.  This completeness constraint can be
+relaxed after this occurs.
 
 On-robot vs. off-robot
 ----------------------
