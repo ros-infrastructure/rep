@@ -38,7 +38,7 @@ def main(argv):
             abs_file_path = os.path.join(path, file_path)
             if not os.path.isfile(abs_file_path):
                 continue
-            if file_path.startswith("rep-") and file_path.endswith(".txt"):
+            if file_path.startswith("rep-") and file_path.endswith(".txt") and not file_path == 'rep-0000.txt':
                 with codecs.open(abs_file_path, 'r', encoding='UTF-8') as rep_file:
                     try:
                         rep = REP(rep_file)
