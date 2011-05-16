@@ -10,7 +10,6 @@ Created: 20-Dec-2010
 ROS-Version: 1.6
 Post-History: 20-Dec-2010
 
-
 Abstract
 ========
 
@@ -32,21 +31,17 @@ published on a particular topic.  Example use cases are:
   (or any other fixed number of) message(s).
 
 The filtering cannot be performed after receiving the messages since
-the available bandwidth between publisher (e.g. running on the mobile
-robot) and subscriber (e.g. the GUI) running on an external computer
+the available bandwidth between publisher (e.g. running on a mobile
+robot) and subscriber (e.g. a GUI) running on an external computer
 might be (severly) constrained.
 
 Use Cases
 =========
 
-Any scenario where a subscribing node does not require all messages
-from a particular topic.
-
-Since polling is only one use case of this proposal (the other is
-filtering data on a time- or count-base) the title should be
-reconsidered.  *Polled topics* is misleading if the filtering is used
-to receive every 10-th message (which is indeed the opposite:
-*pushed*).
+Depending on the scenario the demand for receiving messages of a
+specific topic might change dynamically at runtime.  It should be
+possible to switch seemlessly between normal (unfiltered) and
+filtered subscription.
 
 Rationale
 =========
@@ -68,127 +63,79 @@ implies an overhead which would be avoided with this REP:
   update rate topics, large complex messages or resource restricted
   platforms the overhead is significant.
 
-* The publisher is not aware of the *real* current subscribers.
+* The publisher is not aware of the *active* subscribers.
   The (optional) awareness of the publisher of the subsequent
-  filtering enables skipping resource intensive computations.  E.g.
-  a node compresses images (received with 30fps) to JPG format, but
-  the GUI requests only one image per second.
+  filtering enables skipping resource intensive computations of
+  later dropped messages.
 
 Implementation
 ==============
 
-The described functionality has been implemented on-top of ROS in
-student work.  It is only a proof-of-concept and should not be
-applied to ROS as-is.
+In the first step the filtering should enable simple polling of
+messages.  For that the subscriber must pass the number of polled
+messages to each publisher.  This counter is than decreased by the
+publisher until it reaches zero, which would result in dropping
+any further published messages.
 
-Implementation on-top of ROS (proof-of-concept) customization
--------------------------------------------------------------
+In a future extension it might even be imaginable to pass i.e. a 
+Python function which performs the filtering on the publisher.
 
-The pub/sub mechanism of ROS involves the three operations
-*advertise*, *subscribe* and *publish*:
+The implementation consists of three parts:
 
-.. image:: http://ros.org/reps/rep-0106/ros-pub-sub.png
-   :width: 1513
-   :height: 533
-   :scale: 45%
+1. The communication protocol to realize filter functionality.
+   It must be implemented for each client library.
 
-The filter configuration is transfered from the subscriber-side to
-the publisher using an additional anti-parallel topic.  The filter
-configuration is sent at subscription time as well as when the filter
-configuration is changed.  The publisher side can then perform the
-requested filtering per subscriber.
+2. The API for the subscribing node which makes the new features
+   accessible to userland code.
 
-.. image:: http://ros.org/reps/rep-0106/ros-pub-sub-enh.png
-   :width: 1817
-   :height: 896
-   :scale: 35%
+3. The API for the publishing node to make information available
+   which messages aresubsequently passed.
 
-The interface for the suscriber is enhanced with an optional
-parameter during subscription as well as with an additional method
-for setting an filter configuration at runtime.
-
-As the filtering should not be performed by the publisher the
-behavior of the involved ROS classes needed to be modified.  Since
-these classes are not *friendly* to be exchanged/subclassed, several
-modifications have been applied in order to enable exchanging the
-classes with custom subclasses:
-
-.. image:: http://ros.org/reps/rep-0106/ros-class-hierarchy.png
-   :width: 1925
-   :height: 1100
-   :scale: 30%
-.. image:: http://ros.org/reps/rep-0106/ros-custom-class-hierarchy.png
-   :width: 2329
-   :height: 1346
-   :scale: 30%
-
-While this approach looked promising, several issues came up due to
-missing virtual functions, internal use of singletons etc.  It
-required extensive modifications of the ROS sources.
-
-The source code and the modification should only be viewed as a
-proof-of-concept and not as a patch sources_.
-
-Implementation in ROS
----------------------
-
-For integration into ROS a better approach should be used.  The
-filter configuration may be sent using the already existing TCP
-connection between the publisher and the subscriber, avoiding an
-additional anti-parallel topic.
-
-The new features are not yet implemented in ROS.  First a consensus
-should be reached before investing the coding effort.
-
-API changed / enhancements
-==========================
-
-GenericFilter (new class)
+1. Communication protocol
 -------------------------
 
-The new class *GenericFilter* acts as the interface for the filter
-and contains the filter configuration.  This class is used by ROS
-and is subclassed for specific filter implementations.
+The communication protocol is extended with the following opcodes:
 
-The following filters has been implemented for testing the behavior:
+* *setPollCounter* with one argument N.
+  Sets the poll counter to the value N, which demands for the next
+  N message of the topic (actually N messages from  each publisher).
+  The argument value zero can be used to drop all further messages.
 
-* *PassThroughFilter* simply passes every messages.
+* *addPollCounter* with one argument N.
+  Increases the poll counter by the value N.
 
-* *CounterFilter* passes every N-th message and skips the other.
+* *restoreUnfilteredMode* without arguments.
+  Enables to switch back to normal (unfiltered) subscription.
 
-* *FrequencyFilter* passes one message every N milliseconds.  This
-  is similar to the CounterFilter but indepenent of the frequency of
-  the published messages.
+In order to make filtering work from the beginning an additional
+flag *useFiltering* must be passes at connection establishment.
+This initializes the poll counter with zero and prevents sending
+messages in the timeframe between the subscription and the first
+received poll-opcode.
 
-Another easy to implement filter (not implemented done):
+The subscriber must be able to check, if the publisher supports the
+requested filtering mode.  If not: the userland-code might implement
+a reasonable fallback behavior e.g. filter after reception.
 
-* *FixedNumberFilter* passes the first N messages and skips any
-  further.  This would fit the title polled topics.
+2. API on subscriber-side
+-------------------------
 
-Subscriber
-----------
+The *subscribe* methods of the NodeHandle class is extended with an
+additional boolean parameter *useFiltering*.
 
-The subscriber has a new public method *setFilter* which has a
-*GenericFilterPtr* as an argument.
+The Subscriber class is extended with additional methods - one for
+each opcode.
 
-Internally it advertises the anti-parallel topic and publishes the
-filter configuration.  This has to be repeated when new publishers
-are registered or the filter configuration changes.
+3. API on publisher-side
+------------------------
 
-Publisher
----------
-
-Internally it subscribes to the anti-parallel topic and receives the
-filter configuration from each subscriber.  The method
-*passCurrentMessage* utilizes the filter configuration of each
-subscriber to decide if the message is passed to that endpoint.
-
-A public method *getCurrentNumSubscribers* can be introduced (not yet
-implemented) which returns the number of subscribers which would
-receive the next published message.  If this method returns zero the
-publisher could skip any computation to create the message as it
-would be skipped anyway.  This skipping must still be reflected in
-the current filter configuration.
+The Publisher class is extended with a new method
+*getActiveNumSubscribers*.  In contrast to the method
+getNumSubscribers it returns the subscribers, which will not drop the
+next published message.  If this method would return zero the
+publisher can omit any computations to calculate the unnecessary
+message.  Nevertheless in order for the poll counter to be decreased
+the publisher must call the publish method with e.g. a dummy message.
 
 Backwards Compatibility
 =======================
@@ -202,15 +149,13 @@ appropriate.
 References
 ==========
 
-.. _sources: http://ros.org/reps/rep-0106/rep-polled-topics-sources.zip
-
 Copyright
 =========
 
 This document has been placed in the public domain.
 
 
-
+
 ..
    Local Variables:
    mode: indented-text
