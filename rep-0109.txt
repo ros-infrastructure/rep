@@ -1,0 +1,196 @@
+REP: 109
+Title: Unary Stacks
+Version: $Revision$
+Last-Modified: $Date$
+Author: Ken Conley <kwc@willowgarage.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 25-May-2011
+Post-History: 25-May-2011
+
+
+Abstract
+========
+
+The definition of ROS stacks and packages is changed to enable a
+directory to be both a stack and a package.  We call this combined
+entity a *unary stack* to indicate that it is a stack with a single
+package entity.
+
+Motivation
+==========
+
+ROS enables developers to organize directories into both *packages*
+and *stacks*.  Packages are the basic unit of the ROS build system and
+they typically contain libraries, nodes, and configuration files.
+Stacks are the basic unit of the ROS release system
+
+Packages and stacks are usually organized at different levels of
+granularity.  Packages are focused on build products and thus follow a
+'Goldilocks' principle: enough functionality to be useful, not too
+much to be heavyweight.  A package might provide an implementation of
+a specific algorithm or data structure.
+
+Stacks are focused on release products, so they usually organize
+packages together that provide an aggregate functionality, like a
+navigation system.  Stacks are also organized by software development
+concerns: they often collect code that is co-developed and has
+interdependent APIs.  Releasing this code together enables shared
+internal APIs to be changed together within a single release.
+
+While most stacks contain multiple packages, there are several
+instances of stacks only containing a single package.  This type of
+organization is common with external libraries that are integrated
+into ROS and also common with packages that are developed in
+isolation, such as a ROS client library.  For example, the
+``slam_gmapping`` stack just contains the ``gmapping`` package.  This
+demonstrates the awkward naming prefix that is often used to
+differentiate the stack from the package.
+
+There are also cases where stacks collect packages that either have
+similar functionality or were co-developed, but are better provided
+separately.  For example, the various driver stacks in ROS collect
+similar drivers, like ``camera_drivers``, and ``laser_drivers``.  This
+collection requires users to install many drivers, instead of drivers
+just for the hardware they have.
+
+One final interesting case is external libraries that wish to provide
+ROS integration.  While these libraries can add a ROS package manifest
+to their source tree to achieve integration with the build system,
+they must create an additional level of directory hierarchy to be
+release-able.
+
+Unary stacks enable a filesystem directory to be treated as both a
+package and stack.  This will alleviate pain felt by developers when
+the package and stack organizational levels overlap and also make it
+easier for external library maintainers to release code for use in a
+ROS system.
+
+
+Specification
+=============
+
+*Unary stacks* are defined to be directories that contain both a
+*stack manifest* [1]_ and *package manifest* [2]_.  With respect to
+ROS command-line tools, the directory is both a stack and a package.
+The stack contains a single package, which shares the same name.
+
+Stack version
+-------------
+
+The stack version number is currently contained the ``CMakeLists.txt``
+file.  For example, this indicate a stack at version 1.2.5:
+
+::
+
+  rosbuild_make_distribution(1.2.5)
+
+
+For backwards compatibility, we will continue to support the
+``rosbuild_make_distribution()`` macro as a version number source.
+
+In order to support external libraries that cannot use this CMake macro,
+this REP introduces a ``<version>`` tag in the stack manifest:
+
+::
+
+   <stack>
+      <version>1.2.5</version>
+      ...
+   </stack>
+   
+The ``<version>`` tag has a single text element, which is interpreted to
+be the version number of the stack.  Surrounding whitespace in this
+text element is stripped.  
+
+The ``<version>`` tag has precedence over the
+``rosbuild_make_distribution()`` macro.
+
+
+Affected tools and libraries
+----------------------------
+
+The following tools are expected to be directly impacted by this
+change and will require testing:
+
+ * ``rospack``
+ * ``rosstack``
+ * ``rosdep``
+ * ``roscreate-stack``
+ * ``rosmake``
+
+The following Python libraries will be updated to follow the
+definition of unary stacks:
+
+ * ``roslib.packages``
+ * ``roslib.stacks``
+ * ``roslib.manifest``
+ * ``roslib.stack_manifest``
+
+The following ROS wiki documentation macros will be updated to
+represent unary stacks:
+
+ * ``StackHeader()``
+ * ``PackageHeader()``
+
+For ease of deployment, ``StackHeader()`` and ``PackageHeader()`` will
+treat unary stacks the same and represent both stack and package
+metadata.
+
+Releasing a unary stack
+-----------------------
+
+The largest required change is to the ROS release system [3]_.
+Previously, stacks and packages each have a ``CMakeLists.txt`` file that
+handles the required release behavior.  In order to simplify combining
+these two entities, stacks will no longer be built by CMake.  Instead,
+the release scripts will perform the necessary release packaging.
+
+Deployment
+==========
+
+Unary stacks are targeted at the ROS Electric Emys release. We
+anticipate migrating a small number of stacks to use the unary stack
+system, but our priority is the stability of the distribution release.
+
+Backwards Compatibility
+=======================
+
+Unary stacks are not backwards compatible with previous ROS
+distributions and will not be released into ROS Diamondback.
+
+In order to minimize the impact to stack dependencies, we will release
+shell stacks for any stacks that are migrated to use the unary stack
+system.  For example, when ``camera_drivers`` are separated into
+individual unary stacks for each driver, we will release a new
+``camera_drivers`` stack that depends on each of these stacks. Support
+for these shell stacks will be maintained for a single ROS
+distribution release, then removed.
+
+References
+==========
+
+.. [1] Stack Manifests
+   (http://ros.org/wiki/Stack Manifest)
+.. [2] Package Manifests
+   (http://ros.org/wiki/Manifest)
+.. [3] ROS release system
+   (http://www.ros.org/wiki/release)
+
+   
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
