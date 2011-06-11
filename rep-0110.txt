@@ -13,16 +13,13 @@ Post-History: 11-Jun-2011
 Abstract
 ========
 
-This REP suggests to change and extend the rosinstall [1]_
-command-line interface to offer more transparency and support to
-users. This REP provides a command-based structure, which is similar
-to the syntax used for SCM tools like ``svn``, ``git``, and ``hg``.
-These tools have a command-line argument that describes and action to
-perform, like ``svn checkout``, ``git clone``, and ``hg import``.
-This REP suggests to provide individual commands for main rosinstall
-use cases, to provide use-case specific information and error
-messages. Use-case specific information also relates to a potential
-future bash completion help.
+This REP changes and extends the rosinstall [1]_
+command-line interface to a command-based syntax.
+The command-based syntax is inspired by SCM 
+tools like ``svn``, ``git``, and ``hg``, and is intended
+to improve the usability of rosinstall as well as expose more 
+functionality.  Common use cases of rosinstall are 
+described and compared with the proposed changes.
 
 Specification
 =============
