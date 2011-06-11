@@ -1,0 +1,382 @@
+REP: 110
+Title: SCM-like rosinstall command structure
+Version: $Revision: 36 $
+Last-Modified: $Date: 2010-09-23 10:24:11 -0700 (Thu, 23 Sep 2010) $
+Author: Thibault Kruse <kruset@in.tum.de>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 11-Jun-2011
+Post-History: 11-Jun-2011
+
+
+Abstract
+========
+
+This REP suggests to change and extend the rosinstall [1]_
+command-line interface to offer more transparency and support to
+users. This REP provides a command-based structure, which is similar
+to the syntax used for SCM tools like ``svn``, ``git``, and ``hg``.
+These tools have a command-line argument that describes and action to
+perform, like ``svn checkout``, ``git clone``, and ``hg import``.
+This REP suggests to provide individual commands for main rosinstall
+use cases, to provide use-case specific information and error
+messages. Use-case specific information also relates to a potential
+future bash completion help.
+
+Specification
+=============
+
+Command-line syntax
+-------------------
+
+rosinstall init PATH /path/to/ros [URIs]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This covers use cases U1-U3.
+This requires a directory without an existing .rosinstall and will establish one.
+The 3rd argument /path/to/ros will be used as ROS_ROOT. rosinstall currently already
+has the internal functionality of doing a sanity check to verify a local directory
+contains a valid ROS_ROOT.
+Further URIs might be provided for powerusers to setup further local paths in one go,
+as in use-case U3.
+
+rosinstall check PATH
+~~~~~~~~~~~~~~~~~~~~~
+
+This covers parts of use case U10, it requires an existing .rosinstall in PATH.
+This use case deals with a user having made changes to either of the .rosinstall
+or setup.* files, or to any directory mentioned in the rosinstall. The command
+assumes the .rosinstall to reflect the desired environment. The command first
+checks the semantical validity of the .rosinstall and then checks the
+setup files, the current environment, and all directories for compliance with the
+contents of the .rosinstall.
+Causes for errors are:
+Duplicate target-path of local-names (and this also includes "home/user/workspace/foo" being the same as "~/workspace/foo" and "./foo")
+Duplicate remote URI names for different target paths.
+Missing ROS_ROOT.
+Duplicate ROS_ROOT (e.g. cturtle and diamondback).
+Current ROS_PACKAGE_PATH not as .rosinstall specifies
+setup.sh generated ROS_PACKAGE_PATH not as .rosinstall specifies
+same for $ROS_ROOT, $PATH and $PYTHON_PATH
+ROS_ROOT not last in ROS_PACKAGE_PATH
+Missing directories for entries in .rosinstall
+Modified versions for SCM entries in .rosinstall
+Missing SCM directories (.dvn, .git, etc) for SCM entries in .rosinstall
+
+The tool may merely report errors as roswtf, or provide repair actions.
+The functionality will also serve for most other commands, as a sane
+current environments should be a prerequisite for any kind of update.
+
+rosinstall info PATH
+~~~~~~~~~~~~~~~~~~~~
+
+This also covers U10, but it also explains the effect of rosinstall to the user.
+It is supposed to give an overview of the environment and its state. In the
+reference implementation it lists the interpreted ROS_ROOT, and then the paths in the
+ROS_PACKAGE_PATH in their order, as well as providing status information about the local
+directories (whether they exist, and whether their current version matches the .rosinstall)
+
+rosinstall diff PATH
+~~~~~~~~~~~~~~~~~~~~
+
+This also cover U10, this time with respect to SCM diffs. Such a
+feature was suggested on os-developers. The reference implementation
+shows how this could be done. However the solution is neither very
+robust nor flexible for SCM diff options.
+
+rosinstall add PATH [URI]+
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This covers U13, it requires a rosinstall to exist in PATH. URI can be a path to
+a rosinstall file or to a local directory, or an
+This will fail with an error when new entries are duplicates of existing entries
+with respect to target-path but not to SCM information. Exact duplicates will be dropped.
+
+rosinstall update PATH
+~~~~~~~~~~~~~~~~~~~~~~
+
+This covers U5, with the same options current rosinstall has for conflict resolution.
+
+rosinstall remove PATH [RPATH]+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This covers U9, semantics are straightforward. Error if ROS_ROOT is being removed.
+RPATHs must be equivalent to local-names.
+
+rosinstall snapshot PATH filename
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Covers U11, and maintains current rosinstall --generate-versioned-rosinstall semantics.
+
+rosinstall apply PATH filename
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This covers use-case U12. filename is a rosinstall file. Their entries
+will be added to the .rosinstall, or replace entries if the local-path
+is the same. This can be a version change, a URI change, or an SCM change.
+
+rosinstall change-ros
+~~~~~~~~~~~~~~~~~~~~~
+
+This covers U14, it removes the entry from the .rosinstall which was previous ROS_ROOT and
+inserts the new one, provided it passes the sanity check for being a ROS_ROOT.
+
+rosinstall reorder PATH
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This covers U8. Interactive command, details TODO
+
+rosinstall change-version PATH target-path version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This covers use-case U6.
+
+rosinstall shadow PATH PKG-NAME target-path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Covers use-case 7. Looks up PKG-NAME similar to roslocate info, and then uses SCM
+ to checkout trunk (or optinally other version?) from repository location.
+
+
+Analysis
+========
+
+Use cases
+---------
+
+The following are a list of use cases for rosinstall.  U1-U6 are based on use cases described in the rosinstall documentation [1]_.
+U7-14 describe additional common use cases of rosinstall.
+
+
+U1: Developing on top of a system/shared installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rosinstall ~/workspace /opt/ros/boxturtle http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
+
+U2: Full source checkout
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rosinstall ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall``
+
+U3: Developing a stack against a full tree
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rosinstall ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall my_stack.rosinstall``
+
+U4: Adding a rosinstall layout to an existing workspace
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rosinstall ~/workspace http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
+
+U5: Updating a rosinstall tree
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rosinstall ~/workspace``
+
+U6: Changing the version of a specific stack
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can manually edit the file ``.rosinstall`` in a rosinstall managed workspace and then call ``rosinstall ~/workspace``.
+
+
+U7: Shadowing a released ROS package with the sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+e.g. taking the sources from trunk, using ``roslocate``
+
+``roslocate info common_msgs | rosinstall add .``
+
+U8: Rearranging the order of entries in the ``ROS_PACKAGE_PATH``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can manually edit the file ``.rosinstall`` in a rosinstall managed workspace and then call ``rosinstall ~/workspace``
+
+U9: Removing directories from the ``ROS_PACKAGE_PATH``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can manually edit the file ``.rosinstall`` in a rosinstall managed workspace and then call ``rosinstall ~/workspace``
+
+U10: Checking the validity of the current ROS environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+using diverse file exploration tools
+
+U11: Creating a snapshot of the configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rosinstall ~/workspace --generate-versioned-rosinstall=GENERATE_VERSIONED``
+
+U12: Modifying the current configuration according to a snapshot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+not specified manual work
+
+U13: Adding source code to the ROS environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rosinstall ~/workspace [URI]+``
+
+U14: Basing the environment on a different ``ROS_ROOT``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+manually edit ``.rosinstall``
+``rosinstall ~/workspace``
+
+Use-case analysis
+-----------------
+
+All rosinstall use-cases deal with a user trying to maintain a ROS environment on a local machine.
+A ROS environment means the assignment of values to ``ROS_PACKAGE_PATH``, ``PATH``, ``PYTHONPATH``
+and ``ROS_MASTER_URI``, as well as further changes to support ROS toolchains.
+
+Given the description, a user of rosinstall needs to be aware of the following artifacts:
+- any .rosinstall file in the current directory
+- the setup.* files in the current directory
+- the state of local directories
+- the information contained in other rosinstall files
+
+As a user is free to manipulate entry in the configuration files, a major cause for errors are mistakes during such modifications.
+As an automated tool, rosinstall currently only knows of this:
+The user may have changed the rosinstall file, the user may have provided additional locations,
+now a new .rosinstall file may have to be merged with additional locations, and new setup.* files
+have to be generated.
+
+So the current command line structure of the rosinstall tool does not allow for the tool
+to know which of the use cases above (or further ones not listed) the user is attempting
+to do, and hence it can only weakly react to conflicts or report on use-case related errors.
+
+By offering the rosinstall functionality in chunks discriminated by individual sub-commands,
+the intention of the user is revealed to the tool, and thus better conflict resolutions or
+error messages can be provided.
+
+
+** T1: Table of use cases and commands
+
+Makes sure all use cases are covered, and that there is no ambiguity for which use case to use which command.
+
+| UC | init | check | info |   | add | update | remove | snapshot | change-ros | reorder | change-version | apply | shadow |
+|  1 | x    |       |      |   |     |        |        |          |            |         |                |       |        |
+|  2 | x    |       |      |   |     |        |        |          |            |         |                |       |        |
+|  3 | x    |       |      |   |     |        |        |          |            |         |                |       |        |
+|  4 |      |       |      |   | x   |        |        |          |            |         |                |       |        |
+|  5 |      |       |      |   |     | x      |        |          |            |         |                |       |        |
+|  6 |      |       |      |   |     |        |        |          |            |         | x              |       |        |
+|  7 |      |       |      |   |     |        |        |          |            |         |                |       | x      |
+|  8 |      |       |      |   |     |        |        |          |            | x       |                |       |        |
+|  9 |      |       |      |   |     |        | x      |          |            |         |                |       |        |
+| 10 |      | x     | x    |   |     |        |        |          |            |         |                |       |        |
+| 11 |      |       |      |   |     |        |        | x        |            |         |                |       |        |
+| 12 |      |       |      |   |     |        |        |          |            |         |                | x     |        |
+| 13 |      |       |      |   | x   |        |        |          |            |         |                |       |        |
+| 14 |      |       |      |   |     |        |        |          | x          |         |                |       |        |
+
+
+** T2: Table of rosinstall phases and new commands
+
+Lists how the functionality of original rosinstall as described in wiki and in Specification is mapped to new commands.
+o means optional, which means can mean that it is undecided, or that it could depend on a command-line option.
+
+| UC                         | init | check | info | diff | add | update | remove | snapshot | change-ros | reorder | change-version | apply | shadow |
+| 10.1.1 load rosinstall     |      | x     | x    | x    | x   | x      | x      | x        | x          | x       | x              | x     | x      |
+| 10.1.2 append more entries | o    |       |      |      | x   |        |        |          |            |         |                |       | x      |
+| 10.1.3 remove duplicates   | x    | x     |      |      | x   | x      | x      |          |            |         |                |       | x      |
+| 10.1.4 write rosinstall    | x    |       |      |      | x   |        | x      |          | x          | x       | x              | x     | x      |
+| 10.2 checkout or update    | o    |       |      |      |     | x      |        |          |            |         | x              | x     | x      |
+| 10.3.1 check for ROS_ROOT  | x    | x     | x    |      | x   |        | x      |          | x          |         |                |       |        |
+| 10.3.2 write setup.*       | x    |       |      |      | x   |        | x      |          | x          | x       | o              | o     | x      |
+| 10.4 bootstrap ros         | x    |       |      |      |     |        |        |          | x          |         |                |       |        |
+
+
+
+Motivation
+==========
+
+The rosinstall tool, while useful, has a command-line syntax that
+can be difficult for beginners of ROS to become familiar with.  Users
+who are intimated by rosinstall can resort to manually creating
+source trees and maintaining ``ROS_PACKAGE_PATH`` by hand.  Improving
+the usability of the rosinstall tool can improve the ROS experience
+for beginner users as well as introduce advanced users to more
+powerful features.
+
+
+
+Rationale
+=========
+
+Allows changes to ``.rosinstall`` files to be made by the ``rosinstall`` tool rather than hand-editing
+the file (such as removing a path)
+
+Breaking down functionality helps self-explaining of the tool.
+
+Having the user specify his intention allows to generate
+context-specific error messages, options and help.
+
+Also this makes it easier to extend rosinstall with other functions, and
+to use rosintall in scripts (e.g. provide a curses/tk-based rosinstall
+ui).
+
+Backwards Compatibility
+=======================
+
+The rosinstall setup files remain unchanged.
+
+Current rosinstall syntax is:
+
+::
+
+  Usage: rosinstall PATH [<options> ...] [URI]...
+  
+  Options:
+    --version             show program's version number and exit
+    -h, --help            show this help message and exit
+    -n, --nobuild         skip the build step for the ROS stack
+    --rosdep-yes          Pass through --rosdep-yes to rosmake
+    --continue-on-error   Continue despite checkout errors
+    --delete-changed-uris
+                          Delete the local copy of a directory before changing
+                          uri.
+    --abort-changed-uris  Abort if changed uri detected
+    --backup-changed-uris=BACKUP_CHANGED
+                          backup the local copy of a directory before changing
+                          uri to this directory.
+    --generate-versioned-rosinstall=GENERATE_VERSIONED
+                          generate a versioned rosintall file
+  
+No single command would replace this usage, as can be seen in table T2.
+
+The fallback solution to manually edit the ``.rosinstall`` file and
+then call rosinstall to apply the changes can be fulfilled by
+rosinstall update.
+
+Reference implementation
+========================
+
+Reference implementation code located in git repo at:
+http://code.in.tum.de/indefero/index.php//p/rosinstall2/
+
+References
+==========
+
+.. [1] rosinstall
+   (http://www.ros.org/wiki/rosinstall)
+
+
+Copyright
+=========
+
+Copyright (c) 2011 by Thibault kruse. This material may be distributed only subject to
+the terms and conditions set forth in the Open Publication License, v0.1 or later
+(the latest version is presently available at http://www.opencontent.org/openpub/).
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
