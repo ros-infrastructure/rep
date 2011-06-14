@@ -3,7 +3,7 @@ Title: Unary Stacks
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
-Status: Draft
+Status: Active
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 25-May-2011
@@ -119,6 +119,7 @@ change and will require testing:
  * ``rosdep``
  * ``roscreate-stack``
  * ``rosmake``
+ * ``rosdoc``
 
 The following Python libraries will be updated to follow the
 definition of unary stacks:
@@ -146,6 +147,45 @@ Previously, stacks and packages each have a ``CMakeLists.txt`` file that
 handles the required release behavior.  In order to simplify combining
 these two entities, stacks will no longer be built by CMake.  Instead,
 the release scripts will perform the necessary release packaging.
+
+Additional rosmake modifications
+--------------------------------
+
+The behavior of ``rosmake <stack-name>`` will be modify to mean,
+"rosmake all the packages in this stack, as well as all of the stacks
+this stack depends on."  Previously, the behavior was, "rosmake all of
+the packages in this stack."
+
+
+Rationale
+=========
+
+Unary stacks vs. bare packages
+------------------------------
+
+One of the main alternatives to unary stacks is to release bare
+packages.  This creates issues relating to separation of concerns.
+Stacks contain information about how a body of code is released,
+whereas packages contain information about how code is built.  Keeping
+this information semantically separate simplifies and clarifies the
+toolchain.  For similar reasons, the specified implementation is much
+more straightforward as the existing toolchain can maintain the
+existing semantics of stacks and packages and not have to introduce a
+new hybrid semantic.
+
+
+rosmake changes
+---------------
+
+The changes to the behavior in rosmake are necessitated by the desire
+to release empty stacks.  Empty stacks are a convenient mechanism for
+migrating to unary stacks and are also a useful mechanism for
+declaring 'meta stacks' that simply aggregate multiple stacks.  For
+the purposes of migrating to unary stacks, empty stacks are used to
+declare a dependency on the new unary stack.  For example, the
+``simulator_stage`` stack will still exist in ROS Electric, but it
+will be empty and declare a dependency on the ``stage`` stack.
+
 
 Deployment
 ==========
