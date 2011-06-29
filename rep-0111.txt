@@ -1,0 +1,238 @@
+REP: 111
+Title: Multiple Package Manager Support for Rosdep
+Version: $Revision: 83 $
+Last-Modified: $Date: 2011-01-17 19:02:13 -0800 (Mon, 17 Jan 2011) $
+Author: Tully Foote
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 28-June-2011
+ROS-Version: 1.6
+Post-History: 30-Aug-2002
+
+
+Abstract
+========
+
+This REP add support to the rosdep.yaml format to support multiple
+package managers on an individual platform.  
+
+Rationale
+=========
+
+The limitation of using only one package manager has been found to be
+limiting and makes more work than is necessary.  The previous work
+around was to use custom bash scripts, however these bash scripts are
+prone to failure, hard to maintain and or impossible to make cross
+platform.  The goal of this REP is to make rosdep more robust and
+enable better support of platforms other than Ubuntu.  
+
+Existing Implementation
+=======================
+
+The current implementation (in ROS Diamondback) supports the following structures:
+
+
+ * Simple 
+
+    ::
+
+        ROSDEP_NAME:
+          OS_NAME1: PACKAGE_ARGUMENTS_A
+          OS_NAME2: PACKAGE_ARGUMENTS_A
+
+ * Versioned
+
+    ::
+
+        ROSDEP_NAME:
+          OS_NAME1:
+            OS_VERSION1:  PACKAGE_ARGUMENTS_A
+            OS_VERSION2:  PACKAGE_ARGUMENTS_A2
+
+The names above resolve as follows:
+ * ROSDEP_NAME is the name referred to by manifest files such as: log4cxx or gtest.
+ * OS_NAME is the name of an OS such as: ubuntu, fedora, debian, or windows.  
+ * OS_VERSION is the name of specific versions in the OS such as: '10.04' or squeeze.
+ * PACKAGE_ARGUMENT has two interpretations.  If it is a single line, it is expected to be a list of packages to pass to the package manager for the OS.  If this field is a multi line script it is expected to be a bash script which will be executed to install the dependency.  
+
+This is also documented on the 'rosdep wiki page'_http://www.ros.org/wiki/rosdep/rosdep.yaml
+
+.. _rosdep wiki page: http://www.ros.org/wiki/rosdep/rosdep.yaml
+
+Limitations of Existing Implementation
+======================================
+
+Multiple Package Managers Unsupported
+-------------------------------------
+
+On many platforms there are multiple package managers which are valid ways to install software onto the system.  Often there is one dominant package manager such as deb/apt for Debian based systems and RPM/yum for RedHat systems.  However there are often other package managers which provide a different set of software.  Many python modules are available using easy_install/pip.  Java also as seperate package managers and deployment systems.  
+
+One pressing case at the moment is that Python applications on OSX are much easier to install using easy_install than macports.  However there are many things requiring macports.  With the current system things available from easy_install cannnot be set as rosdeps.  
+
+As mentioned before Java also has it's own deployment infrastructure which could potentially be integrated in the future.  
+
+
+Scripting Interface Cannot Systematically Detect Presence
+---------------------------------------------------------
+
+Currently there is the freeform bash scripting interface.  This proposes to deprecate that functionality with the plan to put forward a seperate proposal for a "source" based package manager.  Which will compile packages from source.  
+
+
+Implementation
+==============
+
+To overcome the limitations above there must be a tag for each package
+manager.  Instead of having a single line for each OS or each
+OS/Version pair there will be a package manager key. And any yaml
+inside the package manager's section will be pass through as
+arguments.
+
+
+
+ * Simple 
+    ::
+
+        ROSDEP_NAME:
+          OS_NAME1: 
+            PACKAGE_MANAGER1:
+              PACKAGE_ARGUMENTS_A
+          OS_NAME2: 
+            PACKAGE_MANAGER2:
+              PACKAGE_ARGUMENTS_A
+
+ * Versioned
+    ::
+
+        ROSDEP_NAME:
+          OS_NAME1:
+            OS_VERSION1:  
+              PACKAGE_MANAGER1:
+                PACKAGE_ARGUMENTS_A
+            OS_VERSION2:  
+              PACKAGE_MANAGER2:
+                PACKAGE_ARGUMENTS_A2
+
+The names above resolve as follows:
+ * ROSDEP_NAME is the name referred to by manifest files such as: log4cxx or gtest.
+ * OS_NAME is the name of an OS such as: ubuntu, fedora, debian, or windows.  
+ * OS_VERSION is the name of specific versions in the OS such as: '10.04' or squeeze.
+ * PACKAGE_MANAGER is the name of the package manager to use for this rosdep such as: apt, easy_install, macports.  
+ * PACKAGE_ARGUMENT is arbitray yaml which will be passed directly into the appropriate submodule for that package manager on the OS.  
+
+
+
+Example Package Manager
+=======================
+
+For Ubuntu the default package manager is apt.  The new syntax would
+be as follows:
+
+    ROSDEP_NAME:
+      ubuntu: 
+        apt:
+          debian-package-name other-debian-package-name
+
+or versioned as follows: 
+
+    ROSDEP_NAME:
+      ubuntu: 
+        '10.04':
+          apt:
+            debian-package-name other-debian-package-name
+    
+
+
+Errata
+======
+
+With this change in standards there are a few smaller changes which
+will make the system more manageable listed below.
+
+Invalid Version Tags
+--------------------
+
+To avoid parsing ambiguities in the rosdep.yaml file it will be
+necessary to make sure that all version tags do not conflict with the
+package manager names.
+
+OS Version Identifiers
+----------------------
+
+OS Version Identifiers will be standardized onto oneword codenames for
+each distro.
+
+For example:
+
+ * debian: squeeze
+ * ubuntu: lucid, maverick, natty, oneiric
+
+OSX Identifier Update
+---------------------
+
+With the new scheme the current method of identifying OSX with the
+"macports" key does not make sense.  It will be updated to have "osx"
+as the OS Identification and use "lepoard" "snow_lepoard" and "tiger"
+as the version identifiers if necessary.  As OSX support has been
+experimental this will not be done in a backward compatable way due to
+significant complications, however existing macports keys will not
+interfere with new operations.
+
+Dependencies
+------------
+
+With the introduction of multiple package managers it is no longer the
+case that all dependency resolution is externally contained.  Inside
+each package manager arguments there should be a dependency
+specification where a dependency on another rosdep can be declared.
+This allows a library installed best by package manager A to be
+installed before the executable is attempted to be installed by
+manager B which will link against the library.  rosdep will provide a
+mechanism for the individual rule to trigger the dependent packages.
+
+Single Package Manager Per Rule
+-------------------------------
+
+For simplicity for any given rosdep rule (specific to OS (and version)
+only a single package manager may be used.  It is invalid to use
+multiple package managers for a single rosdep.  To do this use a
+dependency.
+
+
+Backwards Compatability
+=======================
+
+For backwards compatability with existing syntax a default package
+manager must be defined.
+
+Default Package Manager
+-----------------------
+
+For backwards compatability the current active package manager will be
+defaulted for the old style rules on the same line.  And the bash
+scripts will be executed as previously implemented for one release
+cycle.
+
+These are currently:
+ * ubuntu: apt
+ * debian: apt
+ * mint: apt
+ * osx: macports
+ * freebsd: port
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
