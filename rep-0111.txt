@@ -226,7 +226,7 @@ or versioned as follows:
     
     rosdep_name:
       ubuntu: 
-        '10.04':
+        lucid:
           apt:
             debian-package-name other-debian-package-name
     
@@ -259,24 +259,45 @@ which can be used as a `PACKAGE_MANAGER` field.
         macports: bzip2
 
 
-Invalid Version Tags
---------------------
+Disambiguation of OS_VERSION and PACKAGE_MANAGER
+------------------------------------------------
 
-To avoid parsing ambiguities in the rosdep.yaml file, it will be
-necessary to make sure that all version tags do not conflict with the
-package manager names.
+For backwards compatibility, the ``PACKAGE_MANAGER`` is allowed to be
+optional in the ROS Electric case.  As both ``PACKAGE_MANAGER`` and
+``OS_VERSION`` are optional, this creates an ambiguious case where
+either ``OS_VERSION`` or ``PACKAGE_MANAGER`` is specified, but not
+both.  
+
+In this ambiguous case, rosdep first interprets the key as a
+``PACKAGE_MANAGER``.  If this test fails, it will be interpreted as an
+``OS_VERSION``.  Developers should exercise caution in keeping
+``OS_VERSION`` and ``PACKAGE_MANAGER`` keys globally distinct.
 
 Dependencies
 ------------
 
-With the introduction of multiple package managers, it is no longer
-the case that all dependency resolution is externally contained.
-Inside each package manager arguments there should be a dependency
-specification where a dependency on another rosdep can be declared.
-This allows a library installed best by package manager A to be
-installed before the executable is attempted to be installed by
-manager B which will link against the library.  rosdep will provide a
-mechanism for the individual rule to trigger the dependent packages.
+Although not specified in this REP, developers of new package managers
+for rosdep are encouraged to include a dependency specification in
+their ``PACKAGE_ARGUMENTS`` values.  This dependency specification
+should enable rosdep rules to specify dependencies on other rosdep
+rules.  This, for example, would enable an ``easy_install`` package to
+also depend on a ``apt``-based install.  One use case of this is
+rosinstall, which can be installed via ``easy_install``, but also
+implicitly requires non-Python libraries for Git, Subversion,
+Mercurial, and other non-``easy_install`` packages.
+
+This advisory does not apply to package managers that are builtin to a
+particular platform, such as apt and yum.
+
+Internally, the rosdep library will provide APIs for developers to
+trigger installation of these dependencies.
+
+New source-based package manager
+--------------------------------
+
+A new source-based package manager is discussed in the motivation for
+this REP.  This specification of this new source-based package manager
+will be described in a separate forthcoming REP.
 
 Single package manager per rule
 -------------------------------
