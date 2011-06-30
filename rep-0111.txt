@@ -14,23 +14,45 @@ Post-History: 30-Aug-2002
 Abstract
 ========
 
-This REP add support to the rosdep.yaml format to support multiple
-package managers on an individual platform.  
+This REP add support to the rosdep YAML format [1]_ to support
+multiple package managers on an individual platform.  This includes a
+a new 'source' package manager that replacees the previous mechanisms
+for performing source-based installs.
 
 Rationale
 =========
 
-The limitation of using only one package manager has been found to be
-limiting and makes more work than is necessary.  The previous work
-around was to use custom bash scripts, however these bash scripts are
-prone to failure, hard to maintain and or impossible to make cross
-platform.  The goal of this REP is to make rosdep more robust and
-enable better support of platforms other than Ubuntu.  
+Previously, the rosdep format has enabled two modes of installation of
+system dependencies: the platform's preferred package manager, or a
+custom bash script.  Both of these installation mechanisms were
+limiting.  
+
+Using only a single package manager limits integration options on
+platforms like OS X, where there are multiple mechanisms available for
+installing system libraries (e.g. MacPorts, distribute/easy_install).
+For example, for Python libraries, it can be beneficial to use
+distribute, which works with the default Python installation on OS X
+10.6, instead of using the MacPorts Python libraries, which require
+additional setup by the user.
+
+Similarly, the bash script specification was brittle and provided
+limited information to rosdep itself.  The scripts were required to
+be idempotent because rosdep was unable to detect whether or not the
+dependency was already installed. 
+
+The goal of this REP is to make rosdep more robust and flexible, as
+well as enable better support of platforms other than Ubuntu.
+
+
+
+Motivation
+==========
 
 Existing Implementation
-=======================
+-----------------------
 
-The current implementation (in ROS Diamondback) supports the following structures:
+The current implementation of rosdep in ROS Diamondback [2]_ supports the
+following structures:
 
 
  * Simple 
@@ -50,43 +72,107 @@ The current implementation (in ROS Diamondback) supports the following structure
             OS_VERSION1:  PACKAGE_ARGUMENTS_A
             OS_VERSION2:  PACKAGE_ARGUMENTS_A2
 
+
+
 The names above resolve as follows:
- * ROSDEP_NAME is the name referred to by manifest files such as: log4cxx or gtest.
- * OS_NAME is the name of an OS such as: ubuntu, fedora, debian, or windows.  
- * OS_VERSION is the name of specific versions in the OS such as: '10.04' or squeeze.
- * PACKAGE_ARGUMENT has two interpretations.  If it is a single line, it is expected to be a list of packages to pass to the package manager for the OS.  If this field is a multi line script it is expected to be a bash script which will be executed to install the dependency.  
 
-This is also documented on the 'rosdep wiki page'_http://www.ros.org/wiki/rosdep/rosdep.yaml
+ * ``ROSDEP_NAME`` is the name referred to by manifest files. Examples: ``log4cxx``, ``gtest``.
+ * ``OS_NAME`` is the name of an OS. Examples: ``ubuntu``, ``fedora``, ``debian``, ``windows``, ``macports``. 
+ * ``OS_VERSION`` (''optional'') is the name of specific versions in the OS. Examples: ``'10.04'``, ``squeeze``. If no ``OS_VERSION`` is specified, the rule is assumed to apply to all versions.
+ * ``PACKAGE_ARGUMENT`` has two interpretations.  If it is a single line, it is expected to be a list of packages to pass to the package manager for the OS.  If this field is a multi-line script, it is an idempotent bash script that is executed to install the dependency.  
 
-.. _rosdep wiki page: http://www.ros.org/wiki/rosdep/rosdep.yaml
 
-Limitations of Existing Implementation
-======================================
+Example:
 
-Multiple Package Managers Unsupported
+::
+    
+    python:
+      ubuntu: python-dev
+      fedora: python-devel
+      macports: py26-scipy
+    boost:
+      ubuntu:
+        '11.04': libboost.42-all-dev
+        '10.10': libboost.42-all-dev
+        
+
+Support for Multiple Package Managers
 -------------------------------------
 
-On many platforms there are multiple package managers which are valid ways to install software onto the system.  Often there is one dominant package manager such as deb/apt for Debian based systems and RPM/yum for RedHat systems.  However there are often other package managers which provide a different set of software.  Many python modules are available using easy_install/pip.  Java also as seperate package managers and deployment systems.  
+For many Linux-based platforms, there are dominant package managers
+that are the main mechanism for deploying software, such as deb/apt
+for Debian-based systems and rpm/yum for RedHat-based systems.
+However, for non-Linux platforms, as well as for cross-platform
+language environments (e.g. Python, Java, Ruby), there exist other
+software deployment mechanisms that are commonly used.  There are also
+platforms like OS X and Windows, where no package manager has a
+dominant role.
 
-One pressing case at the moment is that Python applications on OSX are much easier to install using easy_install than macports.  However there are many things requiring macports.  With the current system things available from easy_install cannnot be set as rosdeps.  
+On OS X, rosdep currently uses MacPorts as the default package
+manager.  While MacPorts does provide most of the libraries necessary
+for integrating ROS on an OS X system, the current implementation
+limits the flexibility of integration options.  One area of
+integration we wish to improve is Python.  The MacPorts Python
+integration requires a separate Python tree from the default OS X
+Python interpreter.  This has proven to be very brittle for users and
+a common are of misconfiguration.  Now that OS X now deploys with a
+Python version that is compatible with ROS, we wish to explore using
+distribute/easy_install for Python libraries instead.
 
-As mentioned before Java also has it's own deployment infrastructure which could potentially be integrated in the future.  
+
+Richer information from scripting interface
+-------------------------------------------
+
+The current support for bash scripts requires these scripts to be
+idempotent: they must detect the presence of the required dependency
+and install it if it is not present.  There is no mechanism for rosdep
+to determine for itself whether the required dependency is installed,
+nor is there any mechanism for removing dependencies installed via
+this mechanism.  This creates confusion on the part of the user as
+there is no mechanism for analyzing whether or not these dependencies
+are installed correctly. Creating more structure for source-based
+installations will enable simpler installation scripts, better error
+reporting, and more advanced features (e.g. uninstall) in the future.
 
 
-Scripting Interface Cannot Systematically Detect Presence
----------------------------------------------------------
+Integration with OS X
+----------------------
 
-Currently there is the freeform bash scripting interface.  This proposes to deprecate that functionality with the plan to put forward a seperate proposal for a "source" based package manager.  Which will compile packages from source.  
+OS X dependencies are specified generally as ``macports`` and are not
+versioned to a particular OS X release.  OS X releases frequently have
+significant differences as Apple does not maintain much backwards
+compatibility.  
+
+The current ROS OS X integration suffers from 32-bit/64-bit
+compatibility problems due to the OS X 10.6 release.  The current
+rosdep specification also does not allow integrators to take advantage
+of the builtin Python 2.5+ interpeter that was introduced in the OS X
+10.5 release.
+
+Another limitation of the OS X integration is that the rosdep syntax
+did not allow for specification of MacPorts "variants" for individual
+packages.  The rosdep syntax interpreted the package argument value as
+a list of packages, which was not flexible enough for specifying
+variants on specific packages.
 
 
-Implementation
-==============
+OS version identifiers
+----------------------
 
-To overcome the limitations above there must be a tag for each package
-manager.  Instead of having a single line for each OS or each
-OS/Version pair there will be a package manager key. And any yaml
-inside the package manager's section will be pass through as
-arguments.
+The current OS version identifiers use the release number (e.g. 11.04)
+instead of the release codename (e.g. lucid).  Using the release
+number has been a frequent source of bugs as YAML interprets ``11.04``
+as a floating point number instead of a string.  This requires
+explicit string escaping when specifying rules (e.g. ``'11.04'``).
+
+
+Specification
+=============
+
+The new specification for rosdep introduces a ``PACKAGE_MANAGER``
+key in the YAML specification, which is a child key of the ``OS_NAME``.
+rosdep no longer interprets the ``PACKAGE_MANAGER_ARGUMENTS`` and instead
+passes them to the specified ``PACKAGE_MANAGER`` handler.
 
 
 
@@ -114,112 +200,132 @@ arguments.
                 PACKAGE_ARGUMENTS_A2
 
 The names above resolve as follows:
- * ROSDEP_NAME is the name referred to by manifest files such as: log4cxx or gtest.
- * OS_NAME is the name of an OS such as: ubuntu, fedora, debian, or windows.  
- * OS_VERSION is the name of specific versions in the OS such as: '10.04' or squeeze.
- * PACKAGE_MANAGER is the name of the package manager to use for this rosdep such as: apt, easy_install, macports.  
- * PACKAGE_ARGUMENT is arbitray yaml which will be passed directly into the appropriate submodule for that package manager on the OS.  
+
+ * ``ROSDEP_NAME`` is the name referred to by manifest files. Examples: ``log4cxx`` or ``gtest``.
+ * ``OS_NAME`` is the name of an OS.  Examples: ``ubuntu``, ``osx``, ``fedora``, ``debian``, or ``windows``.  
+ * ``OS_VERSION`` (*optional*) is the name of specific versions in the OS. Examples: ``'10.04'`` or ``squeeze``. If no ``OS_VERSION`` is specified, the rule is assumed to apply to all versions.
+ * ``PACKAGE_MANAGER`` (*optional in ROS Electric, required in ROS Fuerte*) is the name of the package manager to use for this rosdep.  Examples: ``apt``, ``easy_install``, ``macports``.  
+ * ``PACKAGE_ARGUMENT`` is free-form YAML that is be passed to the handler for the specified ``PACKAGE_MANAGER``.
 
 
+Example
+-------
 
-Example Package Manager
-=======================
+For Ubuntu the default package manager is apt.  The new syntax is:
 
-For Ubuntu the default package manager is apt.  The new syntax would
-be as follows:
-
-    ROSDEP_NAME:
+::
+    
+    rosdep_name:
       ubuntu: 
         apt:
           debian-package-name other-debian-package-name
 
 or versioned as follows: 
 
-    ROSDEP_NAME:
+::
+    
+    rosdep_name:
       ubuntu: 
         '10.04':
           apt:
             debian-package-name other-debian-package-name
     
 
-
-Errata
-======
-
-With this change in standards there are a few smaller changes which
-will make the system more manageable listed below.
-
-Invalid Version Tags
---------------------
-
-To avoid parsing ambiguities in the rosdep.yaml file it will be
-necessary to make sure that all version tags do not conflict with the
-package manager names.
-
-OS Version Identifiers
+OS version identifiers
 ----------------------
 
-OS Version Identifiers will be standardized onto oneword codenames for
-each distro.
+OS version identifiers will be standardized onto one-word codenames
+for each distro.
 
 For example:
 
  * debian: squeeze
  * ubuntu: lucid, maverick, natty, oneiric
+ * osx: snow, lion
 
-OSX Identifier Update
----------------------
 
-With the new scheme the current method of identifying OSX with the
-"macports" key does not make sense.  It will be updated to have "osx"
-as the OS Identification and use "lepoard" "snow_lepoard" and "tiger"
-as the version identifiers if necessary.  As OSX support has been
-experimental this will not be done in a backward compatable way due to
-significant complications, however existing macports keys will not
-interfere with new operations.
+Changes to OS X
+---------------
+
+The `OS_NAME` key for OS X will be changed to `osx` and will start
+including `OS_VERSION` keys that represent the version number of the
+OS X releases (e.g. `lion`).  The default package is ``macports``,
+which can be used as a `PACKAGE_MANAGER` field.
+
+::
+    
+    osx:
+      lion:
+        macports: bzip2
+
+
+Invalid Version Tags
+--------------------
+
+To avoid parsing ambiguities in the rosdep.yaml file, it will be
+necessary to make sure that all version tags do not conflict with the
+package manager names.
 
 Dependencies
 ------------
 
-With the introduction of multiple package managers it is no longer the
-case that all dependency resolution is externally contained.  Inside
-each package manager arguments there should be a dependency
+With the introduction of multiple package managers, it is no longer
+the case that all dependency resolution is externally contained.
+Inside each package manager arguments there should be a dependency
 specification where a dependency on another rosdep can be declared.
 This allows a library installed best by package manager A to be
 installed before the executable is attempted to be installed by
 manager B which will link against the library.  rosdep will provide a
 mechanism for the individual rule to trigger the dependent packages.
 
-Single Package Manager Per Rule
+Single package manager per rule
 -------------------------------
 
-For simplicity for any given rosdep rule (specific to OS (and version)
-only a single package manager may be used.  It is invalid to use
-multiple package managers for a single rosdep.  To do this use a
-dependency.
+rosdep rules are only allowed to specify a single package manager
+to fulfill them.
 
 
-Backwards Compatability
+
+Backwards Compatibility
 =======================
 
-For backwards compatability with existing syntax a default package
-manager must be defined.
+All current rosdep.yaml files are compatible with the new proposed
+syntax, though some features will be deprecated and the files should
+be upgraded during the ROS Electric cycle to maintain compatibility.
 
 Default Package Manager
 -----------------------
 
-For backwards compatability the current active package manager will be
-defaulted for the old style rules on the same line.  And the bash
-scripts will be executed as previously implemented for one release
-cycle.
+If no package manager is specified, the previous default package
+manager will be used.
 
-These are currently:
+Defaults:
+
  * ubuntu: apt
  * debian: apt
  * mint: apt
  * osx: macports
  * freebsd: port
 
+Bash scripts
+------------
+
+Multi-line values will still be treated as bash scripts in ROS
+Electric.  Support for this will be removed in ROS Fuerte.
+
+Macports
+--------
+
+The ``macports`` rules will be supported during ROS Electric.
+
+
+References and Footnotes
+========================
+
+.. [1] rosdep documentation
+   (http://www.ros.org/wiki/rosdep)
+.. [2] rosdep.yaml format in ROS Diamondback
+   (http://www.ros.org/wiki/rosdep/rosdep.yaml/diamondback)
 
 Copyright
 =========
