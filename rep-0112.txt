@@ -32,6 +32,19 @@ necessary.  However just installing from source is hard to manage
 across multiple machiens.  The goal of this REP is to make
 installation of software from source easy and repeatable.
 
+Specific Goals
+--------------
+
+ * Enable repeatable source based installations
+
+ * Provide testable presence checks so it will not be repeatedly installed
+
+  * Do not require administrative privlages for testing presence
+
+ * Allow any community member to contribute
+
+ * Make reuse of definitions easy.  
+
 
 Specification
 =============
@@ -43,7 +56,9 @@ In the rosdep yaml syntax as layed out in REP 111 (LINKME) the package
 manager name will be "source". And there will be three fields:
 
  * uri: the primary download uri for the rosdep manfiest(rdmanifest)
+
  * alternate-uri:  an optional backup download source.  
+
  * md5sum: a recommended md5sum hash of the rdmanifest for security.
 
 Example: 
@@ -62,10 +77,25 @@ rosdep manifest syntax
 The rosdep manifest file will have 6 fields.  
 
  * uri: The uri of the tarball to download.  
+
  * md5sum: The expected md5sum of the tarball (recommended)
- * alternate-uri: An optional alternate-uri for reliability (recommended) 
- * check-presence-script: A string format.  The check-presence-script which will be downloaded and written to a temporary file and executed.  The return code will be zero if the package is already present, any other return code implies not present. If the check-presence-script returns nonzero the tarball will be dowloaded and checked agsinst the md5sum field.  The package will be untarred into a temporary directory.
- * install-script: String format.  The install-script will be downloaded and written to a temporary file and be executed in the subdirectory of the tarball defined by the exec-path.  exec-path is optional it will default to '.'
+
+ * alternate-uri: An optional alternate-uri for reliability
+   (recommended)
+
+ * check-presence-script: A string format.  The check-presence-script
+   which will be downloaded and written to a temporary file and
+   executed.  The return code will be zero if the package is already
+   present, any other return code implies not present. If the
+   check-presence-script returns nonzero the tarball will be dowloaded
+   and checked agsinst the md5sum field.  The package will be untarred
+   into a temporary directory.
+
+ * install-script: String format.  The install-script will be
+   downloaded and written to a temporary file and be executed in the
+   subdirectory of the tarball defined by the exec-path.  exec-path is
+   optional it will default to '.'
+
  * exec-path: Optional default is '.'
 
 
