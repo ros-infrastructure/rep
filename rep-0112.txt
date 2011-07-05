@@ -104,7 +104,8 @@ external rosdep manifest file, as well as an mirror of this
 installation for additional robustness.
 
 ::
-
+my_rosdep_name:
+  ubuntu: 
   ubuntu:
     source:
       uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
