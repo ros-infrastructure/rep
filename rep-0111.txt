@@ -218,7 +218,7 @@ For Ubuntu the default package manager is apt.  The new syntax is:
     rosdep_name:
       ubuntu: 
         apt:
-          packages: debian-package-name other-debian-package-name
+          packages: [ debian-package-name, other-debian-package-name]
 
 or versioned as follows: 
 
@@ -228,7 +228,7 @@ or versioned as follows:
       ubuntu: 
         lucid:
           apt:
-            packages: debian-package-name other-debian-package-name
+            packages: [debian-package-name, other-debian-package-name]
     
 
 OS version identifiers
