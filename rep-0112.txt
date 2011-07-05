@@ -109,13 +109,13 @@ external rosdep manifest file, as well as an mirror of this
 installation for additional robustness.
 
 ::
-my_rosdep_name:
-  ubuntu: 
-  ubuntu:
-    source:
-      uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
-      alternate-uri: 'https://mirror-kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
-      md5sum: 740a2193cea112f5ef682d9f69f9c7b1
+
+    yaml-cpp:
+      ubuntu:
+        source:
+          uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
+          alternate-uri: 'https://mirror-kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
+          md5sum: 740a2193cea112f5ef682d9f69f9c7b1
 
 
 rosdep manifests (``.rdmanifest``)
