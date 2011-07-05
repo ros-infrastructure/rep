@@ -18,10 +18,19 @@ Post-History: 30-Aug-2002
 Abstract
 ========
 
-This REP defines how to add a "source" package manager to the rosdep infrastructure as defined in REP 111. LINKME
+This REP defines a new "source" package manager for rosdep [1]_ that
+improves source-based installation of system dependencies.  The new
+source package manager provides scripts for installing dependencies
+and verifying that they are present.  This REP builds on the new
+rosdep syntax introduced in REP 111 [2]_.
 
-Rationale
-=========
+Motivation
+==========
+
+ * monolithic, idempotent scripts
+ * rosdep cannot verify if dependency is installed
+ * duplication of scripts between different OS rules.  Bad b/c it leads to bloated rosdep files and potential, buggy duplication.
+
 
 As the range of code required to build ROS against expands it becomes
 necessary to expand beyond what is available in existing package
@@ -29,19 +38,19 @@ mangers sometimes. Sometimes things are just not up to date enough, or
 existing packaged software has critical bugs which are not being
 patched. To deal with these cases installing from source sometimes is
 necessary.  However just installing from source is hard to manage
-across multiple machiens.  The goal of this REP is to make
+across multiple machines.  The goal of this REP is to make
 installation of software from source easy and repeatable.
 
 Specific Goals
 --------------
 
- * Enable repeatable source based installations
+ * Enable repeatable source based installations.
 
- * Provide testable presence checks so it will not be repeatedly installed
+ * Provide testable presence checks so it will not be repeatedly installed.
 
-  * Do not require administrative privlages for testing presence
+ * Does not require administrative privileges (``sudo``) to verify installation.
 
- * Allow any community member to contribute
+ * Enable any community member to contribute.
 
  * Make reuse of definitions easy.  
 
@@ -49,57 +58,137 @@ Specific Goals
 Specification
 =============
 
-rosdep.yaml syntax
-------------------
+rosdep.yaml additions
+---------------------
 
-In the rosdep yaml syntax as layed out in REP 111 (LINKME) the package
-manager name will be "source". And there will be three fields:
+rosdep.yaml syntax: source PACKAGE_MANAGER, fields
+''''''''''''''''''''''''''''''''''''''''''''''''''
 
- * uri: the primary download uri for the rosdep manfiest(rdmanifest)
-
- * alternate-uri:  an optional backup download source.  
-
- * md5sum: a recommended md5sum hash of the rdmanifest for security.
-
-Example: 
+According to REP 111 [2]_, the basic syntax for a rosdep.yaml rule is:
 
 ::
 
+        ROSDEP_NAME:
+          OS_NAME1: 
+            PACKAGE_MANAGER1:
+              PACKAGE_ARGUMENTS_A
+          OS_NAME2: 
+            PACKAGE_MANAGER2:
+              PACKAGE_ARGUMENTS_A
+
+
+The source package manager defines the ``PACKAGE_MANAGER`` and ``PACKAGE_ARGUMENTS``
+fields as follows:
+
+ * ``PACKAGE_MANAGER`` is ``source``
+ * ``PACKAGE_ARGUMENTS``: the ``source`` package manager accepts three fields:
+
+   - ``uri``: the primary download uri for the rosdep manifest (*required*).
+   - ``alternate-uri``:  a mirror download uri for the rosdep manifest (*optional*).  
+   - ``md5sum``: md5sum hash of the rdmanifest for security and verification. (*optional, recommended*)
+
+As defined by REP 111, the use of the ``source`` package manager is
+specific to a OS platform.
+
+The use of the ``md5sum`` field is *strongly recommended*.  It
+provides protection against thirdparty library installs being
+compromised either due to corruption or malicious intent.  It also
+enables the downloaded file to be verified for completeness.
+
+rosdep.yaml example source rule:
+''''''''''''''''''''''''''''''''
+
+The following example is a plausible rosdep.yaml rule for installing
+the yaml-cpp library on an Ubuntu system.  This rule references an
+external rosdep manifest file, as well as an mirror of this
+installation for additional robustness.
+
+::
+
+  ubuntu:
     source:
       uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
-      alternate-uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
+      alternate-uri: 'https://mirror-kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
       md5sum: 740a2193cea112f5ef682d9f69f9c7b1
 
 
-rosdep manifest syntax
-----------------------
+rosdep manifests (``.rdmanifest``)
+----------------------------------
 
-The rosdep manifest file will have 6 fields.  
+The ``rosdep.yaml`` rule for the source package manager points to an
+external rosdep manifest (``.rdmanifest``) file that provides the
+necessary URLs and scripts for managing a system dependency.
 
- * uri: The uri of the tarball to download.  
+There may one or more than one ``.rdmanifest`` file for a given
+software package dependencing on the installation and platforms needs
+of the software.  For example, a single ``.rdmanifest`` file may be
+sufficient for POSIX-based systems, but a separate ``.rdmanifest`` may
+be necessary for OS X systems.  This choice is not enforced by this
+REP and is up to the developer providing the integration.
 
- * md5sum: The expected md5sum of the tarball (recommended)
+``.rdmanifest`` syntax
+''''''''''''''''''''''
 
- * alternate-uri: An optional alternate-uri for reliability
+The rosdep manifest (``.rdmanifest``) file has 6 fields:
+
+ * ``uri`` (single-line string): The uri of the tarball to download.  
+
+ * ``md5sum`` (single-line string): The expected md5sum of the tarball (*recommended*)
+
+ * ``alternate-uri`` (single-line string): An optional alternate-uri for reliability
    (recommended)
 
- * check-presence-script: A string format.  The check-presence-script
-   which will be downloaded and written to a temporary file and
-   executed.  The return code will be zero if the package is already
-   present, any other return code implies not present. If the
-   check-presence-script returns nonzero the tarball will be dowloaded
-   and checked agsinst the md5sum field.  The package will be untarred
-   into a temporary directory.
+ * ``check-presence-script`` (multi-line string): a script that exits
+   with return code zero if a package is already present, non-zero otherwise.  This
+   script is downloaded to a temporary file and is executed.   The script
+   must be able to run without superuser permissions.
 
- * install-script: String format.  The install-script will be
-   downloaded and written to a temporary file and be executed in the
-   subdirectory of the tarball defined by the exec-path.  exec-path is
-   optional it will default to '.'
+ * ``install-script`` (multi-line string):  a script that installs
+   software library from tarball.  The install script will have the working
+   directory set to the ``exec-path``, which is generally the directory where
+   the unpacked tarball is located.  The script is executed with *superuser* privleges.
 
- * exec-path: Optional default is '.'
+ * ``exec-path``: relative path used to specify working directory of
+   the ``install-script`` (*optional*).  The path is interpreted to be
+   relative to the directory the tarball is downloaded and unpacked
+   to. ``exec-path`` is optional and defaults to '.', i.e. the directory
+   of the tarball.
 
 
-An example:
+Source package manager implementation
+'''''''''''''''''''''''''''''''''''''
+
+In the event that rosdep determines that the source package manager is
+responsible for a rosdep dependency, the following steps are taken by
+the source package manager to verify a system dependency is installed.
+
+ 1. Download the ``.rdmanifset`` file referenced by the ``uri`` rule.  If the primary ``uri`` is unavailable, attempt to download the ``alternate-uri``. 
+ 2. If md5sum is specified, validate the md5sum of the  ``.rdmanifest`` file.
+ 3. Download the ``check-presence-script`` specified in the ``.rdmanifest`` file.
+ 4. Execute the ``check-presence-script`` under the current user's account.
+
+If the script returns zero, the installation is assumed to be present.
+Otherwise, rosdep may determine that it is necessary to perform an
+installation of this dependency.  If the source package manager is
+asked to install a dependency, the following steps are followed:
+
+ 1. Download the tarball specified in the ``uri`` rule.  If the primary ``uri`` is unavailable, attempt to download the ``alternate-uri``.
+ 2. If md5sum is specified, validate the md5sum of the tarball.
+ 3. Unpack the tarball.
+ 4. Download the ``install-script`` specified in the ``.rdmanifest`` file. The working directory of the ``install-script`` specified by ``exec-path``, which defaults to the directory the tarball is unpacked to.
+ 5. Execute the ``install-script`` with superuser permissions.
+
+
+``.rdmanifest`` example
+'''''''''''''''''''''''
+
+The following example demonstrates a plausible rosdep manifest file
+for the yaml-cpp library.  This particular rosdep manifest file
+leverages the ``dpkg`` tool and thus will only work on Debian-based
+systems. A more generic rosdep manifest file could be written to work
+on a greater variety of platforms, or different rosdep manifest files
+could be written to support other platforms.
+
 ::
 
     uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.tar.gz'
@@ -124,9 +213,63 @@ An example:
     exec-path: yaml-cpp-0.2.5
     depends: [checkinstall ]
 
+Rationale
+=========
+
+depends
+-------
+
+The rosdep manifest file follows the recommendation of REP 111 and
+provides a dependency specification.  The ``depends`` syntax in the
+rosdep manifest provides greater flexibility when integrating software
+packages.  It functions similar to `dpkg` and `rpm` dependencies,
+where it provides an ordering for installing a hierarchical set of
+libraries.  It also enables developers to use multiple package
+managers to satisfy dependencies.  For example, the library could
+specify dependencies that resolve to ``apt`` or ``yum`` installations,
+and then perform a source-based install on top.
 
 
+rosdep manifest files
+---------------------
 
+In the previous implementation of source-based installs for rosdep,
+the entire installation script was contained within the ``rosdep.yaml``
+rule.  This enabled the ``rosdep.yaml`` file to be complete: no additional
+specifications were necessary, other than implicit resources
+referenced by the script.
+
+This REP requires developers to now specify a ``rosdep.yaml`` rule as well
+as create and host a separate rosdep manifest file.  There were
+several reasons leading to this separation.  First, the inline syntax
+leads to more duplication.  Two platforms wishing to both used a
+source-based install must repeat the entire rule separately.  If there
+is a bug in an installation script, it must be fixed in each
+repetition of the rule.  
+
+Furthermore, this can also lead to repetition in cases where two ROS
+stacks, without a common ancestor, wish to integrate the same
+thirdparty library.  As these stacks doe not have a common ancestor,
+each stack must add integrate the thirdparty library in its own
+``rosdep.yaml`` file.  The new rosdep manifest files enable a
+separation of roles: those that provide wrappers for thirdparty
+libraries to be used in ROS, and those that integrate these into
+``rosdep.yaml`` files in a ROS stack hierarchy.
+
+Finally, the inline syntax of the old rosdep format decreased the
+readability of the ``rosdep.yaml`` files. which is an important
+concern when maintaining these files over time.
+
+
+References and Footnotes
+========================
+
+.. [1] rosdep documentation
+   (http://www.ros.org/wiki/rosdep)
+.. [2] REP 111: Multiple Package Manager Support for Rosdep
+   (http://www.ros.org/reps/rep-0111.html)
+.. [3] rosdep.yaml format in ROS Diamondback
+   (http://www.ros.org/wiki/rosdep/rosdep.yaml/diamondback)
 
 
 Copyright
