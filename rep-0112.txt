@@ -8,12 +8,7 @@ Type: Standards Track
 Content-Type: text/x-rst
 Created: 29-June-2011
 ROS-Version: 1.6
-Post-History: 30-Aug-2002
-
-
-# This is not working should be just below the Type: target
-# Requires: 111
-
+Post-History: 05-Jul-2011
 
 Abstract
 ========
@@ -27,32 +22,42 @@ rosdep syntax introduced in REP 111 [2]_.
 Motivation
 ==========
 
- * monolithic, idempotent scripts
- * rosdep cannot verify if dependency is installed
- * duplication of scripts between different OS rules.  Bad b/c it leads to bloated rosdep files and potential, buggy duplication.
+The motivation for this REP is similar to REP 111 [2]_.  To quote from REP 111:
+
+    ... the bash script specification was brittle and provided
+    limited information to rosdep itself.  The scripts were required to
+    be idempotent because rosdep was unable to detect whether or not the
+    dependency was already installed. 
+
+    The goal of this REP is to make rosdep more robust and flexible, as
+    well as enable better support of platforms other than Ubuntu.
 
 
-As the range of code required to build ROS against expands it becomes
-necessary to expand beyond what is available in existing package
-mangers sometimes. Sometimes things are just not up to date enough, or
-existing packaged software has critical bugs which are not being
-patched. To deal with these cases installing from source sometimes is
-necessary.  However just installing from source is hard to manage
-across multiple machines.  The goal of this REP is to make
-installation of software from source easy and repeatable.
+This REP specifically introduces a custom rosdep package manager that
+provides a new mechanism for source-based installations of software
+libraries.  The goals for this new package manager are:
 
-Specific Goals
---------------
+ * Reliable, source-based installation of thirdparty libraries for any ROS platform.
+ * Enable rosdep to check that source-based dependencies are present.
+ * Allow source rosdeps to have prerequisites, i.e. to depend on other rosdeps.
+ * Enable any community member to contribute rosdep-compatible packaging for libraries.
+ * Enable automated verification of source-based dependencies without superuser access.
+ * Reduce duplication in rosdep source installation rules.
 
- * Enable repeatable source based installations.
 
- * Provide testable presence checks so it will not be repeatedly installed.
+There are several anticipated use cases for this new source-based
+package manager.  The first is to provide generic scripts for
+POSIX-based systems for common thirdparty libraries.  These generally
+can be improved by integrating the native package manager for that
+platform, but the source mechanism provides an initial working system.
 
- * Does not require administrative privileges (``sudo``) to verify installation.
-
- * Enable any community member to contribute.
-
- * Make reuse of definitions easy.  
+A new, anticipated use case is improving support for ROS on platforms
+that lack official package managers.  For example, support for ROS on
+Windows is improving and will soon require better infrastructure for
+satisfying rosdep dependencies.  Similarly, although OS X users can
+use MacPorts for rosdep dependencies, this REP provides an alternative
+mechanism that is more stable and easier to lock to specific OS X
+versions.
 
 
 Specification
@@ -81,11 +86,11 @@ The source package manager defines the ``PACKAGE_MANAGER`` and ``PACKAGE_ARGUMEN
 fields as follows:
 
  * ``PACKAGE_MANAGER`` is ``source``
- * ``PACKAGE_ARGUMENTS``: the ``source`` package manager accepts three fields:
+ * ``PACKAGE_ARGUMENTS``: the ``source`` package manager accepts a dictionary with three possible keys:
 
-   - ``uri``: the primary download uri for the rosdep manifest (*required*).
-   - ``alternate-uri``:  a mirror download uri for the rosdep manifest (*optional*).  
-   - ``md5sum``: md5sum hash of the rdmanifest for security and verification. (*optional, recommended*)
+   - ``uri`` (string): the primary download uri for the rosdep manifest (*required*).
+   - ``alternate-uri`` (string):  a mirror download uri for the rosdep manifest (*optional*).  
+   - ``md5sum`` (string): md5sum hash of the rdmanifest for security and verification. (*optional, recommended*)
 
 As defined by REP 111, the use of the ``source`` package manager is
 specific to a OS platform.
@@ -132,29 +137,52 @@ REP and is up to the developer providing the integration.
 
 The rosdep manifest (``.rdmanifest``) file has 6 fields:
 
- * ``uri`` (single-line string): The uri of the tarball to download.  
+ * ``uri`` (string): The uri of the tarball to download.  
 
- * ``md5sum`` (single-line string): The expected md5sum of the tarball (*recommended*)
+ * ``md5sum`` (string): The expected md5sum of the tarball (*recommended*)
 
- * ``alternate-uri`` (single-line string): An optional alternate-uri for reliability
+ * ``alternate-uri`` (string): An optional alternate-uri for reliability
    (recommended)
 
  * ``check-presence-script`` (multi-line string): a script that exits
    with return code zero if a package is already present, non-zero otherwise.  This
-   script is downloaded to a temporary file and is executed.   The script
-   must be able to run without superuser permissions.
+   script is downloaded to a temporary file and executed with the user's account.  
 
- * ``install-script`` (multi-line string):  a script that installs
-   software library from tarball.  The install script will have the working
-   directory set to the ``exec-path``, which is generally the directory where
-   the unpacked tarball is located.  The script is executed with *superuser* privleges.
+ * ``install-script`` (multi-line string): a script that installs
+   software library from tarball.  The script is downloaded to a
+   temporary file and executed with the user's account.  The working
+   directory set to the ``exec-path``, which is generally the
+   directory where the unpacked tarball is located.
 
- * ``exec-path``: relative path used to specify working directory of
+ * ``exec-path`` (string): relative path used to specify working directory of
    the ``install-script`` (*optional*).  The path is interpreted to be
    relative to the directory the tarball is downloaded and unpacked
    to. ``exec-path`` is optional and defaults to '.', i.e. the directory
    of the tarball.
 
+ * ``depends`` (string list): list of rosdep dependencies that must
+   be installed before checking or installing this rosdep.
+
+check-presence-script and install-script
+''''''''''''''''''''''''''''''''''''''''
+
+The ``check-presence-script`` and ``install-script`` are text-based
+scripts that are downloaded and executed by rosdep.  rosdep will
+assign these scripts an executable permission and they may be written
+in any executable text format supported by the target platform.
+
+For example, on POSIX-based systems, scripts can use a shebang to
+specify the desired interpreter of the script, such as ``#!/bin/sh``
+or ``#!/usr/bin/env python``.  
+
+The scripts are executed using the user's account.  In the event that
+a script requires superuser access, it must explicitly invokes
+commands like ``sudo`` on its own.  It is *strongly recommended* that
+the ``check-presence-script`` not use any superuser privileges as this
+interferes with automated verification of dependencies.  This
+recommendation is only for the ``check-presence-script`` as it is
+expected that an ``install-script`` will need to use superuser
+permissions for final install steps, e.g. ``make install``.
 
 Source package manager implementation
 '''''''''''''''''''''''''''''''''''''
@@ -165,8 +193,9 @@ the source package manager to verify a system dependency is installed.
 
  1. Download the ``.rdmanifset`` file referenced by the ``uri`` rule.  If the primary ``uri`` is unavailable, attempt to download the ``alternate-uri``. 
  2. If md5sum is specified, validate the md5sum of the  ``.rdmanifest`` file.
- 3. Download the ``check-presence-script`` specified in the ``.rdmanifest`` file.
- 4. Execute the ``check-presence-script`` under the current user's account.
+ 3. Verify that all rosdep dependencies specified in ``depends`` in the ``.rdmanifest`` are installed.
+ 4. Download the ``check-presence-script`` specified in the ``.rdmanifest`` file.
+ 5. Execute the ``check-presence-script`` with the current user's account.
 
 If the script returns zero, the installation is assumed to be present.
 Otherwise, rosdep may determine that it is necessary to perform an
@@ -177,7 +206,7 @@ asked to install a dependency, the following steps are followed:
  2. If md5sum is specified, validate the md5sum of the tarball.
  3. Unpack the tarball.
  4. Download the ``install-script`` specified in the ``.rdmanifest`` file. The working directory of the ``install-script`` specified by ``exec-path``, which defaults to the directory the tarball is unpacked to.
- 5. Execute the ``install-script`` with superuser permissions.
+ 5. Execute the ``install-script`` with the current user's account.
 
 
 ``.rdmanifest`` example
@@ -234,28 +263,33 @@ and then perform a source-based install on top.
 rosdep manifest files
 ---------------------
 
-In the previous implementation of source-based installs for rosdep,
-the entire installation script was contained within the ``rosdep.yaml``
-rule.  This enabled the ``rosdep.yaml`` file to be complete: no additional
+The new rosdep manifest files provides for a separation of roles when
+integrating libraries into rosdep: those that provide wrappers for
+thirdparty libraries to be used in ROS, and those that integrate these
+into ``rosdep.yaml`` files in a ROS stack hierarchy.  Authors of
+thirdparty libraries can provide integration with rosdep without
+having to release separate ROS stacks.
+
+This approach does comes with some disadvantages. In the previous
+implementation of source-based installs for rosdep, the entire
+installation script was contained within the ``rosdep.yaml`` rule.
+This enabled the ``rosdep.yaml`` file to be complete: no additional
 specifications were necessary, other than implicit resources
-referenced by the script.
+referenced by the script.  REP 111 instead requires developers to also
+to create and host a separate rosdep manifest file.
 
-This REP requires developers to now specify a ``rosdep.yaml`` rule as well
-as create and host a separate rosdep manifest file.  There were
-several reasons leading to this separation.  First, the inline syntax
-leads to more duplication.  Two platforms wishing to both used a
-source-based install must repeat the entire rule separately.  If there
-is a bug in an installation script, it must be fixed in each
-repetition of the rule.  
+Although this separation has additional overhead, it has benefits
+beyond the separation of roles described above.  First, the inline
+syntax leads to more duplication.  Two platforms wishing to both used
+a source-based install must repeat the entire rule separately, even if
+the rules are identical.
 
-Furthermore, this can also lead to repetition in cases where two ROS
-stacks, without a common ancestor, wish to integrate the same
-thirdparty library.  As these stacks doe not have a common ancestor,
-each stack must add integrate the thirdparty library in its own
-``rosdep.yaml`` file.  The new rosdep manifest files enable a
-separation of roles: those that provide wrappers for thirdparty
-libraries to be used in ROS, and those that integrate these into
-``rosdep.yaml`` files in a ROS stack hierarchy.
+The old inline approach also led to repetition in cases where two ROS
+stacks, without a common ancestor, wished to integrate the same rosdep
+library.  As these stacks do not have a common ancestor, each stack
+must add the rosdep library in its own ``rosdep.yaml`` file.  This REP
+reduces the duplication as each ``rosdep.yaml`` file only needs to
+point at the external rosdep manifest file.
 
 Finally, the inline syntax of the old rosdep format decreased the
 readability of the ``rosdep.yaml`` files. which is an important
