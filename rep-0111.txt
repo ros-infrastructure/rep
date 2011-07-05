@@ -343,6 +343,23 @@ Macports
 The ``macports`` rules will be supported during ROS Electric.
 
 
+Ubuntu Codename Usage
+---------------------
+
+For the following codenames backwards compatabilty will be built into
+the tool to automatically translate rules:
+
+ * '10.04' -> lucid
+
+ * '10.10' -> maverick
+
+ * '11.04' -> natty
+
+It is expected that all future releases will refer to the correct
+codename, e.g. 'oneiric'.
+
+This will be supported through ROS Fuerte.
+
 References and Footnotes
 ========================
 
