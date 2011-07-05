@@ -1,0 +1,116 @@
+REP: 112
+Title: Source Package Manager for Rosdep
+Version: $Revision: 83 $
+Last-Modified: $Date: 2011-01-17 19:02:13 -0800 (Mon, 17 Jan 2011) $
+Author: Tully Foote
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 29-June-2011
+ROS-Version: 1.6
+Post-History: 30-Aug-2002
+
+
+# This is not working should be just below the Type: target
+# Requires: 111
+
+
+Abstract
+========
+
+This REP defines how to add a "source" package manager to the rosdep infrastructure as defined in REP 111. LINKME
+
+Rationale
+=========
+
+As the range of code required to build ROS against expands it becomes
+necessary to expand beyond what is available in existing package
+mangers sometimes. Sometimes things are just not up to date enough, or
+existing packaged software has critical bugs which are not being
+patched. To deal with these cases installing from source sometimes is
+necessary.  However just installing from source is hard to manage
+across multiple machiens.  The goal of this REP is to make
+installation of software from source easy and repeatable.
+
+
+Specification
+=============
+
+rosdep.yaml syntax
+------------------
+
+In the rosdep yaml syntax as layed out in REP 111 (LINKME) the package
+manager name will be "source". And there will be three fields:
+
+ * uri: the primary download uri for the rosdep manfiest(rdmanifest)
+ * alternate-uri:  an optional backup download source.  
+ * md5sum: a recommended md5sum hash of the rdmanifest for security.
+
+Example: 
+
+::
+
+    source:
+      uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
+      alternate-uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.rdmanifest'
+      md5sum: 740a2193cea112f5ef682d9f69f9c7b1
+
+
+rosdep manifest syntax
+----------------------
+
+The rosdep manifest file will have 6 fields.  
+
+ * uri: The uri of the tarball to download.  
+ * md5sum: The expected md5sum of the tarball (recommended)
+ * alternate-uri: An optional alternate-uri for reliability (recommended) 
+ * check-presence-script: A string format.  The check-presence-script which will be downloaded and written to a temporary file and executed.  The return code will be zero if the package is already present, any other return code implies not present. If the check-presence-script returns nonzero the tarball will be dowloaded and checked agsinst the md5sum field.  The package will be untarred into a temporary directory.
+ * install-script: String format.  The install-script will be downloaded and written to a temporary file and be executed in the subdirectory of the tarball defined by the exec-path.  exec-path is optional it will default to '.'
+ * exec-path: Optional default is '.'
+
+
+An example:
+::
+
+    uri: 'https://kforge.ros.org/rosrelease/viewvc/sourcedeps/yaml-cpp/yaml-cpp-0.2.5.tar.gz'
+    md5sum: b17dc36055cd2259c88b2602601415d9
+    install-script: |
+      #!/bin/bash
+      set -o errexit
+      mkdir -p build
+      cd build
+      cmake ..
+      make
+      echo "About to run checkinstall make install"
+      sudo checkinstall -y --nodoc --pkgname=yaml-cpp-sourcedep make install
+    check-presence-script: |
+      #!/bin/bash
+      dpkg-query -W -f='${Package} ${Status}\n' yaml-cpp-sourcedep | awk '{\
+      if ($4 =="installed")
+        exit 0
+      else
+        print "yaml-cpp-sourcedep not installed"
+        exit 1}'
+    exec-path: yaml-cpp-0.2.5
+    depends: [checkinstall ]
+
+
+
+
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
