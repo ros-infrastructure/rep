@@ -204,7 +204,7 @@ The names above resolve as follows:
  * ``ROSDEP_NAME`` is the name referred to by manifest files. Examples: ``log4cxx`` or ``gtest``.
  * ``OS_NAME`` is the name of an OS.  Examples: ``ubuntu``, ``osx``, ``fedora``, ``debian``, or ``windows``.  
  * ``OS_VERSION`` (*optional*) is the name of specific versions in the OS. Examples: ``lucid`` or ``squeeze``. If no ``OS_VERSION`` is specified, the rule is assumed to apply to all versions.
- * ``PACKAGE_MANAGER`` (*optional in ROS Electric, required in ROS Fuerte*) is the name of the package manager to use for this rosdep.  Examples: ``apt``, ``easy_install``, ``macports``.  
+ * ``PACKAGE_MANAGER`` (*optional in ROS Electric, required in ROS Fuerte*) is the code name of the package manager to use for this rosdep.  Examples: ``apt``, ``easy_install``, ``macports``.  
  * ``PACKAGE_ARGUMENT`` is free-form YAML that is be passed to the handler for the specified ``PACKAGE_MANAGER``.
 
 
