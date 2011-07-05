@@ -328,6 +328,9 @@ Defaults:
  * osx: macports
  * freebsd: port
 
+Support for the default package manger will be maintained upto and
+including ROS Fuerte.
+
 Bash scripts
 ------------
 
