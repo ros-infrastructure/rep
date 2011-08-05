@@ -220,10 +220,6 @@ discourage GUI dependencies in these stacks, if possible.
       stacks: [simulator_stage, simulator_gazebo, physics_ode,
         visualization_common, rx]
   
-  - simulators:
-      extends: [robot]
-      stacks: [simulator_stage, simulator_gazebo, physics_ode]
-
   - viz:
       extends: [robot]
       stacks: [visualization_common, visualization, rx, image_common, laser_pipeline,
