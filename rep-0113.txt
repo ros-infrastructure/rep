@@ -3,7 +3,7 @@ Title: ROS Electric Variants
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 05-Aug-2011
