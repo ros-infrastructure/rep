@@ -213,6 +213,20 @@ vital functionality and is bug-prone.
 Open issues
 ===========
 
+roslib.load_manifest
+--------------------
+
+The ``roslib.load_manifest`` and related ``from ros import <package>``
+APIs have not yet been ported to the ``rospkg`` library.  These APIs
+are largely the reason why ROS installations require configuration of
+the ``PYTHONPATH`` environment variable -- though there are many tools
+tha also use this configuration to access other roslib libraries.
+
+It is possible that this setup requirement could be phased out of
+future ROS distribution releases if we include this functionality, but
+the analysis has not yet been done as to whether or not this can be
+provided in a backwards-compatible manner.
+
 rospkg.os_detect
 ----------------
 
