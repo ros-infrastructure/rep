@@ -1,0 +1,299 @@
+REP: 114
+Title: rospkg standalone Python library
+Version: $Revision$
+Last-Modified: $Date: $
+Author: Ken Conley <kwc@willowgarage.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 18-Aug-2011
+Post-History: 18-Aug-2011
+
+Abstract
+========
+
+``rospkg`` is a standalone Python package designed to supercede many
+of the Python modules that exist in the ``roslib`` [1]_ library.  This
+library provides APIs for accessing information on ROS packages and
+stacks and is similar in functionality to the ``rospack`` and
+``rosstack`` tools.
+
+Motivation
+==========
+
+There are several motivating use cases:
+
+ - Create supporting toolchain that is external to ROS distributions
+ - Clean, supported API for ROS package system access
+ - In the long term, minimize ROS package system dependencies
+
+``roslib`` is one of the earliest Python modules written to support
+ROS and has historically been an internal API used to develop a
+variety of ROS tools and libraries, like ``rosmake`` [2]_, ``rosdep``
+[3]_, ``rospy`` [4]_ and more.  It is long overdue for a rewrite to a
+cleaner API, and it is also necessary to migrate it out of the normal
+ROS package system in order to better support tools written against
+it.
+
+There are a variety of tools like ``rosinstall`` [5]_, ``create.py``
+[6]_, and a large debian-packaging-building pipeline that have been
+written to support the release and deployment of ROS software.  There
+are also tools that support the documentation of ROS software, like
+``rosdoc`` [6]_ and macros for the ROS wiki [8]_.  The software
+supporting this infrastructure suffers from being part of the system
+that it is being applied to.  
+
+This coupling means that support tools, from documentation to release
+tools, must use the APIs of the software they are being applied to or
+duplicate them separately.  A different approach is to create a
+separate, standalone library that is decoupled from ROS distribution
+releases.  This library can be shared by the support tools and used by
+libraries in ROS distribution releases, eliminating any duplication.
+However, more care must be taken with the standalone libraries to
+retain long-term backwards compatibility so that updates to the
+library do not break pre-existing software.
+
+The most commonly used APIs in support tools relate to the ROS package
+and build system.  As the package and stack specification has been
+relatively stable since the ROS 1.0 release, this is a good target for
+a stable, standalone library.
+
+In the longer term, the goal is to enable any developer to release
+ROS-related tools and packages without depending on any particular ROS
+distribution.  Currently, developers of ROS stacks have to declare a
+dependency on the ROS stack in order to properly integrate with the
+ROS packaging and build system.  In addition to providing a standalone
+ROS package library, tools like ``rosdep`` and ``rosmake`` could also
+be migrated to be standalone tools to remove any dependency on a
+specific ROS distribution release.
+
+A related goal is to have the full ROS packaging and build system
+available as a system dependency (e.g. a standard debian package
+accepted in an Ubuntu distribution release).  This will provide
+additional flexibility and options, such as using Launchpad PPAs, to
+developers wishing to release ROS-related software.
+
+
+Specification
+=============
+
+This REP introduces a new ``rospkg`` Python module that can be
+installed installed via ``easy_install`` or ``pip`` to the standard
+Python ``dist-packages`` location.  The ``rospkg`` library provides
+ROS package and stack APIs.  It also provides an OS detection library
+in a submodule.
+
+The ``rospkg`` library is a replacement for existing libraries in
+``roslib`` but it is not API compatible.
+
+The ``rospkg`` Python module fully supercedes the following ``roslib``
+Python modules:
+
+
+ - ``roslib.manifest``
+ - ``roslib.manifestlib``
+ - ``roslib.os_detect``
+ - ``roslib.packages``
+ - ``roslib.stack_manifest``
+ - ``roslib.stacks``
+ 
+The ``rospkg`` Python module partially supercedes the following
+``roslib`` Python modules:
+
+ - ``roslib.environment`` 
+
+environment APIs
+----------------
+
+The ``rospkg`` environment APIs are restricted to environment
+variables that deal with the ROS packaging system and filesystem
+locations.  It does not provide functionality related to the ROS graph
+system (e.g. ``ROS_MASTER_URI``).
+
+rospkg.RosPack
+--------------
+
+``rospkg.RosPack`` is a Python analogue of the ``rospack`` tool.  It
+implements its own filesystem-crawling logic so it can be deployed in
+environments without the ``rospack`` tool.  It is capable of reading
+the ``rospack_cache`` file and implements internal caching so that it
+can be used efficiently for repeated queries.
+
+rospkg.RosStack
+---------------
+
+``rospkg.RosStack`` is a Python analogue of the ``rosstack`` tool.  It
+implements its own filesystem-crawling logic so it can be deployed in
+environments without the ``rosstack`` tool.  It is capable of reading
+the ``rosstack_cache`` file and implements internal caching so that it
+can be used efficiently for repeated queries.
+
+rospkg.Manifest
+---------------
+
+The new ``rospkg.Manifest`` class supports parsing ``manifest.xml``
+and ``stack.xml`` files.  It mainly supports the ``RosPack`` and
+``RosStack`` APIs.
+
+rospkg.os_detect
+----------------
+
+The ``rospkg.os_detect`` submodule provides support for detecting the
+platform that the ROS software is being run on, such as determining
+the OS name and version.
+
+
+Rationale
+=========
+
+rospkg.os_detect
+----------------
+
+``rospkg.RosPack`` and ``rospkg.RosStack`` are fairly straightforward
+components to include in a ``rospkg`` library.  The inclusion of the
+``rospkg.os_detect`` submodule is less clear.  
+
+Tools like ``rosmake``, ``rosdep``, and ``rosinstall`` all have
+OS-dependent behaviors that led to the development of the
+``roslib.os_detect`` library.  In to support the future goal of making
+all of these tools standalone, this library needs to be migrated to a
+standalone library as well.
+
+It is also the case that ROS package manifests have 
+`<platform os="OS_NAME" version="OS_VERSION" />` tags meant to annotate 
+package compatibility.  The values for ``OS_NAME`` and ``OS_VERSION``
+are currently codified by the ``roslib.os_detect`` module, which means
+that a ``rospkg`` library requires this information as well.
+
+To balance this tension, the OS-detection libraries are presented as a
+submodule so that they are separated from ROS package and stack APIs.
+
+rosdistro
+---------
+
+There is a separate ``rosdistro`` ROS package that supports parsing of
+ROS ``.rosdistro`` files.  These files describe a ROS distribution,
+which is a collection of ROS stacks at a particular version.  As a ROS
+distribution is conceptually part of the ROS package ecosystem and as
+many support tools require this library as well, we may wish to
+consider putting it into the ``rospkg`` module in the future.
+However, this would require putting the ``vcstools`` module in
+``rospkg`` as well.  The ``vcstools`` module is currently undergoing
+major development, so it is not ideal for putting in ``rospkg`` right
+now.
+
+
+Compatibility
+=============
+
+The ``rospkg`` module is not backwards compatible with the ``roslib``
+module.  The intent is to have a clean API that is stable and can be
+supported for a long period.
+
+rospkg.RosPack
+--------------
+
+The dependency and rosdep APIs have been altered to only take in a
+single package argument instead of a list of arguments.  Similarly,
+the return values are now just the list of dependencies or rosdeps,
+instead of a map of argument names to return values.  This change was
+made as it is easy to implement a list-of-packages-style API on top of
+the base API.
+
+rospkg.Manifest
+---------------
+
+The new ``rospkg.Manifest`` class condenses the
+``roslib.manifest.Manifest`` and ``roslib.manifest.StackManifest``
+classes into a single class in order to streamline the implementation.
+It also removes the ability to marshal instances to XML, which is not
+vital functionality and is bug-prone.
+
+
+Open issues
+===========
+
+rospkg.os_detect
+----------------
+
+The definition of an OS name and version are heavily geared towards
+the rosdep definition.  Sometimes version is equivalent to 'codename';
+in other cases it is a version number.  In the interest of supporting
+a longer-term API, it may be worthwhile to migrate to an
+``lsb_release``-style API [9]_ that provides the version number and
+codename separately.
+
+Manifest
+--------
+
+The new ``rospkg.Manifest`` class API is not considered API stable at
+this point.  Better accessors (e.g. property decorators) and other
+validation logic may be added that could alter the API.  For now, the
+``rospkg.Manifest`` API should not be directly manipulated, and
+relevant information should be extracted via the ``RosPack`` and
+``RosStack`` APIs.
+
+
+Reference implementation
+========================
+
+Reference implementation code located in SVN repository at:
+
+https://code.ros.org/svn/ros/stacks/ros_experimental/trunk/rospkg/
+
+It will eventually be moved to a separate, standalone location.
+
+You can also download and use ``rospkg`` using ``easy_install`` or ``pip``, e.g.::
+
+    pip install rospkg
+
+API documentation can be read at:
+
+http://www.ros.org/doc/api/rospkg/html/sphinx/html/
+
+References
+==========
+
+.. [1] roslib
+   (http://www.ros.org/wiki/roslib)
+
+.. [2] rosmake
+   (http://www.ros.org/wiki/rosmake)
+
+.. [3] rosdep
+   (http://www.ros.org/wiki/rosdep)
+
+.. [4] rospy
+   (http://www.ros.org/wiki/rospy)
+
+.. [5] rosinstall
+   (http://www.ros.org/wiki/rosinstall)
+
+.. [6] release
+   (http://www.ros.org/wiki/release)
+
+.. [7] rosdoc
+   (http://www.ros.org/wiki/rosdoc)
+
+.. [8] ROS wiki
+   (http://www.ros.org/wiki/)
+
+.. [9] lsb_release
+   (http://refspecs.freestandards.org/LSB_3.1.0/LSB-Core-generic/LSB-Core-generic/lsbrelease.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
