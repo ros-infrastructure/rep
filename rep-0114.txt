@@ -251,11 +251,9 @@ relevant information should be extracted via the ``RosPack`` and
 Reference implementation
 ========================
 
-Reference implementation code located in SVN repository at:
+Reference implementation code located in Mercurial repository at:
 
-https://code.ros.org/svn/ros/stacks/ros_experimental/trunk/rospkg/
-
-It will eventually be moved to a separate, standalone location.
+https://kforge.ros.org/rosrelease/rospkg
 
 You can also download and use ``rospkg`` using ``easy_install`` or ``pip``, e.g.::
 
