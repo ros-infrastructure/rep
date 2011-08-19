@@ -1,7 +1,7 @@
 REP: 114
 Title: rospkg standalone Python library
 Version: $Revision$
-Last-Modified: $Date: $
+Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
 Status: Draft
 Type: Informational
