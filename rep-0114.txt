@@ -43,18 +43,18 @@ are also tools that support the documentation of ROS software, like
 supporting this infrastructure suffers from being part of the system
 that it is being applied to.  
 
-This coupling means that support tools, from documentation to release
-tools, must use the APIs of the software they are being applied to or
+This coupling means that support tools, from documentation to release,
+must use the APIs of the software they are being applied to or
 duplicate them separately.  A different approach is to create a
 separate, standalone library that is decoupled from ROS distribution
 releases.  This library can be shared by the support tools and used by
 libraries in ROS distribution releases, eliminating any duplication.
-However, more care must be taken with the standalone libraries to
-retain long-term backwards compatibility so that updates to the
-library do not break pre-existing software.
+However, more care must be taken with a standalone library to retain
+long-term backwards compatibility so that updates do not break
+pre-existing software.
 
 The most commonly used APIs in support tools relate to the ROS package
-and build system.  As the package and stack specification has been
+and build system.  As the ROS package and stack specification has been
 relatively stable since the ROS 1.0 release, this is a good target for
 a stable, standalone library.
 
@@ -62,10 +62,9 @@ In the longer term, the goal is to enable any developer to release
 ROS-related tools and packages without depending on any particular ROS
 distribution.  Currently, developers of ROS stacks have to declare a
 dependency on the ROS stack in order to properly integrate with the
-ROS packaging and build system.  In addition to providing a standalone
-ROS package library, tools like ``rosdep`` and ``rosmake`` could also
-be migrated to be standalone tools to remove any dependency on a
-specific ROS distribution release.
+ROS packaging and build system.  Instead, Python-based tools like
+``rosdep`` and ``rosmake`` could also be migrated to be external to
+ROS distributions as well.
 
 A related goal is to have the full ROS packaging and build system
 available as a system dependency (e.g. a standard debian package
@@ -133,7 +132,7 @@ rospkg.Manifest
 
 The new ``rospkg.Manifest`` class supports parsing ``manifest.xml``
 and ``stack.xml`` files.  It mainly supports the ``RosPack`` and
-``RosStack`` APIs.
+``RosStack`` APIs, so it's API is not publicly supported, yet.
 
 rospkg.os_detect
 ----------------
@@ -225,7 +224,8 @@ tha also use this configuration to access other roslib libraries.
 It is possible that this setup requirement could be phased out of
 future ROS distribution releases if we include this functionality, but
 the analysis has not yet been done as to whether or not this can be
-provided in a backwards-compatible manner.
+supported in the long-term under the backwards-compatibility
+requirement of rospkg.
 
 rospkg.os_detect
 ----------------
