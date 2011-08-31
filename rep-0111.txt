@@ -3,7 +3,7 @@ Title: Multiple Package Manager Support for Rosdep
 Version: $Revision$
 Last-Modified: $Date$
 Author: Tully Foote
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 28-June-2011
