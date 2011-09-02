@@ -1,0 +1,362 @@
+REP: 115
+Title: rosco and roslocate tools for rosinstall
+Version: $Revision: 126 $
+Last-Modified: $Date: 2011-08-18 20:07:49 -0700 (Thu, 18 Aug 2011) $
+Author: Ken Conley <kwc@willowgarage.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 01-Sep-2011
+Post-History: 01-Sep-2011
+
+Abstract
+========
+
+This REP proposes two updates to rosinstall: ``roslocate`` and
+``rosco``.  ``roslocate`` enables users to locate rosinstall fragments
+and other information about ROS stacks and packages. ``rosco``
+supports source-control checkout of any rosinstall fragment.
+
+
+Motivation
+==========
+
+rosco
+-----
+
+``rosinstall`` [1]_ is a useful tool for managing a consistent
+development tree of multiple ROS stacks.  It takes care of important
+environment configuration, tree updates, and more.  It is less useful
+in situations where you just want to quickly get the source for a
+particular stack or package as it does more than just retrieve code.
+
+For example, you want to add a stack to an existing checkout, you may have to:
+
+1. Lookup the rosinstall fragment for the package/stack using ``roslocate``.
+2. Update your rosinstall configuration with this information.
+3. Run rosinstall, which will iterate through all entries in the rosinstall file.
+
+If you have multiple entries in the rosinstall file, you will have to
+wait as rosinstall examines each for updates.
+
+``rosco`` is instead motivated by "give me the source, now." In
+exchange for this haste, it does not do any bookkeeping or environment
+configuration for you: it is tries to be equivalent to running ``svn
+co``, ``git clone``, or the like.
+
+roslocate
+---------
+
+``roslocate`` is a tool for finding version-control and other
+information about a ROS package or stack.  It is a command-line
+interface for accessing information produced by the ROS indexing
+system.
+
+``roslocate`` has existed for quite some time in ROS, though its
+current incarnation is fairly recent.  A new prototype was written in
+December 2010 to emit rosinstall fragments as the original version was
+SVN-centric.  The prototype was later included with ``rosinstall`` to
+test its usefulness.
+
+An updated version of this prototype was introduced on
+``ros-developers`` in July 2011 to add distribution-specific searches
+for its commands (``--dev``, ``--distro``).  ``roslocate`` has existed
+as part of ``rosinstall`` for awhile, though it has not been formally
+specified.  As there are now tools like ``rosco`` and ``rosws`` [3]_
+that depend on this API, it is more important to provide this
+specification.
+
+
+Specification
+=============
+
+
+roslocate API
+-------------
+
+``roslocate`` has a command-based API.  Each of the commands is described below.
+
+
+describe
+''''''''
+
+``roslocate describe`` summarizes information about a ROS package or
+stack.  
+
+Example::
+
+    $ roslocate describe rosinstall
+    
+    Type: package
+    Stack: ros_release
+    Description: rosinstall is a tool to check out ROS source code (or any source code, really) from multiple version control repositories and updating these checkouts. Given a *.rosinstall file that specifies where to get code, rosinstall will check out a working copy for you. We recommend the use of rosinstall when checking out development versions of ROS source code. This package is where the code lives, however it is not expected for users to checkout and use this package directly.  It is expected that users use the version available through pypi.python.org.
+    URL: http://ros.org/wiki/rosinstall
+        
+info
+''''
+
+Prints the rosinstall fragment for the resource.  
+
+Example::
+
+    $ roslocate info common
+    - hg:
+        local-name: common
+        meta:
+          repo-name: wg-kforge
+        uri: https://kforge.ros.org/common/common
+        version: default
+    
+
+repo
+''''
+
+Prints the name of the repository the resource is stored in.  This
+repository name is for display purposes only -- it cannot be used as
+input to source control tools.
+
+Example::
+
+    $ roslocate repo cram_pl
+    tum-ros-pkg
+
+uri
+'''
+
+Prints the source control URI of a resource.  This is mainly intended
+as input to other programs via shell backtick or pipe.
+
+
+Example::
+
+    $ roslocate uri rospy
+    https://code.ros.org/svn/ros/stacks/ros_comm/trunk/clients/rospy
+
+
+vcs
+'''
+
+Prints the type of version control system used for the resource.
+Possible values include ``svn``, ``hg``, ``git``, and ``bzr``.
+
+
+Example::
+
+    $ roslocate vcs common
+    hg
+
+www
+'''
+
+Prints the website of a resource.  
+
+Example::
+
+    $ roslocate www rospy
+    http://ros.org/wiki/rospy
+
+
+--distro=DISTRO_NAME
+''''''''''''''''''''
+
+If the ``--distro=DISTRO_NAME`` option is combined with a roslocate
+command, the information returned will be based on a particular
+distribution release of a resource.
+
+
+Example::
+
+    $ roslocate info rospy
+    - svn:
+        local-name: rospy
+        uri: https://code.ros.org/svn/ros/stacks/ros_comm/trunk/clients/rospy
+    
+    $ roslocate info rospy --distro=diamondback
+    - svn:
+        local-name: ros_comm
+        uri: https://code.ros.org/svn/ros/stacks/ros_comm/tags/ros_comm-1.4.7
+    
+
+--dev
+'''''
+
+If the ``--dev`` option is combined with a roslocate command, the
+information returned will be based on the development branch of the
+resource (e.g. ``trunk``), if possible.  It should be used in
+combination with the ``--distro=DISTRO_NAME`` option as development
+trees are indexed based on a particular ROS distribution.
+
+The ``-dev`` option generally only affects source control information,
+like URIs and rosinstall fragments.  Other information, like resource
+descriptions, are not guaranteed to be development-branch specific.
+
+    
+Example::
+
+    $ roslocate info rospy --distro=electric
+    - svn:
+        local-name: ros_comm
+        uri: https://code.ros.org/svn/ros/stacks/ros_comm/tags/ros_comm-1.6.0
+        
+    $ roslocate info rospy --distro=electric --dev
+    - svn:
+        local-name: ros_comm
+        uri: https://code.ros.org/svn/ros/stacks/ros_comm/trunk
+    
+
+
+rosco command-line API
+----------------------
+
+The ``rosco`` command is roughly equivalent to running the equivalent
+``svn``, ``git``, or other source control tool to "checkout" or
+"clone" a repository.  It does not record any additional state.
+
+
+rosco <package-or-stack>
+''''''''''''''''''''''''
+
+Searches for the specified ROS package or stack and retrieves the
+source code use the appropriate version control tool.  For example, if
+the source code is stored in a Subversion repository, ``rosco`` will
+run a ``svn checkout`` of the resource in the local directory.
+
+
+rosco --rosinstall <rosinstall-file>, rosco -r <rosinstall-file>
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+For each entry in the rosinstall file, retrieve the source code use
+the appropriate version control tool.  Unlike ``rosinstall``, it only
+retrieves the source code and nothing more.
+
+
+piped input
+'''''''''''
+
+``rosco`` also accepts piped input formatted as rosinstall fragments.
+This is primarily meant to be used in combination with ``roslocate``.
+
+Example::
+
+    $ roslocate info rospy | rosco
+
+
+--distro=DISTRO_NAME
+''''''''''''''''''''
+
+Checkout the source code for a particular ROS distribution release,
+e.g. ``rosco rospy --distro=electric`` will checkout the Electric
+release of rospy.  This option is not valid when used with ``--rosinstall``.
+    
+
+--dev
+'''''
+
+The ``--dev`` option causes ``rosco`` to checkout the development
+branch instead.  It should be specified in combination with a
+``--distro=DISTRO_NAME`` option as development branches are
+distribution specific.
+
+
+Packaging
+---------
+
+``rosco`` and ``roslocate`` are distributed as scripts with the
+rosinstall PyPI package.
+
+
+Rationale
+=========
+
+
+rosco API
+---------
+
+The original ``rosco`` prototype had a different command-line specification::
+
+    rosco <rosinstall-file>
+
+
+This style favored rosinstall fragments for the API.  The revised API
+is based on discussions with Ibrahim Awwal on ros-users.  Ibrahim
+wrote a different ``rosco`` prototype that favored package and stack
+names as the primary argument.  This syntax is more direct as it omits
+the intermediate step of having to run the ``roslocate`` tool to
+generate the rosinstall data.
+
+
+--dev
+-----
+
+Both ``roslocate`` and ``rosco`` return the released version of a
+stack by default.  Thus, by default, users will get a working code
+tree.  There is also no option to select between the version-based tag
+and a distribution-based tag of a resource: the version-based tag is
+always used.  This simplifies the command-line API as users don't have
+to distinguish between these two different types of tags.  Although
+tracking tags, e.g. distribution-based tags, are useful, they
+encounter issues on VCS tools like ``git`` and we may phase them out
+in the future.
+
+
+Compatibility
+=============
+
+Removal of ``roslocate rosinstall``
+-----------------------------------
+
+This REP removes the ``roslocate rosinstall`` command that was part of
+the prototype tool.  Originally, ``roslocate`` had separate
+``rosinstall`` and ``info`` subcommands.  The ``rosinstall`` command
+was meant to return the exact rosinstall fragment used to generate the
+index information, whereas ``info`` was meant to provide more advanced
+URL computations, like returning the URL of a specific package inside
+a stack.  The distinction between these two was confusing and
+dependent on the implementation of the indexer.
+
+
+rosco
+-----
+
+The new ``rosco`` API is not compatible with the original prototype.
+As the original prototype had limited visiblity, this is assumed to
+not be a major issue.
+
+
+Reference implementation
+========================
+
+Reference implementation code is located in SVN repository at:
+
+https://code.ros.org/svn/ros/stacks/ros_release/trunk/rosinstall
+
+
+References
+==========
+
+.. [1] rosinstall
+   (http://www.ros.org/wiki/rosinstall)
+
+.. [2] roslocate
+   (http://www.ros.org/wiki/roslocate)
+
+.. [3] rosws
+   (http://www.ros.org/wiki/rosws)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
