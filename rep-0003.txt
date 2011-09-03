@@ -63,7 +63,7 @@ Electric Emys (Aug 2011)
 - Ubuntu Lucid
 - Ubuntu Maverick
 - Ubuntu Natty
-- Ubuntu O
+- Ubuntu Oneiric
 - C++03
 - Boost 1.40
 - Lisp SBCL 1.0.x(TBD)
