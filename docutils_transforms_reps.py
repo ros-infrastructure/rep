@@ -145,7 +145,11 @@ class Contents(Transform):
     default_priority = 380
 
     def apply(self):
-        language = languages.get_language(self.document.settings.language_code, None)
+        try:
+            #incompatible API change in docutils
+            language = languages.get_language(self.document.settings.language_code, None)
+        except TypeError:
+            language = languages.get_language(self.document.settings.language_code )
         name = language.labels['contents']
         title = nodes.title('', name)
         topic = nodes.topic('', title, classes=['contents'])
