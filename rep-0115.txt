@@ -7,19 +7,38 @@ Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Created: 01-Sep-2011
-Post-History: 01-Sep-2011
+Post-History: 01-Sep-2011, 02-Sep-2011
 
 Abstract
 ========
 
 This REP proposes two updates to rosinstall: ``roslocate`` and
-``rosco``.  ``roslocate`` enables users to locate rosinstall fragments
+``rosco``.  ``roslocate`` enables users to locate rosinstall entries
 and other information about ROS stacks and packages. ``rosco``
-supports source-control checkout of any rosinstall fragment.
+supports source-control checkout of any rosinstall entry.
+
+
+rosinstall entry
+================
+
+This specification frequently refers to `rosinstall entries`.  To
+clarify the meaning of this, in this REP we use rosinstall entry to
+mean a single YAML list element that describes source control
+information for rosinstall.
+
+Example::
+
+    - hg:
+        local-name: common
+        meta:
+          repo-name: wg-kforge
+        uri: https://kforge.ros.org/common/common
+        version: default
 
 
 Motivation
 ==========
+
 
 rosco
 -----
@@ -32,12 +51,12 @@ particular stack or package as it does more than just retrieve code.
 
 For example, you want to add a stack to an existing checkout, you may have to:
 
-1. Lookup the rosinstall fragment for the package/stack using ``roslocate``.
+1. Lookup the rosinstall entry for the package/stack using ``roslocate``.
 2. Update your rosinstall configuration with this information.
-3. Run rosinstall, which will iterate through all entries in the rosinstall file.
+3. Run rosinstall, which will iterate through all entries in the rosinstall configuration.
 
-If you have multiple entries in the rosinstall file, you will have to
-wait as rosinstall examines each for updates.
+If you have multiple entries in the rosinstall configuration, you will have to
+wait as rosinstall examines each entry for updates.
 
 ``rosco`` is instead motivated by "give me the source, now." In
 exchange for this haste, it does not do any bookkeeping or environment
@@ -48,23 +67,27 @@ roslocate
 ---------
 
 ``roslocate`` is a tool for finding version-control and other
-information about a ROS package or stack.  It is a command-line
-interface for accessing information produced by the ROS indexing
-system.
+information about a ROS package or stack.  The main use case is
+"locate the source code repository of this resource," though it can
+also provide additional metadata about that resource. It is designed
+to be a command-line interface for accessing information produced by
+the ROS.org indexing system, which crawls the known public
+repositories of ROS-compatible software.
 
 ``roslocate`` has existed for quite some time in ROS, though its
 current incarnation is fairly recent.  A new prototype was written in
-December 2010 to emit rosinstall fragments as the original version was
-SVN-centric.  The prototype was later included with ``rosinstall`` to
-test its usefulness.
+December 2010 [4]_ to emit rosinstall entries as the original version
+was SVN-centric and had scaling issues.  The prototype was later
+included with ``rosinstall`` to test its usefulness.  After upgrades
+to the ROS.org indexing system were made, an updated version of this
+prototype was introduced on ``ros-developers`` in July 2011 [5]_ to
+add distribution-specific searches for its commands (``--dev``,
+``--distro``).
 
-An updated version of this prototype was introduced on
-``ros-developers`` in July 2011 to add distribution-specific searches
-for its commands (``--dev``, ``--distro``).  ``roslocate`` has existed
-as part of ``rosinstall`` for awhile, though it has not been formally
-specified.  As there are now tools like ``rosco`` and ``rosws`` [3]_
-that depend on this API, it is more important to provide this
-specification.
+Although ``roslocate`` has existed for awhile in various forms, it has
+not been formally specified.  As there are now tools like ``rosco``
+and ``rosws`` [3]_ that depend on this API, it is more important to
+provide this specification.
 
 
 Specification
@@ -95,7 +118,7 @@ Example::
 info
 ''''
 
-Prints the rosinstall fragment for the resource.  
+Prints the rosinstall entry for the resource.  
 
 Example::
 
@@ -187,7 +210,7 @@ combination with the ``--distro=DISTRO_NAME`` option as development
 trees are indexed based on a particular ROS distribution.
 
 The ``-dev`` option generally only affects source control information,
-like URIs and rosinstall fragments.  Other information, like resource
+like URIs and rosinstall entries.  Other information, like resource
 descriptions, are not guaranteed to be development-branch specific.
 
     
@@ -233,7 +256,7 @@ retrieves the source code and nothing more.
 piped input
 '''''''''''
 
-``rosco`` also accepts piped input formatted as rosinstall fragments.
+``rosco`` also accepts piped input formatted as rosinstall entries.
 This is primarily meant to be used in combination with ``roslocate``.
 
 Example::
@@ -277,8 +300,8 @@ The original ``rosco`` prototype had a different command-line specification::
     rosco <rosinstall-file>
 
 
-This style favored rosinstall fragments for the API.  The revised API
-is based on discussions with Ibrahim Awwal on ros-users.  Ibrahim
+This style favored rosinstall entries for the API.  The revised API is
+based on discussions with Ibrahim Awwal on ros-users [6]_.  Ibrahim
 wrote a different ``rosco`` prototype that favored package and stack
 names as the primary argument.  This syntax is more direct as it omits
 the intermediate step of having to run the ``roslocate`` tool to
@@ -308,7 +331,7 @@ Removal of ``roslocate rosinstall``
 This REP removes the ``roslocate rosinstall`` command that was part of
 the prototype tool.  Originally, ``roslocate`` had separate
 ``rosinstall`` and ``info`` subcommands.  The ``rosinstall`` command
-was meant to return the exact rosinstall fragment used to generate the
+was meant to return the exact rosinstall entry used to generate the
 index information, whereas ``info`` was meant to provide more advanced
 URL computations, like returning the URL of a specific package inside
 a stack.  The distinction between these two was confusing and
@@ -343,6 +366,14 @@ References
 .. [3] rosws
    (http://www.ros.org/wiki/rosws)
 
+.. [4] [ros-developers] roslocate2
+   (https://code.ros.org/lurker/message/20101221.230920.c59b4048.en.html)
+
+.. [5] [ros-developers] Version-specific index and roslocate prototype
+   (http://code.ros.org/lurker/message/20110711.160222.666ecfe4.gl.html)
+
+.. [6] [ros-users] Rosco - ros.org checkout tool
+   (http://code.ros.org/lurker/message/20110818.223024.9c374482.en.html)
 
 Copyright
 =========
