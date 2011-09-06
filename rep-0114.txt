@@ -261,7 +261,7 @@ You can also download and use ``rospkg`` using ``easy_install`` or ``pip``, e.g.
 
 API documentation can be read at:
 
-http://www.ros.org/doc/api/rospkg/html/sphinx/html/
+http://www.ros.org/doc/api/rospkg/html/
 
 References
 ==========
