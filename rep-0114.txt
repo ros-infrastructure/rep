@@ -7,7 +7,7 @@ Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Created: 18-Aug-2011
-Post-History: 18-Aug-2011
+Post-History: 18-Aug-2011, 06-Sep-2011
 
 Abstract
 ========
@@ -101,6 +101,9 @@ The ``rospkg`` Python module partially supercedes the following
 
  - ``roslib.environment`` 
 
+The ``rospkg`` Python module also supercedes the ``rosdistro`` module.
+
+
 environment APIs
 ----------------
 
@@ -172,14 +175,21 @@ rosdistro
 
 There is a separate ``rosdistro`` ROS package that supports parsing of
 ROS ``.rosdistro`` files.  These files describe a ROS distribution,
-which is a collection of ROS stacks at a particular version.  As a ROS
-distribution is conceptually part of the ROS package ecosystem and as
-many support tools require this library as well, we may wish to
-consider putting it into the ``rospkg`` module in the future.
-However, this would require putting the ``vcstools`` module in
-``rospkg`` as well.  The ``vcstools`` module is currently undergoing
-major development, so it is not ideal for putting in ``rospkg`` right
-now.
+which is a collection of ROS stacks at a particular version.  
+
+The ``rosdistro`` ROS package has been included for porting to rospkg 
+as a ROS distribution is conceptually part of the ROS package ecosystem.
+The rosdistro module is also heavily used in the toolchain that rospkg 
+is intended to support. 
+
+Recent changes to the ``rosdistro``` package have made it easier to port.  The
+dependency on the ``vcstools`` package have been removed so the 
+distribution-related code can now be packaged standalone.  
+
+As distributions are not a primary concept like packages and stacks,
+the distribution-related APIs are being kept in the ``rospkg.distro``
+submodule.  These APIs are also not as stable as the package and stack
+APIs.
 
 
 Compatibility
@@ -208,6 +218,27 @@ classes into a single class in order to streamline the implementation.
 It also removes the ability to marshal instances to XML, which is not
 vital functionality and is bug-prone.
 
+os_detect
+---------
+
+The ``rospkg.os_detect`` module differs from ``roslib.os_detect`` in the
+definition of an OS "version".  In the ``roslib`` API, version
+can be a codename or a pure version number, depending on the specific OS.
+This is largely an artifact of the library originally being a rosdep support
+library.  
+
+In the interest of consistency and supporting a longer-term API, the
+definitionis have been migrated to be more like ``lsb_release``-style
+[9]_, which provides the version number and codename separately.
+
+
+rospkg.distro
+-------------
+
+The new ``rospkg.distro`` format streamlines the distribution API by
+removing backwards-compatibility support for older rosdistro formats.
+It also simplifies up access to stack and release information.
+
 
 Open issues
 ===========
@@ -226,16 +257,6 @@ future ROS distribution releases if we include this functionality, but
 the analysis has not yet been done as to whether or not this can be
 supported in the long-term under the backwards-compatibility
 requirement of rospkg.
-
-rospkg.os_detect
-----------------
-
-The definition of an OS name and version are heavily geared towards
-the rosdep definition.  Sometimes version is equivalent to 'codename';
-in other cases it is a version number.  In the interest of supporting
-a longer-term API, it may be worthwhile to migrate to an
-``lsb_release``-style API [9]_ that provides the version number and
-codename separately.
 
 Manifest
 --------
