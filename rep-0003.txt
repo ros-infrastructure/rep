@@ -66,12 +66,24 @@ Electric Emys (Aug 2011)
 - Ubuntu Oneiric
 - C++03
 - Boost 1.40
-- Lisp SBCL 1.0.x(TBD)
+- Lisp SBCL 1.0.x
 - Python 2.6
 
-F Turtle (Feb 2012)
--------------------
-- TBD: This release will be used to plan migration to a new Ubuntu LTS
+Fuerte Turtle (Mar 2012)
+------------------------
+- Ubuntu Lucid
+- Ubuntu Oneiric
+- Ubuntu P
+- C++03
+- Boost 1.40
+- Lisp SBCL 1.0.x
+- Python 2.6
+
+Groovy Galapagos (Aug 2012)
+---------------------------
+- Ubuntu Oneiric
+- Ubuntu P
+- System libraries TBD
 
 Motivation
 ==========
