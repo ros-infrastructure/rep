@@ -73,7 +73,7 @@ Fuerte Turtle (Mar 2012)
 ------------------------
 - Ubuntu Lucid
 - Ubuntu Oneiric
-- Ubuntu P
+- Ubuntu Precise
 - C++03
 - Boost 1.40
 - Lisp SBCL 1.0.x
