@@ -1,0 +1,107 @@
+REP: 116
+Title: Extend pluginlib
+Version: $Revision: 1 $
+Last-Modified: $Date: 2011-10-07 02:00:00 +0200 (Fri, 7 Oct 2011) $
+Author: Dirk Thomas
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 7-Oct-2011
+ROS-Version: Fuerte
+Post-History: 7-Oct-2011
+
+Abstract
+========
+
+This REP extends pluginlib with additional features.  It proposes
+to enable unloading of libraries, checking if the library binary
+actually exists, refreshing the list of available plugins during
+runtime and to provide the necessary information to access the
+plugin manifest.
+
+Motivation
+==========
+
+The pluginlib is used to find plugins in the ROS package system.
+
+When plugins are used (especially in long running applications)
+it is useful to unload plugins if they are no longer used.  But
+currently unloading functionality is not exposed to the developer
+but only performed on destruction of the ClassLoader instance.
+Unloading plugins does not only reduce the memory footprint but
+also enables a use case like: load -> unload -> recompile
+plugin -> reload updated plugin.
+
+For a long running application it would also be useful to be able
+to refresh the list of discovered plugins.  But currently when a
+new plugin is made available (either by creating it or adding
+another location to the package path) it is not available
+instantly.  The ClassLoader discovers plugins only once at
+construction time.
+
+The discovery of plugins is performed based on the manifest files
+of the package system.  Currently it is not possible (without
+trying to load the plugin) to decide if the plugin's binary does
+really exist.
+
+The manifest for a plugin usually contains only the information
+necessary to instantiate the plugin.  But the XML file could be
+used to store additional meta data for a plugin which should be
+available without loading the plugin (e.g. to provide a label,
+description, icon).  But currently this information can not be
+accessed since neither the location of the XML file nor the
+section in it relevant for the specific plugin are exposed.
+
+Use Cases
+=========
+
+Manually trigger unloading of a plugin when it is no longer used.
+
+Refresh the list of plugins if new plugins have been provided.
+
+Determine if a plugin binary actually exists.
+
+Access the plugin's manifest to retrieve additional information
+from the XML.
+
+All use cases apply to the current development of ROS GUI [1]_.
+
+Implementation
+==============
+
+A patch implementing the aforementioned features is attached to
+the ticket #4887 [2]_.  For details about the proposed API please
+look at the aforementioned patch.
+
+Backwards Compatibility
+=======================
+
+The currently available functionality will stay untouched.  The
+proposed additional features require to add several public
+functions to pluginlib::ClassLoader. Implementing them might
+break ABI.
+
+References
+==========
+
+.. [1] SIG: ROS GUI
+   (http://www.ros.org/wiki/fuerte/Planning/ROS%20GUI)
+.. [2] Ticket #4887: Extend pluginlib with more info and explicit unloading
+   (https://code.ros.org/trac/ros-pkg/ticket/4887)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
