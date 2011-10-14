@@ -1,0 +1,83 @@
+REP: 117
+Title: Informational Distance Measurements
+Version: $Revision$
+Last-Modified: $Date$
+Author: Chad Rockey <chadrockey@gmail.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 24-Sep-2011
+Post-History: 13-Oct-2011
+
+
+Abstract
+========
+
+There is a need for reporting special conditions within distance measurements.  Ideally, this will be done without adding error flags to each measurement or changing the fundamental way distances are represented.  Sensor manufacturers typically represent these values as special error conditions outside the range of their specific sensor.  The most important error cases that are common between sensors and useful to client libraries are readings too close to measure, invalid measurements, and readings of no return.  This REP proposes that these values be represented by -Inf, NaN, and +Inf respectively and as defined within floating point standards.
+
+Specification
+=============
+
+For any sensor measurement that reports physical distance (see `Range`_, `LaserScan`_, `PointCloud2`_), three special conditions will be well-defined.  These readings shall be: detection too close to determine true distance but not cause an erroneous measurement; an erroneous measurement that has no useful physical quantification; and no information within the useful range of the sensor but likely no object within range.
+
+    .. _Range: http://www.ros.org/doc/api/sensor_msgs/html/msg/Range.html
+    .. _LaserScan: http://www.ros.org/doc/api/sensor_msgs/html/msg/LaserScan.html
+    .. _PointCloud2: http://www.ros.org/doc/api/sensor_msgs/html/msg/PointCloud2.html
+
+Detections that are too close to the sensor to quantify shall be represented by -Inf.  Erroneous detections shall be represented by quiet (non-signaling) NaNs.  Finally, out of range detections will be represented by +Inf.
+
+Motivation
+==========
+
+There is currently ambiguity within range measurements as how to accurately represent certain special conditions.  By not reporting these conditions, we lose potential information from the sensor since these values are not technically distance measurements.  Through reporting of these errors, better results can be obtained for safety, data collection, error handling, and map making.
+
+Rationale
+=========
+
+The current method of representing these values is to commonly report obstructed values to be exactly or less than minimum range, no returns as exactly maximum range, and to set invalid measurements as somewhere outside of the two extremes.  The difficulty with this representation is that it causes confusion as to whether a measurement is truly invalid or simply not desired.  For instance, a reading of max range could indicate that the sensor has actually reported its true upper bound or it could indicate that nothing at all was detected.  It is also common to set invalid points as 'maximum range+1' to simply discard an invalid or undesired measurement.  Another issue is that users may have modified minimum or maximum range out of a desire for their specific application.  If this data is logged and used later in a different application, truly valid data cannot be recovered entirely.
+
+Pointclouds (from `pcl`_) already use two of the three proposed representations.  These are NaN and Inf.  By using these values, pointclouds can represent consistently organized and sized data arrays without sacrificing measurement validity.  This approach has been working well both in ROS and PCL, and so this REP proposes to extend this approach and adopt it for all distance measurement systems.
+
+    .. _pcl: http://pointclouds.org/
+
+This approach also preserves the current distance representations in ROS and requires no modifications to defined messages except to warn users of Infs and NaNs, possibly through a link to this REP.  It also leaves sensors free to report negative or zero values, as any measurement with a valid physical meaning will not be defined as a special condition.
+
+Backwards Compatibility
+=======================
+
+This approach can cause compatibility errors if the data is not filtered in the most common manner (ex: *if(minimum_range < value && value < maximum_range){}* ).  Because NaNs compares will always return false, -Inf will always be less than a valid, numerical minimum range, and +Inf will always be greater than a valid, numerical maximum range, this commonly used check will successfully reject all errors cases.  However, if the code does not check for invalid points or was written to check for the opposite case (ex: *if(value < minimum_range || value > maximum_range){ // Invalid point } else { // Valid point }*) then NaNs will slip through this check, breaking backwards compatibility.
+
+The other possible error is numerical values reported and logged before this REP could be assumed to be actual sensor returns.  This may cause issues for reusing data assuming invalid points were marked as maximum_range + 1 could now be considered actual sensor output if not careful.  This is a minor case and not expected to cause many problems.
+
+Reference Implementation
+========================
+
+To successfully implement this REP, checks for valid measurements should use floating-point standards and follow this form: ::
+
+    if(minimum_range <= value && value <= maximum_range){  // Represents expected pre-REP logic and is the only necessary condition for most applications.
+        // This is a valid measurement.
+    } else if( !isfinite(value) && value < 0){
+        // Object too close to measure.
+    } else if( !isfinite(value) && value > 0){
+        // No objects detected in range.
+    } else if( isnan(value) ){
+        // This is an erroneous, invalid, or missing measurement.
+    } else {
+        // The sensor reported these measurements as valid, but they are discarded per the limits defined by minimum_range and maximum_range.
+    }
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
