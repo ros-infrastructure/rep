@@ -4,7 +4,7 @@ Version: $Revision: 126 $
 Last-Modified: $Date: 2011-08-18 20:07:49 -0700 (Thu, 18 Aug 2011) $
 Author: Ken Conley <kwc@willowgarage.com>
 Status: Draft
-Type: Informational
+Type: Standards
 Content-Type: text/x-rst
 Created: 01-Sep-2011
 Post-History: 01-Sep-2011, 02-Sep-2011

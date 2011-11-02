@@ -4,7 +4,7 @@ Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
 Status: Accepted
-Type: Informational
+Type: Standards
 Content-Type: text/x-rst
 Created: 18-Aug-2011
 Post-History: 18-Aug-2011, 06-Sep-2011
