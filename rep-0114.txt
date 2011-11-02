@@ -3,7 +3,7 @@ Title: rospkg standalone Python library
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
-Status: Draft
+Status: Accepted
 Type: Informational
 Content-Type: text/x-rst
 Created: 18-Aug-2011

@@ -3,7 +3,7 @@ Title: Informational Distance Measurements
 Version: $Revision$
 Last-Modified: $Date$
 Author: Chad Rockey <chadrockey@gmail.com>
-Status: Draft
+Status: Accepted
 Type: Informational
 Content-Type: text/x-rst
 Created: 24-Sep-2011

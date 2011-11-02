@@ -3,7 +3,7 @@ Title: Polled topics
 Version: $Revision$
 Last-Modified: $Date$
 Author: Dirk Thomas
-Status: Draft
+Status: Accepted
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 20-Dec-2010
