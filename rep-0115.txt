@@ -3,8 +3,8 @@ Title: rosco and roslocate tools for rosinstall
 Version: $Revision: 126 $
 Last-Modified: $Date: 2011-08-18 20:07:49 -0700 (Thu, 18 Aug 2011) $
 Author: Ken Conley <kwc@willowgarage.com>
-Status: Draft
-Type: Standards
+Status: Accepted
+Type: Standards Track
 Content-Type: text/x-rst
 Created: 01-Sep-2011
 Post-History: 01-Sep-2011, 02-Sep-2011
