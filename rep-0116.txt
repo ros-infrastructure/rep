@@ -70,8 +70,46 @@ Implementation
 ==============
 
 A patch implementing the aforementioned features is attached to
-the ticket #4887 [2]_.  For details about the proposed API please
-look at the aforementioned patch.
+the ticket #4887 [2]_.  The patch includes the following changes:
+
+Added public API:
+
+* pluginlib::LibraryUnloadException : public PluginlibException
+  Symmetric to pluginlib::LibraryLoadException.
+  Returns the number of pending unloads until the library is removed
+  from memory.
+
+* int ClassLoader::unloadLibraryForClass(const std::string&)
+  Symmetric to ClassLoader::loadLibraryForClass(..)
+  
+
+* void ClassLoader::refreshDeclaredClasses()
+  Enables to update the list of available classes.
+
+* std::string ClassLoader::getPluginManifestPath(const std::string&)
+  Returns the path to the plugin manifest.
+
+Changed visibility from private to pulic:
+
+* std::string getClassLibraryPath(const std::string&)
+  Enables checking if the library exists.
+
+Further notes about non-public changes:
+
+* The implementation of the constructor is moved to the new method
+  std::map<std::string, ClassDesc> ClassLoader::determineAvailableClasses()
+
+* The generation of the error string is moved to the new method
+  std::string ClassLoader::getErrorStringForUnknownClass(const std::string&)
+
+* ClassDesc is extended with a member containing the path to the
+  plugin mainfest.
+
+* Added method int ClassLoader::unloadClassLibraryInternal(const std::string&)
+  Symmetric to ClassLoader::loadClassLibraryInternal(..)
+
+* Added missing pluginlib::LibraryLoadException to the
+  documentation of the ClassLoader constructor.
 
 Backwards Compatibility
 =======================
