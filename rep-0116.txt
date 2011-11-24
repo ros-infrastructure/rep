@@ -3,7 +3,7 @@ Title: Extend pluginlib
 Version: $Revision: 1 $
 Last-Modified: $Date: 2011-10-07 02:00:00 +0200 (Fri, 7 Oct 2011) $
 Author: Dirk Thomas
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 7-Oct-2011
