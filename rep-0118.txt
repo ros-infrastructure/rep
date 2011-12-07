@@ -1,0 +1,180 @@
+REP: 118
+Title: Depth Images
+Version: $Revision: 83 $
+Last-Modified: $Date: 2011-01-17 19:02:13 -0800 (Mon, 17 Jan 2011) $
+Author: Patrick Mihelich <mihelich@willowgarage.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 01-Dec-2011
+ROS-Version: Fuerte
+Post-History: 06-Dec-2011
+
+
+Abstract
+========
+
+This REP defines a representation for depth images in ROS.  Depth images may be
+produced by a variety of camera technologies, including stereo, structured light
+and time-of-flight.
+
+
+Specification
+=============
+
+Canonical Representation
+------------------------
+
+Depth images are published as `sensor_msgs/Image` encoded as 32-bit float.
+Each pixel is a depth (along the camera Z axis) in meters.
+
+The non-finite values `NaN`, `+Inf` and `-Inf` have special meanings as defined
+by REP 117.
+
+The ROS API for producers of depth images follows the standard camera driver
+API.  Depth images are published on the `image` topic.  The `camera_info`
+topic describes how to interpret the depth image geometrically.  Whereas each
+pixel in a standard image can only be projected to a 3D ray, the depth image
+can (given the camera calibration) be converted to a 3D point cloud.
+
+OpenNI Raw Representation
+-------------------------
+
+Alternatively, a device driver may publish depth images encoded as 16-bit
+unsigned integer, where each pixel is depth in millimeters.  This differs
+from the standard units recommended in REP 103.
+
+The value 0 denotes an invalid depth, equivalent to a `NaN` floating point
+distance.
+
+Raw depth images are published on the `image_raw` topic.  The `image_pipeline`
+stack will provide a nodelet to convert the `image_raw` topic to the canonical
+`image` topic.
+
+Consumers of depth images are only required to support the canonical floating
+point representation.
+
+
+Rationale
+=========
+
+Why Not sensor_msgs/DisparityImage
+----------------------------------
+
+With the addition of depth images, ROS now has three messages suitable for
+representing dense depth data: `sensor_msgs/Image`,
+`sensor_msgs/DisparityImage`, and `sensor_msgs/PointCloud2`.  `PointCloud2` is
+more general than a depth image, but also more verbose.  The `DisparityImage`
+representation however is very similar.
+
+The `DisparityImage` message exists for historical reasons: stereo cameras were
+used with ROS long before any other type of depth sensor, and disparity images
+are the natural "raw" output of stereo correlation algorithms.  For some
+vision algorithms (e.g. VSLAM), disparities are a convenient input to error
+metrics with pixel units.
+
+In practice, the `DisparityImage` message also has drawbacks.
+
+* It is tied to the stereo approach to 3D vision.  Representing the output of
+  a time-of-flight depth camera as a `DisparityImage` would be awkward.
+* Converting a disparity image to a point cloud requires two `CameraInfo`
+  messages, for the left and right camera.  Converting a depth image requires
+  only one `CameraInfo` message.
+* It cannot be used with `image_transport`.  Using `sensor_msgs/Image` already
+  permits reasonable compression of 16-bit depth images with PNG, and easily
+  allows adding compression algorithms specialized for depth images.
+* A major feature of OpenNI is registering the depth image to align with the
+  RGB image, taken with a different camera.  Registering a disparity image to
+  a different camera frame is difficult to describe precisely, because
+  converting disparity to depth depends on parameters (focal length and
+  baseline) of the original camera.
+* In most robotics applications, depth is actually the quantity of interest.
+
+`sensor_msgs/DisparityImage` will continue to exist for backwards compatibility
+and for applications where it truly is the better representation.  The
+`image_pipeline` stack will provide a nodelet for converting depth images to
+disparity images.  Producers of dense depth data are encouraged to use
+`sensor_msgs/Image` instead of `sensor_msgs/DisparityImage`.
+
+Why Not a New Message Type
+--------------------------
+
+Disparity images are represented by a distinct `sensor_msgs/DisparityImage`
+type, so why not define a `sensor_msgs/DepthImage`?
+
+Defining a new image-like message incurs significant tooling costs.  The new
+message is incompatible with `image_transport`, standard image viewers, and
+various utilities such as converters between bags and images/video.
+
+On the other hand, perhaps there is additional metadata that a depth image ought
+to include.  Let's consider the fields added by `sensor_msgs/DisparityImage`:
+
+* `f`, `T`: focal length and baseline.  These are duplicated from the
+  `CameraInfo` messages, and duplicated data is usually a bad sign.  They are not
+  even sufficient to correctly compute a point cloud, as `fx` may differ from
+  `fy` and the principal point (`cx`, `cy`) is not included.
+* `valid_window`: The subwindow of potentially valid disparity values.  This
+  allows clients to iterate over the disparity image a bit more efficiently, but
+  is hardly necessary.  Another way is to publish the depth image cropped down to
+  its valid window, and representing that with the `roi` field of `CameraInfo`.
+  This has the advantage of not wasting bandwidth on necessarily invalid data.
+* `min_disparity`, `max_disparity`: define the minimum and maximum depth the
+  camera can "see."  This actually is useful information, but generally not
+  required.
+* `delta_d`: Allows computation of the achievable depth resolution at any given
+  depth.  This is theoretically useful, and an analogous value could be
+  calculated for the Kinect; but it may be hard to generalize over all 3D camera
+  technologies.
+
+The main information we are unable to capture with an (`Image`, `CameraInfo`)
+pair is the min/max range.  That does not seem to justify breaking from the
+established camera driver API.  If necessary, the min/max range and other
+metadata could be published as another side channel, similar to the
+`camera_info` topic.
+
+Why Allow the OpenNI Representation
+-----------------------------------
+
+Including the `uint16` OpenNI format is unfortunate in some ways.  It adds
+complexity, is tied to a particular family of hardware, and uses different units
+from the rest of ROS.  There are, nevertheless, some compelling reasons:
+
+* Strength in numbers: Over 10 million Microsoft Kinects have already been sold,
+  and PrimeSense technology may make further inroads on the desktop with new
+  products from Asus.  The overwhelming market adoption makes OpenNI a de-facto
+  standard for the foreseeable future.
+* Bandwidth: The `float` format is twice as large as the raw `uint16` one.  The
+  raw representation has a large advantange for network transmission and archival
+  purposes.
+* Compression: The raw format can already be PNG-compressed.
+* Efficiency: Processing VGA depth data at 30fps stresses the capabilities of
+  today's hardware, and many users are attempting to do so with relatively
+  light-weight machines such as netbooks.  In such resource-constrained
+  environments, avoiding an intermediate conversion to the `float` format can be
+  a noticeable win for performance.
+
+Backwards Compatibility
+=======================
+
+This REP codifies existing behavior in the openni_kinect stack, so backwards
+compatibility is not expected to be an issue.
+
+References
+==========
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
