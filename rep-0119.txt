@@ -1,0 +1,178 @@
+REP: 119
+Title: Specification for TurtleBot Compatible Platforms
+Version: $Revision: 1 $
+Last-Modified: $Date: 2011-01-17 22:23:59 -0800 (Mon, 17 Jan 2011) $
+Author: Melonee Wise and Tully Foot
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 5-Dec-2011
+ROS-Version: Electric
+Post-History: 
+
+
+Abstract
+========
+
+This REP outlines compatibility defintions for TurtleBot compatible platforms. 
+
+
+Motivation
+==========
+
+Developers of TurtleBot applications, hardware accessories, models,
+and libraries need a share convention for compatibility in order to
+better integrate and re-use software and hardware components. Shared
+conventions for compatibility provides a specification for developers
+creating new hardware configurations, and accessories for TurtleBot
+compatible platforms. Similarly, developers creating libraries and
+applications can more easily use their software with robots that are
+compatible with this specification.  
+
+It is expected that most tools and applications written for a
+TurtleBot should run on a Level 1 compatible robot.
+
+Simulation
+==========
+
+And there is a package which provides the necessary Gazebo model for
+Level 1 compliant robots.  See the turtlebot_simulator stack
+[#turtlebot_simulator]_ for more information.
+
+It is recommended for Level 2 compliant robots to release a stack with
+the gazebo model(s) which allows them to be simulated as well, to ease
+development for developers who do not always have access to hardware.
+
+.. image:: rep-0119/turtlebot_sim.png
+
+Existing REP Compliance
+=======================
+
+This REP is built upon previous REPs and ROS best practices. All implementations should do the same.  Specifically relevant ones are listed below.  
+
+* REP 103 [#REP-103]_ Standard Units of Measure and Coordinate Conventions 
+  All units will follow REP 103 and all cooridnate frames will follow the conventions in REP 103. 
+* REP 105 [#REP-105]_ Coordinate Frames for Mobile Platforms 
+  The coordinate frames for the mobile base will follow REP 105. 
+
+
+Compatibility Specification
+===========================
+
+There are two levels of compatability defined in this REP.  Level 1
+compatable robots are expected to be able to be swapped out without
+significant code changes. Level 2 compatable robots are expected to be
+able to share significant software components, but may require
+non-trivial changes to software between robots.
+
+
+Level 1
+-------
+
+Robots that are level 1 compatible meet the following guidelines as well as all Level 2 requirements.  
+
+
+Hardware
+''''''''
+The following hardware requirements are to ensure that the default
+TurtleBot software runs without modification on the robot and to
+ensure accessory compatibility between TurtleBot compatible robots. 
+
+* The robot must have a rgbd camera with a base_link to
+  camera_rgb_frame translation of [x:-0.087m, y:-0.005m, z:0.287m], as
+  specified in the turtlebot.xacro file in the turtlebot_description
+  package. 
+* The top mounting surface of the robot must provide a hole grid pattern
+  centered around the z-axis of the robot base_link that is identical to
+  the 68-04541_TurtleBot_Plate_2 part found in the TurtleBot hardware
+  documentation. #### TODO DESCRIBE IN THIS DOCUMENT 
+* The top mounting surface of the robot must be 0.2032m (8 inches)
+  from rgbd camera mounting surface.
+* The base footprint is circular with diameter ######
+ 
+Software
+''''''''
+The TurtleBot stacks (turtlebot_viz, turtlebot_apps, and  turtlebot_arm)
+must run on the robot without user modification. 
+
+Distributors of TurtleBot Level 1 compatible robots should provide the 
+following software and configuration files if they are different than the 
+TurtleBot:
+
+* A node which implements the turtlebot_node ROS API http://www.ros.org/wiki/turtlebot_node FIXME
+* Provide equivilant diagnostics with turtlebot_node
+* Provide turtlebot.launch file to replace turtlebot_bringup/upstart/turtlebot.launch
+
+* If the RGBD sensor requires a breaker to turn on it will use "Breaker 0"
+* If an attached arm requires a breaker to turn on it will use "Breaker 1"  Better define
+
+Level 2
+-------
+
+Hardware
+''''''''
+
+* An RGBD sensor
+* A mobile robot base
+* A computer capable of running ROS and processing the RGBD sensor.  
+
+Software
+''''''''
+* URDF description of the robot
+* The origin of the base_link is at the center of the base footprint. 
+* The depth sensor should publish in the "camera" namespace
+* The base moves based on "geometry_msgs/Twist" on the topic "cmd_vel"
+* The base publishes "nav_msgs/Odometry" on "odom"
+* REP 105 [#REP-105]_ compliant
+
+Hardware Extensions and Modifications
+-------------------------------------
+
+When adding or creating new hardware for TurtleBot compliant robots
+distributors should use the following guidelines and conventions:
+
+Sensor Naming Convetions
+''''''''''''''''''''''''
+
+ * 
+
+Link and Joint Naming Conventions
+'''''''''''''''''''''''''''''''''
+
+URDF
+''''
+
+
+Exceptions
+----------
+
+The scope of potential robotics software is too broad to require all
+ROS software to follow the guidelines of this REP.  However, choosing
+different conventions should be well justified and well documented.
+
+
+
+Compliance
+==========
+
+This REP depends on and is compliant with REP 103 [#REP-103]_ , REP 105 [#REP-105]_,
+and REP 107 [#REP-107]_.
+
+References
+==========
+
+.. [#REP-103] REP 103, Standard Units of Measure and Coordinate Conventions
+   (http://www.ros.org/reps/rep-0103.html)
+.. [#REP-105] REP 105, Coordinate Frames for Mobile Platforms
+   (http://www.ros.org/reps/rep-0105.html)
+.. [#REP-107] REP 107, Diagnostic System for Robots Running ROS
+   (http://www.ros.org/reps/rep-0107.html)
+.. [#REP-10?] REP 10?, Camera Frame Naming Conventions
+   (http://www.ros.org/reps/rep-0107.html)
+.. [#turtlebot_simulator] The turtlebot_simulator stack
+   (http://www.ros.org/wiki/turtlebot_simulator)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
