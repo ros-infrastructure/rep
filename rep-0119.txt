@@ -37,11 +37,19 @@ compatible with this specification.
 It is expected that most tools and applications written for a
 TurtleBot should run on a Level 1 compatible robot.
 
+.. figure:: rep-0119/turtlebot_lg.png
+   :alt: An image of a TurtleBot
+   
+   A TurtleBot
+
+
 There are a lot of tools and applications written for the TurtleBot
 which can be useful for other similar robots.  Level 2 compatible
 robots are a subset of these robots for which a significant subset
 will work.  There are already a number of robots which are close such
 as Mini Max [#minimax]_ and Pi Robot [#pirobot]_ .
+
+
 
 .. figure:: rep-0119/mini_max.png
    :alt: An image of Mini Max
