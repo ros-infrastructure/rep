@@ -38,53 +38,27 @@ It is expected that most tools and applications written for a
 TurtleBot should run on a Level 1 compatible robot.
 
 .. figure:: rep-0119/turtlebot_lg.png
+   :width: 260px
    :alt: An image of a TurtleBot
    
    A TurtleBot
 
 
-There are a lot of tools and applications written for the TurtleBot
+There are many tools and applications written for the TurtleBot
 which can be useful for other similar robots.  Level 2 compatible
 robots are a subset of these robots for which a significant subset
-will work.  There are already a number of robots which are close such
-as Mini Max [#minimax]_ and Pi Robot [#pirobot]_ .
+will work.  There are already a number of robots which are TurtleBot
+compatible such as Mini Max [#minimax]_ and Pi Robot [#pirobot]_ .
 
 
 
 .. figure:: rep-0119/mini_max.png
+   :width: 260px
    :alt: An image of Mini Max
    
    Mini Max the robot. 
 
-Simulation
-==========
 
-And there is a package which provides the necessary Gazebo model for
-Level 1 compliant robots.  See the turtlebot_simulator stack
-[#turtlebot_simulator]_ for more information.
-
-It is recommended for Level 2 compliant robots to release a stack with
-the gazebo model(s) which allows them to be simulated as well, to ease
-development for developers who do not always have access to hardware.
-
-.. figure:: rep-0119/turtlebot_sim.png
-   :alt: A screenshot of the TurtleBot in the Gazebo Simulator
-
-   The TurtleBot simulated in Gazebo
-
-Existing REP Compliance
-=======================
-
-This REP is built upon previous REPs and ROS best practices. All implementations should do the same.  Specifically relevant ones are listed below.  
-
-REP 103 [#REP-103]_ Standard Units of Measure and Coordinate Conventions 
-    All units will follow REP 103 and all cooridnate frames will follow the conventions in REP 103. 
-
-REP 105 [#REP-105]_ Coordinate Frames for Mobile Platforms 
-    The coordinate frames for the mobile base will follow REP 105. 
-
-REP 107 [#REP-107]_ Diagnostic System for Robots Running ROS
-    All hardware drivers should provide diagnostic information via the diagnostic_msgs interface of REP 107.
 
 Compatibility Specification
 ===========================
@@ -116,10 +90,16 @@ ensure accessory compatibility between TurtleBot compatible robots.
 * The top mounting surface of the robot must provide a hole grid pattern
   centered around the z-axis of the robot base_link that is identical to
   the 68-04541_TurtleBot_Plate_2 part found in the TurtleBot hardware
-  documentation. #### TODO DESCRIBE IN THIS DOCUMENT 
+  documentation and shown in the figure below. 
 * The top mounting surface of the robot must be 0.2032m (8 inches)
   from rgbd camera mounting surface.
 * The base footprint is circular with diameter ######
+
+.. figure:: rep-0119/68-04541-RD_Turtlebot_Plate_2.png
+   :width: 100%
+   :alt: An image of the top mounting surface
+   
+   TurtleBot Mounting Surface. 
  
 Software Requirements
 '''''''''''''''''''''
@@ -136,8 +116,6 @@ TurtleBot:
 
 * If the RGBD sensor requires a breaker to turn on it will use "Breaker 0"
 * If an attached arm requires a breaker to turn on it will use "Breaker 1"  TODO Better define
-
-
 
 Level 2
 -------
@@ -168,32 +146,68 @@ distributors should use the following guidelines and conventions:
 
 Sensor Naming Convetions
 ''''''''''''''''''''''''
+Whenever possible it is prefered to use the following convention
+naming for sensor topics/namespaces LOCATION_TYPE. For example:
 
- * 
+* base_scan
+* head_camera
+* forearm_camera
+ 
+Link, Joint, and Frame Naming Conventions
+'''''''''''''''''''''''''''''''''''''''''
+Whenever possible it is prefered to use the following convention
+naming for links and connecting joints LOCATION_DESCRIPTOR_TYPE. For example:
 
-Link and Joint Naming Conventions
-'''''''''''''''''''''''''''''''''
+* arm_shoulder_pan_link, arm_shoulder_pan_joint
+* head_tilt_link, head_tilt_joint
 
-The naming conventions for link names are designed to 
+Whenever possible it is prefered to use the following convention
+naming for links and sensors LOCATION_SENSOR_TYPE. For example:
+
+* head_camera_rgb_link, head_camera_rgb_optical_frame
 
 URDF
 ''''
+Additionally a URDF snippet should be provided for the hardware
+extension or modification. 
+
+Simulation
+==========
+
+There is a package which provides the necessary Gazebo model for
+Level 1 compliant robots.  See the turtlebot_simulator stack
+[#turtlebot_simulator]_ for more information.
+
+It is recommended for Level 2 compliant robots to release a stack with
+the gazebo model(s) which allows them to be simulated as well, to ease
+development for developers who do not always have access to hardware.
+
+.. figure:: rep-0119/turtlebot_sim.png
+   :alt: A screenshot of the TurtleBot in the Gazebo Simulator
+
+   The TurtleBot simulated in Gazebo
 
 
 Exceptions
-----------
+==========
 
 The scope of potential robotics software is too broad to require all
 ROS software to follow the guidelines of this REP.  However, choosing
 different conventions should be well justified and well documented.
 
+Existing REP Compliance
+=======================
 
+This REP is built upon previous REPs and ROS best practices. All implementations should do the same.  Specifically relevant ones are listed below.  
 
-Compliance
-==========
+REP 103 [#REP-103]_ Standard Units of Measure and Coordinate Conventions 
+    All units will follow REP 103 and all cooridnate frames will follow the conventions in REP 103. 
 
-This REP depends on and is compliant with REP 103 [#REP-103]_ , REP 105 [#REP-105]_,
-and REP 107 [#REP-107]_.
+REP 105 [#REP-105]_ Coordinate Frames for Mobile Platforms 
+    The coordinate frames for the mobile base will follow REP 105. 
+
+REP 107 [#REP-107]_ Diagnostic System for Robots Running ROS
+    All hardware drivers should provide diagnostic information via the diagnostic_msgs interface of REP 107.
 
 References
 ==========
