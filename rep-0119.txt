@@ -2,7 +2,7 @@ REP: 119
 Title: Specification for TurtleBot Compatible Platforms
 Version: $Revision: 1 $
 Last-Modified: $Date: 2011-01-17 22:23:59 -0800 (Mon, 17 Jan 2011) $
-Author: Melonee Wise and Tully Foot
+Author: Melonee Wise and Tully Foote
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
@@ -14,7 +14,12 @@ Post-History:
 Abstract
 ========
 
-This REP outlines compatibility defintions for TurtleBot compatible platforms. 
+This REP outlines compatibility defintions for TurtleBot compatible
+platforms. The TurtleBot is a specific product, but it is an Open
+Hardware Design TODO LINK.  The purpose of this document is to
+differentiate the critical design features which are necessary for
+compatability from the other design features which can be modified
+without functionally effecting the core design.
 
 
 Motivation
@@ -32,6 +37,17 @@ compatible with this specification.
 It is expected that most tools and applications written for a
 TurtleBot should run on a Level 1 compatible robot.
 
+There are a lot of tools and applications written for the TurtleBot
+which can be useful for other similar robots.  Level 2 compatible
+robots are a subset of these robots for which a significant subset
+will work.  There are already a number of robots which are close such
+as Mini Max [#minimax]_ and Pi Robot [#pirobot]_ .
+
+.. figure:: rep-0119/mini_max.png
+   :alt: An image of Mini Max
+   
+   Mini Max the robot. 
+
 Simulation
 ==========
 
@@ -43,18 +59,24 @@ It is recommended for Level 2 compliant robots to release a stack with
 the gazebo model(s) which allows them to be simulated as well, to ease
 development for developers who do not always have access to hardware.
 
-.. image:: rep-0119/turtlebot_sim.png
+.. figure:: rep-0119/turtlebot_sim.png
+   :alt: A screenshot of the TurtleBot in the Gazebo Simulator
+
+   The TurtleBot simulated in Gazebo
 
 Existing REP Compliance
 =======================
 
 This REP is built upon previous REPs and ROS best practices. All implementations should do the same.  Specifically relevant ones are listed below.  
 
-* REP 103 [#REP-103]_ Standard Units of Measure and Coordinate Conventions 
-  All units will follow REP 103 and all cooridnate frames will follow the conventions in REP 103. 
-* REP 105 [#REP-105]_ Coordinate Frames for Mobile Platforms 
-  The coordinate frames for the mobile base will follow REP 105. 
+REP 103 [#REP-103]_ Standard Units of Measure and Coordinate Conventions 
+    All units will follow REP 103 and all cooridnate frames will follow the conventions in REP 103. 
 
+REP 105 [#REP-105]_ Coordinate Frames for Mobile Platforms 
+    The coordinate frames for the mobile base will follow REP 105. 
+
+REP 107 [#REP-107]_ Diagnostic System for Robots Running ROS
+    All hardware drivers should provide diagnostic information via the diagnostic_msgs interface of REP 107.
 
 Compatibility Specification
 ===========================
@@ -65,15 +87,16 @@ significant code changes. Level 2 compatable robots are expected to be
 able to share significant software components, but may require
 non-trivial changes to software between robots.
 
+Below are the specifications for each of the levels of compliance:
 
 Level 1
 -------
 
-Robots that are level 1 compatible meet the following guidelines as well as all Level 2 requirements.  
+Robots that are level 1 compatible meet the following requirements as well as all Level 2 requirements.  
 
 
-Hardware
-''''''''
+Hardware Requirements
+'''''''''''''''''''''
 The following hardware requirements are to ensure that the default
 TurtleBot software runs without modification on the robot and to
 ensure accessory compatibility between TurtleBot compatible robots. 
@@ -90,8 +113,8 @@ ensure accessory compatibility between TurtleBot compatible robots.
   from rgbd camera mounting surface.
 * The base footprint is circular with diameter ######
  
-Software
-''''''''
+Software Requirements
+'''''''''''''''''''''
 The TurtleBot stacks (turtlebot_viz, turtlebot_apps, and  turtlebot_arm)
 must run on the robot without user modification. 
 
@@ -99,31 +122,35 @@ Distributors of TurtleBot Level 1 compatible robots should provide the
 following software and configuration files if they are different than the 
 TurtleBot:
 
-* A node which implements the turtlebot_node ROS API http://www.ros.org/wiki/turtlebot_node FIXME
-* Provide equivilant diagnostics with turtlebot_node
+* A node which implements the turtlebot_node ROS API [#turtlebot_node]_
+* Provide equivilant diagnostics with turtlebot_node [#turtlebot_node]_
 * Provide turtlebot.launch file to replace turtlebot_bringup/upstart/turtlebot.launch
 
 * If the RGBD sensor requires a breaker to turn on it will use "Breaker 0"
-* If an attached arm requires a breaker to turn on it will use "Breaker 1"  Better define
+* If an attached arm requires a breaker to turn on it will use "Breaker 1"  TODO Better define
+
+
 
 Level 2
 -------
 
-Hardware
-''''''''
+Hardware Requirements
+'''''''''''''''''''''
 
 * An RGBD sensor
 * A mobile robot base
 * A computer capable of running ROS and processing the RGBD sensor.  
 
-Software
-''''''''
+Software Requiremets
+''''''''''''''''''''
 * URDF description of the robot
 * The origin of the base_link is at the center of the base footprint. 
 * The depth sensor should publish in the "camera" namespace
 * The base moves based on "geometry_msgs/Twist" on the topic "cmd_vel"
 * The base publishes "nav_msgs/Odometry" on "odom"
 * REP 105 [#REP-105]_ compliant
+
+
 
 Hardware Extensions and Modifications
 -------------------------------------
@@ -138,6 +165,8 @@ Sensor Naming Convetions
 
 Link and Joint Naming Conventions
 '''''''''''''''''''''''''''''''''
+
+The naming conventions for link names are designed to 
 
 URDF
 ''''
@@ -171,6 +200,12 @@ References
    (http://www.ros.org/reps/rep-0107.html)
 .. [#turtlebot_simulator] The turtlebot_simulator stack
    (http://www.ros.org/wiki/turtlebot_simulator)
+.. [#turtlebot_node] The turtlebot_node package
+   (http://www.ros.org/wiki/turtlebot_node)
+.. [#minimax] The Mini Max Robot
+   (http://www.showusyoursensors.com/2011/06/introducing-mini-maxwell.html)
+.. [#pirobot] The Pi Robot
+   (http://www.pirobot.org/)
 
 Copyright
 =========
