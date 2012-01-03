@@ -16,9 +16,10 @@ Abstract
 
 This REP outlines compatibility defintions for TurtleBot compatible
 platforms. The TurtleBot is a specific product, but it is an Open
-Hardware Design TODO LINK.  The purpose of this document is to
-differentiate the critical design features which are necessary for
-compatability from the other design features which can be modified
+Hardware Design released under the FreeBSD Documentation
+License. [#oshw]_ [#freebsd-doc-license]_ The purpose of this document
+is to differentiate the critical design features which are necessary
+for compatability from the other design features which can be modified
 without functionally effecting the core design.
 
 
@@ -43,14 +44,17 @@ TurtleBot should run on a Level 1 compatible robot.
    
    A TurtleBot
 
+The TurtleBot is trademarked by Willow Garage.  If you would like
+information on producing TurtleBot branded product please contact
+Willow Garage at turtlebotinfo@willowgarage.com . This document is
+designed to allow others to develop robots which can take advantage of
+the growing community around the TurtleBot design.
 
 There are many tools and applications written for the TurtleBot
 which can be useful for other similar robots.  Level 2 compatible
 robots are a subset of these robots for which a significant subset
 will work.  There are already a number of robots which are TurtleBot
 compatible such as Mini Max [#minimax]_ and Pi Robot [#pirobot]_ .
-
-
 
 .. figure:: rep-0119/mini_max.png
    :width: 260px
@@ -87,12 +91,15 @@ ensure accessory compatibility between TurtleBot compatible robots.
   camera_rgb_frame translation of [x:-0.087m, y:-0.005m, z:0.287m], as
   specified in the turtlebot.xacro file in the turtlebot_description
   package. 
+
 * The top mounting surface of the robot must provide a hole grid pattern
   centered around the z-axis of the robot base_link that is identical to
   the 68-04541_TurtleBot_Plate_2 part found in the TurtleBot hardware
   documentation and shown in the figure below. 
+
 * The top mounting surface of the robot must be 0.2032m (8 inches)
   from rgbd camera mounting surface.
+
 * The base footprint is circular with diameter ######
 
 .. figure:: rep-0119/68-04541-RD_Turtlebot_Plate_2.png
@@ -103,6 +110,7 @@ ensure accessory compatibility between TurtleBot compatible robots.
  
 Software Requirements
 '''''''''''''''''''''
+
 The TurtleBot stacks (turtlebot_viz, turtlebot_apps, and  turtlebot_arm)
 must run on the robot without user modification. 
 
@@ -111,10 +119,13 @@ following software and configuration files if they are different than the
 TurtleBot:
 
 * A node which implements the turtlebot_node ROS API [#turtlebot_node]_
+
 * Provide equivilant diagnostics with turtlebot_node [#turtlebot_node]_
+
 * Provide turtlebot.launch file to replace turtlebot_bringup/upstart/turtlebot.launch
 
 * If the RGBD sensor requires a breaker to turn on it will use "Breaker 0"
+
 * If an attached arm requires a breaker to turn on it will use "Breaker 1"  TODO Better define
 
 Level 2
@@ -124,16 +135,29 @@ Hardware Requirements
 '''''''''''''''''''''
 
 * An RGBD sensor
+
 * A mobile robot base
-* A computer capable of running ROS and processing the RGBD sensor.  
+
+* A computer capable of running ROS and processing the RGBD sensor at full frame rate.  
+
+   - Note: most RGBD sensors require a full USB 2.0 bus to operate correctly, 
+     thus most computers will require 2 USB busses if USB periferals are expected to be used. 
 
 Software Requiremets
 ''''''''''''''''''''
+
 * URDF description of the robot
+
 * The origin of the base_link is at the center of the base footprint. 
+
 * The depth sensor should publish in the "camera" namespace
+
 * The base moves based on "geometry_msgs/Twist" on the topic "cmd_vel"
+
+   - If the base is not holonomic, only the components of the command which are achievable should be executed.
+
 * The base publishes "nav_msgs/Odometry" on "odom"
+
 * REP 105 [#REP-105]_ compliant
 
 
@@ -170,6 +194,11 @@ URDF
 ''''
 Additionally a URDF snippet should be provided for the hardware
 extension or modification. 
+
+When providing an accessory or extension for a Level 1 or 2 TurtleBot
+compatable robot a URDF description of the extension should be
+provided which provides at least collision geometries and visualization meshes.
+
 
 Simulation
 ==========
@@ -228,6 +257,10 @@ References
    (http://www.showusyoursensors.com/2011/06/introducing-mini-maxwell.html)
 .. [#pirobot] The Pi Robot
    (http://www.pirobot.org/)
+.. [#oshw] The Open Source Hardware Statement and Definition
+   (http://freedomdefined.org/OSHW)
+.. [#freebsd-doc-license] The FreeBSD Documentation License
+   (http://www.freebsd.org/copyright/freebsd-doc-license.html)
 
 Copyright
 =========
