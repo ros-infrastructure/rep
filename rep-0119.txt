@@ -20,8 +20,10 @@ Hardware Design released under the FreeBSD Documentation
 License. [#oshw]_ [#freebsd-doc-license]_ The purpose of this document
 is to differentiate the critical design features which are necessary
 for compatability from the other design features which can be modified
-without functionally effecting the core design.
-
+without functionally effecting the core design. This document is meant
+to be a guideline for the development of new cheaper or more
+functional robots that can still leverage the development efforts of
+the TurtleBot community. 
 
 Motivation
 ==========
@@ -63,6 +65,14 @@ compatible such as Mini Max [#minimax]_ and Pi Robot [#pirobot]_ .
    Mini Max the robot. 
 
 
+TurtleBot Core Features
+=======================
+
+TurtleBot is a low-cost, open-source software and hardware personal
+robotics kit. The TurtleBot main hardware features include a mobile
+base, rgbd sensor, on board computation, wireless communication, and
+expansion space for adding new hardware. 
+
 
 Compatibility Specification
 ===========================
@@ -100,13 +110,20 @@ ensure accessory compatibility between TurtleBot compatible robots.
 * The top mounting surface of the robot must be 0.2032m (8 inches)
   from rgbd camera mounting surface.
 
-* The base footprint is circular with diameter ######
+* The robot is circular with 0.33m (13 inches) diameter 
 
+* The robot must provide at least the following power buses:
+
+  - 12V at 1.5A with a male Micro Fit 1x2 connector (Molex 43045-0209)
+  - 5V at 500mA solderable connection
+  
 .. figure:: rep-0119/68-04541-RD_Turtlebot_Plate_2.png
    :width: 100%
    :alt: An image of the top mounting surface
    
    TurtleBot Mounting Surface. 
+
+
  
 Software Requirements
 '''''''''''''''''''''
@@ -119,17 +136,15 @@ following software and configuration files if they are different than the
 TurtleBot:
 
 * A node which implements the turtlebot_node ROS API [#turtlebot_node]_
-
 * Provide equivilant diagnostics with turtlebot_node [#turtlebot_node]_
-
 * Provide turtlebot.launch file to replace turtlebot_bringup/upstart/turtlebot.launch
-
 * If the RGBD sensor requires a breaker to turn on it will use "Breaker 0"
-
 * If an attached arm requires a breaker to turn on it will use "Breaker 1"  TODO Better define
 
 Level 2
 -------
+Robots that are level 2 compatible meet the following requirements as
+well as all the hardware extensions and modification requirements.  
 
 Hardware Requirements
 '''''''''''''''''''''
@@ -140,8 +155,8 @@ Hardware Requirements
 
 * A computer capable of running ROS and processing the RGBD sensor at full frame rate.  
 
-   - Note: most RGBD sensors require a full USB 2.0 bus to operate correctly, 
-     thus most computers will require 2 USB busses if USB periferals are expected to be used. 
+  - Note: most RGBD sensors require a full USB 2.0 bus to operate correctly, 
+    thus most computers will require 2 USB busses if USB periferals are expected to be used. 
 
 Software Requiremets
 ''''''''''''''''''''
@@ -152,14 +167,14 @@ Software Requiremets
 
 * The depth sensor should publish in the "camera" namespace
 
-* The base moves based on "geometry_msgs/Twist" on the topic "cmd_vel"
+* The base moves based on `geometry_msgs/Twist`_ on the "cmd_vel"
+  topic
+  
+  - If the base is not holonomic, only the components of the command which are achievable should be executed.
 
-   - If the base is not holonomic, only the components of the command which are achievable should be executed.
-
-* The base publishes "nav_msgs/Odometry" on "odom"
+* The base publishes `nav_msgs/Odometry`_ on the "odom" topic
 
 * REP 105 [#REP-105]_ compliant
-
 
 
 Hardware Extensions and Modifications
@@ -167,6 +182,24 @@ Hardware Extensions and Modifications
 
 When adding or creating new hardware for TurtleBot compliant robots
 distributors should use the following guidelines and conventions:
+
+Location Naming Conventions
+'''''''''''''''''''''''''''
+Location names should be generic and have semantic meaning with
+respect to the robot hardware, below are examples of common location
+names:
+
+* base
+* torso
+* head
+* arm
+
+  - shoulder
+  - upper_arm
+  - elbow
+  - forearm
+  - wrist
+  - gripper
 
 Sensor Naming Convetions
 ''''''''''''''''''''''''
@@ -192,9 +225,6 @@ naming for links and sensors LOCATION_SENSOR_TYPE. For example:
 
 URDF
 ''''
-Additionally a URDF snippet should be provided for the hardware
-extension or modification. 
-
 When providing an accessory or extension for a Level 1 or 2 TurtleBot
 compatable robot a URDF description of the extension should be
 provided which provides at least collision geometries and visualization meshes.
@@ -261,6 +291,10 @@ References
    (http://freedomdefined.org/OSHW)
 .. [#freebsd-doc-license] The FreeBSD Documentation License
    (http://www.freebsd.org/copyright/freebsd-doc-license.html)
+.. _geometry_msgs/Twist:
+   http://www.ros.org/doc/api/geometry_msgs/html/msg/Twist.html
+.. _nav_msgs/Odometry:
+   http://www.ros.org/doc/api/nav_msgs/html/msg/Odometry.html
 
 Copyright
 =========
