@@ -139,7 +139,7 @@ TurtleBot:
 * Provide equivilant diagnostics with turtlebot_node [#turtlebot_node]_
 * Provide turtlebot.launch file to replace turtlebot_bringup/upstart/turtlebot.launch
 * If the RGBD sensor requires a breaker to turn on it will use "Breaker 0"
-* If an attached arm requires a breaker to turn on it will use "Breaker 1"  TODO Better define
+* If an attached arm requires a breaker to turn on it will use "Breaker 1" 
 
 Level 2
 -------
