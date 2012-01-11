@@ -1,0 +1,186 @@
+REP: 120
+Title: Coordinate Frames for Humanoids Robots
+Version: $Revision: 1 $
+Last-Modified: $Date: 2012-01-11 11:53:00 +0200 (Wed, 11 Jan 2012) $
+Author: Thomas Moulard <thomas.moulard@gmail.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Requires: 103, 105
+Created: 01-Jan-2012
+Post-History: 01-Jan-2012
+
+Abstract
+========
+
+This REP specifies naming conventions and semantic meaning for
+coordinate frames of humanoids robots used within ROS.
+
+Motivation
+==========
+
+Developers of packages aimed at humanoids robots need a shared
+convention for coordinate frames in order to better integrate and
+re-use software components.
+
+The REP 105 [2] already defines frames for mobile bases. This REP
+both remains compatible with REP 105 [2] and extends it to label other
+important locations on a humanoid robot such as the gaze (head), left
+and right wrists, hands and feet.
+
+
+Specification
+=============
+
+Coordinate Frames
+-----------------
+
+base_link
+'''''''''
+
+The coordinate frame called ``base_link`` is rigidly attached to the
+robot root body. It is recommended to choose the robot waist as its
+root body. The ``base_link`` can be attached to the root in any
+arbitrary position or orientation; for every hardware platform there
+will be a different place on the base that provides an obvious point
+of reference. Note that REP 103 [1] specifies a preferred orientation
+for frames.
+
+base_footprint
+''''''''''''''
+
+The coordinate frame called ``base_footprint`` projects the
+``base_link`` position on the floor.
+
+left_wrist and right_wrist
+''''''''''''''''''''''''''
+
+The coordinate frame called ``left_wrist`` defines the position and
+orientation of the left arm regardless of the tool (grasping device
+for instance) attached to it.
+
+The coordinate frame called ``right_wrist`` defines the equivalent
+frame for the right arm.
+
+
+left_hand and right_hand
+''''''''''''''''''''''''
+
+The coordinate frame called ``left_hand`` defines the position and
+orientation of the left arm end effector.
+
+If the end effector is a grasping device, the frame should be located
+at the recommended object grasping location. The frame orientation is
+defined as X the axis which should be collinear with the object axis
+during the grasping process, Y the axis going "toward" the reached
+object and Z the axis orthogonal to the (X,Y) plan.
+
+
+The coordinate frame called ``right_wrist`` defines the equivalent
+frame for the right arm.
+
+
+left_ankle and right_ankle
+''''''''''''''''''''''''''
+
+The coordinate frame called ``left_ankle`` defines the position and
+orientation of the left leg regardless of the support body geometry.
+
+
+The coordinate frame called ``right_ankle`` defines the equivalent
+frame for the right leg.
+
+
+left_sole and right_sole
+''''''''''''''''''''''''
+
+The coordinate frame called ``left_sole`` defines the position and
+orientation of the left leg support body. The (X,Y) plan of this frame
+must be coplanar with the support body contact surface. It is
+recommended to choose the origin as the projection of the body center
+on the contact surface.
+
+
+The coordinate frame called ``right_sole`` defines the equivalent
+frame for the right leg.
+
+
+left_toe and right_toe
+''''''''''''''''''''''
+
+The coordinate frame called ``left_toe`` defines the position and
+orientation of the left leg toe body. The (X,Y) plan of this frame
+must be coplanar with the toe body contact surface. It is recommended
+to choose the origin as the projection of the body center on the
+contact surface.
+
+
+The coordinate frame called ``right_toe`` defines the equivalent frame
+for the right leg.
+
+
+gaze
+''''
+
+The coordinate frame called ``gaze`` defines the head position and
+orientation regardless of any sensors (camera for instance).
+
+
+chest
+'''''
+
+The coordinate frame called ``chest`` is attached to the lowest body
+of the model which is a parent of ``left_hand``, ``right_hand`` and
+``gaze``.
+
+
+map and odom
+''''''''''''
+
+See REP 105 [1] for ``map`` and ``odom`` frames definition.
+
+
+Frame Hierarchy
+---------------
+
+``base_link`` <-- ``chest`` <-- ``gaze``
+``base_link`` <-- ``chest`` <-- ``left_wrist`` <-- ``left_hand``
+``base_link`` <-- ``chest`` <-- ``right_wrist`` <-- ``right_hand``
+``base_link`` <-- ``left_ankle`` <-- ``left_sole`` <-- ``left_toe``
+``base_link`` <-- ``right_ankle`` <-- ``right_sole`` <-- ``right_toe``
+
+Frame Authorities
+-----------------
+
+Unlike mobile bases, the transformation from ``base_link`` to
+``base_footprint`` is not rigid on humanoid robots and is broadcasted by
+an external node.
+
+
+Exceptions
+----------
+
+The scope of potential robotics software is too broad to require all
+ROS software to follow the guidelines of this REP.  However, choosing
+different conventions should be well justified and well documented.
+
+
+Compliance
+==========
+
+This REP depends on and is compliant with REP 103 [1] and REP 105 [2].
+
+
+References
+==========
+
+.. [1] REP 103, Standard Units of Measure and Coordinate Conventions
+   (http://www.ros.org/reps/rep-0103.html)
+
+.. [2] REP 105, Coordinate Frames for Mobile Platforms
+   (http://www.ros.org/reps/rep-0105.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
