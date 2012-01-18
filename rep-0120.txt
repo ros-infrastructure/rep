@@ -7,8 +7,8 @@ Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Requires: 103, 105
-Created: 01-Jan-2012
-Post-History: 01-Jan-2012
+Created: 25-Nov-2011
+Post-History: 11-Jan-2012, 18-Jan-2012
 
 Abstract
 ========
@@ -49,24 +49,34 @@ for frames.
 base_footprint
 ''''''''''''''
 
-The coordinate frame called ``base_footprint`` projects the
-``base_link`` position on the floor.
+The ``base_footprint`` is the representation of the robot position on
+the floor. The floor is usually the level where the supporting leg rests,
+i.e. z = min(l_sole_z, r_sole_z) where l_sole_z and r_sole_z are the left
+and right sole height respecitvely. The translation component of the frame
+should be the barycenter of the feet projections on the floor. With respect
+to the ``odom`` frame, the roll and pitch angles should be zero and the
+yaw angle should correspond to the ``base_link`` yaw angle.
 
-left_wrist and right_wrist
-''''''''''''''''''''''''''
+Rationale: `base_footprint`` provides a fairly stable 2D planar representation
+of the humanoid even while walking and swaying with the ``base_link``.
 
-The coordinate frame called ``left_wrist`` defines the position and
+
+
+l_wrist and r_wrist
+'''''''''''''''''''
+
+The coordinate frame called ``l_wrist`` defines the position and
 orientation of the left arm regardless of the tool (grasping device
 for instance) attached to it.
 
-The coordinate frame called ``right_wrist`` defines the equivalent
+The coordinate frame called ``r_wrist`` defines the equivalent
 frame for the right arm.
 
 
-left_hand and right_hand
-''''''''''''''''''''''''
+l_gripper and r_gripper
+'''''''''''''''''''''''
 
-The coordinate frame called ``left_hand`` defines the position and
+The coordinate frame called ``l_gripper`` defines the position and
 orientation of the left arm end effector.
 
 If the end effector is a grasping device, the frame should be located
@@ -75,47 +85,55 @@ defined as X the axis which should be collinear with the object axis
 during the grasping process, Y the axis going "toward" the reached
 object and Z the axis orthogonal to the (X,Y) plan.
 
+.. image:: rep-0120-1.jpg
+   :scale: 50
+   :alt: Gripper frame (Y, Z) plane
+.. image:: rep-0120-2.jpg
+   :scale: 50
+   :alt: Gripper frame (X, Y) plane
 
-The coordinate frame called ``right_wrist`` defines the equivalent
-frame for the right arm.
+
+The coordinate frame called ``r_gripper`` defines the equivalent frame
+for the right arm.
 
 
-left_ankle and right_ankle
-''''''''''''''''''''''''''
+l_ankle and r_ankle
+'''''''''''''''''''
 
-The coordinate frame called ``left_ankle`` defines the position and
+The coordinate frame called ``l_ankle`` defines the position and
 orientation of the left leg regardless of the support body geometry.
 
 
-The coordinate frame called ``right_ankle`` defines the equivalent
+The coordinate frame called ``r_ankle`` defines the equivalent
 frame for the right leg.
 
 
-left_sole and right_sole
-''''''''''''''''''''''''
+l_sole and r_sole
+'''''''''''''''''
 
-The coordinate frame called ``left_sole`` defines the position and
-orientation of the left leg support body. The (X,Y) plan of this frame
+The coordinate frame called ``l_sole`` defines the position and
+orientation of the left leg support body. The (X,Y) plane of this frame
 must be coplanar with the support body contact surface. It is
 recommended to choose the origin as the projection of the body center
-on the contact surface.
+on the contact surface. The z coordinate of this frame should be on the
+ground level when standing.
 
 
-The coordinate frame called ``right_sole`` defines the equivalent
+The coordinate frame called ``r_sole`` defines the equivalent
 frame for the right leg.
 
 
-left_toe and right_toe
-''''''''''''''''''''''
+l_toe and r_toe
+'''''''''''''''
 
-The coordinate frame called ``left_toe`` defines the position and
-orientation of the left leg toe body. The (X,Y) plan of this frame
+The coordinate frame called ``l_toe`` defines the position and
+orientation of the left leg toe body. The (X,Y) plane of this frame
 must be coplanar with the toe body contact surface. It is recommended
 to choose the origin as the projection of the body center on the
 contact surface.
 
 
-The coordinate frame called ``right_toe`` defines the equivalent frame
+The coordinate frame called ``r_toe`` defines the equivalent frame
 for the right leg.
 
 
@@ -123,14 +141,15 @@ gaze
 ''''
 
 The coordinate frame called ``gaze`` defines the head position and
-orientation regardless of any sensors (camera for instance).
+orientation. The orientation indicates in which direction the head
+appears to be looking regardless of any sensors (camera for instance).
 
 
-chest
+torso
 '''''
 
-The coordinate frame called ``chest`` is attached to the lowest body
-of the model which is a parent of ``left_hand``, ``right_hand`` and
+The coordinate frame called ``torso`` is attached to the lowest body
+of the model which is a parent of ``l_gripper``, ``r_gripper`` and
 ``gaze``.
 
 
@@ -143,16 +162,21 @@ See REP 105 [1] for ``map`` and ``odom`` frames definition.
 Frame Hierarchy
 ---------------
 
-``base_link`` <-- ``chest`` <-- ``gaze``
-``base_link`` <-- ``chest`` <-- ``left_wrist`` <-- ``left_hand``
-``base_link`` <-- ``chest`` <-- ``right_wrist`` <-- ``right_hand``
-``base_link`` <-- ``left_ankle`` <-- ``left_sole`` <-- ``left_toe``
-``base_link`` <-- ``right_ankle`` <-- ``right_sole`` <-- ``right_toe``
+
+- base_link
+   - base_footprint
+   - ... - (l|r)_ankle - (l|r)_sole - (l|r)_toe
+   - torso
+      - ... - gaze
+      - ... - (l|r)_wrist - (l|r)_gripper
+
+
+
 
 Frame Authorities
 -----------------
 
-Unlike mobile bases, the transformation from ``base_link`` to
+Unlike most mobile bases, the transformation from ``base_link`` to
 ``base_footprint`` is not rigid on humanoid robots and is broadcasted by
 an external node.
 
