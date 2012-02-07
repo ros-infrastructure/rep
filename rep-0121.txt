@@ -74,14 +74,14 @@ The common usage patterns would be:
 
 or
 
-* Use loadLFC() before calling createInstance() and unloadLFC() to
+* Use loadLoadForClass() before calling createInstance() and unloadLoadForClass() to
   trigger the unloading manually.
 
 Backwards Compatibility
 =======================
 
-The side effects of the existing and createCI() method in combination
-with unloadLFC() are not fixable without potentially breaking existing
+The side effects of the existing and createCreateInstance() method in combination
+with unloadLoadForClass() are not fixable without potentially breaking existing
 application.  Therefore the implementation of createClassInstance()
 is not altered in any way but deprected.  The additions will induce
 no effect on existing code.
