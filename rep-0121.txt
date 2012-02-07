@@ -1,0 +1,118 @@
+REP: 121
+Title: Automatic unloading of libraries for pluginlib
+Version: $Revision: 1 $
+Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
+Author: Dirk Thomas
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 6-Feb-2012
+ROS-Version: Fuerte
+Post-History: 6-Feb-2012
+
+Abstract
+========
+
+In REP 116 [1]_ pluginlib was enhance to support unloading
+libraries within the life cycle of the ClassLoader.  In this REP
+the interface the user of pluginlib uses is revised to better
+support the load/create/unload cycle of shared libraries in order to
+permit unloading the library from memory when it is no more used.
+
+Current implementation
+======================
+
+The ClassLoader of pluginlib exposes the following methods:
+
+* loadLibraryForClass(const std::string& lookup_name)
+  Loads the library (if not already loaded) and increments a counter
+  which is specific for that library.
+
+* unloadLibraryForClass(const std::string& lookup_name)
+  Decrements the counter of that library and unloads the library if
+  the counter reaches zero.
+
+These two methods provide a clear interface and semantic regarding
+the life cycle of libraries.
+
+In order to instantiate a class from a library the user calls:
+
+* T* createClassInstance(const std::string& lookup_name, bool auto_load = true)
+  Creates an instance of type T and returns a pointer.  The ownership
+  of the object is transfered to the caller.  If autoloading is
+  disabled the pointer might be null if the library has not been
+  loaded before.  If autoloading is enabled (default) the library is
+  only loaded if it has not been loaded before.
+
+The issue with this implementation is that the user has no indication
+if createClassInstance() increased the library counter implicitly or
+not.  Furthermore the user has to take care about the correct point
+in time when calling unloadLibraryForClass().
+
+Specification
+=============
+
+In order to provide a clear semantic for creating instances a new
+method is introduced.  Internally it will always call
+loadLibraryForClass().  In order to receive an event when the
+instance is no more required it returns a boost::shared_ptr.  The
+deleter will trigger an unloadLibraryForClass() call.
+
+* boost::shared_ptr<T> createInstance(const std::string& lookup_name)
+
+The method has no autoloading flag as the user can easily check if
+the library is not loaded before trying to create an instance.  This
+reduces the complexity and potential side effects.
+
+The existing method createClassInstance() will be deprecated and
+later on removed.
+
+The common usage patterns would be:
+
+* Use only createInstance() (once or multiple times) and let the
+  boost deleter take care about unloading the library.
+
+or
+
+* Use loadLFC() before calling createInstance() and unloadLFC() to
+  trigger the unloading manually.
+
+Backwards Compatibility
+=======================
+
+The side effects of the existing and createCI() method in combination
+with unloadLFC() are not fixable without potentially breaking existing
+application.  Therefore the implementation of createClassInstance()
+is not altered in any way but deprected.  The additions will induce
+no effect on existing code.
+
+Reference implementation
+========================
+
+Reference implementation code is locate in the HG repository.
+See the diff [2]_ for detailed information.
+
+References
+==========
+
+.. [1] REP 116
+   (http://ros.org/reps/rep-0116.html)
+.. [2] Patch
+   (https://kforge.ros.org/common/pluginlib/rev/f4a728b1a365)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
