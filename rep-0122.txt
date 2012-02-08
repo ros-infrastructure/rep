@@ -63,7 +63,7 @@ REP.
 Directory layout
 ----------------
 
-The new /opt/ros/<distro> layout::
+The layout within the ``/opt/ros/<distro>`` install prefix is::
 
     bin/
     etc/
@@ -75,6 +75,8 @@ The new /opt/ros/<distro> layout::
 
 This layout generally follows FHS conventions, with the addition of
 the ``stacks`` directory for legacy (backwards-compatible) installs.
+It also contains setup files to easily configure environment variables
+for this prefix.
 
 For backwards-compatibility, existing packages and stacks use the
 following pattern::
@@ -165,20 +167,25 @@ is::
 share/
 ------
 
-``share`` is the root of the ``ROS_PACKAGE_PATH``
+``share`` is the root of the ``ROS_PACKAGE_PATH``.
 
 All package-relative assets must be explicitly installed to
 ``share/<ros-package-name>``.  These assets include:
 
- * manifest files (``manifest.xml`` and ``stack.xml``)
+ * manifest files (``manifest.xml``)
  * launch files
  * package-relative-executables (both binary and script)
  * bag files used in a package-relative manner
- * rosdep definitions (``rosdep.yaml``)  (See note below)
 
 By convention, binary executables go in
 ``share/<ros-package-name>/bin`` and script executables go in
 ``share/<ros-package-name/scripts``.  This convention is not enforced.
+
+Similarly, all stack-relative assets must be explicitly
+installed to ``share/<ros-stack-name``.  These assets include:
+
+ * manifest files (``stack.xml``)
+ * rosdep definitions (``rosdep.yaml``)  (See note below)
 
 NOTE: rosdep is currently being redesigned to make stack-relative
 ``rosdep.yaml`` files unnecessary.  ``rosdep.yaml`` files are expected
@@ -196,6 +203,11 @@ than ``share``.
 
 Environment variables
 '''''''''''''''''''''
+
+The new layout requires changes to existing ROS filesystem environment
+variables [2]_.  Separately, REP 123 [9]_ proposes new ROS filesystem
+environment variables to leverage the FHS layout more effectively.
+
 
 ``ROS_ROOT``
 ------------
@@ -225,61 +237,6 @@ Packages and stacks are responsible for explicitly installing
 Changes to ROS
 ''''''''''''''
 
-The following sections describe the effects on and updates to the ROS
-package-relative specification for the new FHS layout.  They also
-discuss changes to Python library loading and a minor change to the
-ROS package manifest format.
-
-
-Locating package-relative executables in the install tree
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-Package-relative executables are files specified with
-``(<ros-package-name>, <file-name>)``, where ``<file-name>`` denotes a
-file with executable permissions located anywhere in the directory
-root of ``<ros-package-name>``.
-
-Following the specification for ``share/``, package-relative
-executables are stored in ``share/ros-package-name/bin/executable``.
-In an install tree, ``ROS_PACKAGE_PATH`` includes the ``share/`` path.
-Thus, there are no updates to the package-relative executable
-specification for an install tree.
-
-
-Locating package-relative executables in CATKIN_BINARY_DIR
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-We amend the package-relative specification for the
-catkin-based binary builds, which builds out-of-source binaries
-outside of the ROS source package tree.
-
-In order to find executables generated to a catkin-based build
-directory, tools must example the
-``$CATKIN_BINARY_DIR/etc/packages.list`` file for
-
-``packages.list`` is a text file, where each line is of the form::
-
-    <ros-package-name> <relative-file-path>
-
-For example::
-
-    rosconsole ros_comm/tools/rosconsole
-
-To locate a package-relative executable when the ``CATKIN_BINARY_DIR``
-environment variable is set, tools use the following precedence:
-
- 1. If an entry ``<ros-package-name> <relative-file-path>`` is in
-    ``packages.list``, look for binary in
-    ``$CATKIN_BINARY_DIR/<relative-file-path>``
- 2. If executable is not found yet, look for the executable in the ROS package directory.
-
-This implementation assumes that the underlying build system, catkin,
-properly separates executables into separate directories based on ROS
-package name to prevent collisions.
-
-This portion of the specification is potentially volatile, as it
-depends on a implementation that has not been reviewed yet.
-
 ``<catkin>`` tag in manifest
 ----------------------------
 
@@ -307,15 +264,23 @@ Python modules and scripts that are part of the FHS install layout
 *must not* use ``load_manifest`` as it does not work properly within
 an out-of-source build.
 
+Stack version may now be in stack.yaml
+--------------------------------------
+
+Catkin defines a ``stack.yaml`` file for release packaging that
+contains a version number.  In order to not violate DRY (Don't Repeat
+Yourself) principles, tools like ``rosversion`` are now capable of
+locating the version number defined in this file.  This REP amends REP
+109 [4]_ to specify that the version number in the ``stack.yaml`` has the
+highest precedence.
 
 Motivation
 ==========
 
 The ROS Fuerte release migrates many of the low-level libraries to use
 a standard Filesystem Hiearchy Standard-like layout [2]_ contained in
-a distribution-specific install prefix (e.g. ``/opt/ros/fuerte/``).
-
-The goals of this conversion are many:
+a distribution-specific install prefix
+(e.g. ``/opt/ros/fuerte/``). The goals of this conversion are many:
 
  - Make ROS libraries more "normal"
 
@@ -337,22 +302,58 @@ The goals of this conversion are many:
    prefix.
 
 The final goal should be possible with converted stacks, but has not
-yet been verified.  The focus on the implementation has been
-preserving the ability to install multiple ROS distributions on the
-same machine as robots are frequently shared, expensive resources.
-The feature enables newer releases to be easily adopted without
-breaking existing code.
+yet been verified.  There are also unresolved performance issues
+discussed in the "Rationale" section.  The focus on the implementation
+has been preserving the ability to install multiple ROS distributions
+on the same machine as robots are frequently shared, expensive
+resources.  
 
 Compatibility with the Filesystem Hiearchy Standard has been a
 long-term goal for ROS.  ROS began as an in-source, package-relative
 system for finding, developing, building, and distributing code.
 Multiple attempts have been made to transition towards an
-FHS-compatible layout for ROS, including the withdrawn REP 102 [4]_
+FHS-compatible layout for ROS, including the withdrawn REP 102 [5]_
 and a prototype "rosbuild2" system that was deployed in ROS Electric.
-
 Experiences with those previous efforts have enabled us to accomplish
 this goal with minimal compatibility issues.
 
+One major goal these changes have enabled is much better integration
+with PCL.  The standalone version of PCL can now build against the
+required ROS messages with minimal additional dependencies.  In fact,
+it does not even require use of the catkin build system.  Hopefully,
+many more libraries will be able to transition to standalone
+implementations.
+
+
+Rationale
+=========
+
+The rationale for using the Filesystem Hierarchy Standard is simple:
+it is the only solution for making the system more "normal".  Most of
+the specifications in this REP are straightforward translations of
+that standard, with the only exception being the use of ``share``.
+
+This REP adds ``share`` to the ``ROS_PACKAGE_PATH``.  ``share`` is
+intended for "read-only architecture independent data files" [8]_.
+This is not true for this REP as package-relative binaries are
+installed to this directory. Furthermore, there are unresolved
+performance issues with this choice if an installation prefix is not
+used.
+
+All directories in this directory will be traversed by tools like
+``rospack`` and ``rosstack``.  This is efficient if all
+sub-directories are ROS aware, but will deteriorate greatly if the
+presence of deep, non-ROS aware directories.
+
+There are multiple ways to address this issue by updating the ROS
+package and stack specification.  For example, a lookup table could be
+used instead for installed packages.  Package-relative computations
+could also be made much more simple as the location relative to
+``share`` is fixed.
+
+This REP does not attempt to resolve this issue.  Instead, more
+experience working within this new layout will hopefully provide
+better intuition on how to complete this transition.
 
 Backwards Compatibility
 =======================
@@ -363,11 +364,10 @@ Backwards Compatibility
 Legacy (rosmake-based) stacks still use the same installation
 procedure as before.  We have been able to build legacy stacks on top
 of the new FHS layout by following the ``share/<ros-package-name>``
-layout described above.  We have not yet found any regressions related
-to the new layout for building legacy stacks that are specifically
-related to this specification.  We have put together a migration guide
-[4]_ that generally notes issues with increased link/include
-strictness.
+layout described above.  There are no known regressions related to the
+new layout for building legacy stacks that are specifically related to
+this specification.  We have put together a migration guide [6]_ that
+generally notes issues with increased link/include strictness.
 
 rosmake
 -------
@@ -383,7 +383,7 @@ roslaunch remote, <machine> tag incompatibility
 
 The changes in this specification break compatibility with roslaunch
 remote launches.  The non-backwards-compatible changes required in
-roslaunch are specified separately in REP 124 [5]_.
+roslaunch are specified separately in REP 124 [7]_.
 
 Stack dependencies, roscreate-stack
 -----------------------------------
@@ -397,14 +397,14 @@ To the best of our knowledge, the only tool affected by this is
 utility moving forward, so we made the difficult decision to delete
 it.
 
-We considered attempting to preserve this information, but we viewed
-this as wasted effort.  The implementation of the new build system
-leverages the fact that all converted ROS stacks are just system
-dependencies.  A dependency on 'boost' is no different than a
-dependency on 'ros_comm'. These system system dependencies are
-resolved using tools like rosdep.  This seamlessness is necessary as
-the intent of this REP is to treat the converted stacks as
-"standalone" libraries that can be easily integrated in other systems.
+There are alternatives that preserve this information, but it would
+waste effort.  The implementation of the new build system leverages
+the fact that all converted ROS stacks are normal system dependencies,
+e.g., a dependency on "boost" is no different than a dependency on
+"ros_comm". These system system dependencies are resolved using tools
+like rosdep.  This seamlessness is necessary as the intent of this REP
+is to treat the converted stacks as "standalone" libraries that can be
+easily integrated in other systems.
 
 In other words, preserving the ``roscreate-stack`` tool would
 implement the wrong behavior for converted stacks: it would treat them
@@ -430,24 +430,31 @@ safe to use in rosmake-based packages.  However, it is also
 unnecessary for importing Python modules that use the FHS install
 layout.
 
+As noted in the specification, ``roslib.load_manifest()`` cannot be
+used in converted stacks.
+
 
 References
 ==========
 
-.. [1] ROS filesystem environment variables
-   (http://ros.org/doc/api/rospkg/html/environment.html) 
-.. [2] Wikipedia: Filesystem Hiearchy Standard
+.. [1] Wikipedia: Filesystem Hiearchy Standard
    (http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
+.. [2] ROS filesystem environment variables
+   (http://ros.org/doc/api/rospkg/html/environment.html) 
 .. [3] ROS Manifest XML Tags Reference
    (http://www.ros.org/doc/api/rospkg/html/manifest_xml.html)
-.. [4] REP 102: ROS Install Target
+.. [4] REP 109: Unary Stacks
+   (http://ros.org/reps/rep-0109.html)
+.. [5] REP 102: ROS Install Target
    (http://ros.org/reps/rep-0102.html) 
-.. [5] ROS Fuerte Migration Guide
+.. [6] ROS Fuerte Migration Guide
    (http://ros.org/wiki/fuerte/Migration)
-.. [6] REP 124: Changes to roslaunch and rosrun for new filesystem layout and catkin build system
+.. [7] REP 124: Changes to roslaunch and rosrun for new filesystem layout and catkin build system
    (http://ros.org/reps/rep-0124.html) 
-
-
+.. [8]: Filesystem Hierarchy Standard 2.3
+   (http://www.pathname.com/fhs/pub/fhs-2.3.pdf)
+.. [9]: REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
+   (http://ros.org/reps/rep-0123.html) 
 Copyright
 =========
 
