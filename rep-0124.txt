@@ -1,0 +1,235 @@
+REP: 124
+Title: Changes to roslaunch and rosrun for new FHS layout and catkin build system
+Version: $Revision: 1 $
+Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
+Author: Ken Conley
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 6-Feb-2012
+ROS-Version: Fuerte
+Post-History: 6-Feb-2012
+
+Abstract
+========
+
+This REP describes changes to roslaunch [1]_ made necessary by the
+Filesystem Hierarchy Standard [2]_ changes in REP 122 [3]_ as well as
+changes necessary for compatibility with the catkin build system.  A
+non-backwards-compatible change is introduced for the ``<machine>``
+tag.  The mechanism for locating package-relative executables is also
+changed in order to find executables in an out-of-source, catkin-based
+build.
+
+
+Specification
+=============
+
+<machine> tag
+-------------
+
+The `<machine>` tag now uses the following syntax for setting environment variables
+on a remote machine::
+
+    <machine env-loader="path/to/env-loader.sh" />
+
+For example::
+
+    <machine env-loader="/opt/ros/fuerte/env.sh" />
+
+The ``env-loader`` attribution is *optional*.  If it is not set, it
+defaults to ``/opt/ros/<distro-name>/env.sh``, where ``<distro-name>`` is
+the ROS distribution named defined by the rules in REP 123 [2]_.
+
+Package-relative executables
+----------------------------
+
+The following sections describe the effects on and updates to the ROS
+package-relative specification for the new FHS layout.  They also
+discuss changes to Python library loading and a minor change to the
+ROS package manifest format.
+
+
+Locating package-relative executables in the install tree
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Package-relative executables are files specified with
+``(<ros-package-name>, <file-name>)``, where ``<file-name>`` denotes a
+file with executable permissions located anywhere in the directory
+root of ``<ros-package-name>``.
+
+Following the specification for ``share/``, package-relative
+executables are stored in ``share/ros-package-name/bin/executable``.
+In an install tree, ``ROS_PACKAGE_PATH`` includes the ``share/`` path.
+Thus, there are no updates to the package-relative executable
+specification for an install tree.
+
+
+Locating package-relative executables in CATKIN_BINARY_DIR
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+We amend the package-relative specification for the
+catkin-based binary builds, which builds out-of-source binaries
+outside of the ROS source package tree.
+
+In order to find executables generated to a catkin-based build
+directory, tools must example the
+``$CATKIN_BINARY_DIR/etc/packages.list`` file for
+
+``packages.list`` is a text file, where each line is of the form::
+
+    <ros-package-name> <relative-file-path>
+
+For example::
+
+    rosconsole ros_comm/tools/rosconsole
+
+To locate a package-relative executable when the ``CATKIN_BINARY_DIR``
+environment variable is set, tools use the following precedence:
+
+ 1. If an entry ``<ros-package-name> <relative-file-path>`` is in
+    ``packages.list``, look for binary in
+    ``$CATKIN_BINARY_DIR/<relative-file-path>``
+ 2. If executable is not found yet, look for the executable in the ROS package directory.
+
+This implementation assumes that the underlying build system, catkin,
+properly separates executables into separate directories based on ROS
+package name to prevent collisions.
+
+This portion of the specification is potentially volatile, as it
+depends on a implementation that has not been reviewed yet.
+
+
+
+Motivation
+==========
+
+
+Rationale
+=========
+
+Locating executables in catkin build directories
+------------------------------------------------
+
+In order to facilitate an write->compile->run development cycle, it is
+necessary to easily run executables that are compiled to the build
+directory.  In particular, because tools like roslaunch and rosrun use
+a package-relative scheme for locating executables, this same scheme
+must work with build artifacts.  Otherwise, the user would have to
+install the build artifacts, which would lengthen the development
+cycle.
+
+Out-of-source build systems are more complicated as an executable may
+be a binary build artifact, or it can be a script with executable
+permission in the source tree.  
+
+An alternative would be to make allow a package to have multiple
+directories, such as setting the ``ROS_PACKAGE_PATH`` to point to
+multiple locations.  This would have numerous undesireable effects,
+such as disabling the ability to override existing packages, and also
+not have backwards-compatibility with many tools.
+
+Another alternative would be to copy the entire source tree into the
+build space and point the ``ROS_PACKAGE_PATH`` there.  This is similar
+to how tools like Eclipse perform out-of-source builds.  This was
+considered undesireable as it would lengthen the development cycle for
+script executables, such as Python scripts, as a build would be
+required each time the script was modified in order to copy it back to
+the build space.
+
+There are even more alternatives, but the ``packages.list``
+specification ultimately is desireable for its simplicity.
+
+The particular implementation using ``CATKIN_BINARY_DIR`` creates a
+design coupling with the catkin build system.  It would be desireable
+to have a more general mechanism for preserving the semantics in an
+out-of-source build.  However, as the specification places
+requirements on the underlying build system as well, such as keeping
+executables for packages in separate directories.  Thus, this design
+coupling in unavoidable, so it is made explicit.
+
+
+env-loader optional
+-------------------
+
+The ``env-loader`` attribute was made optional because the most common
+value encodes the name of the current ROS distribution.  This would
+make it difficult, moving forward, to maintain the same set of launch
+files for different distributions.  The default value will allow
+things to "just work" in the most common case.
+    
+
+
+Backwards Compatibility
+=======================
+
+roslaunch remote, <machine> tag incompatibility
+-----------------------------------------------
+
+The roslaunch ``<machine>`` tag previously assumed that it was
+possible to construct the remote execution environment using
+``ROS_ROOT`` and ``ROS_PACKAGE_PATH``.  As described above,
+``ROS_ROOT`` no longer describes the path to ROS top-level binaries,
+including the ``roslaunch`` executable.
+
+There is no way to correctly determine the remote execution
+environment using the ``<machine>`` tag as specified in ROS Electric.
+roslaunch could attempt to infer settings by pattern matching on the
+values present in the tag, but this approach would be very brittle.
+
+Instead, we have decided to create an intentional,
+non-backwards-compatible change to the ``<machine>`` tag so that users
+are immediately notified of this issue and can easily migrate to the
+new tag.  This requires developers to maintain two sets of launch
+files with machine tags if they wish to use them in multiple ROS
+distributions.  This is inconvenient, but we less problematic than
+bugs in remote environment setup.
+
+The new ``<machine>`` tag specification is more powerful and
+implicitly implements an often-requested feature, which is to be able
+to execute on the remote machine via an environment setup file located
+on that machine::
+
+    <machine env-loader="/opt/ros/fuerte/env.sh" />
+
+The ``env-loader`` file must be a script that accepts variable-length
+arguments.  After performing environment setup, the script must then
+execute its arguments as a command.  Installations come with a default
+environment loader file.
+
+If ``env-loader`` is not specified, it is assumed to be
+``/opt/ros/<distro-name/env.sh``. This version of the tag is backwards
+compatible.
+
+
+
+References
+==========
+
+.. [1] roslaunch wiki page
+   (http://ros.org/wiki/roslaunch)
+.. [2] Wikipedia: Filesystem Hiearchy Standard
+   (http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
+.. [3] REP 122: FHS layout for ROS installation
+   (http://ros.org/reps/rep-0122.html) 
+.. [4] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
+   (http://ros.org/reps/rep-0123.html) 
+
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+

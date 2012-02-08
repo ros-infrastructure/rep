@@ -45,7 +45,8 @@ use case noted above.
 The complete set of ROS *filesystem* environment variables is
 enumerated in the rospkg documentation [2]_.
 
-
+The removal of resources from ``ROS_ROOT``-relative locations is
+further discussed in REP 122 [1]_.
 
 Motivation
 ==========
@@ -76,8 +77,8 @@ continues to be important information used for packaging and version
 detection, especially with the underlying changes to the filesystem
 layout.  
 
-Motivation
-==========
+Rationale
+=========
 
 We considered a more general environment variable to point to the
 install prefix instead of ``ROS_ETC_DIR``.  While such a setting is
@@ -100,7 +101,8 @@ Backwards Compatibility
 
 ``ROS_ROOT`` points to a directory location that retains the same
 structure and contents for paths to the ``mk`` and ``rosbuild``
-packages.  This preserves commonly used include behavior in ``CMakeLists.txt`` and ``Makefile`` files, such as::
+packages.  This preserves commonly used include behavior in
+``CMakeLists.txt`` and ``Makefile`` files, such as::
 
     include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
