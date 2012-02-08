@@ -8,7 +8,7 @@ Type: Informational
 Content-Type: text/x-rst
 Requires: 103, 105
 Created: 25-Nov-2011
-Post-History: 11-Jan-2012, 18-Jan-2012
+Post-History:
 
 Abstract
 ========
@@ -81,17 +81,8 @@ orientation of the left arm end effector.
 
 If the end effector is a grasping device, the frame should be located
 at the recommended object grasping location. The frame orientation is
-defined as X the axis which should be collinear with the object axis
-during the grasping process, Y the axis going "toward" the reached
-object and Z the axis orthogonal to the (X,Y) plan.
-
-.. image:: rep-0120-1.jpg
-   :scale: 50
-   :alt: Gripper frame (Y, Z) plane
-.. image:: rep-0120-2.jpg
-   :scale: 50
-   :alt: Gripper frame (X, Y) plane
-
+defined as X the axis going "toward" the object. Y the main dimension
+in which the grasping device moves and Z orthogonal to X and Y axes.
 
 The coordinate frame called ``r_gripper`` defines the equivalent frame
 for the right arm.
@@ -112,11 +103,11 @@ l_sole and r_sole
 '''''''''''''''''
 
 The coordinate frame called ``l_sole`` defines the position and
-orientation of the left leg support body. The (X,Y) plane of this frame
-must be coplanar with the support body contact surface. It is
-recommended to choose the origin as the projection of the body center
-on the contact surface. The z coordinate of this frame should be on the
-ground level when standing.
+orientation of the left leg support body. The (X,Y) plane of this
+frame must be coplanar with the support body contact surface. It is
+recommended to choose the origin as the projection of the support body
+origin on the contact surface. The Z coordinate of this frame should
+be on the ground level when standing.
 
 
 The coordinate frame called ``r_sole`` defines the equivalent
@@ -127,7 +118,7 @@ l_toe and r_toe
 '''''''''''''''
 
 The coordinate frame called ``l_toe`` defines the position and
-orientation of the left leg toe body. The (X,Y) plane of this frame
+orientation of the left leg toe body. The (X,Y) plan of this frame
 must be coplanar with the toe body contact surface. It is recommended
 to choose the origin as the projection of the body center on the
 contact surface.
@@ -165,8 +156,8 @@ Frame Hierarchy
 
 - base_link
    - base_footprint
-   - ... - (l|r)_ankle - (l|r)_sole - (l|r)_toe
-   - torso
+   - ... - (l|r)_ankle - (l_r)_sole - (l|r)_toe
+   - ... - torso
       - ... - gaze
       - ... - (l|r)_wrist - (l|r)_gripper
 
