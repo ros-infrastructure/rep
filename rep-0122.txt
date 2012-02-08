@@ -13,40 +13,211 @@ Post-History: 6-Feb-2012
 Abstract
 ========
 
-This REP introduces the ``ROS_ETC_DIR`` and ``ROS_DISTRO``
-environment variables.  It also deprecates the use of ``ROS_ROOT``.
+This REP introduces a new Filesystem Hierarchy Standard (FHS) [1]_
+layout for ROS.  For ROS distributions, such as ROS Fuerte, this
+layout will be done within an install prefix, though this layout is
+intended to make non-prefixed installs possible as well.
+
 
 Specification
 =============
 
-The following two environment variables are introduced.
+Install prefix
+--------------
 
-``ROS_ETC_DIR``
+For clarity, we will refer to the install prefix as
+``/opt/ros/<distro>``. The install prefix does not have to follow this
+actual pattern.  Additionally, the intent of this layout is to enable
+installations with no install prefix whatsoever, though this is not
+possible at the time of this REP.
 
-   Override path to ``/etc/ros`` directory.
+Directory layout
+----------------
 
-``ROS_DISTRO``
+The new /opt/ros/<distro> layout::
 
-   Override name of the currently active ROS distribution.  By default, this value is
-   read from ``$ROS_ETC_DIR``/distro. 
+    bin/
+    cmake/
+    include/
+    lib/
+    etc/
+    share/
+    stacks/
 
 
-The ``ROS_ROOT`` environment is deprecated, though it is not marked
-for removal. The ``ROS_ROOT`` is also no longer required.  The only
-valid use for ``ROS_ROOT`` moving forward is backwards-compatibility
-for rosbuild-based ``Makefile`` and ``CMakeLists.txt`` includes.
+This layout generally follows FHS conventions, with the addition of
+the ``stacks`` directory for legacy (backwards-compatible) installs.
 
-All programs are strongly discouraged from using the ``ROS_ROOT``
-environment variable to infer locations of resources other than the
-use case noted above.
+For backwards-compatibility, existing packages and stacks use the following pattern:
 
-The complete set of ROS *filesystem* environment variables is
-enumerated in the rospkg documentation [1]_.
+Stacks should *never* install to both ``share`` and ``stacks``.
+Stacks following this specification install to ``share``.  Legacy
+(rosmake-based) stacks install to ``stacks``.
 
+These directories are described in greater detail below.
+
+bin
+---
+
+``bin`` is used to store top-level executables, i.e. executables that are
+
+cmake
+-----
+
+``cmake``
+
+include
+-------
+
+ROS packages using the new install layout must install all header
+files to the ``include`` directory.  Assuming a ROS package uses the
+namespace ``<ros-package-name>``, include files for a package are
+stored in::
+
+    include/<ros-package-name>/
+
+lib
+---
+
+ROS packages using the new install layout must install all header
+files to the ``lib`` directory.  
+
+In the case of an install prefix, ``LD_LIBRARY_PATH`` must be set for
+executables to properly load.  We use the setting::
+
+    LD_LIBRARY_PATH=/opt/ros/<distro>/lib:$LD_LIBRARY_PATH
+
+
+``ROS_ROOT``
+------------
+
+``ROS_ROOT`` is defined to be::
+
+    ROS_ROOT=/opt/ros/<distro>/share/ros
+
+The *only* purpose of ``ROS_ROOT`` is backwards compatibility for
+finding legacy ``rosbuild`` and ``mk`` resources.  It no longer
+contains ROS binaries nor any other ROS stack assets.
+
+
+``ROS_PACKAGE_PATH``
+--------------------
+
+``ROS_PACKAGE_PATH`` is defined to be::
+
+    ROS_PACKAGE_PATH=/opt/ros/<distro>/share:/opt/ros/<distro>/stacks
+
+Thus, ``share/`` has precedence over ``stacks/``.  
+
+Packages and stacks are responsible for explicitly installing
+``manifest.xml`` and ``stack.xml`` files in
+``share/<package-or-stack-name>``.
+
+
+share/
+------
+
+``share`` is the root of the ``ROS_PACKAGE_PATH``
+
+All package-relative assets must be explicitly installed to
+``share/<ros-package-name>``.  These assets include:
+
+ * manifest files (``manifest.xml`` and ``stack.xml``)
+ * launch files
+ * package-relative-executables (both binary and script)
+ * bag files used in a package-relative manner
+ * rosdep definitions (``rosdep.yaml``)  (See note below)
+
+By convention, binary executables go in
+``share/<ros-package-name>/bin`` and script executables go in
+``share/<ros-package-name/scripts``.  This convention is not enforced.
+
+NOTE: rosdep is currently being redesigned to make stack-relative
+``rosdep.yaml`` files unnecessary.  ``rosdep.yaml`` files are expected
+to disappear from the ``share`` directory once this new functionality
+is available.
+
+
+Package-relative executables
+----------------------------
+
+Package-relative executables are files specified with
+``(<ros-package-name>, <file-name>)``, where ``<file-name>`` denotes a
+file with executable permissions located anywhere in the directory
+root of ``<ros-package-name>``.
+
+The following sections describe the effects on and updates to the
+package-relative specification for the new FHS layout.
+
+Locating package-relative executables in the install tree
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Following the specification for ``share/``, package-relative
+executables are stored in ``share/ros-package-name/bin/executable``.
+In an install tree, ``ROS_PACKAGE_PATH`` includes the ``share/`` path.
+Thus, there are no updates to the package-relative executable
+specification for an install tree.
+
+
+Locating package-relative executables in CATKIN_BINARY_DIR
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+We amend the package-relative specification for the
+catkin-based binary builds, which builds out-of-source binaries
+outside of the ROS source package tree.
+
+In order to find executables generated to a catkin-based build directory, tools must
+example the ``$CATKIN_BINARY_DIR/etc/packages.list`` file for 
+
+``packages.list`` is a text file, where each line is of the form::
+
+    <ros-package-name> <relative-file-path>
+
+For example::
+
+    rosconsole ros_comm/tools/rosconsole
+
+To locate a package-relative executable when the ``CATKIN_BINARY_DIR``
+environment variable is set, tools use the following precedence:
+
+ 1. If an entry ``<ros-package-name> <relative-file-path>`` is in
+    ``packages.list``, look for binary in
+    ``$CATKIN_BINARY_DIR/<relative-file-path>``
+ 2. If executable is not found yet, look for the executable in the ROS package directory.
+
+This implementation assumes that the underlying build system, catkin,
+properly separates executables into separate directories based on ROS
+package name to prevent collisions.
+
+This portion of the specification is potentially volatile, as it
+depends on a implementation that has not been reviewed yet.
+
+``<catkin>`` tag in manifest
+----------------------------
+
+Package manifests can now contain a ``<catkin>`` tag, to indicate that
+they are built using the catkin build system.  This tag is a
+performance optimization for tools like ``rosmake`` and the Python
+``roslib.load_manifest()`` API.
+
+PYTHONPATH, roslib.load_manifest()
+----------------------------------
+
+Python modules now install into a ``dist-packages``/``site-packages``
+directory in the install prefix.  This directory is added to the
+``PYTHONPATH``.  Thus, these modules are immediately accessible via
+Python ``import`` and do not require a ``roslib.load_manifest()``.
+
+In order to prevent unnecessary accumulation to the Python
+``sys.path``, ``roslib.load_manifest()`` does not recurse through
+packages that have a ``<catkin/>`` tag in their manifest.
 
 
 Motivation
 ==========
+
+REP 102, "ROS Install Target,"
+http://ros.org/reps/rep-0102.html
 
 The ROS Fuerte release migrates many of the low-level libraries to use
 a standard Filesystem Hiearchy Standard-like layout [2]_ contained in
@@ -74,49 +245,149 @@ continues to be important information used for packaging and version
 detection, especially with the underlying changes to the filesystem
 layout.  
 
-Motivation
-==========
+Rationale
+=========
 
-We considered a more general environment variable to point to the
-install prefix instead of ``ROS_ETC_DIR``.  While such a setting is
-more general, it encodes additional assumptions about the filesystem
-layout, such as the `etc/ros` directory structure beneath this path.
-This is not desireable for cross-platform support.  Furthermore,
-redirecting just this directory can be advantageous as it enables
-manipulation of just the configuration files.
+Locating executables in catkin build directories
+''''''''''''''''''''''''''''''''''''''''''''''''
 
-The ``ROS_DISTRO`` environment variable provides easy integration with
-various tools that need to alter behavior based on this setting.  The
-additional requirement to check ``ROS_ETC_DIR/distro`` seems an
-unnecessary inconvenience, but it motivated by the desire to enable
-future versions of ROS to operate without any special environment
-variables.
+In order to facilitate an write->compile->run development cycle, it is
+necessary to easily run executables that are compiled to the build
+directory.  In particular, because tools like roslaunch and rosrun use
+a package-relative scheme for locating executables, this same scheme
+must work with build artifacts.  Otherwise, the user would have to
+install the build artifacts, which would lengthen the development
+cycle.
+
+Out-of-source build systems are more complicated as an executable may
+be a binary build artifact, or it can be a script with executable
+permission in the source tree.  
+
+An alternative would be to make allow a package to have multiple
+directories, such as setting the ROS_PACKAGE_PATH to point to multiple
+locations.  This would have numerous undesireable effects, such as
+disabling the ability to override existing packages, and also not have
+backwards-compatibility with many tools.
+
+Another alternative would be to copy the entire source tree into the
+build space and point the ``ROS_PACKAGE_PATH`` there.  This is similar
+to how tools like Eclipse perform out-of-source builds.  This was
+considered undesireable as it would lengthen the development cycle for
+script executables, such as Python scripts, as a build would be
+required each time the script was modified in order to copy it back to
+the build space.
+
+There are even more alternatives, but the ``packages.list``
+specification ultimately is desireable for its simplicity.
+
+The particular implementation using ``CATKIN_BINARY_DIR`` creates a
+design coupling with the catkin build system.  It would be desireable
+to have a more general mechanism for preserving the semantics in an
+out-of-source build.  However, as the specification places
+requirements on the underlying build system as well, such as keeping
+executables for packages in separate directories.  Thus, this design
+coupling in unavoidable, so it is made explicit.
 
 
 Backwards Compatibility
 =======================
 
-``ROS_ROOT`` points to a directory location that retains the same
-structure and contents for paths to the ``mk`` and ``rosbuild``
-packages.  This preserves commonly used include behavior in ``CMakeLists.txt`` and ``Makefile`` files, such as::
+/opt/ros/<distro>/stacks
+------------------------
+
+Legacy (rosmake-based) stacks still use the same installation
+procedure as before.  We have been able to build legacy stacks on top
+of the new FHS layout by following the ``share/<ros-package-name>``
+layout described above.  We have not yet found any regressions related
+to the new layout for building legacy stacks that are specifically
+related to this specification.  We have put together a migration guide
+[4]_ that generally notes issues with increased link/include
+strictness.
+
+rosmake
+-------
+
+rosmake will recurse into packages that are installed in ``share``.
+As this location does not contain ``Makefile`` files, it will treat
+this as not buildable.  For small performance improvements, new-style
+packages with a ``<catkin>`` tag in their manifest.xml are treated the
+same as ``ROS_NOBUILD``.
+
+roslaunch remote, <machine> tag incompatibility
+-----------------------------------------------
+
+The roslaunch ``<machine>`` tag previously assumed that it was
+possible to construct the remote execution environment using
+``ROS_ROOT`` and ``ROS_PACKAGE_PATH``.  As described above,
+``ROS_ROOT`` no longer describes the path to ROS top-level binaries,
+including the ``roslaunch`` executable.
+
+There is no way to correctly determine the remote execution
+environment using the ``<machine>`` tag as specified in ROS Electric.
+roslaunch could attempt to infer settings by pattern matching on the
+values present in the tag, but this approach would be very brittle.
+
+Instead, we have decided to create an intentional,
+non-backwards-compatible change to the ``<machine>`` tag so that users
+are immediately notified of this issue and can easily migrate to the
+new tag.  This requires developers to maintain two sets of launch
+files with machine tags if they wish to use them in multiple ROS
+distributions.  This is inconvenient, but we less problematic than
+bugs in remote environment setup.
+
+The new ``<machine>`` tag specification is more powerful and
+implicitly implements an often-requested feature, which is to be able
+to execute on the remote machine via an environment setup file located
+on that machine::
+
+    <machine env-loader="/opt/ros/fuerte/env.sh" />
+
+The ``env-loader`` file must be a script that accepts variable-length
+arguments.  After performing environment setup, the script must then
+execute its arguments as a command.  Installations come with a default
+environment loader file.
+
+If ``env-loader`` is not specified, it is assumed to be
+``/opt/ros/<distro-name/env.sh``. This version of the tag is backwards
+compatible.
+
+
+Stack dependencies, roscreate-stack
+-----------------------------------
+
+The new install layout does not preserve the stack-package
+relationship: it is no longer possible to determine the packages that
+a stack contains in the install layout.
+
+To the best of our knowledge, the only tool affected by this is
+``roscreate-stack``.  Although this is a convenient tool, it has less
+utility moving forward, so we made the difficult decision to delete
+it.
+
+In the future, it is expected that changes to rosdep will turn stack
+dependencies into rosdeps dependencies instead.  
+
+ROS_ROOT
+--------
+
+As described in the specification, ``ROS_ROOT`` preserves
+backwards-compatibility for ``mk`` and ``rosbuild`` files.  For
+example,
 
     include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-This location also contains legacy ``rosdep.yaml`` and ``stack.xml``
-files.  Programs should not rely on these files as they are planned
-for removal.
+resolves to the same path.
 
+roslib.load_manifest()
+----------------------
 
-Reference implementation
-========================
+The Python environment bootstrapper, ``roslib.load_manifest()``, is
+safe to use in rosmake-based packages.  However, it is also
+unnecessary for importing packages that use the FHS install layout.
 
-The rospkg [3]_ library has been updated to support these environment
-variables.  The ``rosversion`` script has also been moved to rospkg.
-
-The specific API additions include:
-
- * ``rospkg.get_etc_ros_dir()``
- * ``rospkg.distro.current_distro_codename()``
+Furthermore, packages are part of the FHS install layout must not use
+this call at all as it does not work properly within the out-of-source
+build.
 
 
 References
@@ -126,8 +397,10 @@ References
    (http://ros.org/doc/api/rospkg/html/environment.html) 
 .. [2] Wikipedia: Filesystem Hiearchy Standard
    (http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
-.. [3] rospkg documentation
-   (http://ros.org/doc/api/rospkg/html/)
+.. [4] ROS Fuerte Migration Guide
+   (http://ros.org/wiki/fuerte/Migration)
+
+
 
 Copyright
 =========

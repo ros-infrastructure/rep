@@ -1,0 +1,151 @@
+REP: 123
+Title: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
+Version: $Revision: 1 $
+Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
+Author: Ken Conley
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 6-Feb-2012
+ROS-Version: Fuerte
+Post-History: 6-Feb-2012
+
+Abstract
+========
+
+This REP introduces the ``ROS_ETC_DIR`` and ``ROS_DISTRO`` environment
+variables.  It also deprecates the use of ``ROS_ROOT``.  The
+environment variables are related to the fileystem layout introduced
+in REP 122 [1]_.
+
+Specification
+=============
+
+The following two environment variables are introduced.
+
+``ROS_ETC_DIR``
+
+   Override path to ``/etc/ros`` directory.
+
+``ROS_DISTRO``
+
+   Override name of the currently active ROS distribution.  By default, this value is
+   read from ``$ROS_ETC_DIR``/distro. 
+
+
+The ``ROS_ROOT`` environment is deprecated, though it is not marked
+for removal. The ``ROS_ROOT`` is also no longer required.  The only
+valid use for ``ROS_ROOT`` moving forward is backwards-compatibility
+for rosbuild-based ``Makefile`` and ``CMakeLists.txt`` includes.
+
+All programs are strongly discouraged from using the ``ROS_ROOT``
+environment variable to infer locations of resources other than the
+use case noted above.
+
+The complete set of ROS *filesystem* environment variables is
+enumerated in the rospkg documentation [2]_.
+
+
+
+Motivation
+==========
+
+The ROS Fuerte release migrates many of the low-level libraries to use
+a standard Filesystem Hierarchy Standard-like layout [3]_ contained in
+a distribution-specific install prefix (e.g. ``/opt/ros/fuerte/``).
+
+The implications of this new layout are several.  First, there 
+ROS Fuerte introduces a new ``/etc/ros`` directory that contains
+configuration files for ROS.  There are currently very few files in
+this directory, but the contents are expected to increase over time.
+
+Second, ROS binaries are now installed in a standard ``bin/``
+directory instead of ``$ROS_ROOT/bin``, which removes one of the major
+motivations for this environment variable.  Other uses of
+``ROS_ROOT``, such as finding locations for log files and test
+results, were migrated to use ``ROS_HOME`` instead.
+
+Another major use of ``ROS_ROOT``, adding ROS packages to the package
+search path, is easily migrated to use ``ROS_PACKAGE_PATH`` directly.
+The precedence of ``ROS_ROOT`` on the package search path has been
+problematic in the past as it prevents easily overriding packages that
+are part of the ``ros`` stack.
+
+Finally, the active ROS distribution codename (e.g. ``fuerte``)
+continues to be important information used for packaging and version
+detection, especially with the underlying changes to the filesystem
+layout.  
+
+Motivation
+==========
+
+We considered a more general environment variable to point to the
+install prefix instead of ``ROS_ETC_DIR``.  While such a setting is
+more general, it encodes additional assumptions about the filesystem
+layout, such as the `etc/ros` directory structure beneath this path.
+This is not desireable for cross-platform support.  Furthermore,
+redirecting just this directory can be advantageous as it enables
+manipulation of just the configuration files.
+
+The ``ROS_DISTRO`` environment variable provides easy integration with
+various tools that need to alter behavior based on this setting.  The
+additional requirement to check ``ROS_ETC_DIR/distro`` seems an
+unnecessary inconvenience, but it motivated by the desire to enable
+future versions of ROS to operate without any special environment
+variables.
+
+
+Backwards Compatibility
+=======================
+
+``ROS_ROOT`` points to a directory location that retains the same
+structure and contents for paths to the ``mk`` and ``rosbuild``
+packages.  This preserves commonly used include behavior in ``CMakeLists.txt`` and ``Makefile`` files, such as::
+
+    include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+
+This location also contains legacy ``rosdep.yaml`` and ``stack.xml``
+files.  Programs should not rely on these files as they are planned
+for removal.
+
+
+Reference implementation
+========================
+
+The rospkg [3]_ library has been updated to support these environment
+variables.  The ``rosversion`` script has also been moved to rospkg.
+
+The specific API additions include:
+
+ * ``rospkg.get_etc_ros_dir()``
+ * ``rospkg.distro.current_distro_codename()``
+
+
+References
+==========
+
+.. [1] REP 122: FHS layout for ROS installation
+   (http://ros.org/reps/rep-0122.html) 
+.. [2] ROS filesystem environment variables
+   (http://ros.org/doc/api/rospkg/html/environment.html) 
+.. [3] Wikipedia: Filesystem Hiearchy Standard
+   (http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
+.. [4] rospkg documentation
+   (http://ros.org/doc/api/rospkg/html/)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
