@@ -249,7 +249,7 @@ Rationale
 =========
 
 Locating executables in catkin build directories
-''''''''''''''''''''''''''''''''''''''''''''''''
+------------------------------------------------
 
 In order to facilitate an write->compile->run development cycle, it is
 necessary to easily run executables that are compiled to the build
