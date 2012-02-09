@@ -126,8 +126,8 @@ The specific include directories for a package are located using
 lib/
 ----
 
-ROS packages using the new install layout must install all library
-files to the ``lib`` directory.
+ROS packages using the new install layout must install library files
+to the ``lib`` directory.
 
 Python modules are installed to ``lib/pythonX.Y``, where ``X.Y`` is
 the Python version.  This directory follows the standard Python
