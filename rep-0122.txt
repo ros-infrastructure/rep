@@ -37,11 +37,9 @@ within the ROS toolchain.
 
 For the most part, this specification avoids a specific reliance on
 the catkin build system except for a new manifest tag to mark packages
-as being built by catkin.  
-
-Additionally, this specification does not define catkin-specific
-additions, such as modifications to ``CMAKE_PREFIX_PATH`` and
-``etc/catkin``, and ``etc/langs``.
+as being built by catkin.  Additionally, this specification does not
+define catkin-specific additions, such as modifications to
+``CMAKE_PREFIX_PATH`` and ``etc/catkin``, and ``etc/langs``.
 
 
 Filesystem layout
@@ -52,12 +50,11 @@ Install prefix
 
 For clarity, the install prefix is referred to as
 ``/opt/ros/<distro>``. The install prefix does not have to follow this
-actual pattern, but it is the convention that ROS binary distributions
-follow.
+actual pattern, but it is the convention for ROS binary distributions.
 
 The intent of this layout is to enable installations with no install
-prefix whatsoever, though this is not possible at the time of this
-REP.
+prefix whatsoever, though there are unresolved integration issues
+discussed in the "Rationale" section.
 
 Directory layout
 ----------------
@@ -206,7 +203,7 @@ Environment variables
 
 The new layout requires changes to existing ROS filesystem environment
 variables [2]_.  Separately, REP 123 [9]_ proposes new ROS filesystem
-environment variables to leverage the FHS layout more effectively.
+environment variables and deprecates ``ROS_ROOT``.
 
 
 ``ROS_ROOT``
@@ -240,17 +237,18 @@ Changes to ROS
 ``<catkin/>`` tag in manifest
 -----------------------------
 
-Package manifests [3]_ can now contain a ``<catkin/>`` tag, to indicate
+Package manifests [3]_ can now contain a ``<catkin/>`` tag to indicate
 that they are built using the catkin build system.  This tag is a
 performance optimization for tools like ``rosmake`` and the Python
-``roslib.load_manifest()`` API.
+``roslib.load_manifest()`` API.  It is not required, but it is
+*strongly recommended*.
 
 PYTHONPATH, roslib.load_manifest()
 ----------------------------------
 
 Python modules now install into a ``dist-packages``/``site-packages``
-directory in the install prefix.  This installation uses the standard
-Python distutil/setuptools toolchain.
+in the ``lib`` directory in the install prefix.  This installation
+uses the standard Python distutil/setuptools toolchain.
 
 The Python install directory is added to the ``PYTHONPATH``.  Thus,
 these modules are immediately accessible via Python ``import`` and do
@@ -344,15 +342,14 @@ All directories in this directory will be traversed by tools like
 sub-directories are ROS aware, but will deteriorate greatly if the
 presence of deep, non-ROS aware directories.
 
-There are multiple ways to address this issue by updating the ROS
-package and stack specification.  For example, a lookup table could be
-used instead for installed packages.  Package-relative computations
-could also be made much more simple as the location relative to
-``share`` is fixed.
+There are multiple ways to address the performance issue by updating
+the ROS package and stack specification.  For example, a lookup table
+could be used instead for installed packages.  Package-relative
+computations could also be made much more simple as the location
+relative to ``share`` is fixed.
 
-This REP does not attempt to resolve this issue.  Instead, more
-experience working within this new layout will hopefully provide
-better intuition on how to complete this transition.
+It is hoped that more experience with this new layout will provide
+better intuition on how to resolve the above issues.
 
 Backwards Compatibility
 =======================
@@ -366,7 +363,8 @@ of the new FHS layout by following the ``share/<ros-package-name>``
 layout described above.  There are no known regressions related to the
 new layout for building legacy stacks that are specifically related to
 this specification.  We have put together a migration guide [6]_ that
-generally notes issues with increased link/include strictness.
+generally notes issues with increased link/include strictness that are
+separate from this REP.
 
 rosmake
 '''''''
@@ -381,8 +379,9 @@ roslaunch remote, <machine> tag incompatibility
 '''''''''''''''''''''''''''''''''''''''''''''''
 
 The changes in this specification break compatibility with roslaunch
-remote launches.  The non-backwards-compatible changes required in
-roslaunch are specified separately in REP 124 [7]_.
+remote launches as the environment configuration is very different.
+The non-backwards-compatible changes required in roslaunch are
+specified separately in REP 124 [7]_.
 
 Stack contents, roscreate-stack
 '''''''''''''''''''''''''''''''
