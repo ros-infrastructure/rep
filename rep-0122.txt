@@ -14,8 +14,8 @@ Abstract
 ========
 
 This REP introduces a new Filesystem Hierarchy Standard (FHS) [1]_
-layout for ROS and discusses the implications and changes necessary
-for ROS code that is converted to this standard.  
+based layout for ROS and discusses the implications and changes
+necessary for ROS code that is converted to this standard.
 
 For ROS distributions, such as ROS Fuerte, this layout is created
 within an install prefix, but this specification is intended to make
@@ -32,14 +32,14 @@ Specification
 =============
 
 This specification defines changes to the filesystem layout,
-associated environment variable changes, as well as changes necessary
-within the ROS toolchain.
+associated environment variable updates, and necessary modifications
+to ROS itself.
 
 For the most part, this specification avoids a specific reliance on
-the catkin build system except for a new manifest tag to mark packages
-as being built by catkin.  Additionally, this specification does not
-define catkin-specific additions, such as modifications to
-``CMAKE_PREFIX_PATH`` and ``etc/catkin``, and ``etc/langs``.
+the catkin build system, except for a new manifest tag to mark
+packages as being built by catkin.  Additionally, this specification
+does not define catkin-specific additions, such as
+``CMAKE_PREFIX_PATH``, ``etc/catkin`` and ``etc/langs``.
 
 
 Filesystem layout
@@ -73,16 +73,6 @@ This layout generally follows FHS conventions, with the addition of
 the ``stacks`` directory for legacy (backwards-compatible) installs.
 It also contains setup files to easily configure environment variables
 for this prefix.
-
-For backwards-compatibility, existing packages and stacks use the
-following pattern::
-
-    share/<ros-stack-name>/stack.xml
-    share/<ros-package-name>/manifest.xml
-
-Stacks should *never* install to both ``share`` and ``stacks``.
-Stacks following this specification install to ``share``.  Legacy
-(rosmake-based) stacks install to ``stacks``.
 
 These directories are described in greater detail below.
 
@@ -163,7 +153,8 @@ is::
 share/
 ------
 
-``share`` is the root of the ``ROS_PACKAGE_PATH``.
+``share`` is where ROS package and stack data files are installed, as
+well as package-relative binaries. It is on the ``ROS_PACKAGE_PATH``.
 
 All package-relative assets must be explicitly installed to
 ``share/<ros-package-name>``.  These assets include:
@@ -215,7 +206,7 @@ environment variables and deprecates ``ROS_ROOT``.
 
 The *only* purpose of ``ROS_ROOT`` is backwards compatibility for
 finding legacy ``rosbuild`` and ``mk`` resources.  It no longer
-contains ROS binaries nor any other ROS stack assets.
+contains ROS binaries.
 
 
 ``ROS_PACKAGE_PATH``
@@ -225,11 +216,8 @@ contains ROS binaries nor any other ROS stack assets.
 
     ROS_PACKAGE_PATH=/opt/ros/<distro>/share:/opt/ros/<distro>/stacks
 
-Thus, ``share/`` has precedence over ``stacks/``.  
+Thus, ``share`` has precedence over ``stacks``.
 
-Packages and stacks are responsible for explicitly installing
-``manifest.xml`` and ``stack.xml`` files in
-``share/<package-or-stack-name>``.
 
 Changes to ROS
 ''''''''''''''
@@ -303,8 +291,8 @@ The final goal should be possible with converted stacks, but has not
 yet been verified.  There are also unresolved performance issues
 discussed in the "Rationale" section.  The focus on the implementation
 has been preserving the ability to install multiple ROS distributions
-on the same machine as robots are frequently shared, expensive
-resources.  
+on the same machine as robots frequently are shared, expensive
+resources.
 
 Compatibility with the Filesystem Hiearchy Standard has been a
 long-term goal for ROS.  ROS began as an in-source, package-relative
@@ -414,7 +402,7 @@ ROS_ROOT
 
 As described in the specification, ``ROS_ROOT`` preserves
 backwards-compatibility for ``mk`` and ``rosbuild`` files.  For
-example,
+example,::
 
     include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
@@ -432,12 +420,23 @@ As noted in the specification, ``roslib.load_manifest()`` cannot be
 used in converted stacks.
 
 
+rosinstall
+''''''''''
+
+Changes to both ``ROS_ROOT`` and environment setup have created
+incompatibilities with the rosinstall tool.  There are also separate
+issues with rosinstall and catkin compatibility when building
+completely from source that are separate from the issues of install
+layout changes.  All of these are resolveable and are being addressed
+outside the scope of this REP.
+
+
 Reference implementation
 ========================
 
 A reference implementation is provided by the catkin build system,
-which is incorporated in the ROS Fuerte release.  Where possible,
-changes to this REP will be incorporated in the ROS Fuerte release.
+which is deployed in the ROS Fuerte release.  Where possible, changes
+to this REP will be incorporated in the ROS Fuerte release.
 Otherwise, changes will be incorporated in future ROS releases.
 
 
