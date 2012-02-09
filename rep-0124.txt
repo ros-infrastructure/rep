@@ -1,14 +1,14 @@
 REP: 124
-Title: Changes to roslaunch and rosrun for new FHS layout and catkin build system
+Title: Changes to roslaunch and rosrun for REP 122 and catkin build system
 Version: $Revision: 1 $
 Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
-Author: Ken Conley
+Author: Ken Conley, Brian Gerkey
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
-Created: 6-Feb-2012
+Created: 8-Feb-2012
 ROS-Version: Fuerte
-Post-History: 6-Feb-2012
+Post-History: 8-Feb-2012
 
 Abstract
 ========
@@ -28,8 +28,8 @@ Specification
 <machine> tag
 -------------
 
-The `<machine>` tag now uses the following syntax for setting environment variables
-on a remote machine::
+The `<machine>` tag now uses the following syntax for setting
+environment variables on a remote machine::
 
     <machine env-loader="path/to/env-loader.sh" />
 
@@ -37,9 +37,32 @@ For example::
 
     <machine env-loader="/opt/ros/fuerte/env.sh" />
 
+The ``env-loader`` file must be an executable script that accepts
+variable-length arguments.  After performing environment setup, the
+script must then execute its arguments as a command.  ROS
+installations come with a default environment loader file.
+
 The ``env-loader`` attribution is *optional*.  If it is not set, it
 defaults to ``/opt/ros/<distro-name>/env.sh``, where ``<distro-name>`` is
 the ROS distribution named defined by the rules in REP 123 [2]_.
+
+The following attributes are no longer supported and will raise errors::
+
+    ros-root
+    ros-package-path
+
+Also, the ``<env>`` tag is no longer supported inside of a
+``<machine>`` tag and will also raise an error.
+
+etc/ros/roscore.xml
+-------------------
+
+The configuraton file for ``roscore`` is now stored in ``etc/ros``.
+roslaunch obeys REP 123 [2]_ for locating ``etc/ros``.  
+
+This ``roscore.xml`` configuration file is a roslaunch file that
+defines the nodes that are launched with ``roscore`` is run.  It was
+previously stored in the ``roslaunch`` directory.
 
 Package-relative executables
 ----------------------------
@@ -100,9 +123,19 @@ This portion of the specification is potentially volatile, as it
 depends on a implementation that has not been reviewed yet.
 
 
-
 Motivation
 ==========
+
+The changes in this REP enable roslaunch to maintain compatibility
+with the changes introduced by REP 122.  As the FHS layout and
+underlying out-of-source build implementation affect the location of
+binaries and data files, roslaunch is heavily impacted by these
+changes.
+
+In the longer term, changes to the roslaunch model may enable even
+better integration with the REP 122 changes.  Such changes are
+considered out-of-scope for this REP, which is instead focused on
+compatibility updates.
 
 
 Rationale
@@ -111,13 +144,13 @@ Rationale
 Locating executables in catkin build directories
 ------------------------------------------------
 
-In order to facilitate an write->compile->run development cycle, it is
-necessary to easily run executables that are compiled to the build
-directory.  In particular, because tools like roslaunch and rosrun use
-a package-relative scheme for locating executables, this same scheme
-must work with build artifacts.  Otherwise, the user would have to
-install the build artifacts, which would lengthen the development
-cycle.
+In order to facilitate an efficient write-compile-run development
+cycle, it is necessary to easily run executables that are compiled to
+the build directory.  In particular, because tools like roslaunch and
+rosrun use a package-relative scheme for locating executables, this
+same scheme must work with build artifacts.  Otherwise, the user would
+have to install the build artifacts, which would lengthen the
+development cycle.
 
 Out-of-source build systems are more complicated as an executable may
 be a binary build artifact, or it can be a script with executable
@@ -159,12 +192,15 @@ files for different distributions.  The default value will allow
 things to "just work" in the most common case.
     
 
+Breaking compatibility with <machine> tag
+-----------------------------------------
+
+The rationale for these changes is discussed in the "Backwards
+Compatibility" section below.
+
 
 Backwards Compatibility
 =======================
-
-roslaunch remote, <machine> tag incompatibility
------------------------------------------------
 
 The roslaunch ``<machine>`` tag previously assumed that it was
 possible to construct the remote execution environment using
@@ -177,29 +213,13 @@ environment using the ``<machine>`` tag as specified in ROS Electric.
 roslaunch could attempt to infer settings by pattern matching on the
 values present in the tag, but this approach would be very brittle.
 
-Instead, we have decided to create an intentional,
-non-backwards-compatible change to the ``<machine>`` tag so that users
-are immediately notified of this issue and can easily migrate to the
-new tag.  This requires developers to maintain two sets of launch
-files with machine tags if they wish to use them in multiple ROS
-distributions.  This is inconvenient, but we less problematic than
-bugs in remote environment setup.
-
-The new ``<machine>`` tag specification is more powerful and
-implicitly implements an often-requested feature, which is to be able
-to execute on the remote machine via an environment setup file located
-on that machine::
-
-    <machine env-loader="/opt/ros/fuerte/env.sh" />
-
-The ``env-loader`` file must be a script that accepts variable-length
-arguments.  After performing environment setup, the script must then
-execute its arguments as a command.  Installations come with a default
-environment loader file.
-
-If ``env-loader`` is not specified, it is assumed to be
-``/opt/ros/<distro-name/env.sh``. This version of the tag is backwards
-compatible.
+Instead, there is an intentional, non-backwards-compatible change to
+the ``<machine>`` tag so that users are immediately notified of this
+issue and can easily migrate to the new tag.  This requires developers
+to maintain two sets of launch files with machine tags if they wish to
+use them both in ROS Fuerte and previous ROS distributions.  This is
+inconvenient, but less problematic than hard-to-debug issues with
+remote environment setup.
 
 
 

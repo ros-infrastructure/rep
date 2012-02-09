@@ -2,13 +2,13 @@ REP: 122
 Title: Filesystem Hierarchy Standard layout changes for ROS
 Version: $Revision: 1 $
 Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
-Author: Ken Conley
+Author: Ken Conley, Troy Straszheim, Morten Kjaergaard, Ethan Rublee, Tully Foote, Brian Gerkey
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
-Created: 6-Feb-2012
+Created: 8-Feb-2012
 ROS-Version: Fuerte
-Post-History: 6-Feb-2012
+Post-History: 8-Feb-2012
 
 Abstract
 ========
@@ -21,10 +21,11 @@ For ROS distributions, such as ROS Fuerte, this layout is created
 within an install prefix, but this specification is intended to make
 non-prefixed installs possible as well.
 
-This REP makes reference to the catkin build system, which is used as
-our reference implementation. However, this REP does not provide
-catkin-specific documentation an is intended to mostly be neutral to
-implementation. 
+The majority of this specification is due to the hard work of Troy
+Straszheim and Morten Kjaergaard on the catkin build system, which is
+the reference implementation this REP is based on.  This REP does not
+document catkin itself as the specification is intended to be
+implementation-neutral.
 
 
 Specification
@@ -35,14 +36,12 @@ associated environment variable changes, as well as changes necessary
 within the ROS toolchain.
 
 For the most part, this specification avoids a specific reliance on
-the catkin build system except for:
-
- - locating binary executables in a catkin build workspace
- - a new manifest tag to mark packages as being built by catkin
+the catkin build system except for a new manifest tag to mark packages
+as being built by catkin.  
 
 Additionally, this specification does not define catkin-specific
 additions, such as modifications to ``CMAKE_PREFIX_PATH`` and
-``etc/catkin``.
+``etc/catkin``, and ``etc/langs``.
 
 
 Filesystem layout
@@ -157,7 +156,7 @@ executables can load shared libraries.  We use the settings::
     PKG_CONFIG_PATH=/opt/ros/<distro>/lib/pkgconfig::$PKG_CONFIG_PATH
     LD_LIBRARY_PATH=/opt/ros/<distro>/lib:$LD_LIBRARY_PATH
 
-``PYTHONPATH`` must also be set in an install prefix as is platform
+``PYTHONPATH`` must also be set in an install prefix and is platform
 dependent.  For example, on Ubuntu Lucid with Python 2.6, the setting
 is::
 
@@ -172,20 +171,21 @@ share/
 All package-relative assets must be explicitly installed to
 ``share/<ros-package-name>``.  These assets include:
 
- * manifest files (``manifest.xml``)
- * launch files
- * package-relative-executables (both binary and script)
- * bag files used in a package-relative manner
+- manifest files (``manifest.xml``)
+- launch files
+- package-relative-executables (both binary and script)
+- bag files used in a package-relative manner
 
-By convention, binary executables go in
-``share/<ros-package-name>/bin`` and script executables go in
-``share/<ros-package-name/scripts``.  This convention is not enforced.
+By convention, package-relative binary executables go in
+``share/<ros-package-name>/bin`` and package-relative script
+executables go in ``share/<ros-package-name/scripts``.  This
+convention is not enforced.
 
 Similarly, all stack-relative assets must be explicitly
 installed to ``share/<ros-stack-name``.  These assets include:
 
- * manifest files (``stack.xml``)
- * rosdep definitions (``rosdep.yaml``)  (See note below)
+- manifest files (``stack.xml``)
+- rosdep definitions (``rosdep.yaml``)  (See note below)
 
 NOTE: rosdep is currently being redesigned to make stack-relative
 ``rosdep.yaml`` files unnecessary.  ``rosdep.yaml`` files are expected
@@ -196,9 +196,9 @@ is available.
 stacks/
 -------
 
-``stacks`` is installation location for legacy, rosmake-based stacks.
-It is included on the ``ROS_PACKAGE_PATH``, but has lower precedence
-than ``share``.
+``stacks`` is the installation location for legacy, rosmake-based
+stacks.  It is included on the ``ROS_PACKAGE_PATH``, but has lower
+precedence than ``share``.
 
 
 Environment variables
@@ -237,10 +237,10 @@ Packages and stacks are responsible for explicitly installing
 Changes to ROS
 ''''''''''''''
 
-``<catkin>`` tag in manifest
-----------------------------
+``<catkin/>`` tag in manifest
+-----------------------------
 
-Package manifests [3]_ can now contain a ``<catkin>`` tag, to indicate
+Package manifests [3]_ can now contain a ``<catkin/>`` tag, to indicate
 that they are built using the catkin build system.  This tag is a
 performance optimization for tools like ``rosmake`` and the Python
 ``roslib.load_manifest()`` API.
@@ -282,24 +282,24 @@ a standard Filesystem Hiearchy Standard-like layout [2]_ contained in
 a distribution-specific install prefix
 (e.g. ``/opt/ros/fuerte/``). The goals of this conversion are many:
 
- - Make ROS libraries more "normal"
+- Make ROS libraries more "normal"
 
- - Enable the ROS toolchain to use existing libraries for packaging
-   and release (e.g. ``git-buildpackage``)
+- Enable the ROS toolchain to use existing libraries for packaging
+  and release (e.g. ``git-buildpackage``)
 
- - Enable ROS messages, libraries and tools to be easily integrated
-   with other build systems via ``pkg-config`` and CMake's
-   ``find_package()``.
+- Enable ROS messages, libraries and tools to be easily integrated
+  with other build systems via ``pkg-config`` and CMake's
+  ``find_package()``.
 
- - Enable ROS binary releases to be accepted into Debian, Ubuntu, and
-   other Linux distributions.
+- Enable ROS binary releases to be accepted into Debian, Ubuntu, and
+  other Linux distributions.
    
- - Preserve the ability to install multiple ROS distributions on the
-   same machine.
+- Preserve the ability to install multiple ROS distributions on the
+  same machine.
 
- - Eventually eliminate the need for ROS-specific filesystem
-   environment variables when the installation is not in an install
-   prefix.
+- Eventually eliminate the need for ROS-specific filesystem
+  environment variables when the installation is not in an install
+  prefix.
 
 The final goal should be possible with converted stacks, but has not
 yet been verified.  There are also unresolved performance issues
@@ -319,10 +319,9 @@ this goal with minimal compatibility issues.
 
 One major goal these changes have enabled is much better integration
 with PCL.  The standalone version of PCL can now build against the
-required ROS messages with minimal additional dependencies.  In fact,
-it does not even require use of the catkin build system.  Hopefully,
-many more libraries will be able to transition to standalone
-implementations.
+required ROS messages using CMake with minimal additional
+dependencies.  Hopefully, many more libraries will be able to
+transition to standalone implementations.
 
 
 Rationale
@@ -359,7 +358,7 @@ Backwards Compatibility
 =======================
 
 /opt/ros/<distro>/stacks
-------------------------
+''''''''''''''''''''''''
 
 Legacy (rosmake-based) stacks still use the same installation
 procedure as before.  We have been able to build legacy stacks on top
@@ -370,7 +369,7 @@ this specification.  We have put together a migration guide [6]_ that
 generally notes issues with increased link/include strictness.
 
 rosmake
--------
+'''''''
 
 rosmake will recurse into packages that are installed in ``share``.
 As this location does not contain ``Makefile`` files, it will treat
@@ -379,14 +378,14 @@ packages with a ``<catkin>`` tag in their manifest.xml are treated the
 same as ``ROS_NOBUILD``.
 
 roslaunch remote, <machine> tag incompatibility
------------------------------------------------
+'''''''''''''''''''''''''''''''''''''''''''''''
 
 The changes in this specification break compatibility with roslaunch
 remote launches.  The non-backwards-compatible changes required in
 roslaunch are specified separately in REP 124 [7]_.
 
-Stack dependencies, roscreate-stack
------------------------------------
+Stack contents, roscreate-stack
+'''''''''''''''''''''''''''''''
 
 The new install layout does not preserve the stack-package
 relationship: it is no longer possible to determine the packages that
@@ -412,7 +411,7 @@ as ROS stack dependencies, instead of system dependencies.
 
 
 ROS_ROOT
---------
+''''''''
 
 As described in the specification, ``ROS_ROOT`` preserves
 backwards-compatibility for ``mk`` and ``rosbuild`` files.  For
@@ -423,7 +422,7 @@ example,
 resolves to the same path.
 
 roslib.load_manifest()
-----------------------
+''''''''''''''''''''''
 
 The Python environment bootstrapper, ``roslib.load_manifest()``, is
 safe to use in rosmake-based packages.  However, it is also
@@ -432,6 +431,15 @@ layout.
 
 As noted in the specification, ``roslib.load_manifest()`` cannot be
 used in converted stacks.
+
+
+Reference implementation
+========================
+
+A reference implementation is provided by the catkin build system,
+which is incorporated in the ROS Fuerte release.  Where possible,
+changes to this REP will be incorporated in the ROS Fuerte release.
+Otherwise, changes will be incorporated in future ROS releases.
 
 
 References
@@ -449,12 +457,13 @@ References
    (http://ros.org/reps/rep-0102.html) 
 .. [6] ROS Fuerte Migration Guide
    (http://ros.org/wiki/fuerte/Migration)
-.. [7] REP 124: Changes to roslaunch and rosrun for new filesystem layout and catkin build system
-   (http://ros.org/reps/rep-0124.html) 
-.. [8]: Filesystem Hierarchy Standard 2.3
+.. [7] REP 124: Changes to roslaunch and rosrun for REP 122 and catkin build system
+   (http://ros.org/reps/rep-0124.html)
+.. [8] Filesystem Hierarchy Standard 2.3
    (http://www.pathname.com/fhs/pub/fhs-2.3.pdf)
-.. [9]: REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
+.. [9] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
    (http://ros.org/reps/rep-0123.html) 
+
 Copyright
 =========
 
