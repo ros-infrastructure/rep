@@ -1,7 +1,7 @@
 REP: 121
 Title: Automatic unloading of libraries for pluginlib
-Version: $Revision: 1 $
-Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
+Version: $Revision: 2 $
+Last-Modified: $Date: 2012-02-08 14:00:00 +0200 (Wed, 8 Feb 2012) $
 Author: Dirk Thomas
 Status: Draft
 Type: Standards Track
@@ -47,44 +47,68 @@ In order to instantiate a class from a library the user calls:
 The issue with this implementation is that the user has no indication
 if createClassInstance() increased the library counter implicitly or
 not.  Furthermore the user has to take care about the correct point
-in time when calling unloadLibraryForClass().
+in time when calling unloadLibraryForClass().  If two different
+entities are working with the same ClassLoader instance the library
+might get unloaded while it is still in use (i.e. A calling
+loadLibraryForClass(), B calling createClassInstance(), A calling
+unloadLibraryForClass(), results in unloading the library).
 
 Specification
 =============
 
-In order to provide a clear semantic for creating instances a new
-method is introduced.  Internally it will always call
-loadLibraryForClass().  In order to receive an event when the
-instance is no more required it returns a boost::shared_ptr.  The
-deleter will trigger an unloadLibraryForClass() call.
+In order to not break existing code which relies on this current
+implementation detail the behavior of it can not be changes and is
+therefore deprecated (and later on removed).
 
-* boost::shared_ptr<T> createInstance(const std::string& lookup_name)
+Instead two new methods are introduced which provide a clear semantic
+for creating instances and handling the life cycle of the create
+instance.
 
-The method has no autoloading flag as the user can easily check if
-the library is not loaded before trying to create an instance.  This
-reduces the complexity and potential side effects.
+* T* createInstance(const std::string& lookup_name)
 
-The existing method createClassInstance() will be deprecated and
-later on removed.
+* boost::shared_ptr<T> createManagedInstance(const std::string& lookup_name)
+
+Internally both will always call loadLibraryForClass() which ensures
+that the reference counter for the library is increased for every
+instance.
+
+For createInstance() the ownership and responsibility to unload the
+library is transfered to the caller.  For createManagedInstance() the
+ownership stays with the callee (the ClassLoader) and deleting and
+unloading is triggered by the deleter of the boost shared pointer.
 
 The common usage patterns would be:
 
-* Use only createInstance() (once or multiple times) and let the
-  boost deleter take care about unloading the library.
+* Use createManagedInstance() (once or multiple times) and let the
+  boost deleter take care about deleting the instance and unloading
+  the library.
 
 or
 
-* Use loadLoadForClass() before calling createInstance() and unloadLoadForClass() to
-  trigger the unloading manually.
+* Use createInstance() (once or multiple times) and manually delete
+  the instance later and call unloadLibraryForClass() for each
+  garbaged instance.  This approach is usually used when the
+  ownership of the instances should be passed to something else (i.e.
+  when using Qt objects).
+
+or
+
+* Wrap multiple create calls between one loadLoadForClass() and
+  one unloadLoadForClass() to keep library loaded for a longer time
+  (even if no instance are currently loaded).
 
 Backwards Compatibility
 =======================
 
-The side effects of the existing and createCreateInstance() method in combination
-with unloadLoadForClass() are not fixable without potentially breaking existing
-application.  Therefore the implementation of createClassInstance()
-is not altered in any way but deprected.  The additions will induce
-no effect on existing code.
+The side effects of the existing and createCreateInstance() method in
+combination with unloadLoadForClass() are not fixable without
+potentially breaking existing application.  Therefore the
+implementation of createClassInstance() is not altered in any way but
+deprecated.  The additions will induce no effect on existing code.
+
+The previous option to create an instance with autoloading disabled
+is not necessary since that case can be easily queried before and
+only conditionally call one of the create methods.
 
 Reference implementation
 ========================
