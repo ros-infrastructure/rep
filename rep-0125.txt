@@ -1,0 +1,466 @@
+REP: 125
+Title: rosdep 2
+Version: $Revision: 1 $
+Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
+Author: Ken Conley
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 10-Feb-2012
+ROS-Version: Fuerte
+Post-History: 10-Feb-2012
+
+Abstract
+========
+
+This REP describes a "rosdep 2" tool that is significantly different
+from its predecessor [1]_.  This new version uses a "sources list",
+similar in semantics to the ``apt`` tool [2]_.  It is also a standalone
+tool that can be separately installed and used with or without a ROS
+package system.
+
+This specification is meant to be minimal.  See "Future Improvements"
+for possible extensions.
+
+
+Example workflow
+================
+
+The example workflows below provide a high-level sketch of how rosdep
+2 is used.  The main differences are:
+
+ 1. Standalone installation.
+ 2. Installation requires an ``init`` and ``update`` step to create
+    the local database.
+ 3. More querying APIs.
+
+
+Installation::
+
+    sudo pip install -U rosdep
+    sudo rosdep init
+    rosdep update
+
+Common installation workflow::
+
+    $ rosdep check ros_comm
+    All system dependencies have been satisified
+    $ rosdep install geometry
+
+Querying::
+
+    $ rosdep keys roscpp
+    pkg-config
+
+    $ rosdep resolve pkg-config
+    pkg-config
+
+    $ rosdep keys geometry
+    eigen
+    apr
+    glut
+    python-sip
+    python-numpy
+    graphviz
+    paramiko
+    cppunit
+    libxext
+    log4cxx
+    pkg-config
+
+    $ rosdep resolve eigen
+    libeigen3-dev
+
+
+
+Resolution specification
+========================
+
+rosdep 2 loads *valid data sources* specified in the sources list in
+order.  This follows the behavior of apt, which designates the "most
+preferred source listed first."
+
+Each rosdep entry from the data sources is combined into a single
+rosdep database.  Entries from data sources listed higher in the
+sources have higher precedence.
+
+A data source is considered *valid* if all of its tags match the local
+tags.  A data source with no tags is always loaded.
+
+
+Tags
+----
+
+The following tags are set for the local rosdep instance:
+
+- ``ROS-DISTRO-CODENAME``, e.g. ``fuerte``
+- ``OS-NAME``, e.g. ``ubuntu``
+- ``OS-VERSION-CODENAME``, e.g. ``lucid``
+
+For example, on Ubuntu Lucid 10.04, with the ROS Fuerte distribution,
+the tags for the local rosdep instance would be: ``fuerte, ubuntu,
+lucid``.
+
+``OS-NAME`` and ``OS-VERSION-CODENAME`` are the same values that the
+``rosdep.yaml`` file format uses [3]_.  NOTE: REP 111 refers to
+``OS-VERSION-CODENAME`` as ``OS_VERSION``.  Here we attach
+``CODENAME`` to explicitly refer to the codename, not the numerical
+version marker.
+
+
+Conflict resolution
+-------------------
+
+There are no longer conflicts in rosdep 2.  ``rosdep.yaml`` files are
+processed in order of precedence, with the first entry for a rosdep
+key "winning".  Subsequent entries for the same key, even if they are
+non-conflicting, are not merged.
+
+Caching
+-------
+
+rosdep 2 always loads its database from a local cache.  The user must
+explicitly update this local cache to get new resolution rules.
+
+
+File format specification
+=========================
+
+This specification uses the same ``rosdep.yaml`` file format as
+defined in REP 111 [3]_ and also described more concisely in [4]_.
+
+Data sources .list format
+-------------------------
+
+A ``.list`` file lists *data sources*, with the most preferred data
+source first.  The general format is::
+
+    source-type uri [tags...]
+
+Where ``source-type`` can be:
+
+  ``yaml``
+
+     ``rosdep.yaml`` file   
+
+  ``gbpdistro``
+
+    ``gbpdistro`` file.
+
+
+Lines that start with a ``#`` are considered to be comments.
+
+Example file::
+
+    yaml https://github.com/ros/rosdistro/raw/master/rosdep/base.yaml
+    yaml https://github.com/ros/rosdistro/raw/master/rosdep/python.yaml
+    gbpdistro https://github.com/ros/rosdistro/raw/master/releases/fuerte.yaml fuerte
+
+    
+gbpdistro files
+---------------
+
+``gbpdistro`` refers to a ``git-buildpackage``-based toolchain
+currently in use for building REP 122-compliant stacks.  This
+toolchain is still in a prototype phase; thus, this ``gbpdistro``
+specification is unstable.
+
+This REP does not define the ``gbpdistro`` format, but it is assumed
+to be a YAML file with that conforms to::
+
+    gbp-repos:
+    - name: NAME1
+      target: all
+      url: git://github.com/PROJECT1/REPO1.git
+    - name: NAME2
+      target: [lucid, oneiric]
+      url: git://github.com/PROJECT2/REPO2.git
+    release-name: RELEASE-NAME
+
+
+rosdep 2 can create a data source based on a ``gbpdistro`` file.  For
+each entry in the ``gbp-repos`` key, rosdep 2 produces a rosdep key
+for ``NAME`` that maps to the Ubuntu package name
+``ros-<RELEASE-NAME>-<NAME>``.  In the future, this mechanism could
+also be used to produce rosdep key mappings for other platforms, like
+OS X Homebrew.
+
+rosdep 2 uses a "targets" file that provides a lookup table for
+resolving ``all`` targets based on ``RELEASE-NAME``. The targets files
+is a machine-readable representation of REP 3 [7]_.
+
+
+/etc/ros/rosdep/sources.list.d
+------------------------------
+
+rosdep 2 uses a similar definition as apt ``sources.list.d`` [2]_:
+
+       The ``/etc/ros/rosdep/sources.list.d`` directory provides a way
+       to add entries in separate files.  File names need to end with
+       .list and may only contain letters (a-z and A-Z), digits (0-9),
+       underscore (_), hyphen (-) and period (.) characters. Otherwise
+       they will be silently ignored.
+
+
+For simplicity, we don't implement an ``/etc/ros/rosdep/sources.list``
+and instead soley use the ``/etc/ros/rosdep/sources.list.d/``
+implementation, which is much easier for idempotent configuration by
+scripts.
+
+
+Command-line specification
+==========================
+
+Updated rosdep commands
+-----------------------
+
+``db``
+
+    No longer takes in any arguments and uses the easier to type
+    ``db`` instead of ``depdb``.  The database that is used to resolve
+    rosdep keys is determined by the sources list, and thus is not
+    dependent on a particular resource (e.g. ROS package or stack).
+    The previous ``depdb`` command is still processed but not
+    promoted.
+
+``what-needs <rosdeps>``
+
+``where-defined <rosdeps>``
+
+    Both commands are the same as their predecessors, but use a more
+    consistent dash separator.  The previous versions are supported
+    but not promoted.
+
+New rosdep commands
+-------------------
+
+``init``
+    
+    Initializes a default ``/etc/ros/rosdep/sources.list.d`` directory
+    for the user.  This is a bootstrapping command that only needs to
+    be run once, most likely as::
+
+        sudo rosdep init
+
+
+``keys <stacks-and-packages>``
+
+    List the rosdep keys that the ROS stacks and packages depend on.
+    This command only works with a ``ROS_PACKAGE_PATH`` set.
+    
+``resolve <rosdeps>``
+
+    Prints the resolution of the listed rosdeps to the console.  This
+    enables users to easily query rosdep and verify its behavior.  It
+    is meant to be used together with the ``keys`` command.
+
+``update``
+
+    Processes ``/etc/ros/rosdep/sources.list.d`` and downloads new
+    datafiles for the local database.  This is the only command that
+    examines remote sources.  All other commands are processed against
+    local data.
+
+
+    
+
+Motivation
+==========
+
+The original rosdep gave preference to the developer of a ROS stack.
+It enabled that developer to declare dependency rules and distribute
+them with the stack.  As a corollary, it strongly favored
+reproducibility and correctness: old source trees could be checked out
+and be built the same way.  As a result of these goals, rosdep rules
+were stored with code.  Also, aggregation of rules in lower-level
+stacks was frowned upon, as it would restrict downstream developers
+
+This design has not scaled very well.  There are several issues, in
+particular, that have strongly motivated a redesign:
+
+- Updates the the rosdep rules for new platforms requires re-releasing
+  code, even though the code is unchanged.  This creates significant
+  delays porting ROS to new platforms.
+- Conflicts require re-releasing code to resolve.
+- Different stacks see different resolution databases, which creates
+  confusion.
+- Rosdep aggregator stacks, like ``common_rosdeps`` become inevitable to
+  avoid conflicting and duplicating rules.
+
+The rosdep 2 design favors the end-user as well as maintainers of
+software distributions.  The main goals of rosdep 2 are:
+
+ 1. Clarity of resolution.
+ 2. Easily end-user control over rosdep resolution.
+
+The semantics of Ubuntu's ``apt`` tool are followed as much as
+possible to provide familiarity.
+
+
+Backwards compatibility
+=======================
+
+The main incompatibility is rosdep 2 does not read ``rosdep.yaml``
+files from ROS stacks.  It only loads from data sources in the sources
+list.
+
+There are minor incompatibilities in the command-line API.  The main
+installation commands are also the same, so many scripts based on
+rosdep are likely to continue to work.  However, the new rosdep
+command requires an initialization/update step to create the rosdep
+database, which may cause some initial incompatibilities.  Scripts
+that use rosdep and run on freshly installed machines, such as
+chroots, will be especially effected.
+
+The output format of some commands, like ``db`` and ``where-defined``
+have been changed for clarity and easier processing.  As far as the
+author knows, no scripts depend on the output format of these
+commands.
+
+For example, rosdep 1::
+
+    $ rosdep where_defined eigen
+    eigen defined in set(['/opt/ros/electric/stacks/common_rosdeps/rosdep.yaml', ">>/opt/ros/electric/stacks/common_rosdeps/rosdep.yaml<<Unused due to package 'common_rosdeps' being in a stack.]]"])
+
+rosdep 2::
+
+   $ rosdep where-defined eigen
+   https://github.com/ros/rosdistro/raw/master/rosdep/base.yaml
+
+
+Rationale
+=========
+
+New querying APIs
+-----------------
+
+Although the querying APIs go beyond the minimal specification
+necessary for rosdep 2, they were useful in its development as they
+provide command-line verification of the resolution behavior.  For the
+same reasons, the new querying APIs make rosdep's behavior more clear
+to the end user.  Users can see the rosdep keys that are tied to a
+particular ROS package.  The user can also see how those keys relate
+to system dependencies prior to performing installation.
+
+New conflict rules
+------------------
+
+The new rosdep eschews conflict in favor of clarity.  A particular
+rosdep entry always comes from a single source, and the source that is
+chosen is the one that is ranked highest.  An alternative would have
+been to merge compatible rules for a rosdep key, such as rules that
+have non-intersecting OSes.  This would mean that entries could come
+from multiple sources, which is less clear.
+
+
+Lack of backwards compatibility
+-------------------------------
+
+The initial reference implementation loaded ``rosdep.yaml`` files from
+stacks as well, but it increased confusion.  Based on the specific
+implementation:
+
+- rosdep entries from the sources list were shadowed by stack-based
+  ``rosdep.yaml`` files.
+- or, stack-based ``rosdep.yaml`` files were shadowed by rosdep entries
+  loaded from the sources list.
+
+Either of these conflicts with the goal of providing clear resolution
+to the user.  Furthermore, it requires maintaining dual sets of
+``rosdep.yaml`` files.
+
+
+No support for ROS_ETC_DIR
+--------------------------
+
+rosdep 2 does not obey the ``ROS_ETC_DIR`` environment variable defined in REP 124 [6]_.
+This decision was made for four reasons:
+
+ 1. Confusing behavior with ``rosdep init``, which is run under
+    ``sudo`` and thus would require an extra command-line arguments to
+    preserve environment variables.
+ 2. Conflicts with goal of clarity.  rosdep always uses the same local database.
+ 3. "tags" in the ``.list`` file format implicitly support multiple distributions.
+ 4. rosdep 2 is a standalone tool not included with any ROS distribution.
+
+
+Future improvements
+===================
+
+rosdep keys as arguments to package-based commands
+--------------------------------------------------
+
+The following rosdep command take in ``<stacks-and-packages>`` as arguments:
+
+- check
+- install
+- keys
+- resolve
+
+In order to support ``rosdep`` as its own standalone tool, it is easy
+to imagine extending each of those commands to take rosdep keys as
+well.
+
+This improvement has strong synergy with ROS Fuerte, which transitions
+lower-level stacks to be rosdep keys.  For example, ``ros_comm`` is
+both a stack name and a rosdep key.
+
+More configurability
+--------------------
+
+The ``rosdep init`` and ``rosdep update`` commands will likely need
+more configurability than their current bare specification provide.
+For example, it will be desirable to configure them to use a different
+sources list than ``/etc/ros/rosdep/sources.list.d``.
+
+
+Reference implementation
+========================
+
+The ``rosdep2`` package provides a reference implementation of this specification.
+It can be installed via ``pip``::
+
+    sudo pip install -U rosdep
+
+
+A mercurial repository is available at ``https://kforge.ros.org/rosrelease/rosdep``.
+
+The reference implementation is not yet fully compatible with this
+specification.
+
+
+References
+==========
+
+.. [1] rosdep wiki page
+   (http://ros.org/wiki/rosdep)
+.. [2] sources.list man page
+   (http://manpages.debian.net/cgi-bin/man.cgi?query=sources.list&sektion=5&apropos=0&manpath=Debian+Sid&locale=en)
+.. [3] REP 111: Multiple Package Manager Support for Rosdep
+   (http://ros.org/reps/rep-0111.html)
+.. [4] rosdep YAML format
+   (http://ros.org/doc/api/rosdep2/html/rosdep_yaml_format.html)
+.. [5] REP 122: FHS layout for ROS installation
+   (http://ros.org/reps/rep-0122.html) 
+.. [6] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
+   (http://ros.org/reps/rep-0123.html) 
+.. [7] REP 3: Target Platforms
+   (http://ros.org/reps/rep-003.html) 
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
