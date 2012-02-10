@@ -52,9 +52,9 @@ For clarity, the install prefix is referred to as
 ``/opt/ros/<distro>``. The install prefix does not have to follow this
 actual pattern, but it is the convention for ROS binary distributions.
 
-The intent of this layout is to enable installations with no install
-prefix whatsoever, though there are unresolved integration issues
-discussed in the "Rationale" section.
+The intent of this layout is to enable installations within the
+standard ``/usr`` hierarchy, though there are unresolved integration
+issues discussed in the "Rationale" section.
 
 Directory layout
 ----------------
@@ -90,7 +90,8 @@ Developers should also be careful about top-level executables and name
 collisions.  In general, try to name executables so that the origin of
 the executable is obvious, e.g. the same as the ROS package name.
 
-In the case of an install prefix, ``PATH`` must include this location, e.g.::
+In the case of a special install prefix, ``PATH`` must include this
+location, e.g.::
 
     PATH=/opt/ros/<distro>/bin
 
@@ -135,17 +136,17 @@ specification for the target platform.  Thus, it may be
 ``lib/pythonX.Y/dist-packages`` or ``lib/pythonX.Y/site-packages`` or
 otherwise.
 
-In the case of an install prefix, ``PKG_CONFIG_PATH`` must be set to
-enable locating libraries and include directories using
+In the case of a speical install prefix, ``PKG_CONFIG_PATH`` must be
+set to enable locating libraries and include directories using
 ``pkg-config``.  ``LD_LIBRARY_PATH`` must be also set so that
 executables can load shared libraries.  We use the settings::
 
     PKG_CONFIG_PATH=/opt/ros/<distro>/lib/pkgconfig::$PKG_CONFIG_PATH
     LD_LIBRARY_PATH=/opt/ros/<distro>/lib:$LD_LIBRARY_PATH
 
-``PYTHONPATH`` must also be set in an install prefix and is platform
-dependent.  For example, on Ubuntu Lucid with Python 2.6, the setting
-is::
+``PYTHONPATH`` must also be set in a special install prefix and is
+platform dependent.  For example, on Ubuntu Lucid with Python 2.6, the
+setting is::
 
     PYTHONPATH=/opt/ros/<distro>/python2.6/dist-packages:$PYTHONPATH
 
@@ -265,7 +266,7 @@ Motivation
 
 The ROS Fuerte release migrates many of the low-level libraries to use
 a standard Filesystem Hiearchy Standard-like layout [2]_ contained in
-a distribution-specific install prefix
+a ROS-distribution-specific install prefix
 (e.g. ``/opt/ros/fuerte/``). The goals of this conversion are many:
 
 - Make ROS libraries more "normal"
@@ -284,8 +285,9 @@ a distribution-specific install prefix
   same machine.
 
 - Eventually eliminate the need for ROS-specific filesystem
-  environment variables when the installation is not in an install
-  prefix.
+  environment variables when the installation is a standard prefix,
+  i.e. ``/usr``.
+
 
 The final goal should be possible with converted stacks, but has not
 yet been verified.  There are also unresolved performance issues
@@ -322,8 +324,8 @@ This REP adds ``share`` to the ``ROS_PACKAGE_PATH``.  ``share`` is
 intended for "read-only architecture independent data files" [8]_.
 This is not true for this REP as package-relative binaries are
 installed to this directory. Furthermore, there are unresolved
-performance issues with this choice if an installation prefix is not
-used.
+performance issues with this choice if an standard prefix like
+``/usr`` is used.
 
 All directories in this directory will be traversed by tools like
 ``rospack`` and ``rosstack``.  This is efficient if all
