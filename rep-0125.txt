@@ -300,9 +300,15 @@ possible to provide familiarity.
 Backwards compatibility
 =======================
 
+stack/rosdep.yaml
+-----------------
+
 The main incompatibility is rosdep 2 does not read ``rosdep.yaml``
 files from ROS stacks.  It only loads from data sources in the sources
 list.
+
+Command-line API
+----------------
 
 There are minor incompatibilities in the command-line API.  The main
 installation commands are also the same, so many scripts based on
@@ -327,6 +333,12 @@ rosdep 2::
    $ rosdep where-defined eigen
    https://github.com/ros/rosdistro/raw/master/rosdep/base.yaml
 
+
+rosmake
+-------
+
+rosmake no longer has options for invoking rosdep internally as rosdep
+is now an external tool.
 
 Rationale
 =========
