@@ -140,11 +140,33 @@ Distributors of TurtleBot Level 1 compatible robots should provide the
 following software and configuration files if they are different than the 
 TurtleBot:
 
-* A node which implements the turtlebot_node ROS API [#turtlebot_node]_
+* A node which implements the TurtleBot Node Core ROS API listed below.
 * Provide equivilant diagnostics with turtlebot_node [#turtlebot_node]_
 * Provide turtlebot.launch file to replace turtlebot_bringup/upstart/turtlebot.launch
 * If the RGBD sensor requires a breaker to turn on it will use "Breaker 0"
 * If an attached arm requires a breaker to turn on it will use "Breaker 1" 
+
+TurtleBot Node Core API
+'''''''''''''''''''''''
+
+Subscribed Topics
+
+    * cmd_vel (geometry_msgs/Twist)
+      The desired velocity of the robot. The type of this message is determined by the drive_mode parameter. Default is geometry_msgs/Twist.
+
+Published Topics
+
+    * ~odom (nav_msgs/Odometry)
+      The odometry of the robot based on the gyro and sensor_state.
+    * ~imu/data (sensor_msgs/Imu)
+       The angular velocity and integrated position of the gryo.
+
+Expected Parameters
+
+    * ~cmd_vel_timeout (double, default: 0.6)
+      If a new command isn't received within this many seconds, the Create is stopped.
+
+
 
 Level 2
 -------
