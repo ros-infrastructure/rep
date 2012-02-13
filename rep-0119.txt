@@ -54,7 +54,7 @@ the growing community around the TurtleBot design.
 
 There are many tools and applications written for the TurtleBot
 which can be useful for other similar robots.  Level 2 compatible
-robots are a subset of these robots for which a significant subset
+robots are a subset of these robots for which a majority of the applications
 will work.  There are already a number of robots which are TurtleBot
 compatible such as Mini Max [#minimax]_ and Pi Robot [#pirobot]_ .
 
@@ -133,7 +133,7 @@ ensure accessory compatibility between TurtleBot compatible robots.
 Software Requirements
 '''''''''''''''''''''
 
-The TurtleBot stacks (turtlebot_viz, turtlebot_apps, and  turtlebot_arm)
+The TurtleBot stacks (turtlebot, turtlebot_viz, turtlebot_apps, turtlebot_arm)
 must run on the robot without user modification. 
 
 Distributors of TurtleBot Level 1 compatible robots should provide the 
@@ -152,19 +152,19 @@ TurtleBot Node Core API
 Subscribed Topics
 
     * cmd_vel (geometry_msgs/Twist)
-      The desired velocity of the robot. The type of this message is determined by the drive_mode parameter. Default is geometry_msgs/Twist.
+       The desired velocity of the robot. The type of this message is determined by the drive_mode parameter. Default is geometry_msgs/Twist.
 
 Published Topics
 
-    * ~odom (nav_msgs/Odometry)
-      The odometry of the robot based on the gyro and sensor_state.
-    * ~imu/data (sensor_msgs/Imu)
+    * odom (nav_msgs/Odometry)
+       The odometry of the robot based on the gyro and sensor_state.
+    * imu/data (sensor_msgs/Imu)
        The angular velocity and integrated position of the gryo.
 
 Expected Parameters
 
     * ~cmd_vel_timeout (double, default: 0.6)
-      If a new command isn't received within this many seconds, the Create is stopped.
+       If a new command isn't received within this many seconds, the base is stopped.
 
 
 
@@ -190,7 +190,7 @@ Software Requiremets
 
 * URDF description of the robot
 
-* The origin of the base_link is at the center of the base footprint. 
+* The origin of the base_link is at the rotation point of an in-place turn. 
 
 * The depth sensor should publish in the "camera" namespace
 
@@ -242,8 +242,19 @@ Link, Joint, and Frame Naming Conventions
 Whenever possible it is prefered to use the following convention
 naming for links and connecting joints LOCATION_DESCRIPTOR_TYPE. For example:
 
+Common Joint Descriptors are: 
+
+* flex
+* lift
+* pan
+* roll
+* tilt
+
+Examples are: 
+
 * arm_shoulder_pan_link, arm_shoulder_pan_joint
 * head_tilt_link, head_tilt_joint
+* forearm_link, elbow_flex_joint
 
 Whenever possible it is prefered to use the following convention
 naming for links and sensors LOCATION_SENSOR_TYPE. For example:
@@ -322,6 +333,11 @@ References
    http://www.ros.org/doc/api/geometry_msgs/html/msg/Twist.html
 .. _nav_msgs/Odometry:
    http://www.ros.org/doc/api/nav_msgs/html/msg/Odometry.html
+
+Trademarks
+==========
+
+TurtleBot is a trademark of Willow Garage.  
 
 Copyright
 =========
