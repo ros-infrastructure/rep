@@ -8,7 +8,7 @@ Type: Standards Track
 Content-Type: text/x-rst
 Created: 8-Feb-2012
 ROS-Version: Fuerte
-Post-History: 8-Feb-2012
+Post-History: 8-Feb-2012, 17-Feb-2012
 
 Abstract
 ========
@@ -180,7 +180,7 @@ been narrowed to "backwards compatibility for finding legacy
 binaries, are no longer supported.  Thus, ``ROS_ROOT`` is deprecated,
 though there are no plans to remove it.
 
- For a full specification and rationale, see REP 123 [9]_, which also
+For a full specification and rationale, see REP 123 [9]_, which also
 proposes new ROS filesystem environment variables based on the REP 122
 layout.
 
@@ -399,7 +399,7 @@ Issues with this layout and proposed resolutions are discussed below.
 Performance issues with share
 '''''''''''''''''''''''''''''
 
-All directories in ``share/` will be traversed by tools like
+All directories in ``share/`` will be traversed by tools like
 ``rospack`` and ``rosstack``.  This is efficient if all
 sub-directories are ROS aware, but will deteriorate greatly if the
 presence of deep, non-ROS aware directories.
@@ -423,19 +423,18 @@ like using``rosed`` to quickly view header file information.  There
 are two categories of contents no longer locatable by package-relative
 tools:
 
-# Resources that are installed in a different location (e.g. C++
-  header files in ``include``)
-# Sources resources (e.g. C++ ``.cpp files``) that are no longer
-  installed due to explicit installation targets.
+ 1. Resources that are installed in a different location (e.g. C++
+    header files in ``include``)
+ 2. Sources resources (e.g. C++ ``.cpp files``) that are no longer
+    installed due to explicit installation targets.
 
 Thibault Kruse noted that approaches like `stow`_ could reproduce this
 information.  Stow creates a directory for a package, plus symlinks
 within that directory to all the install resources of that package.
-This is potentially an area of future investigation, though it would
-be desireable to provide this functionality separately so that the
-base installation is FHS-compliant.
+It would be desireable to provide this functionality separately so
+that the base installation is FHS-compliant.
 
-.. stow: http://www.gnu.org/software/stow/
+.. _stow: http://www.gnu.org/software/stow/
 
 Stack contents, roscreate-stack
 '''''''''''''''''''''''''''''''
@@ -480,13 +479,13 @@ lib/ layout alternative
 
 An alternative to ``lib`` was suggested by Jack O'Quin:
 
-    There is no obvious choice for an alternative. Although "/lib"
+    There is no obvious choice for an alternative. Although ``/lib``
     mostly contains libraries, there are actually quite a few
     executables in its subdirectories, and many more under
-    "/usr/lib". So, I suggest something like
-    "lib/ros/<ros-package-name>" in place of
-    "share/<ros-package-name>". Another alternative might be "opt" (or
-    just making something up), but "lib" seems better to me.
+    ``/usr/lib``. So, I suggest something like
+    ``lib/ros/<ros-package-name>`` in place of
+    ``share/<ros-package-name>``. Another alternative might be ``opt``
+    (or just making something up), but ``lib`` seems better to me.
     
 Bill Morris also noted that FreeBSD uses ``/usr/libexec`` to store
 non-PATH binaries, which addresses the ontological conflict of storing
