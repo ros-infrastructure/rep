@@ -21,6 +21,11 @@ For ROS distributions, such as ROS Fuerte, this layout is created
 within an install prefix, but this specification is intended to make
 non-prefixed installs possible as well.
 
+This REP is a work in progress.  The "`Future Work`_" section indicates
+unfinished portions of this specification that will be resolved before
+this REP is final.  The goal is to resolve these issues entirely by
+the ROS Groovy release.
+
 The majority of this specification is due to the hard work of Troy
 Straszheim and Morten Kjaergaard on the catkin build system, which is
 the reference implementation this REP is based on.  This REP does not
@@ -53,8 +58,7 @@ For clarity, the install prefix is referred to as
 actual pattern, but it is the convention for ROS binary distributions.
 
 The intent of this layout is to enable installations within the
-standard ``/usr`` hierarchy, though there are unresolved integration
-issues discussed in the "Rationale" section.
+standard ``/usr`` hierarchy.
 
 Directory layout
 ----------------
@@ -65,7 +69,6 @@ The layout within the ``/opt/ros/<distro>`` install prefix is::
     etc/
     include/
     lib/
-    share/
     stacks/
 
 
@@ -75,6 +78,11 @@ It also contains setup files to easily configure environment variables
 for this prefix.
 
 These directories are described in greater detail below.
+
+NOTE: The ROS Fuerte release includes an additional ``share/``
+directory, which is currently used as a transition mechanism for
+resources and tools that require the ``ROS_PACKAGE_PATH``.  This is
+described in the "`Future Work`_" section.
 
 
 bin/
@@ -151,73 +159,30 @@ setting is::
     PYTHONPATH=/opt/ros/<distro>/python2.6/dist-packages:$PYTHONPATH
 
 
-share/
-------
-
-``share`` is where ROS package and stack data files are installed, as
-well as package-relative binaries. It is on the ``ROS_PACKAGE_PATH``.
-
-All package-relative assets must be explicitly installed to
-``share/<ros-package-name>``.  These assets include:
-
-- manifest files (``manifest.xml``)
-- launch files
-- package-relative-executables (both binary and script)
-- bag files used in a package-relative manner
-
-By convention, package-relative binary executables go in
-``share/<ros-package-name>/bin`` and package-relative script
-executables go in ``share/<ros-package-name/scripts``.  This
-convention is not enforced.
-
-Similarly, all stack-relative assets must be explicitly
-installed to ``share/<ros-stack-name``.  These assets include:
-
-- manifest files (``stack.xml``)
-- rosdep definitions (``rosdep.yaml``)  (See note below)
-
-NOTE: rosdep is currently being redesigned to make stack-relative
-``rosdep.yaml`` files unnecessary.  ``rosdep.yaml`` files are expected
-to disappear from the ``share`` directory once this new functionality
-is available.
-
-
 stacks/
 -------
 
 ``stacks`` is the installation location for legacy, rosmake-based
 stacks.  It is included on the ``ROS_PACKAGE_PATH``, but has lower
-precedence than ``share``.
+precedence than stacks following the REP 122 layout.
 
 
 Environment variables
 '''''''''''''''''''''
 
-The new layout requires changes to existing ROS filesystem environment
-variables [2]_.  Separately, REP 123 [9]_ proposes new ROS filesystem
-environment variables and deprecates ``ROS_ROOT``.
-
-
 ``ROS_ROOT``
 ------------
 
-``ROS_ROOT`` is defined to be::
+For backwards-compatibility with rosmake-based build files,
+``ROS_ROOT`` must exist within the new layout. However, its scope has
+been narrowed to "backwards compatibility for finding legacy
+``rosbuild`` and ``mk`` resources." Other uses, such as finding ROS
+binaries, are no longer supported.  Thus, ``ROS_ROOT`` is deprecated,
+though there are no plans to remove it.
 
-    ROS_ROOT=/opt/ros/<distro>/share/ros
-
-The *only* purpose of ``ROS_ROOT`` is backwards compatibility for
-finding legacy ``rosbuild`` and ``mk`` resources.  It no longer
-contains ROS binaries.
-
-
-``ROS_PACKAGE_PATH``
---------------------
-
-``ROS_PACKAGE_PATH`` is defined to be::
-
-    ROS_PACKAGE_PATH=/opt/ros/<distro>/share:/opt/ros/<distro>/stacks
-
-Thus, ``share`` has precedence over ``stacks``.
+ For a full specification and rationale, see REP 123 [9]_, which also
+proposes new ROS filesystem environment variables based on the REP 122
+layout.
 
 
 Changes to ROS
@@ -290,11 +255,11 @@ a ROS-distribution-specific install prefix
 
 
 The final goal should be possible with converted stacks, but has not
-yet been verified.  There are also unresolved performance issues
-discussed in the "Rationale" section.  The focus on the implementation
-has been preserving the ability to install multiple ROS distributions
-on the same machine as robots frequently are shared, expensive
-resources.
+yet been verified.  There are also unresolved issues with
+package-relative resources, which is described in the "`Future Work`_"
+section.  The focus on the implementation has been preserving the
+ability to install multiple ROS distributions on the same machine as
+robots frequently are shared, expensive resources.
 
 Compatibility with the Filesystem Hiearchy Standard has been a
 long-term goal for ROS.  ROS began as an in-source, package-relative
@@ -318,28 +283,8 @@ Rationale
 The rationale for using the Filesystem Hierarchy Standard is simple:
 it is the only solution for making the system more "normal".  Most of
 the specifications in this REP are straightforward translations of
-that standard, with the only exception being the use of ``share``.
+that standard.
 
-This REP adds ``share`` to the ``ROS_PACKAGE_PATH``.  ``share`` is
-intended for "read-only architecture independent data files" [8]_.
-This is not true for this REP as package-relative binaries are
-installed to this directory. Furthermore, there are unresolved
-performance issues with this choice if an standard prefix like
-``/usr`` is used.
-
-All directories in this directory will be traversed by tools like
-``rospack`` and ``rosstack``.  This is efficient if all
-sub-directories are ROS aware, but will deteriorate greatly if the
-presence of deep, non-ROS aware directories.
-
-There are multiple ways to address the performance issue by updating
-the ROS package and stack specification.  For example, a lookup table
-could be used instead for installed packages.  Package-relative
-computations could also be made much more simple as the location
-relative to ``share`` is fixed.
-
-It is hoped that more experience with this new layout will provide
-better intuition on how to resolve the above issues.
 
 Backwards Compatibility
 =======================
@@ -347,14 +292,17 @@ Backwards Compatibility
 /opt/ros/<distro>/stacks
 ''''''''''''''''''''''''
 
-Legacy (rosmake-based) stacks still use the same installation
-procedure as before.  We have been able to build legacy stacks on top
-of the new FHS layout by following the ``share/<ros-package-name>``
-layout described above.  There are no known regressions related to the
-new layout for building legacy stacks that are specifically related to
-this specification.  We have put together a migration guide [6]_ that
-generally notes issues with increased link/include strictness that are
-separate from this REP.
+There are no known regressions related to the new layout for building
+legacy (rosmake-based) stacks that are specifically related to this
+specification.  We have been able to build legacy stacks on top of the
+REP 122-compliant stacks by using the ROS manifest "export" mechanism
+with the output of ``pkg-config``.  No changes were necessary to the
+rosmake toolchain based on this REP.  Legacy stacks still use the same
+installation procedure as before.
+
+We have put together a migration guide [6]_ that generally notes
+issues with increased link/include strictness that are separate from
+this REP.
 
 rosmake
 '''''''
@@ -372,32 +320,6 @@ The changes in this specification break compatibility with roslaunch
 remote launches as the environment configuration is very different.
 The non-backwards-compatible changes required in roslaunch are
 specified separately in REP 124 [7]_.
-
-Stack contents, roscreate-stack
-'''''''''''''''''''''''''''''''
-
-The new install layout does not preserve the stack-package
-relationship: it is no longer possible to determine the packages that
-a stack contains in the install layout.
-
-To the best of our knowledge, the only tool affected by this is
-``roscreate-stack``.  Although this is a convenient tool, it has less
-utility moving forward, so we made the difficult decision to delete
-it.
-
-There are alternatives that preserve this information, but it would
-waste effort.  The implementation of the new build system leverages
-the fact that all converted ROS stacks are normal system dependencies,
-e.g., a dependency on "boost" is no different than a dependency on
-"ros_comm". These system system dependencies are resolved using tools
-like rosdep.  This seamlessness is necessary as the intent of this REP
-is to treat the converted stacks as "standalone" libraries that can be
-easily integrated in other systems.
-
-In other words, preserving the ``roscreate-stack`` tool would
-implement the wrong behavior for converted stacks: it would treat them
-as ROS stack dependencies, instead of system dependencies.
-
 
 ROS_ROOT
 ''''''''
@@ -440,6 +362,145 @@ A reference implementation is provided by the catkin build system,
 which is deployed in the ROS Fuerte release.  Where possible, changes
 to this REP will be incorporated in the ROS Fuerte release.
 Otherwise, changes will be incorporated in future ROS releases.
+
+The "`Future Work`_" section notes issues with the ROS Fuerte
+reference implementation.
+
+
+Future work
+===========
+
+ROS Fuerte currently uses ``share`` to install ROS manifest and
+package-relative resources.  This includes package-relative binaries,
+which are not allowed by FHS standards as it is intended for
+"read-only architecture independent data files" [8]_.
+
+In ROS Fuerte, ``ROS_PACKAGE_PATH`` is defined as:
+
+    ROS_PACKAGE_PATH=/opt/ros/<distro>/share:/opt/ros/<distro>/stacks
+
+``ROS_ROOT`` is defined to be::
+
+    ROS_ROOT=/opt/ros/<distro>/share/ros
+
+All package-relative assets are explicitly installed to
+``share/<ros-package-name>``.  These assets include:
+
+- manifest files (``manifest.xml``)
+- launch files
+- package-relative-executables (both binary and script)
+- bag files used in a package-relative manner
+
+Similarly, stack manifests (``stack.xml``) are explicitly installed to
+``share/<ros-stack-name>``.
+
+Issues with this layout and proposed resolutions are discussed below.
+
+Performance issues with share
+'''''''''''''''''''''''''''''
+
+All directories in ``share/` will be traversed by tools like
+``rospack`` and ``rosstack``.  This is efficient if all
+sub-directories are ROS aware, but will deteriorate greatly if the
+presence of deep, non-ROS aware directories.
+
+There are multiple ways to address the performance issue by updating
+the ROS package and stack specification.  For example, a lookup table
+could be used instead for installed packages.  Package-relative
+computations could also be made much more simple as the location
+relative to ``share`` is fixed.
+
+It is hoped that more experience with this new layout will provide
+better intuition on how to resolve the above issues.
+
+
+Package contents
+''''''''''''''''
+
+The ``share/`` does not preserve the full contents of ROS packages
+within the installed layout.  This affects package-relative workflows,
+like using``rosed`` to quickly view header file information.  There
+are two categories of contents no longer locatable by package-relative
+tools:
+
+# Resources that are installed in a different location (e.g. C++
+  header files in ``include``)
+# Sources resources (e.g. C++ ``.cpp files``) that are no longer
+  installed due to explicit installation targets.
+
+Thibault Kruse noted that approaches like `stow`_ could reproduce this
+information.  Stow creates a directory for a package, plus symlinks
+within that directory to all the install resources of that package.
+This is potentially an area of future investigation, though it would
+be desireable to provide this functionality separately so that the
+base installation is FHS-compliant.
+
+.. stow: http://www.gnu.org/software/stow/
+
+Stack contents, roscreate-stack
+'''''''''''''''''''''''''''''''
+
+The ``share/`` layout does not preserve the stack-package
+relationship: it is no longer possible to determine the packages that
+a stack contains in the install layout.
+
+To the best of our knowledge, the only tool directly affected by this
+is ``roscreate-stack``.  Although this is a convenient tool, it has
+less utility moving forward, so we made the difficult decision to
+delete it.
+
+An alternative would be to preserve the hierachy by using::
+
+    share/<stack-name>/<package-name>
+
+This layout makes the path to ``<package-name>`` unstable.  ROS
+packages frequently change stacks, so a package-relative resource
+would frequently move locations in ``share`` between releases.  As we
+eventually wish for package-relative resources to be easily located
+without ROS-specific toolchain such as ``rospack``, this alternative
+was rejected.  We also wish to avoid ROS packages having to know their
+stack.
+
+There other other alternatives, such as creating index files that
+contain this information, but they are currently not being pursued as
+preserving ``roscreate-stack`` was not a strong enough use case.  The
+implementation of the new build system leverages the fact that all
+converted ROS stacks are normal system dependencies, e.g., a
+dependency on "boost" is no different than a dependency on
+"ros_comm". These system system dependencies are resolved using tools
+like rosdep.  This transition requires that *stack* dependencies on
+converted stacks be migrated to be *rosdep* dependencies instead.
+
+In other words, preserving the ``roscreate-stack`` tool would
+implement the wrong behavior for converted stacks: it would treat them
+as ROS stack dependencies, instead of system dependencies.
+
+lib/ layout alternative
+'''''''''''''''''''''''
+
+An alternative to ``lib`` was suggested by Jack O'Quin:
+
+    There is no obvious choice for an alternative. Although "/lib"
+    mostly contains libraries, there are actually quite a few
+    executables in its subdirectories, and many more under
+    "/usr/lib". So, I suggest something like
+    "lib/ros/<ros-package-name>" in place of
+    "share/<ros-package-name>". Another alternative might be "opt" (or
+    just making something up), but "lib" seems better to me.
+    
+Bill Morris also noted that FreeBSD uses ``/usr/libexec`` to store
+non-PATH binaries, which addresses the ontological conflict of storing
+executables in a "lib" directory.  Unfortunately, ``libexec`` is not
+FHS compliant, as noted in this ``debian-devel`` `thread`_:
+
+.. _thread: http://lists.debian.org/debian-devel/2005/05/msg00401.html
+
+``lib/ros/<ros-package-name>`` is the leading candidate for replacing
+the ``share/`` layout.  The simplest implementation would simply
+replace "share" with "lib/ros", which would end up placing manifest
+and launch files resources within the lib tree.  This is similar to
+layouts like Python's ``lib/pythonX.Y/site-packages``, which includes
+egg manifest and data files.
 
 
 References
