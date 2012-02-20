@@ -7,7 +7,7 @@ Status: Active
 Type: Process
 Content-Type: text/x-rst
 Created: 20-Sep-2010
-Post-History: 20-Sep-2010
+Post-History: 20-Sep-2010, 20-Feb-2012
 
 
 Abstract
@@ -95,11 +95,11 @@ Process for inclusion/removal
 -----------------------------
 
 Stacks may be added to or removed from the list above by sending an
-email to ros-developers@code.ros.org with "REP 2" in the Subject
-line. If the voting process [2]_ shows clear favor the list can be
-quickly updated. Otherwise, acceptance follows a similar process to
-those for accepting PEPs [1]_. The Stack Maintainer has final veto
-power over inclusion on this list.
+email to ros-users@code.ros.org with "REP 2" in the Subject line. If
+the voting process [2]_ shows clear favor the list can be quickly
+updated. Otherwise, acceptance follows a similar process to those for
+accepting PEPs [1]_. The Stack Maintainer has final veto power over
+inclusion on this list.
 
 Rationale
 =========
