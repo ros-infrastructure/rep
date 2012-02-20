@@ -14,8 +14,9 @@ Table of Contents
 
 #. Abstract_
 #. Background_
-#. ProblemDescription_
-#. Design_
+#. Specification_
+#. Motivation_
+#. Rationale_
 #. Concerns_
 #. ReferenceImplementation_
 #. References_
@@ -40,7 +41,7 @@ based on a .rosinstall file which states all local folders,
 and for each possibly a version control system (vcs) used 
 for that folder and the uri of a remote repo.
 
-An example of such a .rosinstall file in electric looks like this::
+An example of such a ``.rosinstall`` file in electric looks like this::
 
   # .rosinstall in ros env
   - other: {local-name: /opt/ros/electric/ros}
@@ -55,8 +56,8 @@ The tool can initially checkout local folders, update to the latest
 changes, or to a specific version.
 
 rosinstall also generates a set of files for shell initialization,
-defining a working environment.  Those are setup.sh, setup.bash,
-setup.zsh. The essential one is setup.sh, which in electric may look like
+defining a working environment.  Those are ``setup.sh``, ``setup.bash``,
+``setup.zsh``. The essential one is ``setup.sh``, which in electric may look like
 this::
 
   # setup.sh in ros env
@@ -105,12 +106,12 @@ The [ROSINSTALL FILES OR DIRECTORIES]* arguments can each be
 * a local directory containing a .rosinstall file
 * a remote file uri
 
-With the first invocation of rosinstall in the INSTALL_PATH,
+With the first invocation of rosinstall in the ``INSTALL_PATH``,
 one of the arguments must include the path to a ros installation,
 else rosinstall will fail with an error.
 
 Note that the order of the arguments is the inverse order in which 
-they will be appended to the ROS_PACKAGE_PATH, which for overlaying 
+they will be appended to the ``ROS_PACKAGE_PATH``, which for overlaying 
 packages means that packages in locations of later arguments will 
 overlay packages in locations of earlier arguments.
 
@@ -120,30 +121,63 @@ environments. rosinstall generated setup files aim to enable a
 quick transistion between environments (and distros) by sourcing
 a given setup.sh.
 
-.. _ProblemDescription:
+.. _Specification:
 
-Problem description
-===================
+Specification
+=============
+
+By default fuerte will create a ``.rosinstall`` file in
+``/opt/ros/fuerte`` with contents similar to this::
+
+ - setup-file:
+     local-name: /opt/ros/fuerte/setup.sh
+ - other:
+     local-name: /opt/ros/fuerte/share/ros
+   ...
+
+A user can then create a local ros environment using the 
+command::
+
+  $ rosinstall ~/fuerte foo /opt/ros/fuerte bar
+
+And as a consequence, the generated local .rosinstall 
+will look like this::
+
+  - other: {local-name: bar}
+  - other: {local-name: /opt/ros/fuerte/share/ros}
+  - setup-file: {local-name: /opt/ros/fuerte/setup.sh}
+    ...
+  - other: {local-name: foo}
+
+And the local ``setup.sh`` will look like this::
+
+  . /opt/ros/fuerte/setup.sh
+  export ROS_PACKAGE_PATH=bar:...:/opt/ros/fuerte/share/ros:foo
+
+
+.. _Motivation:
+
+Motivation
+==========
 
 Changes to the ROS build system in fuerte cause the current 
 rosinstall approach to fail [2]_.
 
-The setup.sh as presented above is a self-contained script. 
-This causes several problems in fuerte, where more environment 
-variables have to be set up by several scripts maintained by 
-default in /opt/ros/fuerte/etc/catkin/profile.d, but which 
-could be placed in different locations, and rosinstall 
-should be agnostic of that.
+The setup.sh as presented above is a self-contained script.  This
+causes several problems in fuerte, where more environment variables
+have to be set up by several scripts maintained by default in
+``/opt/ros/fuerte/etc/catkin/profile.d``, but which could be placed in
+different locations, and rosinstall should be agnostic of that.
 
 The better way to go seems to let rosinstall only modify 
-the ROS_PACKAGE_PATH variable, while letting the installation
+the ``ROS_PACKAGE_PATH`` variable, while letting the installation
 process of ros generate and maintain a setup.sh which sets
 the variables for this distro.
 
-The .rosinstall of a rosinstall environment then needs
+The ``.rosinstall`` of a rosinstall environment then needs
 to point to the distro's setup.sh, such that the generated 
 local setup.sh can first source that one, then amend the 
-ROS_PACKAGE_PATH.
+``ROS_PACKAGE_PATH``.
 
 The generated setup.sh within a rosinstall environment in fuerte
 should ideally look like this::
@@ -158,13 +192,13 @@ part that depends on the distro could now replaced by sourcing the
 setup.sh of the distro.
 
 The problem arising now is to identify in general where the distro 
-setup.sh to include is located. rosinstall currently only stores 
+``setup.sh`` to include is located. rosinstall currently only stores 
 information in its .rosinstall, which is currently limited to 
 essentially storing the path to a set of local folders all of 
-which currently are inserted into the ROS_PACKAGE_PATH.
+which currently are inserted into the ``ROS_PACKAGE_PATH``.
 
 The distro setup.sh is also not consistently located relative 
-to any of the folders included in the .rosinstall.
+to any of the folders included in the ``.rosinstall``.
 
 So there currently is no way consistent with the current rosinstall 
 capabilities to gather and store the location of the distro's setup.sh 
@@ -174,10 +208,10 @@ This REP declares therefore a necessary amendment to rosinstall
 to get and to store the location of a distro setup.sh file to be 
 used for generation of environment setup.sh files.
 
-.. _Design:
+.. _Rationale:
 
-Design
-======
+Rationale
+=========
 
 The design needs to provide a solution for two requirements, 
 finding out the intended distro folder the user wants to use 
@@ -249,7 +283,7 @@ the ros distribution. Instead is shall fully depend on the ros
 distro providing information for rosinstall at is has done so 
 up to now. The reason is that this causes the least effort to
 maintain several ROS distros.
-(this discards option C., as the exiting layout of ros 
+(this discards option C., as the existing layout of ros 
 distributions do not permit to identify them as distro 
 folders reliably).
 
@@ -268,35 +302,6 @@ used both for getting the location of the setup file from a
 remote .rosinstall file as well as storing the information 
 in a local .rosinstall file. C.2. and C.3. seemed to lack in 
 transparency.
-
-Specification by Example
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default fuerte will create a .rosinstall file in 
-/opt/ros/fuerte with contents similar to this::
-
- - other:
-   local-name: /opt/ros/fuerte/share/ros
-   setup-file: /opt/ros/fuerte/setup.sh
-   ...
-
-A user can then create a local ros environment using the 
-command::
-
-  $ rosinstall ~/fuerte foo /opt/ros/fuerte bar
-
-And as a consequence, the generated local .rosinstall 
-will look like this::
-
-  - other: {local-name: bar}
-  - other: {local-name: /opt/ros/fuerte/share/ros}
-  - setup-file: /opt/ros/fuerte/setup.sh
-    ...
-  - other: {local-name: foo}
-
-And the local setup.sh will look like this::
-  . /opt/ros/fuerte/setup.sh
-  export ROS_PACKAGE_PATH=bar:...:/opt/ros/fuerte/share/ros:foo
 
 .. _Concerns:
 
