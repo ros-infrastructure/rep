@@ -1,7 +1,7 @@
 REP: 120
 Title: Coordinate Frames for Humanoids Robots
-Version: $Revision: 1 $
-Last-Modified: $Date: 2012-01-11 11:53:00 +0200 (Wed, 11 Jan 2012) $
+Version: $Revision$
+Last-Modified: $Date$
 Author: Thomas Moulard <thomas.moulard@gmail.com>
 Status: Active
 Type: Informational

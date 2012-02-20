@@ -1,7 +1,7 @@
 REP: 115
 Title: rosco and roslocate tools for rosinstall
-Version: $Revision: 126 $
-Last-Modified: $Date: 2011-08-18 20:07:49 -0700 (Thu, 18 Aug 2011) $
+Version: $Revision$
+Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
 Status: Accepted
 Type: Standards Track

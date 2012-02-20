@@ -1,7 +1,7 @@
 REP: 121
 Title: Automatic unloading of libraries for pluginlib
-Version: $Revision: 2 $
-Last-Modified: $Date: 2012-02-08 14:00:00 +0200 (Wed, 8 Feb 2012) $
+Version: $Revision$
+Last-Modified: $Date$
 Author: Dirk Thomas
 Status: Draft
 Type: Standards Track

@@ -1,7 +1,7 @@
 REP: 116
 Title: Extend pluginlib
-Version: $Revision: 1 $
-Last-Modified: $Date: 2011-10-07 02:00:00 +0200 (Fri, 7 Oct 2011) $
+Version: $Revision$
+Last-Modified: $Date$
 Author: Dirk Thomas
 Status: Final
 Type: Standards Track

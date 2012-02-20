@@ -1,7 +1,7 @@
 REP: 123
 Title: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
-Version: $Revision: 1 $
-Last-Modified: $Date: 2012-02-06 13:00:00 +0200 (Mon, 6 Feb 2012) $
+Version: $Revision$
+Last-Modified: $Date$
 Author: Ken Conley
 Status: Draft
 Type: Standards Track
