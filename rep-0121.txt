@@ -64,29 +64,30 @@ Instead two new methods are introduced which provide a clear semantic
 for creating instances and handling the life cycle of the create
 instance.
 
-* T* createInstance(const std::string& lookup_name)
+* boost::shared_ptr<T> createInstance(const std::string& lookup_name)
 
-* boost::shared_ptr<T> createManagedInstance(const std::string& lookup_name)
+* T* createUnmanagedInstance(const std::string& lookup_name)
 
 Internally both will always call loadLibraryForClass() which ensures
 that the reference counter for the library is increased for every
 instance.
 
-For createInstance() the ownership and responsibility to unload the
-library is transfered to the caller.  For createManagedInstance() the
-ownership stays with the callee (the ClassLoader) and deleting and
-unloading is triggered by the deleter of the boost shared pointer.
+For createInstance() the ownership stays with the callee (the 
+ClassLoader) and deleting and unloading is triggered by the deleter
+of the boost shared pointer.  For createUnmanagedInstance() the
+ownership and responsibility to unload the library is transfered to
+the caller.
 
 The common usage patterns would be:
 
-* Use createManagedInstance() (once or multiple times) and let the
-  boost deleter take care about deleting the instance and unloading
-  the library.
+* Use createInstance() (once or multiple times) and let the boost
+  deleter take care about deleting the instance and unloading the
+  library.
 
 or
 
-* Use createInstance() (once or multiple times) and manually delete
-  the instance later and call unloadLibraryForClass() for each
+* Use createUnmanagedInstance() (once or multiple times) and manually
+  delete the instance later and call unloadLibraryForClass() for each
   garbaged instance.  This approach is usually used when the
   ownership of the instances should be passed to something else (i.e.
   when using Qt objects).
@@ -114,7 +115,8 @@ Reference implementation
 ========================
 
 Reference implementation code is locate in the HG repository.
-See the diff [2]_ for detailed information.
+See the current version of the interface [2]_ and the implementation
+[3]_ for detailed information.
 
 References
 ==========
@@ -122,7 +124,9 @@ References
 .. [1] REP 116
    (http://ros.org/reps/rep-0116.html)
 .. [2] Patch
-   (https://kforge.ros.org/common/pluginlib/rev/f4a728b1a365)
+   (https://kforge.ros.org/common/pluginlib/file/1e14fef67d09/include/pluginlib/class_loader.h)
+.. [3] Patch
+   (https://kforge.ros.org/common/pluginlib/file/1e14fef67d09/include/pluginlib/class_loader_imp.h)
 
 Copyright
 =========
