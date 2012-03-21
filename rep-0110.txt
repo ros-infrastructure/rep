@@ -7,7 +7,7 @@ Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Created: 11-Jun-2011
-Post-History: 11-Jun-2011, 10-Aug-2011
+Post-History: 11-Jun-2011, 10-Aug-2011, 03-Mar-2012
 
 Table of Contents
 =================
@@ -30,7 +30,7 @@ Table of Contents
 Abstract
 ========
 
-This REP changes and extends the rosinstall [1]_ command-line
+This REP presents an alternative to the rosinstall [1]_ command-line
 interface to a command-based syntax.  The command-based syntax is
 inspired by SCM tools like ``svn``, ``git``, and ``hg`` as well as
 several other ros commands like rosnode or rosservice, and is intended
@@ -52,15 +52,60 @@ rosws for rosworkspace is a suggestion based also on other activities
 around rosinstall. (see
 https://code.ros.org/lurker/message/20110711.160222.666ecfe4.en.html)
 
-So in this section, the syntax will be shown using the rosws name,
-whereas the rest of the document will not refer to the new name.
+The command by default uses the context to determine which folder to
+use as target of the operations. Two location types are relevant, the
+workspace folder, and folders of entries.
 
-.. _install:
+The workspace folder must contain a .rosinstall file to be recognized
+as such. The rosws command will consider the first such folder in the
+chain of the current directory and its parents. The rosinstall command
+may also rely on the ROS_WORKSPACE environment variable to specify a
+workspace.
+If both approaches detect a suitable folder, the command will fail with
+an error message indicating the ambiguity. The user may specify a target
+workspace folder with the same option for all commands. This is the
+preferred approach for scripting with rosws.
 
-rosws install PATH [URI]+
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To determine what entry a user wants to work on for certain commands,
+the concept of a localname is used in what follows. The localname is
+historically an absolute filepath or a relative path relative to the
+workspace folder. Commands which accept a localname argument will
+first attempt to resolve that argument against the list of known
+localnames. If that fails, the commands will fall back to choosing a
+workspace entry which has the same path in the filesystem, even if the
+localname does not match. As an example, ``rosws diff .`` In a tree with
+localname ``foo`` is equivalent to ``rosws diff foo``. Finally, some
+commands may fall back to interpret such an argument, if it is the
+only one, and in the absence of a specifying option, as a workspace
+folder if the command also accepts a workspace folder.
 
-This command can initialize or update a rosinstall environment.
+.. _init:
+
+rosws init [PATH [URI]]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The command creates an initial environment for the other commands to
+work. This is analogous to scm syntax. Its main purpose is to explain
+the tool to the user, who understands that the location used here is
+going to be a special location further on.
+
+The command also generates three initial files, setup.sh, setup.bash and
+setup.zsh, which when sourced set up environment variables according to
+the .rosinstall file in the same folder. Those files wll only be overwritten
+by the ``rosws regenerate`` command.
+
+
+--catkin
+--cmake-prefix-path
+
+Options retain semantics as in rosinstall
+
+.. _merge:
+
+rosws merge [URI]
+~~~~~~~~~~~~~~~~~
+
+This command processes several entries from a given URI source
 
 The command merges new entries (command line or changed in
 ``.rosinstall``) with existing entries (if a ``.rosinstall`` is
@@ -73,157 +118,98 @@ The strategy fails whenever there are two entries with the same target
 path but replacing is impossible with the strategy above.
 
 When successfull, the command will append the new entries to the end
-of the ``.rosinstall`` and regenerate the ``setup.*`` files.
+of the ``.rosinstall`` file.
 
-URI can be a path to a rosinstall file, to a local directory containing a ``.rosinstall``.
+URI can be a path to a rosinstall file, to a local directory
+containing a ``.rosinstall``.
 
 The command will fail when there are entries with duplicate target paths.
 
-This will fail with an error when new entries are duplicates of existing entries
-with respect to target-path but not to SCM information. Exact duplicates will be dropped.
-
-Finally the command performs an update, with the same semantics as
-``update``, so the command also has the all options ``update``
-provides.
+The command calculates the change to the configuration. If the change
+merely consists of adding entries, this is executed. Else, the user is
+presented with an overview of planned changes, roughly similar to what
+the linux aptitude tool may present. The user can then interrupt the
+operation. An option exists to not ask for confirmation.
 
 Options:
 
+The merge options apply whenever two elements have equivalent localnames
+(pointing to the same directory)
+
+--merge-keep  Existing entries will remain unchanged
+
+--merge-replace  Existing entries will be overwritten in place
+
+--merge-kill-append  Exiting entries will be removed, new ones appended to the end
+
+--confirm-all  Do not ask for confirmation
+
+``-`` a single dash can be used for piping stdout into the merge command
+
+.. _set:
+
+rosws set [LOCALNAME] [URI]?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The command serves to add or modify a single entry of the config and
+is in particular aimed at users entering the entry information
+themselves rather than relying on some other source of information.
+
+For adding an entry, the common case is to add an SCM entry. The
+syntax would then be
+
+rosws set localname uri --scmtype --version=version
+
+Options:
+
+--svn  Subversion SCM
+--hg  Mercurial SCM
+--git  git SCM
+--bzr  bazaar SCM
+--tar  tar as source (unofficial experimental feature)
+--detached  no SCM
+--version-new  the version specification to use
+
+``-``  single dash means read from stdin (similar to tar command)
+
+Option ``-version`` would go against the GNU standard of a global --version
+option giving the version of a command line tool.
+
+Examples::
+  
+  ``$ rosws set robot_model --hg https://kforge.ros.org/robotmodel/robot_model``
+  ``$ rosws set robot_model --version robot_model-1.7.1``
+  ``$ rosws set robot_model --detached``
+
+
+.. _update:
+
+rosws update [LOCALNAME]*
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The command checks out or updates the given subtrees or all subtrees
+from their respective SCM provider and URL.
 
 --continue-on-error   Continue despite checkout errors
 --delete-changed-uris
-                        Delete the local copy of a directory before changing
-                        uri.
+                       Delete the local copy of a directory before changing
+                       uri.
 --abort-changed-uris  Abort if changed uri detected
 --backup-changed-uris=BACKUP_CHANGED
-                        backup the local copy of a directory before changing
-                        uri to this directory.
+                       backup the local copy of a directory before changing
+                       uri to this directory.
 
 Options retain their semantics from current rosinstall.
 
---no-update        Only regenerate files based on changes in rosinstall
-  or additional URIs, without attempting to fetch updates.
+Examples::
 
-.. _check:
-
-rosws check PATH
-~~~~~~~~~~~~~~~~~~~~~
-
-This use case deals with a user having made changes to either of the ``.rosinstall``
-or setup.* files, or to any directory mentioned in the ``.rosinstall``.
-The command first checks the semantic validity of the ``.rosinstall`` and then checks the
-setup files, the current environment, and all directories for compliance with the
-contents of the ``.rosinstall``. Defects may be listed or repaired interactively.
-
-Causes for errors are:
-
-----
-
-Duplicate target-path of local-names with same vcs type details.  This
-also includes "home/user/workspace/foo" being the same as
-"~/workspace/foo" and "./foo".
-
-Severity:
-  warning
-Repair:
-  Offer to keep one.
-  Should warn as this could be a case where the user intended something else.
-
-----
-
-Duplicate target-path of local-names, with different vcs-type details.
-
-Severity:
-  error, as results of other commands become undefined
-Repair:
-  Offer to keep one
-
-----
-
-Missing ``ROS_ROOT``.
-
-Severity:
-  error, as results of other commands become undefined
-Repair:
-  Offer to specify ``ROS_ROOT``
-
-----
-
-Duplicate ``ROS_ROOT`` (e.g. cturtle and diamondback).
-
-Severity:
-  Warning
-Repair:
-  Offer to delete one
-
-----
-
-``setup.sh`` generated ``ROS_PACKAGE_PATH`` not as ``.rosinstall`` specifies.
-
-Severity:
-  Error, as changes would be overwritten by other commands.
-Repair:
-  Offer to either apply path from ``setup.sh`` or from ``.rosinstall``
-
-----
-
-``$ROS_ROOT`` in ``setup.sh`` different from ``$ROS_ROOT`` that
-follows from ``.rosinstall``.
-
-Severity:
-  Error, as changes would be overwritten by other commands
-Repair:
-  Offer to either apply path from ``setup.sh`` or from ``.rosinstall``
-
-----
-
-``ROS_ROOT`` not last in ``ROS_PACKAGE_PATH``.
-
-Severity:
-  Warning
-Repair:
-  offer to move it to back
-
-----
-
-Missing directories for entries in ``.rosinstall``.
-
-Severity:
-  Warning
-Repair:
-  When SCM entries, offer to checkout. In any case offer to remove entry
-
-----
-
-Different versions for SCM entries in ``.rosinstall`` and actual directory
-
-Severity:
-  Warning
-Repair:
-  Update to specified version, update version in entry, remove version information from entry
-
-----
-
-Missing SCM directories (``.svn``, ``.git``, etc) for SCM entries in ``.rosinstall``
-
-Severity:
-  Warning
-Repair:
-  None
-
-----
-
-The tool may merely report errors as ``roswtf``, or provides repair actions.
-
-The functionality will also serve for most other commands, as a sane
-current environments should be a prerequisite for any kind of update.
-The severity indicates whether other commands should fail or just
-report a warning.
-
+  ``$ rosws update -t ~/fuerte``
+  ``$ rosws update robot_model geometry``
 
 .. _info:
 
-rosws info PATH
-~~~~~~~~~~~~~~~~~~~~
+rosws info [LOCALNAME]*
+~~~~~~~~~~~~~~~~~~~~~~~
 
 This serves to explain the current environment to the novice user, and
 provide an overview of it.  It is supposed to give an overview of the
@@ -235,29 +221,44 @@ current version matches the ``.rosinstall``.
 
 Options:
 
---data-only  just the data, no headers or text
---no-root   does not print ROS_ROOT
---no-pkg-path  does not print ROS_PACKAGE_PATH
+--data-only      just the data, no headers or text
+--no-pkg-path    does not print ROS_PACKAGE_PATH
+--pkg-path-only  Shows only ROS_PACKAGE_PATH separated by ``:``. Supercedes all other options.
+--only           Shows only given comma-separated attribute(s) separated by ``,``
+--yaml           prints rosinstall format yaml for backing up the current config
 
 These options are mainly intended to allow scripting based on
-rosinstall. More ``no-*`` options may become available in the future
-as more information becomes available.
+rosinstall. 
+
+Examples::
+  ``$ rosws info -t ~/ros/fuerte``
+  ``$ rosws info robot_model``
+  ``$ rosws info --yaml``
+  ``$ rosws info --only=path,cur_uri,cur_revision robot_model geometry``
+
+.. _remove:
+
+rosws remove [LOCALNAME]+
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+removes entries with given localnames from the .rosinstall file
 
 .. _status:
 
-rosws status PATH
-~~~~~~~~~~~~~~~~~~~~
+rosws status [LOCALNAME]*
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This command batch-calls SCM status. The output is the concatenation
 status commands for all versioned entries.
 
 Options:
--- untracked  also shows untracked files
+
+--untracked  also shows untracked files
 
 .. _diff:
 
-rosws diff PATH
-~~~~~~~~~~~~~~~~~~~~
+rosws diff [LOCALNAME]*
+~~~~~~~~~~~~~~~~~~~~~~~
 
 This command batch-calls SCM diffs. The output is the concatenation of
 diff commands for all versioned entries.
@@ -270,17 +271,27 @@ There is room for ambiguity when the version specified in the ``.rosinstall`` do
 the version in the directory.
 A warning should be given on stderr at least.
 
+.. _regenerate:
 
-.. _snapshot:
+rosws regenerate
+~~~~~~~~~~~~~~~~
 
-rosws snapshot PATH filename
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This command regenerates the setup.sh, setup.bash and setup.zsh files
+that setup a shell environment. The rosinstall command overwrites these
+files on each invocation for historical reasons.
 
-Maintains current rosinstall ``--generate-versioned-rosinstall``
-semantics.  A rosinstall-like yaml file is created where all SCM
-entries have version information.
+There is as of today no need to regenerate these files even if the
+.rosinstall file changed in acceptable use-cases. The only cases
+where the files would be changed is when configuring a workspace
+against a changed ROS distribution, or after an update of the rosws
+tool.
 
+Options
 
+--catkin
+--cmake-prefix-path
+
+Options retain semantics as in rosinstall
 
 Analysis
 ========
@@ -292,6 +303,8 @@ Use cases
 
 The following are a list of use cases for rosinstall.  U1-U6 are based on use cases described in the rosinstall documentation [1]_.
 
+The new command syntax examples usually have several alternatives to use context or options to specify the workspace to operate on..
+
 .. _U1:
 
 U1: Create a new environment based on an existing ros installation
@@ -300,6 +313,14 @@ U1: Create a new environment based on an existing ros installation
 E.g. Developing on top of boxturtle shared install
 
 ``rosinstall ~/workspace /opt/ros/boxturtle http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
+
+New command example::
+
+  ``rosws ~/workspace /opt/ros/boxturtle``
+  ``cd ~/workspace``
+  ``rosws merge  http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
+  ``rosws update``
+
 
 .. _U2:
 
@@ -310,6 +331,10 @@ E.g. Full source checkout
 
 ``rosinstall ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall``
 
+New command example::
+
+  ``rosws ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall``
+
 .. _U3:
 
 U3: Create a new environment with an additional stack
@@ -318,6 +343,13 @@ U3: Create a new environment with an additional stack
 E.g. Developing a stack against a full tree
 
 ``rosinstall ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall my_stack.rosinstall``
+
+New command example::
+
+  ``rosws ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall``
+  ``cd ~/workspace``
+  ``rosws merge my_stack.rosinstall``
+  ``rosws update``
 
 .. _U4:
 
@@ -328,6 +360,12 @@ E.g. Adding a rosinstall layout to an existing workspace
 
 ``rosinstall ~/workspace http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
 
+New command example::
+
+  ``cd ~/workspace``
+  ``rosws merge http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
+  ``rosws update``
+
 .. _U5:
 
 U5: Updating a rosinstall tree
@@ -335,12 +373,22 @@ U5: Updating a rosinstall tree
 
 ``rosinstall ~/workspace``
 
+New command example::
+
+  ``cd ~/workspace``
+  ``rosws update sometree``
+
 .. _U6:
 
 U6: Changing the version of a specific stack
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can manually edit the file ``.rosinstall`` in a rosinstall managed workspace and then call ``rosinstall ~/workspace``.
+
+New command example::
+
+  ``cd ~/workspace``
+  ``rosws set stackname --version=newversion``
 
 .. _U7:
 
@@ -351,7 +399,10 @@ e.g. taking the sources from trunk, using ``roslocate``
 
 ``roslocate info common_msgs | rosinstall add .``
 
-Not to be supported in this REP, see comment by Ken and rosworkspace, meaning user has to checkout manually and call rosinstall add
+New command example::
+
+  ``cd ~/workspace``
+  ``roslocate info common_msgs | rosws merge -``
 
 .. _U8:
 
@@ -367,6 +418,11 @@ U9: Removing directories from the ``ROS_PACKAGE_PATH``
 
 You can manually edit the file ``.rosinstall`` in a rosinstall managed workspace and then call ``rosinstall ~/workspace``
 
+New command example::
+
+  ``cd ~/workspace``
+  ``rosws remove foo``
+
 .. _U10:
 
 U10: Checking the validity of the current ROS environment
@@ -381,29 +437,24 @@ U11: Creating a snapshot of the configuration
 
 ``rosinstall ~/workspace --generate-versioned-rosinstall=GENERATE_VERSIONED``
 
+New command example::
+
+  ``cd ~/workspace``
+  ``rosws info --yaml > GENERATE_VERSIONED``
+
 .. _U12:
 
 U12: Modifying the current configuration according to a snapshot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``rosinstall ~/workspace snapshotfile.rosinstall``
-
+same as U4_
 
 .. _U13:
 
 U13: Basing the environment on a different ``ROS_ROOT``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-manually edit ``.rosinstall``
-``rosinstall ~/workspace``
-
-Comment by Ken:
-Now that ros is
-separated into ros and ros_comm stacks, changing ros isn't effective
-and can put you in a bad state.  Personally, more common for me is
-changing distro from diamondback<->unstable.  That is much more
-difficult to automate with rosinstall as it can be very install
-specific (e.g. debian underlay).
+Users should generall avoid doing this, as it can lead to failure in many ways.
 
 Therefore not implementing the usecase in this REP, meaning user has
 to manually modify ``.rosinstall`` and call rosinstall
@@ -413,12 +464,11 @@ to manually modify ``.rosinstall`` and call rosinstall
 U14: Create a new environment based on an existing one
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Previously
-``rosinstall /path/to/other/workspace``
+``rosinstall ~/workspace /path/to/other/workspace``
 
-The current behavior of rosinstall is to copy the entries of the
-foreign ``.rosinstall`` to the current ``.rosinstall``. However, scm
-entries are converted into non-scm entries in the process.
+New command example::
+
+  ``rosws init ~/workspace /path/to/other/workspace``
 
 .. _U15:
 
@@ -429,15 +479,24 @@ The user has some ROS stack in directory foo, and want to move that
 stack to directory bar. This means moving the files as well as
 updating the ``.rosinstall`` and the ``setup.sh``.
 
+Will not be supported for now.
+
 .. _U16:
 
 U16: User makes arbitrary changes to .rosinstall
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A poweruser can change path, version, scm, entry order, etc. in his
+An expert user can change path, version, scm, entry order, etc. in his
 rosinstall.  In some cases he then just wants his ``setup.sh`` file to be
 regenerated, in other cases he may want to update directories to
 specific revisions.
+
+``rosinstall ~/workspace``
+
+New command example::
+  ``cd ~/workspace``
+  ``rosws update foostack``
+  ``rosws regenerate``
 
 .. _U17:
 
@@ -448,6 +507,12 @@ When the user works on several interdependent stacks, he wants to
 create a unified diff of those stacks against their checked-out
 revision.
 
+``rosinstall ~/workspace --diff``
+
+New command example::
+  ``cd ~/workspace``
+  ``rosws diff``
+
 .. _U18:
 
 U18: User wants to status of scm files
@@ -456,6 +521,12 @@ U18: User wants to status of scm files
 When the user works on several interdependent stacks, he wants to
 see what files are currently in a changed status in their respective SCM.
 
+
+``rosinstall ~/workspace --status``
+
+New command example::
+  ``cd ~/workspace``
+  ``rosws status``
 
 .. _Analysis:
 
@@ -492,71 +563,29 @@ T1: Table of use cases and commands
 -----------------------------------
 
 
-==== =========  ======= ====== ========== ======= =========
- UC  install_   check_  info_   snapshot_  diff_   status_
-==== =========  ======= ====== ========== ======= =========
-U1_      x    
-U2_      x    
-U3_      x    
-U4_      x    
-U5_      x      
-U6_      x      
-U7_      x      
-U8_      x     
-U9_      x      
-U10_                x       x
-U11_                              x
-U12_     x    
-U13_     x      
-U14_     x    
-U15_     x      
-U16_     x       
-U17_                                        x
-U18_                                               x
-==== =========  ======= ====== ========== ======= =========
+==== ====== =========  ======= ====== ========== ======= ========= =========
+UC    init_  merge_     set_    info_  update_    diff_   status_   remove_ 
+==== ====== =========  ======= ====== ========== ======= ========= =========
+U1_    x        x                        x                                  
+U2_    x                                                                    
+U3_    x        x                        x                                  
+U4_             x                        x                                  
+U5_                                      x                                  
+U6_                      x               x                                  
+U7_             x                        x                                  
+U8_                                                                         
+U9_                                                                 x        
+U10_ 
+U11_                             x                                  
+U12_            x                        x                                   
+U14_            x                        x                                  
+U15_                                                                       
+U16_                                     x                                                           
+U17_                                               x                        
+U18_                                                      x                
+==== ====== =========  ======= ====== ========== ======= ========= =========
 
 
-
-T2: Table of init/update/merge combinations
--------------------------------------------
-
-the current rosinstall command combinations can be analyzed as::
-
-    rosinstall target-dir URI*
-
-
-Where the target-dir can be empty or contain a .rosinstall,
-or a manually changed ".rosinstall*" and all other arguments can be:
-
-- local-dir(-ros): a local directory optionally being a ROS installation (``/opt/ros/...``)
-- rosinstall-file(-ros): a rosinstall file optinally referencing a ROS installation
-- .rosinstall-dir: a dir with a .rosinstall
-
-
-============ =================== =============================== ==========================
-target-dir   URI                  Effect                         new command
-============ =================== =============================== ==========================
-empty                            Error
-empty        local-dir           Error
-empty        rosinstall-file     Error
-empty        local-dir-ros       U1_, init from install          install
-empty        rosinstall-file-ros U2_, init from file             install
-empty        .rosinstall-dir     U13_, init from other           install
-empty        anything ros + URI+ U3_, init+add                   install
-.rosinstall                      U5_, update                     install
-.rosinstall  local-dir           U4_, add                        install
-.rosinstall  rosinstall-file     U4_, add, U12_, apply           install
-.rosinstall  local-dir-ros       not specified, conflict
-.rosinstall  rosinstall-file-ros U4_, U12_ add with conflict     install
-.rosinstall  .rosinstall-dir     U4_, U12_ add with conflict     install
-                                 U10_, U17_, U18_                check, diff, status
-.rosinstall*                     all other usecases              install
-.rosinstall* anything                                            install
-============ =================== =============================== ==========================
-
-The table shows that most original cases are covered by the new
-command ``rosws install``.  Not in the table are the commands ``info``,
-``snapshot``, and ``check``.
 
 
 .. _Motivation:
@@ -609,20 +638,29 @@ Names
 
 The current rosinstall command structure allows a command such as::
 
-    rosinstall ~/workspace /opt/ros/diamondback ~/workspace2 ~/workspace/foo ~/download/temp.rosinstall
+   rosinstall ~/workspace /opt/ros/diamondback ~/workspace2 ~/workspace/foo ~/download/temp.rosinstall
 
 The intention of the user typing this cannot be inferred from the
 command, nor can what the tool will do be inferred from the syntax.
 The key idea is to have a syntax that allows the user to express a
 specific intention and to understand what the tool will do.
 
-The commands ``check``, ``info``, ``snapshot``, ``diff``, and
-``status`` are self-explanatory.
+The commands ``info``, ``diff``, and ``status`` are self-explanatory.
 
-The ``install`` command is somewhat ambiguous, as the user would need to
-use it for multiple purposes of adding entries or modifying versions
-of entries. However the different use-cases are algorithmically so
-similar that own commands for each seem superflous.
+The word ``install`` was dropped completely with the broad
+functionality it offers in rosinstall. ``install`` makes users shy
+away from usage fearing they might corrupt their debian installation
+with a tool.
+
+The ``set`` and ``merge`` commands are somewhat ambiguous, as the user
+would need to use them for multiple purposes of adding entries or
+modifying versions of entries. However the different use-cases are
+algorithmically so similar that own commands for each seem superflous.
+
+Rejected names include:
+
+add, edit, modify, read, load, import, change
+
 
 
 .. _Compatibility:
@@ -636,23 +674,23 @@ Current rosinstall syntax is:
 
 ::
 
-  Usage: rosinstall PATH [<options> ...] [URI]...
+ Usage: rosinstall PATH [<options> ...] [URI]...
 
-  Options:
-    --version             show program's version number and exit
-    -h, --help            show this help message and exit
-    -n, --nobuild         skip the build step for the ROS stack
-    --rosdep-yes          Pass through --rosdep-yes to rosmake
-    --continue-on-error   Continue despite checkout errors
-    --delete-changed-uris
-                          Delete the local copy of a directory before changing
-                          uri.
-    --abort-changed-uris  Abort if changed uri detected
-    --backup-changed-uris=BACKUP_CHANGED
-                          backup the local copy of a directory before changing
-                          uri to this directory.
-    --generate-versioned-rosinstall=GENERATE_VERSIONED
-                          generate a versioned rosintall file
+ Options:
+   --version             show program's version number and exit
+   -h, --help            show this help message and exit
+   -n, --nobuild         skip the build step for the ROS stack
+   --rosdep-yes          Pass through --rosdep-yes to rosmake
+   --continue-on-error   Continue despite checkout errors
+   --delete-changed-uris
+                         Delete the local copy of a directory before changing
+                         uri.
+   --abort-changed-uris  Abort if changed uri detected
+   --backup-changed-uris=BACKUP_CHANGED
+                         backup the local copy of a directory before changing
+                         uri to this directory.
+   --generate-versioned-rosinstall=GENERATE_VERSIONED
+                         generate a versioned rosintall file
 
 ``--generate-versioned-rosinstall`` is a special case and is replaced
 by ``rosinstall snapshot``.
@@ -676,7 +714,7 @@ As originally developed by Tully Foote.
 
 Commands are::
 
-    rosinstall PATH [options] [URIs]
+   rosinstall PATH [options] [URIs]
 
 with a 4 Phase model, Merging, Checking out, Generating setup,
 bootstrapping ROS serving most use-cases and
@@ -690,10 +728,10 @@ could be provided by additional ``--options``.
 
 e.g.::
 
-    rosinstall --info
-    rosinstall --check
-    rosinstall --diff
-    rosinstall --status
+   rosinstall --info
+   rosinstall --check
+   rosinstall --diff
+   rosinstall --status
 
 This is less useful for bash completion and focused help.
 
@@ -705,8 +743,8 @@ which to work as the first argument.
 
 Commands are::
 
-    rosinstall <command> PATH [options]
-    rosinstall <command> PATH [options] [URIs]
+   rosinstall <command> PATH [options]
+   rosinstall <command> PATH [options] [URIs]
 
 
 The SCM-like Designs are in line with the other ROS tools. However,
@@ -716,17 +754,13 @@ directory tree.
 SCM-like-implicit-path
 ----------------------
 
-Commands are ``rosinstall <command> [options]``.
+Inferring the path from context can be done to varying degrees, like
+ignoring the ROS_WORKSPACE variable or only considering the current
+folder, not its ancestors as candidates.
 
-The path refers to the first directory in ascending order starting
-with '.' which has a .rosinstall (like git), or the current dir for ``init``.
-
-Alternatively, all commands operate on the current dir.
-
-While this provides clean semantics and reduced effort to type, the
-requirement for the user to explicitly say where to perform and action
-provides some certainty for the user that changes will be made only
-where he wants them to be made.
+Another alternative is to try first interpreting any first argument
+as a workspace folder, however this may conflict with the syntax of
+command ``set``.
 
 SCM-like-extended-command-set
 -----------------------------
@@ -735,58 +769,160 @@ The install command suggested provides support for several use cases
 which could be further split up into different commands, e.g. ``add``
 and ``apply``. See Rejects_.
 
-SCM-like-no-install-command
----------------------------
-
-Commands are::
-
-    rosinstall <command> [options]
-
-except for the default action of init/adding/updating/merging, where command is::
-
-    rosinstall [options] [URIs]
-
-This helps work around the problem of finding a single self-explaining
-command for ``init``, ``install``, ``add``, ``update``, ``merge`` and
-``apply``.
-
-On the downside this requires some handling of the possible case of a
-user naming his environment like one of the commands.
-
-tar-like
---------
-
-The ``tar`` command has an own way of building commands, however that
-way is not very suitable e.g. for helpful tab completion.
-
 
 .. _Reference-implementation:
 
 Reference implementation
 ========================
 
-Reference implementation code located in git repo at:
-http://code.in.tum.de/indefero/index.php//p/rosinstall2/
+Reference implementation is provided with the latest rosinstall release.
 
-It includes fixes to rosinstall as suggested by patches in ROS tickets:
-
-- https://code.ros.org/trac/ros/ticket/3316 bugfix
-- https://code.ros.org/trac/ros/ticket/3520 bugfix
-- https://code.ros.org/trac/ros/ticket/3521 enhancement
-
-It requires applied patches to vcstools of tickets:
-
-- https://code.ros.org/trac/ros/ticket/3555 enhancement
-- https://code.ros.org/trac/ros/ticket/3559 bugfix
-- https://code.ros.org/trac/ros/ticket/3560 bugfix
 
 .. _Rejects:
 
 Rejects
 =======
-
 Ideas for rosinstall commands that were dropped for this REP, but may
 become interesting later:
+
+2nd draft rejects
+-----------------
+
+In 2012 there was a second surge to realize the REP. In this it was
+decided to make a more significant step away from the rosinstall
+design. As a consequence, certain ideas were brought up and rejected:
+
+- rosws install: replicates rosinstall
+
+A command doing many things at once confuses and scares the occasional user
+Similarly commands set, merge nad update only do one thing, and do not allow
+doing more than one thing.
+
+- update after set/merge
+
+It could be convenient if the tool did or offered to checkout/update 
+tree entries after a set/merge operation. This can be added as an option
+in the future if users want it.
+
+- many uris for init and merge
+
+These commands could technically take many uri arguments 
+instead of maximally one. The decision to allow only one 
+is to help users understand the syntax. The problem with 
+many arguments we saw with rosinstall is that users could not
+read from the syntax whether the second argument had a special
+semantic or not, or whether the order of the arguments mattered.
+
+- Maintain rosinstall assumptions about ROS
+
+rosinstall was provided in support of early ROS releases, 
+this REP is provided in the wake of ROS fuerte, which 
+makes significant changes to how a ROS environment is set up.
+rosws can have a fresh start with fuerte only providing 
+minimal support for ealier distros. In particular rosws 
+will not insist on having a ROS stack, and will not build 
+ros or ros_comm even after source checkouts, nor have an 
+option to do so. A future development could be to even 
+drop generation of the setup.* files.
+
+- optional localname when adding using ``set``
+
+With SCM providers, it is possible to checkout a new local 
+copy from a url without giving a target folder name. The 
+same could be achieved with the rosws set syntax. However
+this makes the syntax more confusing, and in many cases we 
+want the user to be aware of names because the repository 
+names often have dashes where the localname should have 
+underscores.
+
+- rosws snapthos
+
+The command is just a variant of rosws info and can be a --option
+
+- making ``set`` and ``merge`` a single command
+
+Both commands add/modify entries, so the case was made to unify them.
+It was rejected after lengthy discussions for these reasons:
+There is the fact that the 1st argument is mandatory for set, but not useful as localname for merge.
+There are the different -- options for the different cases.
+For the user, it should be clear whether his focus is some "remote" resource containing a set of many yaml entries, or on
+a single entry to add/change. That split is also the split of commands.
+The user won't be surprised by tab completion options ``--hg`` (or just ``hg`` as positional argument) or --version when
+merging with rosinstall files. They would make no sense, but code completion cannot know that.
+The localnames wont get in the way of tab completion user when wanting to point to a local xyz.rosinstall file.
+It is true that merge is semantically like n calls to set, except it is an atomic operation (all succeed, or all fail).
+In the far future, we might think of nested workspaces having state and version of their own and defining commit() and add()and update() actions.
+Then we could have a different type for the "set" command, BUT this would be very different semantics from the merge command, and the merge command would not become obsolete.
+This possibility should also indicate why merging the ``set`` and ``merge`` command above would hinder things in the future.
+
+- making all entry arguments in ``set`` mandatory
+
+The ``set`` semantics could be cleaner if it followed the 
+principle that always a full entry (scmtype, uri, version) 
+must be provided. This is however unnecessarily tedious when 
+the user just wants to change one of the details of an 
+existing entry
+
+- splitting ``set`` into ``add`` and ``edit``
+
+The split has the advantage that more warnings can be provided in
+case the user tries to add an entry which overlaps another. 
+However a confirmation step is sufficient.
+Also this would allow having mandatory positional parameters for 
+scmtype and uri in the add case, and optional ones for the edit
+case, but two different syntax structures for very similar cases 
+would be confusing as well.
+
+- making the scmtype in ``set`` a positional argument
+
+positional arguments like hg, git and svn do not work well with an optional third positional argument URI.
+
+- detach as a command of its own
+
+``set`` has option --detached to remove all scm information. 
+The case was made to make this a command of its own, in particular 
+for a fuse set/merge command. But it fits better with the set - merge
+split.
+
+- ``remove`` as a ``set`` option
+
+removal is an instance of modifying, so it could be 
+unified with set as a --option. However the end effect
+of a ``set`` operation is always that something exists 
+afterwards, so these semantics get muddied by remove 
+as an option.
+
+- default merge option killAppend
+
+When using ``merge`` or ``set``, a decision is when an overlapping 
+entry exist, whether to replace it in place, or whether to remove 
+the existing and append the new one at the end. rosinstall has the 
+latter semantic because it conveniently implies that it is possible 
+to ensure an ordering of entries in the config file by ordering them 
+in the argument list.
+
+For novice users however this behavior is confusing and also hard 
+to describe. The default semantics for merge is therefore to replace
+the entry in place. An option exists for merge to change that behavior.
+
+1st draft rejects
+-----------------
+
+The following attempts were rejected in the first REP draft in 2011
+
+- rosws regenerate: Generates setup files but does not attempt to update SCM based entries
+
+- rosws init: first time command demands a ROS root to be specified. too similar to install
+
+- rosws update: merges new entries and runs update on all scm based entries. too similar to install
+
+- rosws remove: removes an entry from .rosinstall. Better be done by hand
+
+In the second draft, those command were resurrected in particular in the
+absence of an all encompassing rosws install command.
+
+Those commands were too similar to rosws install and their behavior to bulk update and regenerate
+all trees conflicted with the semantics sugested by their name.
 
 - rosws overlay: looks up repository location based on roslocate and rosinstalls it
 
@@ -800,16 +936,9 @@ become interesting later:
 
 - rosws check --repair: Attempts to (interactively) fix inconsistencies such as duplicate paths
 
-- rosws regenerate: Generates setup files but does not attempt to update SCM based entries
-
-- rosws init: first time command demands a ROS root to be specified. too similar to install
-
-- rosws update: merges new entries and runs update on all scm based entries. too similar to install
-
-- rosws remove: removes an entry from .rosinstall. Better be done by hand
-
 Those commands make the initial version of the REP more complex to
-discuss and harder to implement, therefore they are left out.
+discuss and harder to implement, therefore they were left out.
+
 
 .. _References:
 
@@ -817,7 +946,7 @@ References
 ==========
 
 .. [1] rosinstall
-   (http://www.ros.org/wiki/rosinstall)
+  (http://www.ros.org/wiki/rosinstall)
 
 .. _Copyright:
 
@@ -829,13 +958,12 @@ the terms and conditions set forth in the Open Publication License, v0.1 or late
 (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 
-
-..
-   Local Variables:
-   mode: indented-text
-   indent-tabs-mode: nil
-   sentence-end-double-space: t
-   fill-column: 70
-   coding: utf-8
-   End:
 
+..
+  Local Variables:
+  mode: indented-text
+  indent-tabs-mode: nil
+  sentence-end-double-space: t
+  fill-column: 70
+  coding: utf-8
+  End:
