@@ -95,10 +95,10 @@ the .rosinstall file in the same folder. Those files wll only be overwritten
 by the ``rosws regenerate`` command.
 
 
---catkin
---cmake-prefix-path
+``--catkin``, 
+``--cmake-prefix-path``
 
-Options retain semantics as in rosinstall
+    Options retain semantics as in rosinstall
 
 .. _merge:
 
@@ -136,15 +136,20 @@ Options:
 The merge options apply whenever two elements have equivalent localnames
 (pointing to the same directory)
 
---merge-keep  Existing entries will remain unchanged
+--merge-keep
+    Existing entries will remain unchanged
 
---merge-replace  Existing entries will be overwritten in place
+--merge-replace
+    Existing entries will be overwritten in place
 
---merge-kill-append  Exiting entries will be removed, new ones appended to the end
+--merge-kill-append
+    Exiting entries will be removed, new ones appended to the end
 
---confirm-all  Do not ask for confirmation
+--confirm-all
+    Do not ask for confirmation
 
-``-`` a single dash can be used for piping stdout into the merge command
+``-``
+    A single dash can be used for piping stdout into the merge command
 
 .. _set:
 
@@ -177,9 +182,9 @@ option giving the version of a command line tool.
 
 Examples::
   
-  ``$ rosws set robot_model --hg https://kforge.ros.org/robotmodel/robot_model``
-  ``$ rosws set robot_model --version robot_model-1.7.1``
-  ``$ rosws set robot_model --detached``
+  $ rosws set robot_model --hg https://kforge.ros.org/robotmodel/robot_model
+  $ rosws set robot_model --version robot_model-1.7.1
+  $ rosws set robot_model --detached
 
 
 .. _update:
@@ -203,8 +208,8 @@ Options retain their semantics from current rosinstall.
 
 Examples::
 
-  ``$ rosws update -t ~/fuerte``
-  ``$ rosws update robot_model geometry``
+  $ rosws update -t ~/fuerte
+  $ rosws update robot_model geometry
 
 .. _info:
 
@@ -231,10 +236,11 @@ These options are mainly intended to allow scripting based on
 rosinstall. 
 
 Examples::
-  ``$ rosws info -t ~/ros/fuerte``
-  ``$ rosws info robot_model``
-  ``$ rosws info --yaml``
-  ``$ rosws info --only=path,cur_uri,cur_revision robot_model geometry``
+
+  $ rosws info -t ~/ros/fuerte
+  $ rosws info robot_model
+  $ rosws info --yaml
+  $ rosws info --only=path,cur_uri,cur_revision robot_model geometry
 
 .. _remove:
 
@@ -316,10 +322,10 @@ E.g. Developing on top of boxturtle shared install
 
 New command example::
 
-  ``rosws ~/workspace /opt/ros/boxturtle``
-  ``cd ~/workspace``
-  ``rosws merge  http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
-  ``rosws update``
+  rosws ~/workspace /opt/ros/boxturtle
+  cd ~/workspace
+  rosws merge  http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall
+  rosws update
 
 
 .. _U2:
@@ -333,7 +339,7 @@ E.g. Full source checkout
 
 New command example::
 
-  ``rosws ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall``
+  rosws ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall
 
 .. _U3:
 
@@ -346,10 +352,10 @@ E.g. Developing a stack against a full tree
 
 New command example::
 
-  ``rosws ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall``
-  ``cd ~/workspace``
-  ``rosws merge my_stack.rosinstall``
-  ``rosws update``
+  rosws ~/workspace http://www.ros.org/rosinstalls/boxturtle_pr2all.rosinstall
+  cd ~/workspace
+  rosws merge my_stack.rosinstall
+  rosws update
 
 .. _U4:
 
@@ -362,9 +368,9 @@ E.g. Adding a rosinstall layout to an existing workspace
 
 New command example::
 
-  ``cd ~/workspace``
-  ``rosws merge http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall``
-  ``rosws update``
+  cd ~/workspace
+  rosws merge http://www.ros.org/rosinstalls/wg_boxturtle_devel.rosinstall
+  rosws update
 
 .. _U5:
 
@@ -375,8 +381,8 @@ U5: Updating a rosinstall tree
 
 New command example::
 
-  ``cd ~/workspace``
-  ``rosws update sometree``
+  cd ~/workspace
+  rosws update sometree
 
 .. _U6:
 
@@ -387,8 +393,8 @@ You can manually edit the file ``.rosinstall`` in a rosinstall managed workspace
 
 New command example::
 
-  ``cd ~/workspace``
-  ``rosws set stackname --version=newversion``
+  cd ~/workspace
+  rosws set stackname --version=newversion
 
 .. _U7:
 
@@ -401,8 +407,8 @@ e.g. taking the sources from trunk, using ``roslocate``
 
 New command example::
 
-  ``cd ~/workspace``
-  ``roslocate info common_msgs | rosws merge -``
+  cd ~/workspace
+  roslocate info common_msgs | rosws merge -
 
 .. _U8:
 
@@ -420,8 +426,8 @@ You can manually edit the file ``.rosinstall`` in a rosinstall managed workspace
 
 New command example::
 
-  ``cd ~/workspace``
-  ``rosws remove foo``
+  cd ~/workspace
+  rosws remove foo
 
 .. _U10:
 
@@ -439,8 +445,8 @@ U11: Creating a snapshot of the configuration
 
 New command example::
 
-  ``cd ~/workspace``
-  ``rosws info --yaml > GENERATE_VERSIONED``
+  cd ~/workspace
+  rosws info --yaml > GENERATE_VERSIONED
 
 .. _U12:
 
@@ -468,7 +474,7 @@ U14: Create a new environment based on an existing one
 
 New command example::
 
-  ``rosws init ~/workspace /path/to/other/workspace``
+  rosws init ~/workspace /path/to/other/workspace
 
 .. _U15:
 
@@ -494,9 +500,10 @@ specific revisions.
 ``rosinstall ~/workspace``
 
 New command example::
-  ``cd ~/workspace``
-  ``rosws update foostack``
-  ``rosws regenerate``
+
+  cd ~/workspace
+  rosws update foostack
+  rosws regenerate
 
 .. _U17:
 
@@ -510,8 +517,9 @@ revision.
 ``rosinstall ~/workspace --diff``
 
 New command example::
-  ``cd ~/workspace``
-  ``rosws diff``
+
+  cd ~/workspace
+  rosws diff
 
 .. _U18:
 
@@ -525,8 +533,9 @@ see what files are currently in a changed status in their respective SCM.
 ``rosinstall ~/workspace --status``
 
 New command example::
-  ``cd ~/workspace``
-  ``rosws status``
+
+  cd ~/workspace
+  rosws status
 
 .. _Analysis:
 
@@ -538,6 +547,7 @@ A ROS environment means the assignment of values to ``ROS_PACKAGE_PATH``, ``PATH
 and ``ROS_MASTER_URI``, as well as further changes to support ROS toolchains.
 
 Given the description, a user of rosinstall needs to be aware of the following artifacts:
+
 - any ``.rosinstall`` file in the current directory
 - the setup.* files in the current directory
 - the state of local directories
