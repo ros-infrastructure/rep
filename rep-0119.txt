@@ -185,6 +185,8 @@ Hardware Requirements
   - Note: most RGBD sensors require a full USB 2.0 bus to operate correctly, 
     thus most computers will require 2 USB busses if USB periferals are expected to be used. 
 
+* Odometry is expected to be accurate within 1% after calibration in both linear and angular movement.  
+
 Software Requiremets
 ''''''''''''''''''''
 
