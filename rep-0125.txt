@@ -3,7 +3,7 @@ Title: rosdep 2
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley
-Status: Accepted
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 10-Feb-2012

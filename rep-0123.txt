@@ -3,7 +3,7 @@ Title: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
 Version: $Revision$
 Last-Modified: $Date$
 Author: Ken Conley
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 8-Feb-2012
