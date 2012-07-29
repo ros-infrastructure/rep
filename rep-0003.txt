@@ -79,11 +79,15 @@ Fuerte Turtle (Mar 2012)
 - Lisp SBCL 1.0.x
 - Python 2.6
 
-Groovy Galapagos (Aug 2012)
+Groovy Galapagos (Oct 2012)
 ---------------------------
 - Ubuntu Oneiric
-- Ubuntu P
-- System libraries TBD
+- Ubuntu Precise
+- Ubuntu Quantal
+- C++03
+- Boost 1.46
+- Lisp SBCL 1.0.x
+- Python 2.7
 
 Motivation
 ==========
