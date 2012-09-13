@@ -1,0 +1,478 @@
+REP: 127
+Title: Specification of package manifest format
+Version: $Revision: 180 $
+Last-Modified: $Date: 2012-09-12 16:00:00 -0800 (We, 12 Sep 2012) $
+Author: Dirk Thomas
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 12-Sep-2012
+Post-History: 12-Sep-2012
+
+Table of Contents
+=================
+
+#. Abstract_
+#. Motivation_
+#. Rationale_
+#. Data_
+#. Concerns_
+#. Specification_
+#. References_
+#. Copyright_
+
+
+Abstract
+========
+
+This REP specifies the format for package manifest used starting with
+Groovy when packages are getting packaged.  The filename is 
+``package.xml`` which will replace ``stack.xml`` and
+``manifest.xml``.
+
+
+Motivation
+==========
+
+With the step towards packaging packages the information contained in
+the both files ``stack.xml`` and ``package.xml`` are being merged.
+
+The file contains different kind of information:
+
+ * core data (i.e. the name)
+ * dependencies to other packages and system dependencies
+ * meta-information (i.e. the author and website)
+ * packaging information (i.e. the version)
+
+
+Rationale
+=========
+
+A new filename replacing the existing ones
+------------------------------------------
+
+Instead of modifying the semantic and content of the old files a new
+filename is chosen to make it possible to distinguish old and new
+packages without parsing the content of the xml file.
+
+One file per package with all the information
+---------------------------------------------
+
+Each package has one ``package.xml`` which contains all necessary
+information (instead of having multiple separate files with
+semantically grouped informations).  This design decision is based on
+the need to utilize these information in several tools (i.e.
+buildfarm, wiki) which should only require to fetch one file from a
+repository.
+
+Catkin-only - no rosbuild information inside
+--------------------------------------------
+
+The file only specifies information needed for a ROS ecosystem which
+is entirely based on ``catkin``.  Any additional information
+necessary for backward compatibility with ``rosbuild`` is kept
+separate (i.e. in the legacy ``manifest.xml`` files).  This enable to
+easily remove the legacy files in the future.
+
+Store normalized data
+---------------------
+
+All data is stored in atomic units to enable automated processing.
+I.e. names and email addresses are not mixed in a single text field
+but separated in related tags and attributes.
+
+Tags vs. attributes
+-------------------
+
+While plain text information can be stored in either attributes or
+tags the later is preferred for readability reasons.
+
+Additional (most times optional) information is stored in attributes
+of the related tag instead of grouping multiple tags inside a parent
+tag.
+
+
+Data
+====
+
+<package>
+---------
+
+The ``<package>`` tag is the unique top-level tag in a
+``package.xml`` file.  All other tags are nested under this.
+
+Required Tags
+-------------
+
+The required set of tags in a ``package.xml`` file provides basic
+meta data about the package:
+
+ * `\<name\>`_
+ * `\<version\>`_
+ * `\<description\>`_
+ * `\<maintainer\> (multiple)`_
+
+Optional Tags
+-------------
+
+Meta information
+''''''''''''''''
+
+We strongly recommend the use of the ``<url>`` tag to point users
+to a website and/or bug tracker where they can find more information
+or give feedback about the package.  The website is most commonly a
+wiki page on ROS.org so that users can easily find and update
+information about the package.
+
+ * `\<url\> (multiple)`_
+
+Furthermore authors, license and copyright information can be stated:
+
+ * `\<author\> (multiple)`_
+ * `\<license\>`_
+ * `\<copyright\>`_
+
+Dependencies
+''''''''''''
+
+The dependencies to other packages and system packages are described
+with:
+
+ * `\<depends\> (multiple)`_
+ * `\<build_depends\> (multiple)`_
+ * `\<run_depends\> (multiple)`_
+
+Build information
+'''''''''''''''''
+
+The type of build system used to build the package and hints for the
+message generation process are described with:
+
+ * `\<build_type\>`_
+
+Various
+'''''''
+
+Since packages need to embed additional meta data for various reasons
+(message generators, plugin discovery, etc.) all of these *dynamic*
+information are stored under a single tag:
+
+ * `\<export\>`_
+
+Example
+-------
+
+::
+
+  <package>
+    <name>my_package</name>
+    <version>1.2.3</version>
+    <description brief="ROS communications-related libraries and tools">
+      ROS communications-related packages, including core client libraries (roscpp, rospy, roslisp) and graph introspection tools (rostopic, rosnode, rosservice, rosparam).
+    </description>
+    <maintainer email="someone@example.com">Someone</maintainer>
+
+    <url type="website">http://wiki.ros.org/my_package</url>
+    <url type="bugtracker">http://www.github.com/my_org/my_package/issues</url>
+
+    <author>John Doe</author>
+    <author email="jane.doe@example.com">Jane Doe</author>
+    <license>BSD</license>
+    <copyright>Willow Garage</copyright>
+
+    <depends>catkin</depends>
+
+    <build_depends>libboost-thread-dev</build_depends>
+    <build_depends>libboost-date-time-dev</build_depends>
+
+    <run_depends>libboost-thread</run_depends>
+    <run_depends>libboost-date-time</run_depends>
+  </package>
+
+
+<name>
+------
+
+The name of the package consisting only of alphanumeric characters,
+dashes and underscores.  The package name must be unique in the ROS
+ecosystem.  It does not need to be identical with the folder name
+where it is checked out to, but it is a good habit to use the same
+name for the folder.
+
+
+<version>
+---------
+
+The version number of the package in the format
+``MAJOR.MINOR.PATCH`` where each part is numeric only.
+
+Attributes
+''''''''''
+
+  ``abi="MAJOR.MINOR.PATCH"`` *(optional)*
+  Specifying an ABI version number.  If it is not set the version
+  number is used instead.
+
+  The Debian package generated is version-locked against the exact
+  ABI version of packages it depends on (if not specified the normal
+  version number).  When increasing the version number while keeping
+  the same ABI version all dependent packages do not need to be
+  rebuild.
+
+
+<description>
+-------------
+
+The description of the package. It can consist of multiple lines and
+may contain XHTML.  But depending on where the description is used
+XML tags and multiple whitespaces might be stripped.
+
+Attributes
+''''''''''
+
+ ``brief="brief text"`` *(optional)*
+  One-line summary of the package description. Useful where the
+  package name is not sufficiently descriptive and the description is
+  to verbose to be displayed.
+
+
+<maintainer> (multiple)
+-----------------------
+
+The name of the person maintaining the package.
+
+Attributes
+''''''''''
+
+ ``email="name@domain.tld"`` *(optional)*
+  Email address of the maintainer.
+
+
+<url> (multiple)
+----------------
+
+The URL to a website or bug tracker for the package.
+
+Attributes
+''''''''''
+
+ ``type="TYPE"`` *(optional)*
+ Valid types are ``website`` (default) and ``bugtracker``.
+
+
+<author> (multiple)
+-------------------
+
+The name of the person who is an author of the package.
+
+Attributes
+''''''''''
+
+ ``email="name@domain.tld"`` *(optional)*
+  Email address of author.
+
+
+<license>
+---------
+
+Name of license for this package, e.g. BSD, GPL, LGPL. In order to
+assist machine readability, only include the license name in this
+tag. Multiple licenses should be comma separated.  For any
+explanatory text about licensing caveats, please use the
+``<description>`` tag.
+
+Most common open-source licenses are described on the
+`OSI website <http://www.opensource.org/licenses/alphabetical>`_.
+
+Commonly used license strings:
+
+ - Apache 2.0
+ - BSD
+ - Boost Software License
+ - GPLv2
+ - GPLv3
+ - LGPLv2.1
+ - LGPLv3
+ - MIT 
+ - Mozilla Public License Version 1.1
+ - ZLib
+ - wxWindows
+
+
+<copyright>
+-----------
+
+Copyright information which is integrated into Debian packages.
+
+Example
+'''''''
+
+::
+
+    <copyright>Willow Garage</copyright>
+
+
+<depends> (multiple)
+--------------------
+
+Declares a ROS dep key that this package depends on at build-time as
+well as run-time.  This tag is for convenience to not repeat
+dependencies twice, as ``build_depends`` and ``run_depends``.
+
+
+<build_depends> (multiple)
+--------------------------
+
+Declares a ROS dep key that this package depends on at build-time.
+Used together with ``depends`` to determine the build order of
+multiple packages.
+
+Attributes
+''''''''''
+
+ ``arch="TYPE"`` *(optional)*
+ Valid types are ``build`` and ``target`` (default).  For
+ cross-compilation it is necessary to distinguish between build
+ dependencies which are use on the build architecture to compile the
+ package or dependencies which the package is linked against (then
+ they need to be for the target architecture).
+
+
+<run_depends> (multiple)
+------------------------
+
+Declares a ROS dep key that this package depends on at run-time.
+Used together with ``depends`` to determine the build order of
+multiple packages.
+
+
+<build_type>
+------------
+
+The build type determines the Debian ``rules`` file to use.
+Valid options are: ``cmake`` (default), ``autotools``,
+``python_distutils`` and ``custom``.
+See ``bloom/bin/em`` for the definitions.
+
+Attributes
+''''''''''
+
+ ``file="local_path_to_rules.em_file"`` *(optional)*
+  If the value is ``custom`` then the path to a custom ``rules`` file
+  has to be given (i.e.``./bloom/rules.em``).
+
+
+<export>
+--------
+
+It serves as a container for any kind of additional information
+various packages and subsystem need to embed to fulfill their goal.
+
+The existing tags for use cases like exporting plugins for
+``pluginlib`` etc. will remain as-is.
+
+The following tags will be used to fulfill specific task in the area
+of package and message generation.
+
+
+<architecture_independent/>
+'''''''''''''''''''''''''''
+
+The empty tag is used to indicate that a package is architecture
+independent and therefore does not contain any architecture specific
+code.
+
+
+<message_generator>
+'''''''''''''''''''
+
+Defines the ``tag`` for the language bindings generated by this package,
+i.e. in ``gencpp`` this is set to ``cpp``.
+
+
+Concerns
+========
+
+Modification to previous specifications
+---------------------------------------
+
+ * Authors are now split into authors and maintainers.
+
+  * Multiple persons and their emails are specified in separate tags
+    and attributes.
+  * Authors are now optional.
+  * But at least one maintainer is now required.
+
+ * The license information is now optional.
+
+ * Multiple ``url``` tags can be specified and the ``type``
+   attributes gives them semantic meaning.
+
+ * The former ``depend`` and ``rosdep`` have been unified, but also
+   split into build- and run-dependencies.
+
+ * The ``export`` tag:
+
+  * The ``cpp`` tag has been dropped, since this functionality is
+    handled by catkin.
+  * The ``roslang`` tag has been dropped, since this functionality is
+    handled by catkin.
+
+ * The ``review`` tag has been dropped, these information will be
+   stored on the website of that package.
+ * The ``versioncontrol`` tag has been dropped.
+
+Backwards Compatibility
+-----------------------
+
+All tools currently utilizing ``stack.xml`` and ``manifest.xml`` are
+updated to work with ``package.xml`` files.
+
+For backward compatibility the ``manifest.xml`` is kept to provide
+information necessary for ``rosbuild`` to work (namely exporting
+compiler and linker flags).  For catkin packages these files will be
+auto generated.
+
+Future enhancements
+-------------------
+
+Additional meta information can be easily added within the ``export``
+tag in the future if necessary.
+
+Furthermore new features related to the infrastructure can be
+specified and integrated using additional tags and attributes:
+
+ * I.e. versioned dependencies can be added using additional
+   attributes on the various ``depends`` tags.
+
+
+Specification
+=============
+
+A schema to validate a ``package.xml`` file against will be provided.
+
+
+References
+==========
+
+.. [1] Manifest
+   (http://ros.org/wiki/Manifest)
+.. [2] Stack Manifest
+   (http://www.ros.org/wiki/Stack%20Manifest)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
