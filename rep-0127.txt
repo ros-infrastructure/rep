@@ -101,6 +101,14 @@ Data
 The ``<package>`` tag is the unique top-level tag in a
 ``package.xml`` file.  All other tags are nested under this.
 
+Attributes
+''''''''''
+
+  ``format="NUMBER"`` *(optional)*
+  Specifying the version of the ``package.xml`` format being used.
+  If it is not set the default format ``1`` is assumed.  This will be
+  used to detect future specification changes.
+
 Required Tags
 -------------
 
@@ -142,6 +150,11 @@ with:
  * `\<build_depends\> (multiple)`_
  * `\<run_depends\> (multiple)`_
 
+Note: the dependencies should use a common tag ``depends`` and use a
+``scope`` attribute to specify the type of the dependency.  This will
+be updated as soon as a good solution has been agreed on in the
+discussion on the buildsytem SIG mailing list.
+
 Build information
 '''''''''''''''''
 
@@ -178,7 +191,7 @@ Example
     <author>John Doe</author>
     <author email="jane.doe@example.com">Jane Doe</author>
     <license>BSD</license>
-    <copyright>Willow Garage</copyright>
+    <copyright>OSRF</copyright>
 
     <depends>catkin</depends>
 
@@ -193,11 +206,11 @@ Example
 <name>
 ------
 
-The name of the package consisting only of alphanumeric characters,
-dashes and underscores.  The package name must be unique in the ROS
-ecosystem.  It does not need to be identical with the folder name
-where it is checked out to, but it is a good habit to use the same
-name for the folder.
+The name of the package consisting only of lower case alphanumeric
+characters and underscores and must start with a letter [1]_.  The
+package name must be unique in the ROS ecosystem.  It does not need
+to be identical with the folder name where it is checked out to, but
+it is a good habit to use the same name for the folder.
 
 
 <version>
@@ -213,11 +226,11 @@ Attributes
   Specifying an ABI version number.  If it is not set the version
   number is used instead.
 
-  The Debian package generated is version-locked against the exact
-  ABI version of packages it depends on (if not specified the normal
+  The packages generated are version-locked against the exact ABI
+  version of packages it depends on (if not specified the normal
   version number).  When increasing the version number while keeping
   the same ABI version all dependent packages do not need to be
-  rebuild.
+  rebuilt.
 
 
 <description>
@@ -244,7 +257,7 @@ The name of the person maintaining the package.
 Attributes
 ''''''''''
 
- ``email="name@domain.tld"`` *(optional)*
+ ``email="name@domain.tld"`` *(required)*
   Email address of the maintainer.
 
 
@@ -302,14 +315,14 @@ Commonly used license strings:
 <copyright>
 -----------
 
-Copyright information which is integrated into Debian packages.
+Copyright information which is integrated into the packages.
 
 Example
 '''''''
 
 ::
 
-    <copyright>Willow Garage</copyright>
+    <copyright>OSRF</copyright>
 
 
 <depends> (multiple)
@@ -342,17 +355,16 @@ Attributes
 ------------------------
 
 Declares a ROS dep key that this package depends on at run-time.
-Used together with ``depends`` to determine the build order of
-multiple packages.
 
 
 <build_type>
 ------------
 
-The build type determines the Debian ``rules`` file to use.
-Valid options are: ``cmake`` (default), ``autotools``,
-``python_distutils`` and ``custom``.
-See ``bloom/bin/em`` for the definitions.
+The build type determines the how to build the package.  For Debian
+it is used to select the ``rules`` file to use. Valid options are:
+``cmake`` (default), ``autotools``, ``python_distutils`` and
+``custom``.  See ``bloom/src/bloom/resources/em`` for the
+definitions.
 
 Attributes
 ''''''''''
@@ -405,7 +417,7 @@ Modification to previous specifications
 
  * The license information is now optional.
 
- * Multiple ``url``` tags can be specified and the ``type``
+ * Multiple ``url`` tags can be specified and the ``type``
    attributes gives them semantic meaning.
 
  * The former ``depend`` and ``rosdep`` have been unified, but also
@@ -418,6 +430,7 @@ Modification to previous specifications
   * The ``roslang`` tag has been dropped, since this functionality is
     handled by catkin.
 
+ * The ``logo`` tag has been dropped.
  * The ``review`` tag has been dropped, these information will be
    stored on the website of that package.
  * The ``versioncontrol`` tag has been dropped.
@@ -452,12 +465,23 @@ Specification
 A schema to validate a ``package.xml`` file against will be provided.
 
 
+Implementation
+==============
+
+A reference implementation will be developed as soon as the
+specification is fixed.  It has still to be determined if this will
+be integrated in any existing tool or a new standalone tool.  It will
+eventually be integrated into ``rospkg``.
+
+
 References
 ==========
 
-.. [1] Manifest
+.. [1] Naming conventions
+   (http://www.ros.org/wiki/Naming)
+.. [2] Manifest
    (http://ros.org/wiki/Manifest)
-.. [2] Stack Manifest
+.. [3] Stack Manifest
    (http://www.ros.org/wiki/Stack%20Manifest)
 
 
