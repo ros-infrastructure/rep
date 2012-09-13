@@ -7,7 +7,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 12-Sep-2012
-Post-History: 12-Sep-2012
+Post-History: 13-Sep-2012
 
 Table of Contents
 =================
@@ -147,13 +147,6 @@ The dependencies to other packages and system packages are described
 with:
 
  * `\<depends\> (multiple)`_
- * `\<build_depends\> (multiple)`_
- * `\<run_depends\> (multiple)`_
-
-Note: the dependencies should use a common tag ``depends`` and use a
-``scope`` attribute to specify the type of the dependency.  This will
-be updated as soon as a good solution has been agreed on in the
-discussion on the buildsytem SIG mailing list.
 
 Build information
 '''''''''''''''''
@@ -195,11 +188,14 @@ Example
 
     <depends>catkin</depends>
 
-    <build_depends>libboost-thread-dev</build_depends>
-    <build_depends>libboost-date-time-dev</build_depends>
+    <depends build="1">genmsg</depends>
 
-    <run_depends>libboost-thread</run_depends>
-    <run_depends>libboost-date-time</run_depends>
+    <depends build="1">libboost-thread-dev</depends>
+    <depends run="1">libboost-thread</depends>
+
+    <depends test="1">gtest</depends>
+
+    <build_type>cmake</build_type>
   </package>
 
 
@@ -211,6 +207,24 @@ characters and underscores and must start with a letter [1]_.  The
 package name must be unique in the ROS ecosystem.  It does not need
 to be identical with the folder name where it is checked out to, but
 it is a good habit to use the same name for the folder.
+
+Reasons for naming convention
+'''''''''''''''''''''''''''''
+
+Package names are used in various contexts:
+ * namespaces
+ * variables
+ * part of a binary package name (i.e. Debian, Fedora)
+
+  * http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Source
+  * http://fedoraproject.org/wiki/Packaging:NamingGuidelines#Common_Character_Set_for_Package_Naming
+
+The ROS package names must be mapped to these conventions without
+generating collision.  Therefore only lower case letters (a-z),
+numbers (0-9) and one delimiting character (_) can be used.  The
+additional restriction that the first character can only be a letter
+is derived from the fact that some language do not allow this for
+namespaces/packages.
 
 
 <version>
@@ -328,33 +342,42 @@ Example
 <depends> (multiple)
 --------------------
 
-Declares a ROS dep key that this package depends on at build-time as
-well as run-time.  This tag is for convenience to not repeat
-dependencies twice, as ``build_depends`` and ``run_depends``.
+Declares a ROS dep key that this package depends on.  The type of
+the dependency is defined with the attributes.  Multiple attributes
+can be specified.  If no attribute is specified the behavior is the
+same as if ``build`` and ``run`` would be set (since it is expected
+that this is the most common use case).
 
-
-<build_depends> (multiple)
---------------------------
-
-Declares a ROS dep key that this package depends on at build-time.
-Used together with ``depends`` to determine the build order of
-multiple packages.
+The ``build`` and ``buildtool`` dependencies are used to determine
+the build order of multiple packages.
 
 Attributes
 ''''''''''
 
- ``arch="TYPE"`` *(optional)*
- Valid types are ``build`` and ``target`` (default).  For
- cross-compilation it is necessary to distinguish between build
- dependencies which are use on the build architecture to compile the
- package or dependencies which the package is linked against (then
- they need to be for the target architecture).
+ ``build="build"`` *(optional)*
+ When this attribute is present and contains a non-empty value the
+ ROS dep key is used as a build-time dependency.
 
+ ``buildtool="buildtool"`` *(optional)*
+ When this attribute is present and contains a non-empty value the
+ ROS dep key is used as a build-time dependency.  But it identifies a
+ tool which is executed during the build process.  For
+ cross-compilation it is necessary to distinguish them from normal
+ build dependencies which the package is linked against (they need to
+ be for the target architecture) and tools which are use on the build
+ architecture to compile the package.
 
-<run_depends> (multiple)
-------------------------
+ ``run="run"`` *(optional)*
+ When this attribute is present and contains a non-empty value the
+ ROS dep key is used as a run-time dependency.
 
-Declares a ROS dep key that this package depends on at run-time.
+ ``test="test"`` *(optional)*
+ When this attribute is present and contains a non-empty value the
+ ROS dep key is used as an additional dependency to run tests.
+
+ While ``build``, ``buildtoold`` and ``run`` define independent sets
+ of dependencies ``test`` dependencies are only additive and specify
+ only what used in addition to the other dependencies.
 
 
 <build_type>
@@ -372,6 +395,14 @@ Attributes
  ``file="local_path_to_rules.em_file"`` *(optional)*
   If the value is ``custom`` then the path to a custom ``rules`` file
   has to be given (i.e.``./bloom/rules.em``).
+
+Example
+'''''''
+
+::
+
+    <build_type>autotools</build_type>
+    <build_type file="./bloom/rules.em">custom</build_type>
 
 
 <export>
@@ -469,9 +500,31 @@ Implementation
 ==============
 
 A reference implementation will be developed as soon as the
-specification is fixed.  It has still to be determined if this will
-be integrated in any existing tool or a new standalone tool.  It will
-eventually be integrated into ``rospkg``.
+specification is fixed.  It will likely be integrated into
+``rospkg``.
+
+Affected tools
+--------------
+
+List of tools affected by the specification (which is very like not
+complete):
+
+ * bloom
+ * buildfarm
+ * catkin
+ * roscd
+ * rosdep
+ * rosdoc
+ * roslaunch
+ * roslib
+ * rospack
+ * rospkg
+ * rosrun
+ * rosstack
+
+Several tools are affected by the transition from packaging packages
+instead of stacks and not really by the specification of the format
+for the package information.
 
 
 References
