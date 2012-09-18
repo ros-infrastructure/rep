@@ -7,7 +7,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 12-Sep-2012
-Post-History: 13-Sep-2012
+Post-History: 17-Sep-2012
 
 Table of Contents
 =================
@@ -26,7 +26,8 @@ Abstract
 ========
 
 This REP specifies the format for package manifest used starting with
-Groovy when packages are getting packaged.  The filename is 
+Groovy when packages are getting packaged.  This is only relevant for
+packages which use the new buildsystem ``catkin``.  The filename is
 ``package.xml`` which will replace ``stack.xml`` and
 ``manifest.xml``.
 
@@ -118,7 +119,7 @@ meta data about the package:
  * `\<name\>`_
  * `\<version\>`_
  * `\<description\>`_
- * `\<maintainer\> (multiple)`_
+ * `\<maintainer\> (multiple, but at least one)`_
 
 Optional Tags
 -------------
@@ -147,14 +148,7 @@ The dependencies to other packages and system packages are described
 with:
 
  * `\<depends\> (multiple)`_
-
-Build information
-'''''''''''''''''
-
-The type of build system used to build the package and hints for the
-message generation process are described with:
-
- * `\<build_type\>`_
+ * `\<relationship\> (multiple)`_
 
 Various
 '''''''
@@ -236,9 +230,8 @@ The version number of the package in the format
 Attributes
 ''''''''''
 
-  ``abi="MAJOR.MINOR.PATCH"`` *(optional)*
-  Specifying an ABI version number.  If it is not set the version
-  number is used instead.
+  ``abi="FORMAT-TBD"`` *(optional)*
+  Specifying an ABI version number.
 
   The packages generated are version-locked against the exact ABI
   version of packages it depends on (if not specified the normal
@@ -263,8 +256,8 @@ Attributes
   to verbose to be displayed.
 
 
-<maintainer> (multiple)
------------------------
+<maintainer> (multiple, but at least one)
+-----------------------------------------
 
 The name of the person maintaining the package.
 
@@ -278,13 +271,14 @@ Attributes
 <url> (multiple)
 ----------------
 
-The URL to a website or bug tracker for the package.
+The URL to a website, a bug tracker or anything else for the package.
 
 Attributes
 ''''''''''
 
  ``type="TYPE"`` *(optional)*
- Valid types are ``website`` (default) and ``bugtracker``.
+ The type should be one of the following identifiers: ``website``
+ (default), ``bugtracker`` and ``repository``.
 
 
 <author> (multiple)
@@ -302,9 +296,9 @@ Attributes
 <license>
 ---------
 
-Name of license for this package, e.g. BSD, GPL, LGPL. In order to
+Name of license for this package, e.g. BSD, GPL, LGPL.  In order to
 assist machine readability, only include the license name in this
-tag. Multiple licenses should be comma separated.  For any
+tag.  Multiple licenses should be comma separated.  For any
 explanatory text about licensing caveats, please use the
 ``<description>`` tag.
 
@@ -322,9 +316,9 @@ Commonly used license strings:
  - LGPLv3
  - MIT 
  - Mozilla Public License Version 1.1
- - ZLib
  - wxWindows
-
+ - ZLib
+ 
 
 <copyright>
 -----------
@@ -342,17 +336,17 @@ Example
 <depends> (multiple)
 --------------------
 
-Declares a ROS dep key that this package depends on.  The type of
-the dependency is defined with the attributes.  Multiple attributes
-can be specified.  If no attribute is specified the behavior is the
-same as if ``build`` and ``run`` would be set (since it is expected
-that this is the most common use case).
-
-The ``build`` and ``buildtool`` dependencies are used to determine
-the build order of multiple packages.
+Declares a ROS dep key that this package depends on.
 
 Attributes
 ''''''''''
+
+ *Type of dependency*
+
+ The type of the dependency is defined with the following attributes.
+ Multiple attributes can be specified.  If no attribute is specified
+ the behavior is the same as if ``build`` and ``run`` would be set
+ (since it is expected that this is the most common use case).
 
  ``build="build"`` *(optional)*
  When this attribute is present and contains a non-empty value the
@@ -375,34 +369,58 @@ Attributes
  When this attribute is present and contains a non-empty value the
  ROS dep key is used as an additional dependency to run tests.
 
+ The ``build`` and ``buildtool`` dependencies are used to determine
+ the build order of multiple packages.
+
  While ``build``, ``buildtoold`` and ``run`` define independent sets
  of dependencies ``test`` dependencies are only additive and specify
  only what used in addition to the other dependencies.
 
+ *Version specific dependency*
 
-<build_type>
-------------
+ See the description of the same attributes of
+ `\<relationship\> (multiple)`_.
 
-The build type determines the how to build the package.  For Debian
-it is used to select the ``rules`` file to use. Valid options are:
-``cmake`` (default), ``autotools``, ``python_distutils`` and
-``custom``.  See ``bloom/src/bloom/resources/em`` for the
-definitions.
+ ``comp="COMPARATOR"`` *(optional)*
+ ``version="VERSION"`` *(optional)*
+
+
+<relationship> (multiple)
+-------------------------
+
+Declares a ROS dep key that this package has a relationship with.
+The type of the relationship is defined with the attributes.
+Multiple attributes can be specified, at least one must be specified.
 
 Attributes
 ''''''''''
 
- ``file="local_path_to_rules.em_file"`` *(optional)*
-  If the value is ``custom`` then the path to a custom ``rules`` file
-  has to be given (i.e.``./bloom/rules.em``).
+ *Type of relationship*
 
-Example
-'''''''
+ ``recommends="recommends"`` *(optional)*
+ ``suggests="suggests"`` *(optional)*
+ ``enhances="enhances"`` *(optional)*
+ ``breaks="breaks"`` *(optional)*
+ ``conflicts="conflicts"`` *(optional)*
+ ``provides="provides"`` *(optional)*
+ ``replaces="replaces"`` *(optional)*
 
-::
+ For a detailed explanation how these relationships are utilized see
+ [4]_.
 
-    <build_type>autotools</build_type>
-    <build_type file="./bloom/rules.em">custom</build_type>
+ *Version specific relationship*
+
+ All dependencies and relationships (except ``provides``) may
+ restrict their applicability to particular versions.  The comparison
+ operator and the version number must be used together.
+
+ ``comp="COMPARATOR"`` *(optional)*
+ The list of valid comparators is: ``<``, ``<=``, ``=``, ``>=`` and
+ ``>``.
+
+ ``version="VERSION"`` *(optional)*
+ The version number in the same format as specified in the
+ `\<version\>`_ tag.
 
 
 <export>
@@ -410,13 +428,16 @@ Example
 
 It serves as a container for any kind of additional information
 various packages and subsystem need to embed to fulfill their goal.
+To avoid potential collisions packages must use their package name as
+the tag name inside of the export block.  The content of that tag is
+up to the package to define and utilize.
 
 The existing tags for use cases like exporting plugins for
 ``pluginlib`` etc. will remain as-is.
 
-The following tags will be used to fulfill specific task in the area
-of package and message generation.
-
+The following tags will list some additional tags which are necessary
+to fulfill specific task in the area of package and message
+generation.
 
 <architecture_independent/>
 '''''''''''''''''''''''''''
@@ -424,7 +445,6 @@ of package and message generation.
 The empty tag is used to indicate that a package is architecture
 independent and therefore does not contain any architecture specific
 code.
-
 
 <message_generator>
 '''''''''''''''''''
@@ -536,6 +556,8 @@ References
    (http://ros.org/wiki/Manifest)
 .. [3] Stack Manifest
    (http://www.ros.org/wiki/Stack%20Manifest)
+.. [4] Declaring relationships between packages (Debian Policy Manual)
+   (http://www.debian.org/doc/debian-policy/ch-relationships.html)
 
 
 Copyright
