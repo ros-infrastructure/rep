@@ -182,14 +182,18 @@ Example
 
     <depends>catkin</depends>
 
-    <depends build="1">genmsg</depends>
+    <depends build="1" comp=">=" version="1.1">genmsg</depends>
 
     <depends build="1">libboost-thread-dev</depends>
     <depends run="1">libboost-thread</depends>
 
     <depends test="1">gtest</depends>
 
-    <build_type>cmake</build_type>
+    <relationship conflicts="1">my_old_package</depends>
+
+    <export>
+        ...
+    </export>
   </package>
 
 
