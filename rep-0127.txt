@@ -7,7 +7,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 12-Sep-2012
-Post-History: 17-Sep-2012
+Post-History: 18-Sep-2012
 
 Table of Contents
 =================
@@ -138,7 +138,7 @@ information about the package.
 Furthermore authors, license and copyright information can be stated:
 
  * `\<author\> (multiple)`_
- * `\<license\>`_
+ * `\<license\> (multiple)`_
  * `\<copyright\>`_
 
 Dependencies
@@ -147,8 +147,7 @@ Dependencies
 The dependencies to other packages and system packages are described
 with:
 
- * `\<depends\> (multiple)`_
- * `\<relationship\> (multiple)`_
+ * `\<depend\> (multiple)`_
 
 Various
 '''''''
@@ -178,18 +177,19 @@ Example
     <author>John Doe</author>
     <author email="jane.doe@example.com">Jane Doe</author>
     <license>BSD</license>
+    <license>LGPL</license>
     <copyright>OSRF</copyright>
 
-    <depends>catkin</depends>
+    <depend>catkin</depend>
 
-    <depends build="1" comp=">=" version="1.1">genmsg</depends>
+    <depend build="" version_gte="1.1" version_lt="2.0">genmsg</depend>
 
-    <depends build="1">libboost-thread-dev</depends>
-    <depends run="1">libboost-thread</depends>
+    <depend build="">libboost-thread-dev</depend>
+    <depend run="">libboost-thread</depend>
 
-    <depends test="1">gtest</depends>
+    <depend test="">gtest</depend>
 
-    <relationship conflicts="1">my_old_package</depends>
+    <depend conflict="">my_old_package</depend>
 
     <export>
         ...
@@ -297,13 +297,13 @@ Attributes
   Email address of author.
 
 
-<license>
----------
+<license> (multiple)
+--------------------
 
 Name of license for this package, e.g. BSD, GPL, LGPL.  In order to
 assist machine readability, only include the license name in this
-tag.  Multiple licenses should be comma separated.  For any
-explanatory text about licensing caveats, please use the
+tag.  For multiple licenses multiple separate tags must be used.  For
+any explanatory text about licensing caveats, please use the
 ``<description>`` tag.
 
 Most common open-source licenses are described on the
@@ -337,8 +337,8 @@ Example
     <copyright>OSRF</copyright>
 
 
-<depends> (multiple)
---------------------
+<depend> (multiple)
+-------------------
 
 Declares a ROS dep key that this package depends on.
 
@@ -352,26 +352,26 @@ Attributes
  the behavior is the same as if ``build`` and ``run`` would be set
  (since it is expected that this is the most common use case).
 
- ``build="build"`` *(optional)*
- When this attribute is present and contains a non-empty value the
- ROS dep key is used as a build-time dependency.
+ ``build=""`` *(optional)*
+ When this attribute is present the ROS dep key is used as a
+ build-time dependency.
 
- ``buildtool="buildtool"`` *(optional)*
- When this attribute is present and contains a non-empty value the
- ROS dep key is used as a build-time dependency.  But it identifies a
- tool which is executed during the build process.  For
- cross-compilation it is necessary to distinguish them from normal
- build dependencies which the package is linked against (they need to
- be for the target architecture) and tools which are use on the build
- architecture to compile the package.
+ ``buildtool=""`` *(optional)*
+ When this attribute is present the ROS dep key is used as a
+ build-time dependency.  But it identifies a tool which is executed
+ during the build process.  For cross-compilation it is necessary to
+ distinguish them from normal build dependencies which the package is
+ linked against (they need to be for the target architecture) and
+ tools which are use on the build architecture to compile the
+ package.
 
- ``run="run"`` *(optional)*
- When this attribute is present and contains a non-empty value the
- ROS dep key is used as a run-time dependency.
+ ``run=""`` *(optional)*
+ When this attribute is present the ROS dep key is used as a run-time
+ dependency.
 
- ``test="test"`` *(optional)*
- When this attribute is present and contains a non-empty value the
- ROS dep key is used as an additional dependency to run tests.
+ ``test=""`` *(optional)*
+ When this attribute is present the ROS dep key is used as an
+ additional dependency to run tests.
 
  The ``build`` and ``buildtool`` dependencies are used to determine
  the build order of multiple packages.
@@ -380,51 +380,49 @@ Attributes
  of dependencies ``test`` dependencies are only additive and specify
  only what used in addition to the other dependencies.
 
- *Version specific dependency*
+ *Additional relationship*
 
- See the description of the same attributes of
- `\<relationship\> (multiple)`_.
+ The following additional relationships can be defined:
 
- ``comp="COMPARATOR"`` *(optional)*
- ``version="VERSION"`` *(optional)*
+ ``conflict=""`` *(optional)*
+ When this attribute is present the ROS dep key states a conflicting
+ package which can not be installed at the same time.  This maps to
+ ``conflicts`` for both ``dpkg`` and ``rpms``.
 
+ ``conflict=""`` *(optional)*
+ When this attribute is present the ROS dep key states a package
+ which is replaced by this one.  This maps to ``Replaces`` for
+ ``dpkg`` and ``Obsoletes`` for ``rpms``.
 
-<relationship> (multiple)
--------------------------
+ *Version specific dependency / relationship*
 
-Declares a ROS dep key that this package has a relationship with.
-The type of the relationship is defined with the attributes.
-Multiple attributes can be specified, at least one must be specified.
+ All dependencies and relationships may restrict their applicability
+ to particular versions.  For each comparison operator an attribute
+ can be used.  Two of these attributes can be set at the same time to
+ describe a version range.
 
-Attributes
-''''''''''
+ ``version_lt="VERSION"`` *(optional)*
+ The dependency to the package is restricted to versions less than
+ the stated version number.
 
- *Type of relationship*
+ ``version_lte="VERSION"`` *(optional)*
+ The dependency to the package is restricted to versions less or
+ equal than the stated version number.
 
- ``recommends="recommends"`` *(optional)*
- ``suggests="suggests"`` *(optional)*
- ``enhances="enhances"`` *(optional)*
- ``breaks="breaks"`` *(optional)*
- ``conflicts="conflicts"`` *(optional)*
- ``provides="provides"`` *(optional)*
- ``replaces="replaces"`` *(optional)*
+ ``version_eq="VERSION"`` *(optional)*
+ The dependency to the package is restricted to a version equal than
+ the stated version number.
+
+ ``version_gte="VERSION"`` *(optional)*
+ The dependency to the package is restricted to versions greater or
+ equal than the stated version number.
+
+ ``version_gt="VERSION"`` *(optional)*
+ The dependency to the package is restricted to versions greater than
+ the stated version number.
 
  For a detailed explanation how these relationships are utilized see
- [4]_.
-
- *Version specific relationship*
-
- All dependencies and relationships (except ``provides``) may
- restrict their applicability to particular versions.  The comparison
- operator and the version number must be used together.
-
- ``comp="COMPARATOR"`` *(optional)*
- The list of valid comparators is: ``<``, ``<=``, ``=``, ``>=`` and
- ``>``.
-
- ``version="VERSION"`` *(optional)*
- The version number in the same format as specified in the
- `\<version\>`_ tag.
+ [4]_ and [5]_.
 
 
 <export>
@@ -453,8 +451,17 @@ code.
 <message_generator>
 '''''''''''''''''''
 
-Defines the ``tag`` for the language bindings generated by this package,
-i.e. in ``gencpp`` this is set to ``cpp``.
+The content defines the *identifier* for the language bindings
+generated by this package, i.e. in ``gencpp`` this is set to ``cpp``.
+
+<meta_package/>
+'''''''''''''''
+
+The empty tag is used to indicate that a package is a meta-package
+which implies that it does not have a ``CMakeLists.txt`` and
+therefore no content of any kind.  This information is necessary for
+the ROS wiki to show the relationship between these meta packages and
+other packages.
 
 
 Concerns
@@ -476,7 +483,7 @@ Modification to previous specifications
    attributes gives them semantic meaning.
 
  * The former ``depend`` and ``rosdep`` have been unified, but also
-   split into build- and run-dependencies.
+   split into various types of dependencies.
 
  * The ``export`` tag:
 
@@ -509,9 +516,6 @@ tag in the future if necessary.
 
 Furthermore new features related to the infrastructure can be
 specified and integrated using additional tags and attributes:
-
- * I.e. versioned dependencies can be added using additional
-   attributes on the various ``depends`` tags.
 
 
 Specification
@@ -562,7 +566,8 @@ References
    (http://www.ros.org/wiki/Stack%20Manifest)
 .. [4] Declaring relationships between packages (Debian Policy Manual)
    (http://www.debian.org/doc/debian-policy/ch-relationships.html)
-
+.. [5] Advances RPM Packaging (Fedora Documentation)
+   (http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-advanced-packaging.html)
 
 Copyright
 =========
