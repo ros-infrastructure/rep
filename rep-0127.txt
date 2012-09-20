@@ -184,6 +184,7 @@ Example
       ROS communications-related packages, including core client libraries (roscpp, rospy, roslisp) and graph introspection tools (rostopic, rosnode, rosservice, rosparam).
     </description>
     <maintainer email="someone@example.com">Someone</maintainer>
+
     <license>BSD</license>
     <license>LGPL</license>
 
@@ -279,10 +280,12 @@ Attributes
 --------------------------------------
 
 Name of license for this package, e.g. BSD, GPL, LGPL.  In order to
-assist machine readability, only include the license name in this
-tag.  For multiple licenses multiple separate tags must be used.  For
-any explanatory text about licensing caveats, please use the
-``<description>`` tag.
+assist machine readability, only include the license name in this tag.
+For multiple licenses multiple separate tags must be used.  A package
+would have multiple licenses if different source files have different
+licenses.  Every license occurring the in the source files should have
+a corresponding ``<license>`` tag.  For any explanatory text about
+licensing caveats, please use the ``<description>`` tag.
 
 Most common open-source licenses are described on the
 `OSI website <http://www.opensource.org/licenses/alphabetical>`_.
@@ -298,7 +301,6 @@ Commonly used license strings:
  - LGPLv3
  - MIT 
  - Mozilla Public License Version 1.1
-
 
 <url> (multiple)
 ----------------
@@ -437,13 +439,18 @@ Attributes
 --------
 
 It serves as a container for any kind of additional information
-various packages and subsystem need to embed to fulfill their goal.
+various packages and subsystems need to embed to fulfill their goal.
 To avoid potential collisions packages must use their package name as
 the tag name inside of the export block.  The content of that tag is
 up to the package to define and utilize.
 
 The existing tags for use cases like exporting plugins for
 ``pluginlib`` etc. will remain as-is.
+
+For example, a package which implements an rviz plugin might include this::
+  <export>
+      <rviz plugin="${prefix}/plugin_description.xml"/>
+  </export>
 
 The following tags will list some additional tags which are necessary
 to fulfill specific task in the area of package and message
