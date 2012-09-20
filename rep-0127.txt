@@ -130,6 +130,7 @@ meta data about the package:
  * `\<version\>`_
  * `\<description\>`_
  * `\<maintainer\> (multiple, but at least one)`_
+ * `\<license\> (multiple, but at least one)`_
 
 Optional Tags
 -------------
@@ -145,17 +146,15 @@ information about the package.
 
  * `\<url\> (multiple)`_
 
-Furthermore authors, license and copyright information can be stated:
+Furthermore authors can be stated:
 
  * `\<author\> (multiple)`_
- * `\<license\> (multiple)`_
- * `\<copyright\>`_
 
 Dependencies
 ''''''''''''
 
 The dependencies and relations to other packages and system packages
-are described with:
+have been discussed in [8}_ and are described with:
 
  * `\<build_depend\> (multiple)`_
  * `\<buildtool_depend\> (multiple)`_
@@ -181,19 +180,17 @@ Example
   <package>
     <name>my_package</name>
     <version>1.2.3</version>
-    <description brief="ROS communications-related libraries and tools">
+    <description>
       ROS communications-related packages, including core client libraries (roscpp, rospy, roslisp) and graph introspection tools (rostopic, rosnode, rosservice, rosparam).
     </description>
     <maintainer email="someone@example.com">Someone</maintainer>
+    <license>BSD</license>
+    <license>LGPL</license>
 
     <url type="website">http://wiki.ros.org/my_package</url>
     <url type="bugtracker">http://www.github.com/my_org/my_package/issues</url>
-
     <author>John Doe</author>
     <author email="jane.doe@example.com">Jane Doe</author>
-    <license>BSD</license>
-    <license>LGPL</license>
-    <copyright>OSRF</copyright>
 
     <build_depend>catkin</build_depend>
     <build_depend version_gte="1.1" version_lt="2.0">genmsg</build_depend>
@@ -265,14 +262,6 @@ The description of the package. It can consist of multiple lines and
 may contain XHTML.  But depending on where the description is used
 XML tags and multiple whitespaces might be stripped.
 
-Attributes
-''''''''''
-
- ``brief="brief text"`` *(optional)*
-  One-line summary of the package description. Useful where the
-  package name is not sufficiently descriptive and the description is
-  verbose enough to need a summary.
-
 
 <maintainer> (multiple, but at least one)
 -----------------------------------------
@@ -284,6 +273,31 @@ Attributes
 
  ``email="name@domain.tld"`` *(required)*
   Email address of the maintainer.
+
+
+<license> (multiple, but at least one)
+--------------------------------------
+
+Name of license for this package, e.g. BSD, GPL, LGPL.  In order to
+assist machine readability, only include the license name in this
+tag.  For multiple licenses multiple separate tags must be used.  For
+any explanatory text about licensing caveats, please use the
+``<description>`` tag.
+
+Most common open-source licenses are described on the
+`OSI website <http://www.opensource.org/licenses/alphabetical>`_.
+
+Commonly used license strings:
+
+ - Apache 2.0
+ - BSD
+ - Boost Software License
+ - GPLv2
+ - GPLv3
+ - LGPLv2.1
+ - LGPLv3
+ - MIT 
+ - Mozilla Public License Version 1.1
 
 
 <url> (multiple)
@@ -309,46 +323,6 @@ Attributes
 
  ``email="name@domain.tld"`` *(optional)*
   Email address of author.
-
-
-<license> (multiple)
---------------------
-
-Name of license for this package, e.g. BSD, GPL, LGPL.  In order to
-assist machine readability, only include the license name in this
-tag.  For multiple licenses multiple separate tags must be used.  For
-any explanatory text about licensing caveats, please use the
-``<description>`` tag.
-
-Most common open-source licenses are described on the
-`OSI website <http://www.opensource.org/licenses/alphabetical>`_.
-
-Commonly used license strings:
-
- - Apache 2.0
- - BSD
- - Boost Software License
- - GPLv2
- - GPLv3
- - LGPLv2.1
- - LGPLv3
- - MIT 
- - Mozilla Public License Version 1.1
- - wxWindows
- - ZLib
- 
-
-<copyright>
------------
-
-Copyright information which is integrated into the packages.
-
-Example
-'''''''
-
-::
-
-    <copyright>OSRF</copyright>
 
 
 <build_depend> (multiple)
@@ -509,9 +483,11 @@ Modification to previous specifications
   * Multiple persons and their emails are specified in separate tags
     and attributes.
   * Authors are now optional.
-  * But at least one maintainer is now required.
+  * Maintainers must have an email.
+  * At least one maintainer is now required.
 
- * The license information is now optional.
+ * Multiple licenses can now be used (even if a single license per
+   package is desired).
 
  * Multiple ``url`` tags can be specified and the ``type``
    attributes gives them semantic meaning.
@@ -526,6 +502,7 @@ Modification to previous specifications
   * The ``roslang`` tag has been dropped, since this functionality is
     handled by catkin.
 
+ * The ``copyright`` tag has been dropped.
  * The ``logo`` tag has been dropped.
  * The ``review`` tag has been dropped, these information will be
    stored on the website of that package.
@@ -566,8 +543,7 @@ Implementation
 ==============
 
 A reference implementation will be developed as soon as the
-specification is fixed.  It will likely be integrated into
-``rospkg``.
+specification is fixed.
 
 Affected tools
 --------------
@@ -608,6 +584,11 @@ References
    (http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-advanced-packaging.html)
 .. [6] Comparison between YAML and XML for manifests
    (https://github.com/ros/catkin/issues/128)
+.. [7] Discussion on the buildsystem mailing list
+   (https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_jRvhXFfsVk)
+.. [8] Discussion on the buildsystem mailing list (regarding
+   package dependencies and relationships)
+   (https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/fXGSZG0SC08)
 
 Copyright
 =========
