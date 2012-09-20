@@ -37,4 +37,4 @@ propcheck:
 	$(PYTHON) propcheck.py
 
 upload: all
-	rsync *.txt *.html *.jpg *.png wgs32.willowgarage.com:/var/www/www.ros.org/html/reps
+	rsync *.txt *.html *.jpg *.png root@wgs32.willowgarage.com:/var/www/www.ros.org/html/reps
