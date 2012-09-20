@@ -267,7 +267,7 @@ XML tags and multiple whitespaces might be stripped.
 <maintainer> (multiple, but at least one)
 -----------------------------------------
 
-The name of the person maintaining the package.
+The name of the person maintaining the package. All packages require a maintainer. For orphaned packages see below.
 
 Attributes
 ''''''''''
@@ -275,6 +275,14 @@ Attributes
  ``email="name@domain.tld"`` *(required)*
   Email address of the maintainer.
 
+An orphaned package is one with no current maintainer. Orphaned packages should have their maintainer set to ROS Community <ros-release@code.ros.org>
+These packages are considered maintained by the ROS Community as a whole until a volunteer takes over maintenance.
+
+Example
+-------
+
+::
+  <maintainer email="ros-release@code.ros.org">ROS Community</maintainer>
 
 <license> (multiple, but at least one)
 --------------------------------------
