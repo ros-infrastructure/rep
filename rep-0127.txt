@@ -204,7 +204,7 @@ Example
     <conflict>my_old_package</conflict>
 
     <export>
-        ...
+      ...
     </export>
   </package>
 
@@ -456,8 +456,9 @@ The existing tags for use cases like exporting plugins for
 ``pluginlib`` etc. will remain as-is.
 
 For example, a package which implements an rviz plugin might include this::
+
   <export>
-      <rviz plugin="${prefix}/plugin_description.xml"/>
+    <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
 
 The following tags will list some additional tags which are necessary
