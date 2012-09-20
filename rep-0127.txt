@@ -7,7 +7,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 12-Sep-2012
-Post-History: 18-Sep-2012
+Post-History: 19-Sep-2012
 
 Table of Contents
 =================
@@ -79,8 +79,18 @@ Store normalized data
 ---------------------
 
 All data is stored in atomic units to enable automated processing.
-I.e. names and email addresses are not mixed in a single text field
-but separated in related tags and attributes.
+I.e. names and email addresses are not mixed in a single field but
+stored separately.
+
+Data format
+-----------
+
+Beside XML (which is used in ROS for ``stack.xml`` and
+``manifest.xml``) other formats have been considered.  Especially
+``yaml`` has been investigates extensively during the Fuerte cycle.
+The benchmark results [6]_ showed that parsing YAML is significantly
+slower (by a factor of 10).  Therefore the format is not changed but
+will stay XML.
 
 Tags vs. attributes
 -------------------
@@ -144,10 +154,15 @@ Furthermore authors, license and copyright information can be stated:
 Dependencies
 ''''''''''''
 
-The dependencies to other packages and system packages are described
-with:
+The dependencies and relations to other packages and system packages
+are described with:
 
- * `\<depend\> (multiple)`_
+ * `\<build_depend\> (multiple)`_
+ * `\<buildtool_depend\> (multiple)`_
+ * `\<run_depend\> (multiple)`_
+ * `\<test_depend\> (multiple)`_
+ * `\<conflict\> (multiple)`_
+ * `\<replace\> (multiple)`_
 
 Various
 '''''''
@@ -180,16 +195,15 @@ Example
     <license>LGPL</license>
     <copyright>OSRF</copyright>
 
-    <depend>catkin</depend>
+    <build_depend>catkin</build_depend>
+    <build_depend version_gte="1.1" version_lt="2.0">genmsg</build_depend>
 
-    <depend build="" version_gte="1.1" version_lt="2.0">genmsg</depend>
+    <build_depend>libboost-thread-dev</build_depend>
+    <run_depend>libboost-thread</run_depend>
 
-    <depend build="">libboost-thread-dev</depend>
-    <depend run="">libboost-thread</depend>
+    <test_depend>gtest</test_depend>
 
-    <depend test="">gtest</depend>
-
-    <depend conflict="">my_old_package</depend>
+    <conflict>my_old_package</conflict>
 
     <export>
         ...
@@ -257,7 +271,7 @@ Attributes
  ``brief="brief text"`` *(optional)*
   One-line summary of the package description. Useful where the
   package name is not sufficiently descriptive and the description is
-  to verbose to be displayed.
+  verbose enough to need a summary.
 
 
 <maintainer> (multiple, but at least one)
@@ -337,64 +351,16 @@ Example
     <copyright>OSRF</copyright>
 
 
-<depend> (multiple)
--------------------
+<build_depend> (multiple)
+-------------------------
 
-Declares a ROS dep key that this package depends on.
+Declares a ROS dep key that this package depends on at build-time.
+
+The ``build`` and ``buildtool`` dependencies are used to determine
+the build order of multiple packages.
 
 Attributes
 ''''''''''
-
- *Type of dependency*
-
- The type of the dependency is defined with the following attributes.
- Multiple attributes can be specified.  If no attribute is specified
- the behavior is the same as if ``build`` and ``run`` would be set
- (since it is expected that this is the most common use case).
-
- ``build=""`` *(optional)*
- When this attribute is present the ROS dep key is used as a
- build-time dependency.
-
- ``buildtool=""`` *(optional)*
- When this attribute is present the ROS dep key is used as a
- build-time dependency.  But it identifies a tool which is executed
- during the build process.  For cross-compilation it is necessary to
- distinguish them from normal build dependencies which the package is
- linked against (they need to be for the target architecture) and
- tools which are use on the build architecture to compile the
- package.
-
- ``run=""`` *(optional)*
- When this attribute is present the ROS dep key is used as a run-time
- dependency.
-
- ``test=""`` *(optional)*
- When this attribute is present the ROS dep key is used as an
- additional dependency to run tests.
-
- The ``build`` and ``buildtool`` dependencies are used to determine
- the build order of multiple packages.
-
- While ``build``, ``buildtoold`` and ``run`` define independent sets
- of dependencies ``test`` dependencies are only additive and specify
- only what used in addition to the other dependencies.
-
- *Additional relationship*
-
- The following additional relationships can be defined:
-
- ``conflict=""`` *(optional)*
- When this attribute is present the ROS dep key states a conflicting
- package which can not be installed at the same time.  This maps to
- ``conflicts`` for both ``dpkg`` and ``rpms``.
-
- ``conflict=""`` *(optional)*
- When this attribute is present the ROS dep key states a package
- which is replaced by this one.  This maps to ``Replaces`` for
- ``dpkg`` and ``Obsoletes`` for ``rpms``.
-
- *Version specific dependency / relationship*
 
  All dependencies and relationships may restrict their applicability
  to particular versions.  For each comparison operator an attribute
@@ -421,8 +387,76 @@ Attributes
  The dependency to the package is restricted to versions greater than
  the stated version number.
 
- For a detailed explanation how these relationships are utilized see
- [4]_ and [5]_.
+
+<buildtool_depend> (multiple)
+-----------------------------
+
+Declares a ROS dep key that this package depends on at build-time.
+But it identifies a tool which is executed during the build process.
+For cross-compilation it is necessary to distinguish them from normal
+build dependencies which the package is linked against (they need to
+be for the target architecture) and tools which are use on the build
+architecture to compile the package.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<run_depend> (multiple)
+-----------------------
+
+Declares a ROS dep key that this package depends on at run-time.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<test_depend> (multiple)
+------------------------
+
+Declares a ROS dep key that this package depends on for running
+tests.
+
+While ``build``, ``buildtoold`` and ``run`` define independent sets
+of dependencies ``test`` dependencies are only additive and specify
+only what is required in addition to the other dependencies.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<conflict> (multiple)
+---------------------
+
+Declares a ROS dep key that this package conflicts with.  This
+package can not be installed at the same time as the conflicting
+package.  This maps to ``conflicts`` for both ``dpkg`` and ``rpms``.
+
+For a detailed explanation how these relationships are utilized see
+[4]_ and [5]_.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<replace> (multiple)
+---------------------
+
+Declares a ROS dep key that this package replaces.  This maps to
+``Replaces`` for ``dpkg`` and ``Obsoletes`` for ``rpms``.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <export>
@@ -503,10 +537,14 @@ Backwards Compatibility
 All tools currently utilizing ``stack.xml`` and ``manifest.xml`` are
 updated to work with ``package.xml`` files.
 
-For backward compatibility the ``manifest.xml`` is kept to provide
-information necessary for ``rosbuild`` to work (namely exporting
-compiler and linker flags).  For catkin packages these files will be
-auto generated.
+The update of existing stacks and packages only effect catkin-ized
+packages.  The existing dry packages stay as-is.  Rosdep will be
+able to distinguish between wet and dry and return the appropriate
+system dependencies.
+
+For backward compatibility with dry packages catkin will generate a
+``manifest.xml`` which provides information necessary for
+``rosbuild`` to work (namely exporting compiler and linker flags).
 
 Future enhancements
 -------------------
@@ -568,6 +606,8 @@ References
    (http://www.debian.org/doc/debian-policy/ch-relationships.html)
 .. [5] Advances RPM Packaging (Fedora Documentation)
    (http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-advanced-packaging.html)
+.. [6] Comparison between YAML and XML for manifests
+   (https://github.com/ros/catkin/issues/128)
 
 Copyright
 =========
