@@ -26,7 +26,7 @@ class Writer(html4css1.Writer):
         os.path.join(os.getcwd(), 'dummy'),
         os.path.join(os.path.dirname(__file__), default_stylesheet))
 
-    default_template = 'template.txt'
+    default_template = 'template.rst'
 
     default_template_path = utils.relative_path(
         os.path.join(os.getcwd(), 'dummy'),

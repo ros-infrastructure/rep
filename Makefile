@@ -1,40 +1,30 @@
-# Rules to only make the required HTML versions, not all of them,
-# without the user having to keep track of which.
-#
-# Not really important, but convenient.
+# targets to generate an index, HTML files and upload them to the server
 
 REP2HTML=rep2html.py
 
 PYTHON=python
 
-.SUFFIXES: .txt .html
+.SUFFIXES: .rst .html
 
-.txt.html:
+.rst.html:
 	@$(PYTHON) $(REP2HTML) $<
 
-REPS=$(filter-out rep-0000.txt,$(wildcard rep-????.txt))
+REPS=$(filter-out rep-0000.rst,$(wildcard rep-????.rst))
 
-TARGETS=$(REPS:.txt=.html) rep-0000.html
+SUBDIRS=$(wildcard rep-????)
 
-all: rep-0000.txt $(TARGETS)
+TARGETS=$(REPS:.rst=.html) rep-0000.html
 
-$(TARGETS) rep-0000.html1: rep2html.py
+all: rep-0000.rst $(TARGETS)
 
-rep-0000.txt: $(REPS)
+$(TARGETS): rep2html.py
+
+rep-0000.rst: $(REPS)
 	$(PYTHON) genrepindex.py .
-
-install:
-	echo "Installing is not necessary anymore. It will be done in post-commit."
 
 clean:
 	-rm *.html
-	-rm rep-0000.txt
-
-update:
-	svn update
-
-propcheck:
-	$(PYTHON) propcheck.py
+	-rm rep-0000.rst
 
 upload: all
-	rsync *.txt *.html *.jpg *.png root@wgs32.willowgarage.com:/var/www/www.ros.org/html/reps
+	rsync -r *.html rep.css style.css rep-0000.rst $(SUBDIRS) root@wgs32.willowgarage.com:/var/www/www.ros.org/html/reps/new

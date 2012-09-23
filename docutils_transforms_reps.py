@@ -32,7 +32,7 @@ class Headers(Transform):
     default_priority = 360
 
     rep_url = 'rep-%04d'
-    rep_svn_url = 'http://code.ros.org/svn/rep/trunk/rep-%04d.txt'
+    rep_git_url = 'https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst'
     rcs_keyword_substitutions = (
           (re.compile(r'\$' r'RCSfile: (.+),v \$$', re.IGNORECASE), r'\1'),
           (re.compile(r'\$[a-zA-Z]+: (.+) \$$'), r'\1'),)
@@ -54,10 +54,10 @@ class Headers(Transform):
                 value = field[1].astext()
                 try:
                     rep = int(value)
-                    cvs_url = self.rep_svn_url % rep
+                    repo_url = self.rep_git_url % rep
                 except ValueError:
                     rep = value
-                    cvs_url = None
+                    repo_url = None
                     msg = self.document.reporter.warning(
                         '"REP" header must contain an integer; "%s" is an '
                         'invalid value.' % rep, base_node=field)
@@ -96,9 +96,9 @@ class Headers(Transform):
                 date = time.strftime(
                       '%d-%b-%Y',
                       time.localtime(os.stat(self.document['source'])[8]))
-                if cvs_url:
+                if repo_url:
                     body += nodes.paragraph(
-                        '', '', nodes.reference('', date, refuri=cvs_url))
+                        '', '', nodes.reference('', date, refuri=repo_url))
             else:
                 # empty
                 continue
@@ -124,9 +124,9 @@ class Headers(Transform):
                 para[:] = newbody[:-1] # drop trailing space
             elif name == 'last-modified':
                 utils.clean_rcs_keywords(para, self.rcs_keyword_substitutions)
-                if cvs_url:
+                if repo_url:
                     date = para.astext()
-                    para[:] = [nodes.reference('', date, refuri=cvs_url)]
+                    para[:] = [nodes.reference('', date, refuri=repo_url)]
             elif name == 'content-type':
                 rep_type = para.astext()
                 uri = self.document.settings.rep_base_url + self.rep_url % 12

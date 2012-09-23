@@ -20,7 +20,7 @@ to templates.  DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
 <td class="textlinks" align="left">
 [<b><a href="%(roshome)s/">ROS Home</a></b>]
 [<b><a href="%(repindex)s/">REP Index</a></b>]
-[<b><a href="%(rephome)s/rep-%(repnum)s.txt">REP Source</a></b>]
+[<b><a href="%(rephome)s/rep-%(repnum)s.rst">REP Source</a></b>]
 </td></tr></table>
 <div class="document">
 %(body)s

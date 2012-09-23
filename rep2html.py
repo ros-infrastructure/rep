@@ -17,7 +17,7 @@ Options:
 
 -i, --install
     After generating the HTML, install it and the plaintext source file
-    (.txt) on python.org.  In that case the user's name is used in the scp
+    (.rst) on python.org.  In that case the user's name is used in the scp
     and ssh commands, unless "-u username" is given (in which case, it is
     used instead).  Without -i, -u is ignored.
 
@@ -31,7 +31,7 @@ Options:
 -h, --help
     Print this help message and exit.
 
-The optional arguments ``reps`` are either rep numbers or .txt files.
+The optional arguments ``reps`` are either rep numbers or .rst files.
 """
 
 import sys
@@ -49,7 +49,7 @@ REQUIRES = {'python': '2.2',
 PROGRAM = sys.argv[0]
 RFCURL = 'http://www.faqs.org/rfcs/rfc%d.html'
 REPURL = 'rep-%04d.html'
-REPSVNURL = ('http://code.ros.org/svn/rep/trunk/rep-%04d.txt')
+REPGITURL = ('https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst')
 REPDIRRUL = 'http://www.ros.org/reps/'
 
 HOST = "wgs32.willowgarage.com"                    # host for update
@@ -67,7 +67,7 @@ to templates.  DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
 DTD = ('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"\n'
        '                      "http://www.w3.org/TR/REC-html40/loose.dtd">')
 
-fixpat = re.compile("((https?|ftp):[-_a-zA-Z0-9/.+~:?#$=&,]+)|(rep-\d+(.txt)?)|"
+fixpat = re.compile("((https?|ftp):[-_a-zA-Z0-9/.+~:?#$=&,]+)|(rep-\d+(.rst)?)|"
                     "(RFC[- ]?(?P<rfcnum>\d+))|"
                     "(REP\s+(?P<repnum>\d+))|"
                     ".")
@@ -211,11 +211,11 @@ def fixfile(inpath, input_lines, outfile):
             '<a href="../" title="ROS Home Page">ROS</a></td>\n'
             '<td class="textlinks" align="left">\n'
             '[<b><a href="../">ROS Home</a></b>]')
-        if basename <> 'rep-0000.txt':
+        if basename <> 'rep-0000.rst':
             print >> outfile, '[<b><a href=".">REP Index</a></b>]'
         if rep:
             try:
-                print >> outfile, ('[<b><a href="rep-%04d.txt">REP Source</a>'
+                print >> outfile, ('[<b><a href="rep-%04d.rst">REP Source</a>'
                                    '</b>]' % int(rep))
             except ValueError, error:
                 print >> sys.stderr, ('ValueError (invalid REP number): %s'
@@ -258,7 +258,7 @@ def fixfile(inpath, input_lines, outfile):
             date = v or time.strftime('%d-%b-%Y',
                                       time.localtime(os.stat(inpath)[8]))
             try:
-                url = REPSVNURL % int(rep)
+                url = REPGITURL % int(rep)
                 v = '<a href="%s">%s</a> ' % (url, cgi.escape(date))
             except ValueError, error:
                 v = date
@@ -289,7 +289,7 @@ def fixfile(inpath, input_lines, outfile):
             continue
         else:
             # REP 0 has some special treatment
-            if basename == 'rep-0000.txt':
+            if basename == 'rep-0000.rst':
                 parts = line.split()
                 if len(parts) > 1 and re.match(r'\s*\d{1,4}', parts[1]):
                     # This is a REP summary line, which we need to hyperlink
@@ -377,11 +377,11 @@ def get_input_lines(inpath):
     return lines
 
 def find_rep(rep_str):
-    """Find the .txt file indicated by a cmd line argument"""
+    """Find the .rst file indicated by a cmd line argument"""
     if os.path.exists(rep_str):
         return rep_str
     num = int(rep_str)
-    return "rep-%04d.txt" % num
+    return "rep-%04d.rst" % num
 
 def make_html(inpath, verbose=0):
     input_lines = get_input_lines(inpath)
@@ -410,7 +410,7 @@ def make_html(inpath, verbose=0):
     os.chmod(outfile.name, 0664)
     return outpath
 
-def push_rep(htmlfiles, txtfiles, username, verbose, local=0):
+def push_rep(htmlfiles, rstfiles, username, verbose, local=0):
     quiet = ""
     if local:
         if verbose:
@@ -427,7 +427,7 @@ def push_rep(htmlfiles, txtfiles, username, verbose, local=0):
         copy_cmd = "scp"
         chmod_cmd = "ssh %s%s chmod" % (username, HOST)
     files = htmlfiles[:]
-    files.extend(txtfiles)
+    files.extend(rstfiles)
     files.append("style.css")
     files.append("rep.css")
     filelist = SPACE.join(files)
@@ -478,7 +478,7 @@ def rep_type_error(inpath, rep_type):
 def browse_file(rep):
     import webbrowser
     file = find_rep(rep)
-    if file.endswith(".txt"):
+    if file.endswith(".rst"):
         file = file[:-3] + "html"
     file = os.path.abspath(file)
     url = "file:" + file
@@ -487,7 +487,7 @@ def browse_file(rep):
 def browse_remote(rep):
     import webbrowser
     file = find_rep(rep)
-    if file.endswith(".txt"):
+    if file.endswith(".rst"):
         file = file[:-3] + "html"
     url = REPDIRRUL + file
     webbrowser.open(url)
@@ -528,11 +528,11 @@ def main(argv=None):
             browse = 1
 
     if args:
-        reptxt = []
+        reprst = []
         html = []
         for rep in args:
             file = find_rep(rep)
-            reptxt.append(file)
+            reprst.append(file)
             newfile = make_html(file, verbose=verbose)
             if newfile:
                 html.append(newfile)
@@ -540,12 +540,12 @@ def main(argv=None):
                     browse_file(rep)
     else:
         # do them all
-        reptxt = []
+        reprst = []
         html = []
-        files = glob.glob("rep-*.txt")
+        files = glob.glob("rep-*.rst")
         files.sort()
         for file in files:
-            reptxt.append(file)
+            reprst.append(file)
             newfile = make_html(file, verbose=verbose)
             if newfile:
                 html.append(newfile)
@@ -553,7 +553,7 @@ def main(argv=None):
             browse_file("0")
 
     if update:
-        push_rep(html, reptxt, username, verbose, local=local)
+        push_rep(html, reprst, username, verbose, local=local)
         if browse:
             if args:
                 for rep in args:

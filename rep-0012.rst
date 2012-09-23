@@ -61,7 +61,7 @@ client libraries or standard libraries.  When in doubt, read REP 1 for details.
 Once you've decided which type of REP yours is going to be, follow the
 directions below.
 
-- Make a copy of this file (``.txt`` file, **not** HTML!) and perform
+- Make a copy of this file (``.rst`` file, **not** HTML!) and perform
   the following edits.
 
 - Replace the "REP: 9" header with "REP: XXX" since you don't yet have

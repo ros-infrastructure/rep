@@ -21,14 +21,14 @@ Created: 13-Jul-2000
 intro = u"""
     The REP contains the index of all ROS Enhancement Proposals,
     known as REPs.  REP numbers are assigned by the REP Editor, and
-    once assigned are never changed.  The SVN history[1] of the REP
+    once assigned are never changed.  The GIT history[1] of the REP
     texts represent their historical record.
 
 """
 
 references = u"""
     [1] View REP history online
-        http://code.ros.org/svn/rep/trunk/
+        https://github.com/ros-infrastructure/rep
 """
 
 footer = u"""

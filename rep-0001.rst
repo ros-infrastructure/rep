@@ -123,7 +123,7 @@ for Now, TBD) can be consulted during the approval phase, and is the
 final arbiter of the draft's REP-ability.
 
 As updates are necessary, the REP author can check in new versions if
-they have SVN commit permissions, or can email new REP versions to
+they have GIT commit permissions, or can email new REP versions to
 the REP editor for committing.
 
 Standards Track REPs consist of two parts, a design document and a
@@ -178,7 +178,7 @@ an API can replace version 1.
 
 The possible paths of the status of REPs are as follows:
 
-.. image:: rep-0001-1.png
+.. image:: rep-0001/rep-0001-1.png
 
 Some Informational and Process REPs may also have a status of "Active"
 if they are never meant to be completed.  E.g. REP 1 (this REP).
@@ -359,7 +359,7 @@ When in doubt about where to send your changes, please check first
 with the REP author and/or REP editor.
 
 REP authors who are also ROS committers can update the
-REPs themselves by using "svn commit" to commit their changes.
+REPs themselves by using "git commit/push" to commit their changes.
 
 
 Transferring REP Ownership
@@ -412,17 +412,17 @@ Once the REP is ready for the repository, the REP editor will:
 * List the REP in REP 0 (in two places: the categorized list, and the
   numeric list).
 
-* Add the REP to SVN.  
+* Add the REP to GIT.
 
   The command to check out a read-only copy of the repository is::
 
-      svn checkout https://code.ros.org/svn/rep/trunk rep
+      git clone https://github.com/ros-infrastructure/rep.git
 
 * Send email back to the REP author with next steps (post to
   ros-users).
 
 Updates to existing REPs also come in to ros-users@code.ros.org.  Many
-REP authors are not SVN committers yet, so we do the commits for them.
+REP authors are not GIT committers yet, so we do the commits for them.
 
 Many REPs are written and maintained by developers with write access
 to the ROS codebase.  The REP editors monitor the rep-commits list for
@@ -443,10 +443,10 @@ Resources:
 References and Footnotes
 ========================
 
-.. [1] This historical record is available by the normal SVN commands
+.. [1] This historical record is available by the normal GIT commands
    for retrieving older revisions.  For those without direct access to
-   the SVN tree, you can browse the current and past REP revisions here:
-   https://code.ros.org/gf/project/rep/scmsvn/?action=browse&path=/trunk/
+   the GIT tree, you can browse the current and past REP revisions here:
+   https://github.com/ros-infrastructure/rep/commits/master
 
 .. [2] REP 12, Sample reStructuredText REP Template
    (http://ros.org/reps/rep-0012.html)

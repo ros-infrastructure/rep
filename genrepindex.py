@@ -38,7 +38,7 @@ def main(argv):
             abs_file_path = os.path.join(path, file_path)
             if not os.path.isfile(abs_file_path):
                 continue
-            if file_path.startswith("rep-") and file_path.endswith(".txt") and not file_path == 'rep-0000.txt':
+            if file_path.startswith("rep-") and file_path.endswith(".rst") and not file_path == 'rep-0000.rst':
                 with codecs.open(abs_file_path, 'r', encoding='UTF-8') as rep_file:
                     try:
                         rep = REP(rep_file)
@@ -58,7 +58,7 @@ def main(argv):
     else:
         raise ValueError("argument must be a directory or file path")
 
-    with codecs.open('rep-0000.txt', 'w', encoding='UTF-8') as rep0_file:
+    with codecs.open('rep-0000.rst', 'w', encoding='UTF-8') as rep0_file:
         write_rep0(reps, rep0_file)
 
 if __name__ == "__main__":
