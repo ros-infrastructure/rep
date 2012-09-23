@@ -5,7 +5,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 12-Sep-2012
-Post-History: 21-Sep-2012
+Post-History: 22-Sep-2012
 
 Table of Contents
 =================
@@ -33,12 +33,13 @@ packages which use the new buildsystem ``catkin``.  The filename is
 Motivation
 ==========
 
-With the step towards packaging packages the information contained in
-the both files ``stack.xml`` and ``package.xml`` are being merged.
+The decision to remove the concept of stacks and therefore package
+packages [8]_ suggests that the information contained in the both
+files ``stack.xml`` and ``manifest.xml`` should be merged.
 
 The file contains different kind of information:
 
- * core data (i.e. the name)
+ * descriptive data (i.e. a description, maintainer)
  * dependencies to other packages and system dependencies
  * meta-information (i.e. the author and website)
  * packaging information (i.e. the version)
@@ -50,7 +51,7 @@ Rationale
 A new filename replacing the existing ones
 ------------------------------------------
 
-Instead of modifying the semantic and content of the old files a new
+Instead of modifying the semantics and content of the old files a new
 filename is chosen to make it possible to distinguish old and new
 packages without parsing the content of the xml file.
 
@@ -68,10 +69,12 @@ Catkin-only - no rosbuild information inside
 --------------------------------------------
 
 The file only specifies information needed for a ROS ecosystem which
-is entirely based on ``catkin``.  Any additional information
-necessary for backward compatibility with ``rosbuild`` is kept
-separate (i.e. in the legacy ``manifest.xml`` files).  This enable to
-easily remove the legacy files in the future.
+is entirely based on ``catkin``.  Any additional information necessary
+for backward compatibility with ``rosbuild`` is kept separate (i.e. in
+the legacy ``manifest.xml`` files).  This enable to easily remove the
+legacy files in the future.  Legacy files required for rosbuild
+interaction are fully generated from the new ``package.xml`` and the
+``CMakeLists.txt``, rather than manually maintained.
 
 Store normalized data
 ---------------------
@@ -116,7 +119,8 @@ Attributes
   ``format="NUMBER"`` *(optional)*
   Specifying the version of the ``package.xml`` format being used.
   If it is not set the default format ``1`` is assumed.  This will be
-  used to detect future specification changes.
+  used to detect future specification changes, and thus allow to have
+  one current and several deprecated formats at the same time.
 
 Required Tags
 -------------
@@ -152,7 +156,7 @@ Dependencies
 ''''''''''''
 
 The dependencies and relations to other packages and system packages
-have been discussed in [8}_ and are described with:
+have been discussed in [8]_ and are described with:
 
  * `\<build_depend\> (multiple)`_
  * `\<buildtool_depend\> (multiple)`_
@@ -164,11 +168,15 @@ have been discussed in [8}_ and are described with:
 Various
 '''''''
 
-Since packages need to embed additional meta data for various reasons
-(message generators, plugin discovery, etc.) all of these *dynamic*
-information are stored under a single tag:
+There is a need to store further meta-data in the manifest regarding
+various other tools that work with packages (message generators,
+plugin discovery, etc.).  All of this *dynamic* information is stored
+in tags under a single tag:
 
  * `\<export\>`_
+
+Tool providers are responsible for defining the tag structure their
+tool requires.
 
 Example
 -------
@@ -265,7 +273,8 @@ XML tags and multiple whitespaces might be stripped.
 <maintainer> (multiple, but at least one)
 -----------------------------------------
 
-The name of the person maintaining the package. All packages require a maintainer. For orphaned packages see below.
+The name of the person maintaining the package.  All packages require
+a maintainer.  For orphaned packages see below.
 
 Attributes
 ''''''''''
@@ -273,8 +282,11 @@ Attributes
  ``email="name@domain.tld"`` *(required)*
   Email address of the maintainer.
 
-An orphaned package is one with no current maintainer. Orphaned packages should have their maintainer set to ROS Community <ros-release@code.ros.org>
-These packages are considered maintained by the ROS Community as a whole until a volunteer takes over maintenance.
+An orphaned package is one with no current maintainer.  Orphaned
+packages should have their maintainer set to
+``ROS Community <ros-release@code.ros.org>``.  These packages are
+considered maintained by the ROS Community as a whole until a
+volunteer takes over maintenance.
 
 Example
 -------
@@ -324,7 +336,8 @@ Attributes
 <author> (multiple)
 -------------------
 
-The name of the person who is an author of the package.
+The name of a person who is an author of the package, as
+acknowledgement of their work and for questions.
 
 Attributes
 ''''''''''
