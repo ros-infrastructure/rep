@@ -1,7 +1,5 @@
 REP: 119
 Title: Specification for TurtleBot Compatible Platforms
-Version: $Revision$
-Last-Modified: $Date$
 Author: Melonee Wise and Tully Foote
 Status: Draft
 Type: Standards Track

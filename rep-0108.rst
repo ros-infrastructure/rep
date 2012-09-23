@@ -1,7 +1,5 @@
 REP: 108
 Title: ROS Diamondback Variants
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
 Status: Active
 Type: Informational

@@ -1,7 +1,5 @@
 REP: 122
 Title: Filesystem Hierarchy Standard layout changes for ROS
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley, Troy Straszheim, Morten Kjaergaard, Ethan Rublee, Tully Foote, Brian Gerkey
 Status: Draft
 Type: Standards Track

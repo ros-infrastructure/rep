@@ -1,7 +1,5 @@
 REP: 117
 Title: Informational Distance Measurements
-Version: $Revision$
-Last-Modified: $Date$
 Author: Chad Rockey <chadrockey@gmail.com>
 Status: Accepted
 Type: Informational

@@ -1,7 +1,5 @@
 REP: 118
 Title: Depth Images
-Version: $Revision$
-Last-Modified: $Date$
 Author: Patrick Mihelich <mihelich@willowgarage.com>
 Status: Final
 Type: Standards Track

@@ -1,7 +1,5 @@
 REP: 12
 Title: Sample reStructuredText REP Template
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley
 Status: Active
 Type: Process

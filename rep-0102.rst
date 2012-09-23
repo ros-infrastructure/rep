@@ -1,7 +1,5 @@
 REP: 102
 Title: ROS Install Target
-Version: $Revision$
-Last-Modified: $Date$
 Author: Brian Gerkey <gerkey@willowgarage.com>
 Status: Withdrawn
 Type: Standards Track

@@ -1,7 +1,5 @@
 REP: 103
 Title: Standard Units of Measure and Coordinate Conventions
-Version: $Revision$
-Last-Modified: $Date$
 Author: Tully Foote
 Status: Active
 Type: Informational

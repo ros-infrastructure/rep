@@ -1,7 +1,5 @@
 REP: 125
 Title: rosdep 2
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley
 Status: Final
 Type: Standards Track

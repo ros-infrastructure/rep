@@ -1,7 +1,5 @@
 REP: 113
 Title: ROS Electric Variants
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
 Status: Active
 Type: Informational

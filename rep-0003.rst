@@ -1,7 +1,5 @@
 REP: 3
 Title: Target Platforms
-Version: $Revision$
-Last-Modified: $Date$
 Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>
 Status: Active
 Type: Informational

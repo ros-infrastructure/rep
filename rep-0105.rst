@@ -1,7 +1,5 @@
 REP: 105
 Title: Coordinate Frames for Mobile Platforms
-Version: $Revision$
-Last-Modified: $Date$
 Author: Wim Meeussen
 Status: Active
 Type: Informational

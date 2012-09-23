@@ -1,13 +1,11 @@
 REP: 127
 Title: Specification of package manifest format
-Version: $Revision: 180 $
-Last-Modified: $Date: 2012-09-12 16:00:00 -0800 (We, 12 Sep 2012) $
 Author: Dirk Thomas
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 12-Sep-2012
-Post-History: 19-Sep-2012
+Post-History: 21-Sep-2012
 
 Table of Contents
 =================
@@ -432,7 +430,7 @@ Attributes
 
 
 <replace> (multiple)
----------------------
+--------------------
 
 Declares a ROS dep key that this package replaces.  This maps to
 ``Replaces`` for ``dpkg`` and ``Obsoletes`` for ``rpms``.

@@ -1,7 +1,5 @@
 REP: 126
 Title: New root element "setup-file" for rosinstall files
-Version: $Revision$
-Last-Modified: $Date$
 Author: Tully Foote, Thibault Kruse
 Status: Draft
 Type: Standards Track

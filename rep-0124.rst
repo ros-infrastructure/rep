@@ -1,7 +1,5 @@
 REP: 124
 Title: Changes to roslaunch and rosrun for REP 122 and catkin build system
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley, Brian Gerkey
 Status: Draft
 Type: Standards Track

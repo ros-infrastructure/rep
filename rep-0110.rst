@@ -1,7 +1,5 @@
 REP: 110
 Title: SCM-like rosinstall command structure
-Version: $Revision$
-Last-Modified: $Date$
 Author: Thibault Kruse <kruset@in.tum.de>
 Status: Draft
 Type: Informational

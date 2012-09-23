@@ -1,7 +1,5 @@
 REP: 106
 Title: Polled topics
-Version: $Revision$
-Last-Modified: $Date$
 Author: Dirk Thomas
 Status: Accepted
 Type: Standards Track

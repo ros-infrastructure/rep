@@ -1,7 +1,5 @@
 REP: 10
 Title: Voting Guidelines
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley <kwc@willowgarage.com>
 Status: Active
 Type: Process

@@ -1,7 +1,5 @@
 REP: 111
 Title: Multiple Package Manager Support for Rosdep
-Version: $Revision$
-Last-Modified: $Date$
 Author: Tully Foote
 Status: Final
 Type: Standards Track

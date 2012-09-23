@@ -1,7 +1,5 @@
 REP: 112
 Title: Source Package Manager for Rosdep
-Version: $Revision$
-Last-Modified: $Date$
 Author: Tully Foote
 Status: Final
 Type: Standards Track

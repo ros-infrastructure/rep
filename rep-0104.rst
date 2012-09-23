@@ -1,7 +1,5 @@
 REP: 104
 Title: CameraInfo updates for Diamondback
-Version: $Revision$
-Last-Modified: $Date$
 Author: Patrick Mihelich <mihelich@willowgarage.com>
 Status: Final
 Type: Standards Track

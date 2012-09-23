@@ -1,7 +1,5 @@
 REP: 9
 Title: ABI Compatibility
-Version: $Revision$
-Last-Modified: $Date$
 Author: Josh Faust
 Status: Active
 Type: Informational

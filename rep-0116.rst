@@ -1,7 +1,5 @@
 REP: 116
 Title: Extend pluginlib
-Version: $Revision$
-Last-Modified: $Date$
 Author: Dirk Thomas
 Status: Final
 Type: Standards Track

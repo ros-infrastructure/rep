@@ -1,7 +1,5 @@
 REP: 2
 Title: Scope of REP Process, REP Stacks
-Version: $Revision$
-Last-Modified: $Date$
 Author: Ken Conley
 Status: Active
 Type: Process
