@@ -27,4 +27,4 @@ clean:
 	-rm rep-0000.rst
 
 upload: all
-	rsync -r *.html rep.css style.css rep-0000.rst $(SUBDIRS) root@wgs32.willowgarage.com:/var/www/www.ros.org/html/reps/new
+	rsync -r *.html rep.css style.css rep-0000.rst $(SUBDIRS) root@wgs32.willowgarage.com:/var/www/www.ros.org/html/reps
