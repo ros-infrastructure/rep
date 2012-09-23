@@ -144,8 +144,8 @@ class REP(object):
     # The various RFC 822 headers that are supported.
     # The second item in the nested tuples represents if the header is
     # required or not.
-    headers = (('REP', True), ('Title', True), ('Version', True),
-               ('Last-Modified', True), ('Author', True),
+    headers = (('REP', True), ('Title', True), ('Version', False),
+               ('Last-Modified', False), ('Author', True),
                ('Discussions-To', False), ('Status', True), ('Type', True),
                ('Content-Type', False), ('Requires', False),
                ('Created', True), ('ROS-Version', False),
