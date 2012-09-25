@@ -1,7 +1,5 @@
 REP: 122
 Title: Filesystem Hierarchy Standard layout changes for ROS
-Version: $Revision: 179 $
-Last-Modified: $Date: 2012-02-20 12:02:31 -0800 (Mon, 20 Feb 2012) $
 Author: Ken Conley, Troy Straszheim, Morten Kjaergaard, Ethan Rublee, Tully Foote, Brian Gerkey, Jack O'Quin
 Status: Draft
 Type: Standards Track
@@ -154,12 +152,12 @@ setting is::
 lib/<ros-package-name>/
 -----------------------
 
-All package-relative executables, scripts and libraries are installed
-in ``share/<ros-package-name>/`` subdirectory.
+All package-relative executables and scripts are installed in
+``lib/<ros-package-name>/`` subdirectory.
 
 
 share/
--------
+------
 
 All architecture-independent package-relative assets are explicitly
 installed to ``share/<ros-package-name>``.  These include:
@@ -175,8 +173,8 @@ stacks/
 
 This is the installation location for rosmake-based stacks.  It is
 included in the ``ROS_PACKAGE_PATH``, but has lower precedence than
-stacks following the new REP 122 layout.  Converted packages do not
-use those files.
+packages following the new REP 122 layout.  Converted packages do not
+use this folder.
 
 
 Environment variables
@@ -382,6 +380,24 @@ incorporated in the ROS Groovy release.
 This section notes differences between the Fuerte implementation and
 the current specification.
 
+buildspace
+''''''''''
+
+In Fuerte the FHS layout was only applied during the installation
+step.  The build folder was not a supported environment to run the
+compiled binaries and generated code.  While some simple applications
+worked features like i.e. discovering plugins were not supported in
+the build folder.  Therefore the ``make install`` step was always
+necessary before developers could run their modified code.  This made
+it less convenient and increased the round-trip time during
+development substantially.
+
+In Groovy the build folder contains a subdirectory ``buildspace``
+which resembles the same structure than an installation.  The content
+of that folder also follows FHS conventions.  It enables to run any
+application from buildspace as well as if it would be installed.
+
+
 catkin tag in manifest
 ''''''''''''''''''''''
 
@@ -403,14 +419,6 @@ package-relative resources.  That included package-relative binaries,
 which is contrary to normal FHS standards as ``share/`` is intended
 for "read-only architecture independent data files" [8]_.
 
-In ROS Fuerte, ``ROS_PACKAGE_PATH`` was defined as:
-
-    ROS_PACKAGE_PATH=/opt/ros/fuerte/share:/opt/ros/<distro>/stacks
-
-``ROS_ROOT`` was defined to be::
-
-    ROS_ROOT=/opt/ros/fuerte/share/ros
-
 All package-relative assets were explicitly installed to
 ``share/<ros-package-name>``.  Those included:
 
@@ -421,16 +429,6 @@ All package-relative assets were explicitly installed to
 
 Similarly, stack manifests (``stack.xml``) were explicitly installed
 in ``share/<ros-stack-name>``.
-
-
-Stack version may could be in stack.yaml
-----------------------------------------
-
-Fuerte Catkin defined a ``stack.yaml`` file for release packaging that
-contained a version number.  In order to not violate DRY (Don't Repeat
-Yourself) principles, tools like ``rosversion`` were capable of
-locating the version number defined in this file.  The version number
-in the ``stack.yaml`` had a higher precedence.
 
 
 References
