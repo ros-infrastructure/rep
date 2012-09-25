@@ -39,8 +39,7 @@ This specification defines changes to the filesystem layout,
 associated environment variable updates, and necessary modifications
 to ROS itself.
 
-For the most part, this specification avoids specifics of the catkin
-build system [*add reference*].
+This document mostly avoids details of the catkin build system [10]_.
 
 
 Filesystem layout
@@ -452,6 +451,8 @@ References
    (http://www.pathname.com/fhs/pub/fhs-2.3.pdf)
 .. [9] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
    (http://ros.org/reps/rep-0123.html) 
+.. [10] Catkin build system documentation
+   (http://ros.org/wiki/catkin)
 
 Copyright
 =========
