@@ -1,6 +1,6 @@
 REP: 122
 Title: Filesystem Hierarchy Standard layout changes for ROS
-Author: Ken Conley, Troy Straszheim, Morten Kjaergaard, Ethan Rublee, Tully Foote, Brian Gerkey, Jack O'Quin
+Author: Ken Conley, Troy Straszheim, Morten Kjaergaard, Ethan Rublee, Tully Foote, Brian Gerkey, Jack O'Quin, Dirk Thomas
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
