@@ -407,7 +407,7 @@ performance optimization for tools like ``rosmake`` and the Python
 recommended.
 
 Catkin packages in Groovy replace the traditional ``manifest.xml``
-with a newly-defined ``package.xml``.
+with a newly-defined ``package.xml``, defined in REP 127 [11]_.
 
 
 share/
@@ -453,6 +453,8 @@ References
    (http://ros.org/reps/rep-0123.html) 
 .. [10] Catkin build system documentation
    (http://ros.org/wiki/catkin)
+.. [11] REP 127: Specification of package manifest format
+   (http://ros.org/reps/rep-0127.html) 
 
 Copyright
 =========
