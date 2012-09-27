@@ -418,16 +418,16 @@ package-relative resources.  That included package-relative binaries,
 which is contrary to normal FHS standards as ``share/`` is intended
 for "read-only architecture independent data files" [8]_.
 
-All package-relative assets were explicitly installed to
-``share/<ros-package-name>``.  Those included:
+As documented above, some archtecture-independent files (like launch
+and parameter files) are still installed to
+``share/<ros-package-name>/``.  But, some that landed there in Fuerte
+are now omitted or stored somewhere else:
 
-- manifest files (``manifest.xml``)
-- launch files
-- package-relative-executables (both binary and script)
-- bag files used in a package-relative manner
+- ``manifest.xml`` is no longer used
+- ``stack.xml`` is no longer used
+- package-relative-executables (both binary and script) moved to
+  ``lib/<ros-package-name>/`` instead.
 
-Similarly, stack manifests (``stack.xml``) were explicitly installed
-in ``share/<ros-stack-name>``.
 
 
 References
