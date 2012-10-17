@@ -83,7 +83,7 @@ directions below.
 - If there is a mailing list for discussion of your new feature, add a
   Discussions-To header right after the Author header.  You should not
   add a Discussions-To header if the mailing list to be used is either
-  ros-users@code.ros.org or ros-developers@code.ros.org, or if discussions
+  ros-users@code.ros.org, or if discussions
   should be sent to you directly.  Most Informational REPs don't have
   a Discussions-To header.
 
@@ -148,7 +148,7 @@ directions below.
 - Leave the Emacs stanza at the end of this file alone, including the
   formfeed character ("^L", or ``\f``).
 
-- Send your REP submission to the ROS developers at ros-developers@code.ros.org.
+- Send your REP submission to the ROS developers at ros-users@code.ros.org.
 
 
 ReStructuredText REP Formatting Requirements
