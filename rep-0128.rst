@@ -47,7 +47,7 @@ This is the recommended layout for development is as follows:
         /include
         /lib
         /share
-        .CATKIN             --Marking the folder as a development space (the file contains a semicolon separated list of Source space paths)
+        .catkin             --Marking the folder as a development space (the file contains a semicolon separated list of Source space paths)
         env.bash
         setup.bash
         setup.sh
@@ -58,7 +58,7 @@ This is the recommended layout for development is as follows:
         /include
         /lib
         /share
-        .CATKIN             --Marking the folder as an install space (the file is emtpy)
+        .catkin             --Marking the folder as an install space (the file is emtpy)
         env.bash
         setup.bash
         setup.sh
