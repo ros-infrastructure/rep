@@ -1,0 +1,197 @@
+REP: 128
+Title: Naming Conventions for Catkin Based Workspaces
+Author: Tully Foote
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 16-Oct-2012
+Post-History: 30-Aug-2002
+
+
+Abstract
+========
+
+This REP provides naming conventions for how to refer to paths on a
+computer in documentation and debugging.
+
+
+Rationale
+=========
+
+This REP has been written to make reading and writing documentation
+easier and more consistent and to remove ambiguities when
+communicating about the code layout of a specific installation.  
+
+Recommended Layout
+==================
+
+This is the recommended layout for development is as follows:
+
+::
+
+    /workspace_folder        --Workspace
+      /src                   --Source space
+        CMakeLists.txt       --This is symlinked to catkin/cmake/toplevel.cmake 
+        /package_1
+          /include
+          /src
+            CMakeLists.txt
+            package.xml
+        ...
+        /package_n
+          /include
+          /src
+            CMakeLists.txt
+            package.xml
+      /build                --Build space (this is where build system is invoked, not necessarily within workspace)
+      /devel                --Development space (targets go here, parameterizable, but defaults to peer of Build Space)
+        setup.bash
+        setup.sh
+        setup.py
+      /install              --Install space (this is where installed targets for test installations go, not necessarily within workspace)
+
+
+
+Elements of the Workspace
+=========================
+
+When talking about a workspace used in development there are several names 
+
+Workspace
+---------
+
+The workspace is the folder inside which you are going to be actively
+developing.  Keeping things in a folder with connected development
+helps keep seperation of development models.
+
+Source Space
+------------
+
+The source space is the folder is where catkin will be expected to
+look for packages when building.  This folder is easily identifed as
+it is where the toplevel.cmake is linked from the catkin project.
+
+Each catkin project desired to be compiled from source should be
+checked out into subdirectories inside this directory.
+
+Buildspace
+----------
+
+The buildspace is the folder in which cmake is invoked and generates
+artifacts such as the CMakeCache
+
+A typical invocation of cmake will look like this when following the recommended layout.  
+
+::
+
+    cmake ../src 
+
+Development Space
+-----------------
+
+The development space is where catkin generates the binaries and
+runtime libraries which are executable before installation.  This
+folder will be an approximation of FHS layout however only containing
+artifacts from the associated source space.
+
+After the build step, inside this folder is expected everything needed
+to run nodes in packages which have been built.
+
+Install Space
+-------------
+
+If ``make install`` is called this is the directory into which cmake
+will target all installations.  Again creating an FHS style directory
+structure with a setup.(ba)sh in the root. This can be set to any
+directory using the ``-DCMAKE_INSTALL_PREFIX=/any/directory`` as an
+option to cmake.  The cmake default is ``/usr/local``.
+
+System Install Space
+''''''''''''''''''''
+
+The system install space is a special category of the installation
+space which is expected to be a shared installation for all users on
+the system.  Usually this is installed from your package manager.  The
+default for this location is ``/opt/ros/ROSDISTRO`` where ROSDISTRO is
+the codename for the ROS distro being used.
+
+
+
+Overlays
+========
+
+In catkin style workspaces, overlaying of one workspace on top of
+another workspace is supported.  Each overlay can be built on top of
+another overlay, and any packages in a higher overlay will mask out
+packages in lower overlays.
+
+Note: When overlaying any package all packages which depend on that
+package must be overlayed if they are intended to be used.  This must
+be checked by the user creating the overlays.  If a core package is
+overlayed and changes how it works, any package which depends on it
+and relies on the old behavior (whether runtime, or link time) will
+crash.
+
+Catkin creates FHS [CITE FHS] style layouts in the devel and install
+spaces.  [cite above] These spaces can be included into another
+workspace using the CMAKE_PREFIX_PATH pointing to either the devel
+space or install space.  If it is an installed space make install must
+have been called, if a devel space, it must have been built with make.
+
+
+
+There are many ways to setup below are some examples. 
+
+Example Workspaces
+------------------
+
+For the following example the following workspaces will be configured:
+
+Workspace 1: ``~/workspace1``  
+With ``CMAKE_INSTALL_PREFIX=/opt/ros/groovy``
+
+Workspace 2: ``~/workspace2``
+With ``CMAKE_INSTALL_PREFIX=/tmp/test_packages CMAKE_PREFIX_PATH=/opt/ros/groovy``
+
+Workspace 3: ``~/workspace3``  
+With ``CMAKE_PREFIX_PATH=/tmp/test_packages``
+
+Workspace 4: ``~/workspace4``  
+With ``CMAKE_PREFIX_PATH=/opt/ros/groovy``
+
+Workspace 5: ``~/workspace5``  
+With ``CMAKE_PREFIX_PATH=~/workspace4/devel``
+
+
+Bottom Level Overlay
+--------------------
+
+
+
+
+Resources
+=========
+
+
+References
+==========
+
+.. [1] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
+   (http://ros.org/reps/rep-0001.html)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
