@@ -33,22 +33,36 @@ This is the recommended layout for development is as follows:
       /src                   --Source space
         CMakeLists.txt       --This is symlinked to catkin/cmake/toplevel.cmake 
         /package_1
-          /include
-          /src
-            CMakeLists.txt
-            package.xml
+          CMakeLists.txt
+          package.xml
         ...
         /package_n
-          /include
-          /src
-            CMakeLists.txt
-            package.xml
+          CMakeLists.txt
+          package.xml
       /build                --Build space (this is where build system is invoked, not necessarily within workspace)
+        CATKIN_IGNORE       --Marking the folder to be ignored when crawling for packages (necessary when source space is in the root of the workspace, the file is emtpy)
       /devel                --Development space (targets go here, parameterizable, but defaults to peer of Build Space)
+        /bin
+        /etc
+        /include
+        /lib
+        /share
+        .CATKIN             --Marking the folder as a development space (the file contains a semicolon separated list of Source space paths)
+        env.bash
         setup.bash
         setup.sh
-        setup.py
+        ...
       /install              --Install space (this is where installed targets for test installations go, not necessarily within workspace)
+        /bin
+        /etc
+        /include
+        /lib
+        /share
+        .CATKIN             --Marking the folder as an install space (the file is emtpy)
+        env.bash
+        setup.bash
+        setup.sh
+        ...
 
 
 
@@ -72,7 +86,8 @@ look for packages when building.  This folder is easily identifed as
 it is where the toplevel.cmake is linked from the catkin project.
 
 Each catkin project desired to be compiled from source should be
-checked out into subdirectories inside this directory.
+checked out into subdirectories inside this directory. Packages are
+found recursively so they do not have to be direct subfolders.
 
 Buildspace
 ----------
