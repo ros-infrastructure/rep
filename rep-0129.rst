@@ -170,7 +170,7 @@ discarded::
     uint32 DELETE=1
     Header header
     uint32 type          # type of update, one of ADD or DELETE
-    PointCloud2 points
+    sensor_msgs/PointCloud2 points
 
 
 map_msgs/ProjectedMap.msg
@@ -186,8 +186,8 @@ in the range of ``min_z`` to ``max_z``::
     float64 max_z
 
 
-map_msgs/ProjectionMapInfo.msg
-''''''''''''''''''''''''''''''
+map_msgs/ProjectedMapInfo.msg
+'''''''''''''''''''''''''''''
 
 This message contains all information to set a projection from a slice of a
 3D point-cloud map onto a 2D occupancy grid.
@@ -232,11 +232,11 @@ map_msgs/SetMapProjections.srv
 This service sets the different map projections::
 
     ---
-    map_msgs/ProjectionMapInfo[] projected_maps_info
+    map_msgs/ProjectedMapInfo[] projected_maps_info
 
 
-map_msg/GetMapROI
-'''''''''''''''''
+map_msg/GetMapROI.srv
+'''''''''''''''''''''
 
 This service retrieves a region of interest (ROI) from a 2D map.
 The ``x``, ``y`` values are the center of the rectangular region of
@@ -251,8 +251,8 @@ The values are given relatively to the map frame::
     nav_msgs/OccupancyGrid sub_map
     
     
-map_msg/GetPointMapROI
-''''''''''''''''''''''
+map_msg/GetPointMapROI.srv
+''''''''''''''''''''''''''
 
 This service retrieves a region of interest (ROI) from a 3D map.
 The ``x``, ``y``, ``z`` values are the center of the region.
