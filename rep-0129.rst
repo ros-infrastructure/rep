@@ -289,6 +289,7 @@ Parameters
 ``~odom_frame`` (string, default: "odom", profile: 2D, 3D)
     the name of the odom frame
 
+The default values are set according to REP 105 [#REP-105].
 For nodes supporting both 2D and 3D, one or more node-specific parameters
 shall allow to specify the mode or the topics to subscribe to.
 
@@ -302,7 +303,8 @@ SLAM nodes both subscribe to and publish on the tf topic, through the tf API.
 Required tf Transforms
 ''''''''''''''''''''''
 
-The following transformations shall be available to SLAM nodes.
+According to REP 105 [#REP-105], the following transformations shall be
+available to SLAM nodes.
 The nodes might not use all of them, for instance,
 ethzasl_mapping_ does not require base_frame.
 
@@ -317,7 +319,8 @@ base_frame -> odom_frame (profile: 2D, 3D)
 Provided tf Transforms
 ''''''''''''''''''''''
 
-The SLAM nodes must provide at least this transform.
+According to REP 105 [#REP-105], the SLAM nodes must provide at least 
+this transform.
 They are allowed to provide more, but they shall provide a setting
 to disable additional published transforms.
 
@@ -511,6 +514,8 @@ References
 .. _gmapping: http://www.ros.org/wiki/gmapping
 .. _hector_slam: http://www.ros.org/wiki/hector_slam
 .. _octomap_mapping: http://www.ros.org/wiki/octomap_mapping
+.. [#REP-105] REP 105, Coordinate Frames for Mobile Platforms
+   (http://www.ros.org/reps/rep-0105.html)
 
 
 Copyright
