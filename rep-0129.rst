@@ -12,7 +12,8 @@ Abstract
 ========
 
 This REP standardizes 2D and 3D mapping node API, to allow easy
-interoperability between different SLAM implementations.
+interoperability between different Simultaneous Localization and
+Mappping (SLAM) implementations.
 This document defines names and types for topics, services and parameters.
 Moreover, it partially defines the semantics of message content,
 for instance in the case of point clouds.
