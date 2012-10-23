@@ -94,13 +94,11 @@ The following profiles are defined:
     The point cloud must at least provide channels ``x``, ``y``, and ``z``.
 
 3DO
-    In 3D, the ability to send octree centers in addition to point maps.
+    In 3D, the ability to send volumetric occupancy maps in addition to point maps.
     The node shall provide a ``PointCloud2`` map, consisting of points
-    at the centers of obstacle cuboids, with the field ``size`` being the
-    length of its side.
-    We call point-cloud maps with this semantic the
-    *octree point-cloud format*.
-    
+    at the centers of obstacle cuboids (voxels), with one field ``size`` being the
+    length of each voxel.
+        
 P2D
     Progressive 2D map, the ability to update parts of the map without sending
     the whole map.
@@ -114,15 +112,15 @@ P3D
     or delete information to the target map.
 
 P3DO
-    Progressive octree map, the ability to update parts of the octree map
-    without sending the whole map.
+    Progressive occupancy  map, the ability to update parts of the 3D occupancy 
+    map without sending the whole map.
     The node shall send ``PointCloud2Update`` updates, that will either add
     or delete information to the target map.
 
 A 2D node shall implement at least the complete 2D profile.
 If so, the node is said to be "REP-129: 2D" compliant.
 A 3D node shall implement at least the complete 3D profile.
-A node implementing 3D and octree maps, including progressive updates,
+A node implementing 3D and occupancy maps, including progressive updates,
 is said to be "REP-129: 3D, P3D, 3DO, P3DO" compliant.
 
 
