@@ -469,9 +469,6 @@ Services
 Open Questions
 ==============
 
-* Map messages in 2D are currently in ``nav_msgs``, which is a bit strange. 
-  As 3D map messages are in ``map_msgs``, this is a bit inconsistent.
-  However, this simplest from a practical point of view is to live with this.
 * Should we standardize additional channels for point clouds like normals, etc.?
   As far as I know there is no specification in ROS for channels within
   PointCloud2, although the usage in PCL might have set a de-facto standard.
