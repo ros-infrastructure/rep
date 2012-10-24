@@ -472,6 +472,23 @@ Open Questions
 * Should we standardize additional channels for point clouds like normals, etc.?
   As far as I know there is no specification in ROS for channels within
   PointCloud2, although the usage in PCL might have set a de-facto standard.
+* It would be nice to have viewpoint information in the resulting map.
+  We could either have something like 'camera' of size 3 or a triplet 
+  'camera_x', 'camera_y', 'camera_z' that is the position of the camera
+  in the final map from which this point would have been observed
+  (after corrections).
+  During registration, points can hold a relative vector to the camera
+  position that can be transformed into an absolute position before sending
+  the cloud.
+  Or we can keep the relative vector if we prefer.
+  The question is whether we want to enforce this, as this might require some
+  additional processing time for a feature that is useful, but might not be
+  required for all applications.
+  My feeling is that the benefit outweighs the drawbacks, so I would be ok
+  enforcing it, or at least having a parameter for enforcing it.
+  If we have it, should ``map_dispatcher`` being able of providing a voxel map
+  out of a point-cloud map?
+  Should it be part of a ``voxel_map_dispatcher`` node?
 * For octree maps, should the free space information be sent as well?
 * For octree maps, do we want non-cubic voxel elements? (i.e. different
   dimensions on x,y,z).
@@ -479,8 +496,16 @@ Open Questions
   SLAM.
 * Do we want a service, in addition to the topics, to get projected maps?
 * Should we add services to only partially set the projections?
-* Should we add a profile for multi-sensors inputs?
-  
+* How do we plan to handle multiple robots? (multi-sensors inputs)?
+  I currently think that a good solution would be to use a name
+  like *local_map_N* for ``map_frame``, letting a third-party tool
+  to fuse different maps together and provide transformations between
+  a global world *map* to the different *local_map_N*.
+  This scheme could also be useful when a robot has to register its
+  position with respect to a pre-existing map.
+  The question is then whether this REP should specify the interface
+  of the mult-map fusion; I am in favor of doing so.
+
 
 Backwards Compatibility
 =======================
