@@ -378,15 +378,13 @@ Services
 3D Node API
 -----------
 
-Nodes providing 3D mapping have to provide a point-cloud map as output.
+Nodes providing 3D mapping on point clouds have to provide a point-cloud map as output.
 Point-cloud maps must provide at least channels ``x``, ``y``, ``z`` and are
 allowed to provide additional channels such as normals and colors as well.
 In the case of a SLAM algorithm based on point clouds, the clouds themselves,
 possibly after filtering, shall be returned.
-For algorithms working with octrees, one point shall be returned for every
-face of the cuboids pointing to the sensor.
-In addition, the center of the cuboids shall be returned, along with the size
-of their side, on the topic ``octree_map``.
+For algorithms working with occupancy maps, the centers of the occupied voxels shall be returned, along with the size
+of their side, on the topic ``occupancy_map``.
 
 
 Subscribed Topics
@@ -401,12 +399,12 @@ Published Topics
 
 ``point_map`` (sensor_msgs/PointCloud2, latched, profile: 3D)
     generated map in point-cloud format
-``octree_map`` (sensor_msgs/PointCloud2, latched, profile: 3DO)
-    generated octree map, in octree point-cloud format.
+``occupancy_map`` (sensor_msgs/PointCloud2, latched, profile: 3DO)
+    generated occupancy map, as point-cloud of the center voxels.
 ``point_map_update`` (map_msgs/PointCloud2Update, profile: P3D)
     updates of the point-cloud map
-``octree_map_update`` (map_msgs/PointCloud2Update, profile: P3DO)
-    updates of the octree map
+``occupancy_map_update`` (map_msgs/PointCloud2Update, profile: P3DO)
+    updates of the occupancy map
 
 If the node implements P3D or P3DO, it can provide map updates between
 full maps.
@@ -418,8 +416,8 @@ Services
 
 ``get_point_map`` (nav_msgs/GetPointMap, profile: 3D)
     Get the point-cloud map.
-``get_octree_map`` (nav_msgs/GetPointMap, profile: 3DO)
-    Get the octree map.
+``get_occupancy_map`` (nav_msgs/GetPointMap, profile: 3DO)
+    Get the occupancy map.
 
     
 2D map_dispatcher API
@@ -458,8 +456,8 @@ Services
 
 ``get_sub_point_map`` (map_msg/GetPointMapROI)
     Get part of the point-cloud map.
-``get_sub_octree_map`` (map_msg/GetPointMapROI)
-    Get part of the octree map, in octree point-cloud format.
+``get_sub_occupancy_map`` (map_msg/GetPointMapROI)
+    Get part of the 3D occupancy map, in occupancy point-cloud format.
 ``set_map_projections`` (map_msgs/SetMapProjections)
     Select the projections of the point-cloud map.
 
@@ -470,9 +468,6 @@ Open Questions
 * Should we standardize additional channels for point clouds like normals, etc.?
   As far as I know there is no specification in ROS for channels within
   PointCloud2, although the usage in PCL might have set a de-facto standard.
-* For octree maps, should the free space information be sent as well?
-* For octree maps, do we want non-cubic voxel elements? (i.e. different
-  dimensions on x,y,z).
 * Should we use mapping or SLAM terminology in this REP? Right now I am using
   SLAM.
 * Do we want a service, in addition to the topics, to get projected maps?
