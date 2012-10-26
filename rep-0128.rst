@@ -29,42 +29,40 @@ This is the recommended layout for development is as follows:
 
 ::
 
-    /workspace_folder        --Workspace
-      /src                   --Source space
-        CMakeLists.txt       --This is symlinked to catkin/cmake/toplevel.cmake 
-        /package_1
+    workspace_folder/        --WORKSPACE
+      src/                   --SOURCE SPACE
+        CMakeLists.txt/      --This is symlinked to catkin/cmake/toplevel.cmake 
+        package_1/
           CMakeLists.txt
           package.xml
         ...
-        /package_n
+        package_n/
           CMakeLists.txt
           package.xml
-      /build                --Build space (this is where build system is invoked, not necessarily within workspace)
-        CATKIN_IGNORE       --Marking the folder to be ignored when crawling for packages (necessary when source space is in the root of the workspace, the file is emtpy)
-      /devel                --Development space (targets go here, parameterizable, but defaults to peer of Build Space)
-        /bin
-        /etc
-        /include
-        /lib
-        /share
-        .catkin             --Marking the folder as a development space (the file contains a semicolon separated list of Source space paths)
+      build/                 --BUILD SPACE(this is where build system is invoked, not necessarily within workspace)
+        CATKIN_IGNORE        --Marking the folder to be ignored when crawling for packages (necessary when source space is in the root of the workspace, the file is emtpy)
+      devel/                 --DEVEL SPACE (targets go here, parameterizable, but defaults to peer of Build Space)
+        bin/
+        etc/
+        /include/
+        lib/
+        share/
+        .catkin              --Marking the folder as a development space (the file contains a semicolon separated list of Source space paths)
         env.bash
         setup.bash
         setup.sh
         ...
-      /install              --Install space (this is where installed targets for test installations go, not necessarily within workspace)
-        /bin
-        /etc
-        /include
-        /lib
-        /share
-        .catkin             --Marking the folder as an install space (the file is emtpy)
+      install/               --INSTALL SPACE (this is where installed targets for test installations go, not necessarily within workspace)
+        bin/
+        etc/
+        include/
+        lib/
+        share/
+        .catkin              --Marking the folder as an install space (the file is emtpy)
         env.bash
         setup.bash
         setup.sh
         ...
-
-
 
 Elements of the Workspace
 =========================
@@ -89,10 +87,10 @@ Each catkin project desired to be compiled from source should be
 checked out into subdirectories inside this directory. Packages are
 found recursively so they do not have to be direct subfolders.
 
-Buildspace
-----------
+Build Space
+-----------
 
-The buildspace is the folder in which cmake is invoked and generates
+The build space is the folder in which cmake is invoked and generates
 artifacts such as the CMakeCache
 
 A typical invocation of cmake will look like this when following the recommended layout.  
@@ -131,10 +129,8 @@ default for this location is ``/opt/ros/ROSDISTRO`` where ROSDISTRO is
 the codename for the ROS distro being used.
 
 
-
 Overlays
 ========
-
 In catkin style workspaces, overlaying of one workspace on top of
 another workspace is supported.  Each overlay can be built on top of
 another overlay, and any packages in a higher overlay will mask out
@@ -153,36 +149,108 @@ workspace using the CMAKE_PREFIX_PATH pointing to either the devel
 space or install space.  If it is an installed space make install must
 have been called, if a devel space, it must have been built with make.
 
+Examples
+========
+Here are some examples showing basic usage.
 
+Let us say we have several catkin workspaces in our home folder (~/).
 
-There are many ways to setup below are some examples. 
+::
 
-Example Workspaces
-------------------
+ ~/workspace1/
+     /src
+     /build
+     /devel
+ ~/workspace2/
+     /src
+     /build
+     /devel
+ ~/workspace3/ 
+     /src
+     /build
+     /devel
+ 
+Example 1: Installing workspace1 to system
+::
 
-For the following example the following workspaces will be configured:
+  export CMAKE_INSTALL_PREFIX=/opt/ros/groovy
+  cd ~/workspace1/build
+  cmake ../src
+  make
+  make install
 
-Workspace 1: ``~/workspace1``  
-With ``CMAKE_INSTALL_PREFIX=/opt/ros/groovy``
+Alternatively you can set CMAKE_INSTALL_PREFIX when calling cmake in the third step:
+::
 
-Workspace 2: ``~/workspace2``
-With ``CMAKE_INSTALL_PREFIX=/tmp/test_packages CMAKE_PREFIX_PATH=/opt/ros/groovy``
+  cd ~/workspace1/build
+  cmake -DCMAKE_INSTALL_PREFIX=/opt/ros/groovy ../src
+  make
+  make install
 
-Workspace 3: ``~/workspace3``  
-With ``CMAKE_PREFIX_PATH=/tmp/test_packages``
+Example 2: Overlaying workspace2 on top of workspace1's devel space
+::
 
-Workspace 4: ``~/workspace4``  
-With ``CMAKE_PREFIX_PATH=/opt/ros/groovy``
+  source ~/workspace1/devel/setup.bash
+  cd ~/workspace2/build
+  cmake ../src
+  make
 
-Workspace 5: ``~/workspace5``  
-With ``CMAKE_PREFIX_PATH=~/workspace4/devel``
+Example 3: Overlaying workspace 2 on top of workspace1's devel space on top of system installation
+::
 
+  source /opt/ros/groovy/setup.bash
+  source ~/workspace1/devel/setup.bash
+  cd ~/workspace2/build
+  cmake ../src
+  make
+  
+Example 4: Overlaying workspace 3 on top of local workspace2 install space on top of workspace1 devel space on top of system install
+::
 
-Bottom Level Overlay
---------------------
+  cd ~/workspace2/build
+  cmake -DCMAKE_INSTALL_PREFIX=~/ws2_installed ../src 
+  make
+  make install
+  
+  source /opt/ros/groovy/setup.bash
+  source ~/workspace1/devel/setup.bash
+  source ~/ws2_installed/setup.bash
+  
+  cd ~/workspace3/build
+  cmake ../src
+  make  
 
+Mixing Wet And Dry Workspaces
+=============================
+catkin was designed to allow dry packages to sit on top of wet ones. This is accomplished by using overlays and sourcing the appropriate setup.* files in the correct order, whether they are generated by rosbuild or catkin. Though one could technically utilize the same folder for a dry rosbuild workspace and a wet catkin workspace, our recommended layout is to isolate rosbuild and catkin workspaces in their own folders. 
 
+::
 
+  ~/rosbuild_ws/
+     dry_pkg1/
+     ...
+     dry_pkgN/
+     setup.bash
+     setup.sh
+  ~/catkin_ws/
+     src/
+       wet_pkg1/
+       ...
+       wet_pkgN/
+     build/
+     devel/
+       setup.bash
+       setup.sh
+     install/
+       setup.bash
+       setup.sh
+
+If we wanted to build packages in "rosbuild_ws" against those in "catkin_ws", we would simply source the setup file in catkin_ws before calling rosmake on any of the dry packages in rosbuild_ws:
+
+::
+
+  source ~/catkin_ws/devel/setup.bash (or alternatively "source ~/catkin_ws/install/setup.bash")
+  rosmake dry_pkg1
 
 Resources
 =========
