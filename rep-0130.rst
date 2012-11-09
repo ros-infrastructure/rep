@@ -1,0 +1,615 @@
+REP: 133
+Title: Separation of build environment and source tree tools
+Author: Tully Foote <tfoote@willowgarage.com>, Dirk Thomas <dthomas@willowgarage.com>, Thibault Kruse <kruset@in.tum.de>, William Woodall <wwoodall@willowgarage.com>
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 09-Nov-2012
+Post-History:
+
+
+Abstract
+========
+
+This REP defines the redesign of the rosinstall/rosws [1]_, [4]_ tools for
+catkin [2]_ workspaces. It suggest introducing two new commands,
+called wstool and catkin_make, such that rosws and rosinstall will go
+out of support at the same time as rosbuild.
+
+Specification
+=============
+
+For catkin workspaces in ROS groovy, the rosws command will be
+replaced by a similar command that mirrors rosws syntax and
+functionality, with minor exceptions. wstool will not generate
+environment setup files (setup.sh, setup.bash, setup.zsh), nor an
+initial catkin CMakeLists.txt.
+
+wstool commands and options will be those of rosws:
+
+``wstool init``: same as rosws init, but wstool has no --catkin and
+no --cmake-prefix-path option, also does not generate setup files.
+
+The following commands retain their options and semantics from rosws::
+
+  wstool update
+  wstool diff
+  wstool status
+  wstool info
+  wstool set
+  wstool merge
+
+There is no equivalent command for ``rosws regenerate``, which only
+regenerates env setup files.
+
+The wstool command will not use the ROS_WORKSPACE environment that
+rosws used to allow manipulations of the workspace from anywhere in
+the filesystem with workspace-relative paths. This means the user has
+to either enter the vcs workspace he wants to operate on, or pass a
+target parameter to the command. For safety of operations, this also
+means that ROS_WORKSPACE will be unset by ros distributions when
+activating catkin workspaces, to prevent users from accidentally
+invoking the wrong tool and changing the wrong source tree.
+
+Motivation
+==========
+
+Early ROS releases were supported by the ``rosinstall`` tool, which
+provided communication with several VCSs, maintenance of a list of
+folders to crawl for packages to be built and creation of a build and
+runtime environment (via the ROS_PACKAGE_PATH set in generated
+setup.*sh files). REP 110 introduced the rosws tool, which covered the
+same functionality but provided a VCS-like command syntax.
+
+The introduction of catkin as a buildsystem to replace rosbuild
+changes the requirements or a tool to support multiple VCS repositories:
+
+Environment setup.*sh file generation
+-------------------------------------
+
+With rosbuild, rosinstall/rosws did not only perform VCS operations,
+but also generated setup.*sh files. Sourcing those files established
+an environment (mainly setting of ROS_PACKAGE_PATH) where tools like
+rosrun would operate with the given source tree as runtime
+environment. This allowed several separate developer runtime
+environments on the same computer.
+
+With catkin, the environment setup is done for every development or
+install space, not once for each workspaces, and thus catkin itself
+provides the generation of setup.*sh files in the devel and install
+spaces.
+
+In catkin workspaces, the workspace folder instead requires a
+CMakeLists.txt that triggers the build of catkin packages in the
+subfolder tree. However setting up a catkin workspace involves several
+further steps which are likely to vary over time as catkin changes, so
+the setup of a build environment should no more be provided by a
+workspace support tool.
+
+Build set management, the "other" element
+-----------------------------------------
+
+rosbuild relies on an environment variable called ROS_PACKAGE_PATH
+(colon separated paths) to manage the set of packages to be build, and
+the runtime environment. Other rosbuild related tools (e.g. rospack)
+used the ROS_PACKAGE_PATH variable to determine the location of a
+package given a package name. The order of entries in
+ROS_PACKAGE_PATH allowed overlaying packages, with similarly named
+packages, earlier entries would be preferred.
+
+rosinstall/rosws provide a means to set a ROS_PACKAGE_PATH via
+sourcing of setup.*sh files that read the entries or .rosinstall and
+set the ROS_PACKAGE_PATH. The list of folders in ROS_PACKAGE_PATH also
+allows overlaying of e.g. installed packages with custom packages.
+
+This has another feature as a side-effect. Dropping new package
+folders into the rosbuild workspace folder would not automatically add
+those to the build process. This behavior was only possible by adding
+folders to a so-called "sandbox" folder, a folder that rosws /
+rosinstall ignored for vcs commands but put on the ROS_PACKAGE_PATH
+anyway.
+
+Both for supporting packages not yet under version control as well as
+sandbox folders, rosinstall/rosws defines a non-vcs element that can
+be added to the ROS_PACKAGE_PATH, the "other" element. Any such folder
+is used placed in the ROS_PACKAGE_PATH for build and runtime tools,
+but is not used for workspace vcs operations.
+
+With catkin workspaces and catkin generated runtime environments, the
+ROS_PACKAGE_PATH is not used to determine overlaying order of catkin
+packages. Instead, at build time catkin crawls the whole source folder
+for package folders, with the ability to prevent crawling subfolders
+by using marker files. The runtime environments (install space and
+develspace) use the FHS layout instead of the ROS_PACKAGE_PATH to
+locate package resources.
+
+So using a rosws workspace, a folder copied into the workspace is not
+part of the build process by default (unless added to a sandbox),
+whereas in catkin a newly added folder is by default immediately part
+of the build process (unless in the subtree of a folder marked to be
+ignored).
+
+Regarding build_time overlaying, catkin does not allow the same
+package to exist twice in a given workspace. So overlaying is possible
+only via separate, chained workspaces. Regarding run-time overlaying,
+catkin uses the CMAKE_PREFIX_PATH to overlay packages.
+
+So the requirement to maintain a list of locations inside a workspace
+folder is currently not relevant for the catkin build process anymore,
+and any "other" element in a catkin workspace is ignored for both the
+build and the vcs processes, such elements have currently no purpose.
+
+Single workspace and global command invocation
+----------------------------------------------
+
+rosinstall/rosws was limited to using a single workspace folder at a
+time, because chaining of workspaces using include or import semantics
+proved to bring more effort than benefits. The rosws command came with
+a convenience feature that allowed performing VCS actions without
+specifying a target workspace. rosinstall and rosws both use a single
+file called ".rosinstall" located in the root of a workspace folder.
+The rosws command would consider the current folder and its parent
+folder, and an environment variable ROS_WORKSPACE, so that the user
+could call "rosws update" from anywhere in the file tree, and the last
+activated workspace folder would be used (or an ancestor folder with a
+.rosinstall file if no ROS_WORKSPACE env var had been set).
+
+With catkin, it becomes difficult to infer a desired workspace for a
+vcs command based on the environment created by catkin's setup.sh
+files. An ad hoc initial solution used the value from .catkin which in
+a devel space points to folders used with the cmake
+invocation. However, this solution is problematic for several reasons:
+
+- the install space does not point to source folders that way, .catkin
+  is empty then.
+
+- .catkin may have multiple entries, supporting isolated builds and
+  merging the builds of several source spaces.
+
+So in general, an environment generated by catkins setup.*sh does not
+point to a single folder, but to 0-n folders.
+
+This means commands like 'rosws merge foo.rosinstall' cannot be
+provided with a single target source folder from the catkin
+environment, similarly no global ROS_WORKSPACE variable can be set
+from the catkin environment.
+
+The --catkin option
+-------------------
+
+With the migration to catkin fuerte, a quick workaround solution was
+implemented, adding a --catkin option to rosinstall and rosws commands
+that would suppress generation of setup.*sh files and generate a
+CMakeLists.txt file compliant with catkin instead::
+
+  rosinstall --catkin ...
+  rosws init --catkin ...
+  rosws regenerate --catkin ...
+
+The --catkin option suppresses generation of setup.*sh files, and
+instead generates a CMakeLists.txt (incompatible with catkin groovy at
+the time of writing, pending new release of catkin fuerte and change to
+rosinstall code to invoke catkin_init_workspace).
+
+With this option the user always has to remember to call the --catkin
+option, else setup.*sh files would be generated.  While there is no
+harm, this approach easily causes user confusion, and since catkin is
+supposed to replace rosbuild, the default behavior should not require
+users to invoke commands providing the --catkin option. However
+replacing the default behavior or rosws would be equally bad for users of ROS
+electric and fuerte using rosbuild.
+
+Devel and install spaces with out-of-source builds
+--------------------------------------------------
+
+rosbuild used in-source builds, such that each package source folder
+also contained the build artifacts next to the source files.
+
+catkin strongly suggests out-of-source and out-of-project builds. This
+means build artifacts for a package will be generated into a different
+folder than the package folder (as opposed to simple out-of-source
+builds, where a build folder in the package folder contains the build
+artifacts).
+
+The recommended catkin workflow recommends separating source space,
+build space, devel space and install space into four separate folders,
+where with rosbuild a single folder contained all artifacts.  This
+also impacts setting up a build process. Whereas with rosbuild, the
+rosmake command allowed starting a build process globally, with
+catkin, a cmake command invocation with specialized options is
+required.
+
+
+Solution
+--------
+
+Therefore, differently named commands will be used for each kind of
+workspace, providing a clearer separation of concerns with the tools.
+
+There will be a wstool command for all VCS commands, and a catkin_make
+tool for help with setting up a build folder layout and invoking cmake
+and make accordingly.
+
+The new tools can also later be extended to better support the
+different constraints of catkin workspaces without compromising the
+simplicity and robustness which currently exist in rosws/rosinstall.
+
+Also this problem reveals the general problem of mixing source
+management with setting up an environment. While rosinstall allowed
+setting up a workspace with just a single command, this design made
+it hard for rosinstall to support several ROS distributions with ever
+changing environment properties.
+
+Therefore, the rosws replacement for catkin workspaces will not offer
+any environment generation capabilities (setup.sh and similar), but
+merely maintain a single declarative file with source projects and the
+file tree (the .rosinstall file, as usual).
+
+Rationale
+=========
+
+REP128 drafts a model workspace for usage with catkin.
+
+This is the recommended layout for development::
+
+ workspace_folder/        --WORKSPACE
+   src/                   --SOURCE SPACE
+     CMakeLists.txt       --This is symlinked to catkin/cmake/toplevel.cmake
+   build/                 --BUILD SPACE
+     CATKIN_IGNORE        --Marking the folder to be ignored when crawling for packages
+   devel/                 --DEVEL SPACE
+     .catkin              --Marking the folder as a development space (the file contains a semicolon separated list of Source space paths)
+     env.bash
+     setup.bash
+     setup.sh
+     setup.zsh
+
+Setting up this workspace manually is tedious and error-prone. The
+catkin_make tool will help creating this structure, possibly by invoking
+other tools such as cmake. The implementation details of catkin_make
+are not part of this REP.
+
+A user would use wstool only on the src folder::
+
+  workspace_folder/        --WORKSPACE
+    src/                   --SOURCE SPACE
+      CMakeLists.txt       --This is symlinked to catkin/cmake/toplevel.cmake
+      .rosinstall
+
+wstool init will create a .rosinstall file which will act the same way
+as for the rosinstall tool before.
+
+The wstool commands will affect this .rosinstall file and folders
+mentioned in it.
+
+Caveat: Using .rosinstall as marker file for wstool may cause some
+confusion for users when creating rosbuild workspaces overlaying
+catkin workspaces. Those will not get useful results when trying to
+init with a wstool workspace, since they should instead init with a
+catkin devel space or install space.
+
+E.g.:
+This will yield positive results::
+
+  $ rosws init ~/rosbuild_ws ~/groovy_underlay/devel
+
+while this will not::
+
+  $ rosws init ~/rosbuild_ws ~/groovy_underlay/src
+
+However using a differently named marker file may equally be difficult
+to learn, and to use while switching between rosbuild and catkin
+workspaces.
+
+Design decisions
+================
+
+A. Alternatives for VCS workspace activation
+--------------------------------------------
+
+VCS workspace activation means changing something in the environment
+variables such that wstool can infer what folder to work on.
+
+The problem is not only to activate a workspace, but also to
+deactivate it when the user is working on a different one. In
+particular we can expect our users to sometimes call the wrong tool
+(rosws vs. wstool), and we need such situations to remain benign.
+
+The following design decisions are possible:
+
+1. No activation, context-only
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Determine wstool target workspace by searching for .rosinstall file in chain
+of path ancestors (similar to git). A target parameter can be used to
+override context.
+
+Deactivation is required for ROS_WORKSPACE to prevent accidental calls
+to rosws to harm the users source tree.
+
+2. Using CMAKE_PREFIX_PATH / catkin_pkg heuristically
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool could crawl the CMAKE_PREFIX_PATH, take the first one that
+contains a .catkin file, parse that file for semicolon-separated
+entries, and use the first of those or all as workspace root. Using
+all entries would create further problems and is a corner case anyway, since
+with most users, there should only ever be one location in a .cmake
+file.
+
+One problem with this is that this introduces a dependency to catkin
+internals. A pure vcs support tool should not rely on a variable like
+CMAKE_PREFIX_PATH or a build tool to operate. Also some confusion may
+arise when rosws and wstool have different was of globally determining
+the current workspace. Finally this does not work with install spaces.
+
+Another huge problem is that when the user uses a rosbuild workspace
+on top of a catkin workspace, or after it in the same terminal, the
+catkin workspace cannot get deactivated. So accidental calls to wstool
+harm the users source tree.
+
+3. Providing a separate setup.sh file setting ROS_WORKSPACE
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool could still generate a shell file (e.g. setup.sh,
+wstool_env.sh) which does nothing else than setting an environment
+variable, e.g. ROS_WORKSPACE, and rely on the user to source it.  Such
+a file may also be confusing because it does not set up a catkin
+environment.
+
+No deactivation required.
+
+4. Use custom env hook
+^^^^^^^^^^^^^^^^^^^^^^
+
+catkin allows environment hooks, meaning shell scripts that will be
+run when sourcing setup.*sh files. Such a hook could be provided by a
+catkin package and set ROS_WORKSPACE to one of the source spaces
+(usually there is just one) used to build::
+
+  @[if DEVELSPACE]@
+  _SPACES=(`echo $ROS_PACKAGE_PATH | tr ':' ' '`)
+  # select the first entry, if several
+  export ROS_WORKSPACE=${_SPACES[0]}
+  unset _SPACES
+  @[else]@
+  unset ROS_WORKSPACE
+  @[end if]@
+
+A proof-of-concept implementation of the wstool env hook exists at
+https://github.com/tkruse/wstool_catkin
+
+Equivalent solutions might use the CMAKE_PREFIX_PATH and .catkin file instead.
+
+However this fails with install spaces and also with multiple source
+trees contributing to the same devel space.
+
+Deactivation is required for ROS_WORKSPACE for catkin install spaces
+with this solution.
+
+B. Alternatives regarding the creation of wstools
+-------------------------------------------------
+
+As mentioned before, the creation of a second tool is also driven by
+the wish to create catkin source trees without using a --catkin option
+with rosinstall/rosws.
+
+1. Create a new tool wstool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This covers the same features as rosws, but for catkin
+workspaces. Meaning no setup.*sh files will be generated, it is not
+possible to create rosbuild workspaces with this tool. A similar
+replacement for rosinstall is not planned at this time.
+
+2. Keep rosws with --catkin option
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Not desirable because of user confusion. When a user forgets to pass
+that option during a rosinstall, rosws init or rosws merge call,
+setup.*sh files will be generated that have no purpose.
+
+However, this alternative has the benefit that it allows more easily
+to later introduce a new tool wstool which drops several other
+rosinstall design decisions that are no more relevant in
+catkin. Examples are the requirement to determine a fixed order of
+local repositories (for ROS_PACKAGE_PATH precedence) and the resulting
+registry of each ROS_PACKAGE_PATH entry (instead of just a root folder).
+
+3. Change rosws default behavior to be setup.*sh agnostic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In theory rosws could be changed to never generate anything else than a
+.rosinstall file. For the rosbuild case, this would mean we'd need a
+small helper script to create those files, like
+ros_create_env [PATH]. This might also have benefits, but would mean
+that plenty of tutorials on the web would have to change their installation
+instructions.
+
+
+C. Mutual compatibility between rosws and wstool
+------------------------------------------------
+
+Since initially, rosws and wstool perform the same vcs operations
+using the same rosinstall file syntax, it is possible to make them
+mutually compatible except for the workspace initialization
+(generation of setup.*sh files).
+
+1. Both use ".rosinstall" filename
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Doing so allows calling the tools interchangeably most of the times,
+but prevents the tool from telling the user he should be using wstool
+for catkin workspaces, and rosws for rosbuild workspaces.
+
+This also allows to keep using the rosinstall tool for catkin
+workspaces, as done in automated scripts.
+
+2. Use a new filename for wstool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Meaning e.g. ".wstool" instead of ".rosinstall".  Doing so allows the
+tools to diverge more in the long run, but prevent the users from
+using the same command where it would technically be possible. Also
+the extension ".rosinstall" indicates a certain file syntax, and it is
+beneficial to keep the same name as long as the syntax remains the
+same. Such a change of name would be more reasonable in the future along
+with a change of the syntax within the file.
+
+However, it must be noted that in catkin, the "other" element of
+the rosinstall syntax has no effect on the build anymore, so in a way,
+the syntaxes are already different.
+
+3. Use a new file format for wstool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool could introduce a new file format, or a flag inside the
+.rosinstall file that rosws and wstool use to tell the user he is
+using the wrong tool for the given workspace. However introducing a
+new syntax cleanly takes more time than we currently have.
+
+D. Drop-in support for vcs folders like catkin
+----------------------------------------------
+
+For the build process, catkin allows drop-ins per default, meaning a
+user can copy a package into the source space, and by default it will
+be used in the next build process. rosws required using the rosws tool
+to declare any new packages in the .rosinstall file before they became
+part of the build process, unless using a sandbox folder. A sandbox
+folder however also prevented subfolders to be part of VCS operations.
+
+Supporting drop-in behavior for vcs operations is generally unsafe for
+the user, as it does not allow keeping a local clone at a specific version.
+
+rosinstall/rosws define an "other" element with the semantics that
+this folder will no be considered for SCM operations, but its
+subfolders will be added to the ROS_PACKAGE_PATH via the setup.*sh env
+files generated by rosws/rosinstall. The "other" element has no
+function in catkin anymore, given that in catkin no setup.*sh are
+generated by rosws.
+
+While the specification of this REP does not decide on this,
+discussions around this feature has influenced the other decisions.
+
+1. No support for drop-in repositories
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Like with rosws, new local clones of repositories have to be
+registered in the .rosinstall file individually to be included in VCS
+operations. wstool does not support vcs operations outside listed vcs
+elements.
+
+2. Support for generic SCM operations in new-style dropin folders
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool (and rosws) could be extended to have a new element (similar to
+the "other" element) which point to a path, under which all vcs
+folders will have default semantic VCS operations applied to them on
+wstool invocations.
+
+3. Support for generic SCM operations in sandbox folders
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool (and rosws) could be extended to support some default vcs
+behavior when a user drops local repositories in a sandbox folder.
+Currently sandbox folders in rosbuild are declared in the rosinstall
+syntax using the "other" element, which implies that subfolders will
+be part of the ROS_PACKAGE_PATH, but no VCS operation will be
+performed on them by rosws/rosinstall.
+
+A new element like "drop-in" could change that behavior, such that
+subfolders would also be included in vcs operations via default
+semantics.
+
+4. Generally update all workspace subfolders
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool could crawl all workspace subfolders, and either perform the
+usual operation if the subfolder is listed with a version in the
+.rosinstall file, or perform some VCS operation with default semantics.
+
+
+D. "other" element in wstool
+----------------------------
+
+Currently, "other" elements in a catkin workspace have no effect
+whatsoever. This can be confusing to users if they happen to see such
+elements in rosinstall files for rosbuild.
+
+1. Support "other" elements in wstool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool treats "other" elements exactly like rosws, meaning it may
+create currently pointless "other" elements, and the set command can
+turn vcs elements into "other" elements. A deprecation warning can be
+displayed.
+
+While this would be confusing in the long run if the "other" element
+never gets any purpose, in the short term this allows easier sharing
+of code between rosws and wstool, and thus lesss maintenance effort.
+
+This would be a quirk that does not cause breakage, just confusion.
+
+2. Ignore "other" elements in wstool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool does not create "other" elements, and when reading .rosinstall
+files, it ignores "other" elements as if they were commented out
+(e.g. they are not shown on wstool info).
+
+This possibly reduces confusion for users, but makes it harder to
+share a code base between wstool and rosws. Also it makes it harder to
+resurrect the concept of whitelisted locations later on. It still
+allows to invoke wstool on workspaces created by rosws.
+
+3. Forbid "other" elements for wstool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool commands fail if working on files having an "other" element.
+
+This possibly reduces confusion for users, but makes it harder to
+share a code base between wstool and rosws. Also it makes it harder to
+resurrect the concept of whitelisted locations later on.
+
+Backwards Compatibility
+=======================
+
+The rosws command remains functionally identical and will continue to be maintained.
+
+Reference Implementation
+========================
+
+The Groovy distribution of ROS will provide two separate additional
+tools wstool and catkin_make following the guidelines of this REP.
+
+
+References and Footnotes
+========================
+
+.. [1] rosinstall
+  (http://www.ros.org/wiki/rosinstall)
+
+.. [2] catkin
+  (http://www.ros.org/wiki/catkin)
+
+.. [3] ROS_WORKSPACE with catkin
+  (https://github.com/ros/catkin/issues/249)
+
+.. [4] REP 110, SCM-like rosinstall command structure
+   (http://ros.org/reps/rep-0012.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
