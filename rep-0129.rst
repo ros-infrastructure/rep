@@ -361,7 +361,7 @@ References
 .. _ROS-PCL: http://www.ros.org/wiki/pcl/Overview
 .. [#REP105] REP 105, Coordinate Frames for Mobile Platforms
    (http://www.ros.org/reps/rep-0105.html)
-.. [#REP130] REP 130, A Node API for Map Dispatching
+.. [#REP130] REP 130, Node API for Map Dispatching
    (http://www.ros.org/reps/rep-0130.html)
 
 
