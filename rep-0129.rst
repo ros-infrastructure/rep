@@ -303,9 +303,13 @@ The node shall still provide full maps at regular intervals.
 Open Questions
 ==============
 
+* Do we need the occupancy profiles? I think that the question boils
+  down to whether there are any SLAM system that directly work on
+  voxels rather than on point clouds for registration.
+  I think that 3DTK_ but I am unsure whether its authors have any
+  plan of integrating it into ROS.
 * Fields within a PointCloud2 message should be formally specified
-  somewhere, more officially than in the overivew page of ROS-PCL
-  (http://www.ros.org/wiki/pcl/Overview).
+  somewhere, more officially than in the overview page of `ROS-PCL`_.
 * It would be nice to have viewpoint information in the resulting map.
   We could either have something like 'camera' of size 3 or a triplet 
   'camera_x', 'camera_y', 'camera_z' that is the position of the camera
@@ -353,6 +357,8 @@ References
 .. _gmapping: http://www.ros.org/wiki/gmapping
 .. _hector_slam: http://www.ros.org/wiki/hector_slam
 .. _octomap_mapping: http://www.ros.org/wiki/octomap_mapping
+.. _3DTK: http://slam6d.sourceforge.net/
+.. _ROS-PCL: http://www.ros.org/wiki/pcl/Overview
 .. [#REP105] REP 105, Coordinate Frames for Mobile Platforms
    (http://www.ros.org/reps/rep-0105.html)
 .. [#REP130] REP 130, A Node API for Map Dispatching
