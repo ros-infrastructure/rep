@@ -1,7 +1,7 @@
 REP: 128
 Title: Naming Conventions for Catkin Based Workspaces
 Author: Tully Foote
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 16-Oct-2012
