@@ -45,11 +45,11 @@ Specification
 General Architecture
 --------------------
 
-The node API for SLAM packages should minimize the necessary work for the
+The node API for mapping should minimize the necessary work for the
 node developers, while at the same time provide a rich set of features
 to users.
-For this reason, we propose to split the functionality into two entities:
-the SLAM node and a map dispatcher node::
+For this reason, we propose to split the functionality into two entities,
+each having its own REP, a SLAM node and a map dispatcher node::
 
     ---->   +---------------+ ---->         +----------------+ <--->
     scans,  |               | poses (tf)    |                | ROI sub maps
