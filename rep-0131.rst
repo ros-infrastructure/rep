@@ -1,0 +1,198 @@
+REP: 131
+Title: ROS Groovy Variants
+Author: Tully Foote <tfoote@willowgarage.com>
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 18-Nov-2011
+Post-History: 05-Aug-2011
+
+
+Abstract
+========
+
+This REP describes the variants for the ROS Groovy release. There
+are no new variants in this release.  This REP mainly updates REP 108
+[1]_ for changes in stack contents.  Otherwise, the variants are the
+same as those in REP 108.
+
+Motivation
+==========
+
+For a discussion on the general motivation and role of variants,
+please see REP 108 [1]_.
+
+In ROS Groovy, we are transitioning to using the catkin build system.  In the future variants will be phased out in favor of metapackages.  However for this cycle they will remain.  For more information on metapackges see REP 127 [2]_.
+
+This REP proposes the same entrypoints as REP 108 and merely updates
+the variant definitions to reflect the organizational changes in ROS
+stacks.
+
+
+Specification
+=============
+
+End-user entry points
+---------------------
+
+We define the same three main entry points for ROS users as REP 108 [1]_.
+
+ * desktop-full (recommended)
+ * desktop
+ * ros-base
+
+Variants
+--------
+
+ROS variants
+''''''''''''
+
+The `ros-base` variant composes the `ros` and `ros_comm` stacks, which
+were separated as part of REP 100 [3]_.  This variant is not allowed
+to have any GUI dependencies.
+
+::
+
+  - ros-base:
+      stacks: [ros, ros_comm]
+
+The `ros-full` variant adds the `rx` and `documentation` stacks,
+which provide useful tools that are not necessary for on-robot
+operation.
+
+::
+
+  - ros-full:
+      extends: ros-base
+      stacks: [rx, documentation]
+
+Robot variant
+'''''''''''''
+
+The `robot` variant is defined to be core, stable, ROS libraries for
+any robot hardware.  It is the "general robotics" libraries of ROS.
+It may not contain any GUI dependencies.
+
+::
+
+  - robot:
+      extends: [ros-base]
+      stacks: [bond_core, common_msgs, common, diagnostics, 
+        driver_common, eigen, filters, bullet, geometry, nodelet_core, 
+        orocos_kinematics_dynamics, pluginlib, assimp, robot_model, 
+        executive_smach, xacro]
+
+
+Capability variants
+'''''''''''''''''''
+
+The capability variants organize commonly used libraries that are
+specific to a class of robots.  We also define a `simulators` variant
+that provides an organizational role for higher-level variants.  We
+discourage GUI dependencies in these stacks, if possible.
+
+::
+
+  - mobile:
+      extends: [robot]
+      stacks: [navigation, slam_gmapping, laser_pipeline,
+        perception_pcl]
+
+  - perception:
+      stacks: [image_common, image_transport_plugins, image_pipeline,
+        laser_pipeline, perception_pcl, vision_opencv]
+
+  - move-arm:
+      extends: [robot, viz]
+      stacks: [arm_navigation, octomap_mapping, kinematics, 
+        motion_planners, motion_planning_common, physics_ode, 
+        trajectory_filters, perception_pcl, pr2_controllers, control, 
+        pr2_mechanism, pr2_common]
+
+  - simulators:
+      extends: [robot]
+      stacks: [simulator_stage, simulator_gazebo, stage, physics_ode, 
+        visualization_common, rx, image_common, perception_pcl]
+
+  - viz:
+      extends: [robot]
+      stacks: [visualization_common, visualization, rx, image_common, 
+        laser_pipeline, executive_smach_visualization, 
+        diagnostics_monitors, geometry_visualization,
+        robot_model_visualization, geometry_experimental]
+
+  
+Desktop variants
+''''''''''''''''
+
+The `desktop` variants are main entry points for users.  The
+`desktop-full` is a "batteries included" experience for users and
+attempts to collect stable, well-documented libraries.  These
+libraries may be specific to certain classes of robots, such as mobile
+robots, though they are not specific to a particular robot.  The
+`desktop` variant is more minimal and only provides the stacks in the
+`robot` variant, plus visualization and debugging tools.  Both of these
+variants contain tutorials for the stacks they provide.
+
+::
+
+  - desktop:
+      extends: [ros-full, robot, viz]
+      stacks: [ros_tutorials, common_tutorials, geometry_tutorials,
+        visualization_tutorials]
+  - desktop-full:
+      extends: [desktop, mobile, perception, simulators]
+
+      
+Institution-specific
+''''''''''''''''''''
+
+Please see REP 108 [1]_ for discussion of institution-specific variants.
+
+This REP also proposes the addition of institution-specific variants.
+Institution-specific variants must have the name of the institution to
+clearly identify them.  The best practice recommendation is to use the
+name of the institution's ros-pkg repository, e.g. "wg-ros-pkg".
+
+An institution is not required to have a variant, and they are mainly
+provided for convenience and identity.
+
+Robot-specific
+''''''''''''''
+
+Please see REP 108 [1]_ for discussion of robot-specific variants.
+
+Backwards Compatibility
+=======================
+
+The variant modifications in this REP are fully backwards compatible
+with Diamondback.
+
+References
+==========
+
+.. [1] REP 108: Diamondback Variants 
+   (http://www.ros.org/reps/rep-0108.html)
+
+.. [2] REP 127: Specification of package manifest format
+   (http://ros.org/reps/rep-0127.html)
+
+.. [3] REP 100
+   (http://ros.org/reps/rep-0100.html)
+
+   
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
