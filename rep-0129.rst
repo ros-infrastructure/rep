@@ -186,16 +186,34 @@ Parameters
     the name of the map frame
 ``~odom_frame`` (string, default: "odom", profile: 2D, 3D)
     the name of the odom frame
+``~enable_tf_publishing`` (bool, default: true, profile: 2D, 3D)
+    if true, publish base_frame -> odom_frame transforms on tf
+``~enable_pose_publishing`` (bool, default: false, profile: 2D, 3D)
+    if true, publish base_frame -> map_frame transforms as
+    ``geometry_msgs/PoseWithCovarianceStamped`` messages on
+    the ``pose`` topic.
 
-The default values are set according to REP 105 [#REP105]_.
+The default values for frames are set according to REP 105 [#REP105]_.
 For nodes supporting both 2D and 3D, one or more node-specific parameters
 shall allow to specify the mode or the topics to subscribe to.
 
 
-Topics
-''''''
+Subscribed Topics
+'''''''''''''''''
 
-SLAM nodes both subscribe to and publish on the tf topic, through the tf API.
+SLAM nodes subscribe to the tf topic, through the tf API.
+
+
+Published Topics
+''''''''''''''''
+
+If ``~enable_pose_publishing`` is true:
+
+``pose`` (geometry_msgs/PoseWithCovarianceStamped, latched, profile: 2D, 3D)
+     base_frame -> map_frame transforms with covariance
+
+In addition, SLAM nodes publish on the tf topic if ``~enable_tf_publishing``
+is true.
 
 
 Required tf Transforms
@@ -218,9 +236,9 @@ Provided tf Transforms
 ''''''''''''''''''''''
 
 According to REP 105 [#REP105]_, the SLAM nodes must provide at least 
-this transform.
-They are allowed to provide more, but they shall provide a setting
-to disable additional published transforms.
+this transform, this REP adds a flag to disable publishing on tf, for
+instance in cases where poses with covariance are fused from different
+sources.
 
 map_frame -> odom_frame (profile: 2D, 3D)
     the current estimate of the robot's pose within the map frame
@@ -279,7 +297,7 @@ of their side, on the topic ``occupancy_map``.
 Subscribed Topics
 '''''''''''''''''
 
-``cloud_in`` (sensor_msgs/PointCloud2, profile: 3D)
+``point_cloud`` (sensor_msgs/PointCloud2, profile: 3D)
     incoming 3D point cloud for scan integration.
 
 
