@@ -59,7 +59,7 @@ each having its own REP, a SLAM node and a map dispatcher node::
             +---------------+               +----------------+ projected maps
 
 SLAM node
-    This node is responsible of localizing the robot and providing a simple
+    This node is responsible for localizing the robot and providing a simple
     map, optionally with progressive updates. This part covered by this REP.
 
 map_dispatcher
