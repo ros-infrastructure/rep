@@ -483,6 +483,20 @@ The empty tag is used to indicate that a package is architecture
 independent and therefore does not contain any architecture specific
 code.
 
+<deprecated>
+'''''''''''''''''''''''''''
+
+The tag is used to indicate that a package is deprecated which enables
+to notify users about that fact.  The tag may either be empty or
+optionally contain an arbitrary text content giving the user more
+information about the deprecation::
+
+  <export>
+    <deprecated>This package will be removed in ROS Hydro. Instead use
+      package FOO which provides similar functionality but with a
+      different API.</deprecated>
+  </export>
+
 <message_generator>
 '''''''''''''''''''
 
