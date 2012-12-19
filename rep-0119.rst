@@ -113,7 +113,7 @@ ensure accessory compatibility between TurtleBot compatible robots.
 * The robot must provide at least the following power buses:
 
   - 12V at 1.5A with a male Micro Fit 1x2 connector (Molex 43045-0209)
-  - 5V at 500mA solderable connection (If connectorized use Micro Fit 2x1 connector (Molex TODO Partnumber) )
+  - 5V at 500mA solderable connection (If connectorized use Micro Fit 2x1 connector (Molex 43650-0218) )
 
 * Accurate Deadreconing:
 
