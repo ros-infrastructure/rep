@@ -108,14 +108,14 @@ ensure accessory compatibility between TurtleBot compatible robots.
 * The top mounting surface of the robot must be 0.2032m (8 inches)
   from rgbd camera mounting surface.
 
-* The robot fits within a a circle 0.33m (13 inches) in diameter 
+* The robot fits within a a circle 0.35m in diameter 
 
 * The robot must provide at least the following power buses:
 
   - 12V at 1.5A with a male Micro Fit 1x2 connector (Molex 43045-0209)
   - 5V at 500mA solderable connection (If connectorized use Micro Fit 2x1 connector (Molex 43650-0218) )
 
-* Accurate Deadreconing:
+* Accurate Deadreckoning:
 
   * Drive pattern TODO with less than X inches offset and Y radians offset. 
 
