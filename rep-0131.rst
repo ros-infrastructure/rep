@@ -56,7 +56,7 @@ to have any GUI dependencies.
   - ros-base:
       stacks: [ros, ros_comm]
 
-The `ros-full` variant adds the `rx` and `documentation` stacks,
+The `ros-full` variant adds the `rqt_common_plugins` and `documentation` stacks,
 which provide useful tools that are not necessary for on-robot
 operation.
 
@@ -64,7 +64,7 @@ operation.
 
   - ros-full:
       extends: ros-base
-      stacks: [rx, documentation]
+      stacks: [rqt_common_plugins, documentation]
 
 Robot variant
 '''''''''''''
@@ -112,11 +112,11 @@ discourage GUI dependencies in these stacks, if possible.
   - simulators:
       extends: [robot]
       stacks: [simulator_stage, simulator_gazebo, stage, physics_ode, 
-        visualization_common, rx, image_common, perception_pcl]
+        visualization_common, rqt_robot_plugins, image_common, perception_pcl]
 
   - viz:
       extends: [robot]
-      stacks: [visualization_common, visualization, rx, image_common, 
+      stacks: [visualization_common, visualization, rqt_common_plugins, rx, image_common, 
         laser_pipeline, executive_smach_visualization, 
         diagnostics_monitors, geometry_visualization,
         robot_model_visualization, geometry_experimental]
