@@ -1,0 +1,130 @@
+REP: 132
+Title: Incorporation of Changelogs into Package Source Tree
+Author: Tully Foote, Thibault Kruse, Mirza Shah, Dirk Thomas, William Woodall
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 22-Jan-2013
+Post-History: ?-?-2013
+
+Table of Contents
+=================
+
+#. Abstract_
+#. Motivation_
+#. DesignRequirements_
+#. Specification_
+#. Rationale_
+#. Concerns_
+#. References_
+#. Copyright_
+
+Abstract
+========
+This REP suggests incorporating package changelogs (i.e. a list of changes made to the package since the last release) as part of the package source tree rather than being maintained separately on the ROS wiki. This is to address shortcomings with maintaining a separate changelog list.
+
+Motivation
+==========
+In ROS, package changelogs have traditionally been maintained as their own subpage within a package's ROS wiki page. These changelogs have had to be maintained separately from their codebases. This approach has had some drawbacks:
+
+* **Hard to Find** - As changelongs are isolated from code, they can be difficult to find and correlate with particular versions of code. By making them part of the source tree, you can determine what has changed by inspecting the package itself.
+
+* **Lack of Maintenance** - As changelogs are isolated from code and are optional, the motivation to maintain the lists is very weak. The result is that only a minority of package maintainers keep good changelogs. The vast majority have however stopped caring overtime or just did not maintain changelists to begin with. The hope is that when changelogs are kept with the package source, developers will be more likely to update the changelog file. 
+
+* **Syntactic Inconsistency** - Even among well-maintained changelogs there is an inconsistency in the layout of these lists across the ROS wiki. The lack of consistency makes it both harder for people and machines to parse the data in these logs. This is an opportunity to constrain the structural and syntactic format of the changelogs so that they are consistent across packages.
+
+* **Needed for Packaging** - Virtually all package formats including .deb and .rpm require changelogs as part of the package. Scraping this information from the wiki is counterintuitive and architecturally brittle.
+
+DesignRequirements
+===================
+The format of the changelog should have the following properties:
+
+* **In Source** - The changelog is part of the package source rather than its own wiki page
+
+* **Wiki Integration** - The changelog is displayed on the wiki as in the past, but now pulled from SCM rather than being directly edited -- just like package headers
+
+* **Syntax** - Simple, easily parseable syntax. Markup languages like YAML are likely overkill.
+
+* **Package Compatible** - Satisfies the required fields for .deb/.rpm changelogs
+
+* **Non-redundant** - Does not contain redundant information found elsewhere such as package.xml
+
+* **Optional but Recommended** - Should not be required, but highly recommended with tools such as bloom giving warnings. If not provided, if [some of] the information can be inferred from SCM commit logs, generate a changelog for the package
+
+Specification
+=============
+The recommended specification is very simple:
+* For each package (i.e. every chunk of code that has a package.xml) a file called "ChangeList.txt" is maintained side-by-side.
+* This file is appended with a new entry for every new release of a package.
+* Bloom will spit out a warning during package release if no changelog is found or if the changelog does not have an updated entry. Future versions of bloom can force changelogs as a requirement.
+
+ChangeList.txt Format
+---------------------
+::
+
+	VersionNumber x
+	----------------
+	* Change 1
+	  Optional Text
+	  .
+	  .
+	  .
+	* Change n
+	  Optional Text
+
+	VersionNumber x-1
+	------------------
+	* Change 1
+	  Optional Text
+	  .
+	  .
+	  .
+	* Change n
+	  Optional Texts
+
+ChangeList.txt Example
+----------------------
+
+::
+
+	0.1.26
+	* Utilizes caching to improve query performance
+	* Simplified API calls
+	Note that these changes are based on REP 192
+	* Fixed synchronization issue on startup
+
+	0.1.25
+	* Added thread safety
+	* Fixed regression introduced in 0.1.22
+
+	0.1.0
+	 * First public stable release
+
+	0.0.1
+	 * Initial release, API follows REP 243s
+
+
+Rationale
+=========
+The proposed format has the following properties that help meet the design requirements:
+ * Extremely simple and very similar to how changelogs are typically written on the wiki
+ * When combined with the corresponding package.xml, enough information is provided to meet the requirements of .deb and .rpm changelog formats.
+ * Easy to parse
+ * No redundant information from package.xml
+
+Concerns
+========
+None, this plan is awesome.
+
+References
+==========
+ * [1] Debian Package Changelog Requirements
+   (http://www.debian.org/doc/debian-policy/ch-source.html)
+ * [2] Fedora RPM Package Changelog Requirements
+   (http://fedoraproject.org/wiki/Packaging:Guidelines#Changelogs)
+ * [3] Tully Foote Proposal for Stack Changelogs (9-03-2010)
+   (http://code.ros.org/lurker/message/20100903.213420.d959fddc.en.html)
+
+Copyright
+=========
+This document has been placed in the public domain.
