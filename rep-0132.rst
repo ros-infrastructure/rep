@@ -54,8 +54,11 @@ The format of the changelog should have the following properties:
 Specification
 =============
 The recommended specification is very simple:
+
 * For each package (i.e. every chunk of code that has a package.xml) a file called "ChangeList.txt" is maintained side-by-side.
+
 * This file is appended with a new entry for every new release of a package.
+
 * Bloom will spit out a warning during package release if no changelog is found or if the changelog does not have an updated entry. Future versions of bloom can force changelogs as a requirement.
 
 ChangeList.txt Format
