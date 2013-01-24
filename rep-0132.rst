@@ -90,7 +90,7 @@ ChangeList.txt Example
 	0.1.26
 	* Utilizes caching to improve query performance
 	* Simplified API calls
-	Note that these changes are based on REP 192
+	  Note that these changes are based on REP 192
 	* Fixed synchronization issue on startup
 
 	0.1.25
@@ -106,11 +106,16 @@ ChangeList.txt Example
 
 Rationale
 =========
+
 The proposed format has the following properties that help meet the design requirements:
- * Extremely simple and very similar to how changelogs are typically written on the wiki
- * When combined with the corresponding package.xml, enough information is provided to meet the requirements of .deb and .rpm changelog formats.
- * Easy to parse
- * No redundant information from package.xml
+
+* Extremely simple and very similar to how changelogs are typically written on the wiki
+
+* When combined with the corresponding package.xml, enough information is provided to meet the requirements of .deb and .rpm changelog formats.
+
+* Easy to parse
+
+* No redundant information from package.xml
 
 Concerns
 ========
@@ -118,12 +123,12 @@ None, this plan is awesome.
 
 References
 ==========
- * [1] Debian Package Changelog Requirements
-   (http://www.debian.org/doc/debian-policy/ch-source.html)
- * [2] Fedora RPM Package Changelog Requirements
-   (http://fedoraproject.org/wiki/Packaging:Guidelines#Changelogs)
- * [3] Tully Foote Proposal for Stack Changelogs (9-03-2010)
-   (http://code.ros.org/lurker/message/20100903.213420.d959fddc.en.html)
+* [1] Debian Package Changelog Requirements
+  (http://www.debian.org/doc/debian-policy/ch-source.html)
+* [2] Fedora RPM Package Changelog Requirements
+  (http://fedoraproject.org/wiki/Packaging:Guidelines#Changelogs)
+* [3] Tully Foote Proposal for Stack Changelogs (9-03-2010)
+  (http://code.ros.org/lurker/message/20100903.213420.d959fddc.en.html)
 
 Copyright
 =========
