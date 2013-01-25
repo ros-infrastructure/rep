@@ -64,7 +64,9 @@ The recommended specification is very simple:
 ChangeList.txt Format
 ---------------------
 The format for the ChangeList.txt file is a very limited subset of ReStructuredText (RST) markup that uses the following features of RST:
+
 * Second-level headings (dashed lines)
+
 * Bullet points
 
 The format is as follows:
