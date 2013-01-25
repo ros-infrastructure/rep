@@ -27,7 +27,7 @@ Motivation
 ==========
 In ROS, package changelogs have traditionally been maintained as their own subpage within a package's ROS wiki page. These changelogs have had to be maintained separately from their codebases. This approach has had some drawbacks:
 
-* **Hard to Find** - As changelongs are isolated from code, they can be difficult to find and correlate with particular versions of code. By making them part of the source tree, you can determine what has changed by inspecting the package itself.
+* **Hard to Find** - As changelogs are isolated from code, they can be difficult to find and correlate with particular versions of code. By making them part of the source tree, you can determine what has changed by inspecting the package itself.
 
 * **Lack of Maintenance** - As changelogs are isolated from code and are optional, the motivation to maintain the lists is very weak. The result is that only a minority of package maintainers keep good changelogs. The vast majority have however stopped caring overtime or just did not maintain changelists to begin with. The hope is that when changelogs are kept with the package source, developers will be more likely to update the changelog file. 
 
@@ -57,54 +57,64 @@ The recommended specification is very simple:
 
 * For each package (i.e. every chunk of code that has a package.xml) a file called "ChangeList.txt" is maintained side-by-side.
 
-* This file is appended with a new entry for every new release of a package.
+* This file is prepended with a new entry for every new release of a package.
 
-* Bloom will spit out a warning during package release if no changelog is found or if the changelog does not have an updated entry. Future versions of bloom can force changelogs as a requirement.
+* bloom will emit a warning during package release if no changelog is found or if the changelog does not have an updated entry. Future versions of bloom can force changelogs as a requirement.
 
 ChangeList.txt Format
 ---------------------
+The format for the ChangeList.txt file is a very limited subset of ReStructuredText (RST) markup that uses the following features of RST:
+* Second-level headings (dashed lines)
+* Bullet points
+
+The format is as follows:
+
 ::
 
-	VersionNumber x
-	----------------
-	* Change 1
-	  Optional Text
-	  .
-	  .
-	  .
-	* Change n
-	  Optional Text
+    VersionNumber x
+    ---------------
+    * Change 1
+      Optional Text
+      .
+      .
+      .
+    * Change n
+      Optional Text
 
-	VersionNumber x-1
-	------------------
-	* Change 1
-	  Optional Text
-	  .
-	  .
-	  .
-	* Change n
-	  Optional Texts
+    VersionNumber x-1
+    -----------------
+    * Change 1
+      Optional Text
+      .
+      .
+      .
+    * Change n
+      Optional Texts
 
 ChangeList.txt Example
 ----------------------
 
 ::
 
-	0.1.26
-	* Utilizes caching to improve query performance
-	* Simplified API calls
-	  Note that these changes are based on REP 192
-	* Fixed synchronization issue on startup
+    0.1.26
+    ------
+    * Utilizes caching to improve query performance
+    * Simplified API calls
+      Note that these changes are based on REP 192
+    * Fixed synchronization issue on startup
 
-	0.1.25
-	* Added thread safety
-	* Fixed regression introduced in 0.1.22
+    0.1.25
+    ------
+    * Added thread safety
+    * Fixed regression introduced in 0.1.22
 
-	0.1.0
-	 * First public stable release
+    0.1.0
+    -----
+     * First public stable release
 
-	0.0.1
-	 * Initial release, API follows REP 243s
+    0.0.1
+    -----
+     * Initial release, API follows REP 243s
 
 
 Rationale
@@ -116,13 +126,46 @@ The proposed format has the following properties that help meet the design requi
 
 * When combined with the corresponding package.xml, enough information is provided to meet the requirements of .deb and .rpm changelog formats.
 
-* Easy to parse
+* Easy to parse as syntax is simple and RST-compatible. Parsing without RST-parser also very easy.
 
 * No redundant information from package.xml
 
 Concerns
 ========
 None, this plan is awesome.
+
+Popular Package Changelog Formats
+=================================
+For reference, here are the changelog formats for .deb [1] and .rpm [2] packages. Both package formats expect a changelog as prerequiste to creating a package.
+
+deb
+---
+
+::
+
+    package (version) distribution(s); urgency=urgency
+            [optional blank line(s), stripped]
+    * change details
+      more change details
+        [blank line(s), included in output of dpkg-parsechangelog]
+    * even more change details
+        [optional blank line(s), stripped]
+  -- maintainer name <email address>[two spaces]  date
+
+rpm
+---
+
+::
+
+  * Fri Jun 23 2006 Jesse Keating <jkeating@redhat.com> - 0.6-4
+  - And fix the link syntax.
+  * Fri Jun 23 2006 Jesse Keating <jkeating@redhat.com> 0.6-4
+  - And fix the link syntax.
+  * Fri Jun 23 2006 Jesse Keating <jkeating@redhat.com>
+  - 0.6-4
+  - And fix the link syntax.
+  * Wed Jun 14 2003 Joe Packager <joe at gmail.com> - 1.0-2
+  - Added README file (#42).
 
 References
 ==========
