@@ -31,7 +31,7 @@ In ROS, package changelogs have traditionally been maintained as their own subpa
 
 * **Lack of Maintenance** - As changelogs are isolated from code and are optional, the motivation to maintain the lists is very weak. The result is that only a minority of package maintainers keep good changelogs. The vast majority have however stopped caring overtime or just did not maintain changelists to begin with. The hope is that when changelogs are kept with the package source, developers will be more likely to update the changelog file. 
 
-* **Syntactic Inconsistency** - Even among well-maintained changelogs there is an inconsistency in the layout of these lists across the ROS wiki. The lack of consistency makes it both harder for people and machines to parse the data in these logs. This is an opportunity to constrain the structural and syntactic format of the changelogs so that they are consistent across packages.
+* **Syntactic Inconsistency** - Even among well-maintained changelogs there is an inconsistency in the layout of these lists across the ROS wiki. The lack of consistency makes it harder for both people and machines to parse the data in these logs. This is an opportunity to constrain the structural and syntactic format of the changelogs so that they are consistent across packages.
 
 * **Needed for Packaging** - Virtually all package formats including .deb and .rpm require changelogs as part of the package. Scraping this information from the wiki is counterintuitive and architecturally brittle.
 
@@ -69,6 +69,17 @@ The format for the ChangeList.txt file is a very limited subset of ReStructuredT
 
 * Bullet points
 
+* Embedded URIs 
+
+  ::
+
+    `Python <http://www.python.org/>`_
+
+  Turns into 
+    `Python <http://www.python.org/>`_
+
+At the moment, we choose not to support all of RST to keep the format simple and non-overwhelming. We also choose to do this to make integration with bloom and the wiki as straightforward as possible. In the future we may loosen the constraints of the format and allow more features from RST.
+
 The format is as follows:
 
 ::
@@ -95,19 +106,19 @@ The format is as follows:
 
 ChangeList.txt Example
 ----------------------
-
 ::
 
     0.1.26
     ------
     * Utilizes caching to improve query performance
-    * Simplified API calls
+    * Simplified API calls based on (https://github.com/ros/robot_model)
       Note that these changes are based on REP 192
     * Fixed synchronization issue on startup
 
     0.1.25
     ------
     * Added thread safety
+    * Replaced custom XML parser with `TinyXML <http://www.grinninglizard.com/tinyxml/>`_.
     * Fixed regression introduced in 0.1.22
 
     0.1.0
@@ -134,7 +145,8 @@ The proposed format has the following properties that help meet the design requi
 
 Concerns
 ========
-None, this plan is awesome.
+* How to link to tickets/issues in bug tracker without having to give full URL?
+* How much of RST should be supported?
 
 Popular Package Changelog Formats
 =================================
