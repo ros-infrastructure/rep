@@ -7,17 +7,7 @@ Content-Type: text/x-rst
 Created: 22-Jan-2013
 Post-History: ?-?-2013
 
-Table of Contents
-=================
-
-#. Abstract_
-#. Motivation_
-#. DesignRequirements_
-#. Specification_
-#. Rationale_
-#. Concerns_
-#. References_
-#. Copyright_
+.. contents::
 
 Abstract
 ========
@@ -29,7 +19,7 @@ In ROS, package changelogs have traditionally been maintained as their own subpa
 
 * **Hard to Find** - As changelogs are isolated from code, they can be difficult to find and correlate with particular versions of code. By making them part of the source tree, you can determine what has changed by inspecting the package itself.
 
-* **Lack of Maintenance** - As changelogs are isolated from code and are optional, the motivation to maintain the lists is very weak. The result is that only a minority of package maintainers keep good changelogs. The vast majority have however stopped caring overtime or just did not maintain changelists to begin with. The hope is that when changelogs are kept with the package source, developers will be more likely to update the changelog file. 
+* **Lack of Maintenance** - As changelogs are isolated from code and are optional, the motivation to maintain the lists is very weak. The result is that only a minority of package maintainers keep good changelogs. The vast majority have however stopped caring overtime or just did not maintain changelists to begin with. The hope is that when changelogs are kept with the package source, developers will be more likely to update the changelog file.
 
 * **Syntactic Inconsistency** - Even among well-maintained changelogs there is an inconsistency in the layout of these lists across the ROS wiki. The lack of consistency makes it harder for both people and machines to parse the data in these logs. This is an opportunity to constrain the structural and syntactic format of the changelogs so that they are consistent across packages.
 
@@ -51,36 +41,64 @@ The format of the changelog should have the following properties:
 
 * **Optional but Recommended** - Should not be required, but highly recommended with tools such as bloom giving warnings. If not provided, if [some of] the information can be inferred from SCM commit logs, generate a changelog for the package
 
+* **Generated Documentation** - It is good practice to also include changelogs in generated static documentation. As we use Sphinx, a format that it can process would be ideal.
+
+* **GitHub Integration** - Since ROS packages are being moved to GitHub (and GitHub practices are copied by other hosting solutions), it would be good to comply with GitHub display of files. [5]_
+
+* **Flexibility** - While we like standard syntax, developers should get as much freedom to do changelogs their own way as we can provide.
+
 Specification
 =============
 The recommended specification is very simple:
+* Each changelog will be specified in ReStructuredText (RST) with additional constraints
 
-* For each package (i.e. every chunk of code that has a package.xml) a file called "ChangeList.txt" is maintained side-by-side.
+* For each package (i.e. every chunk of code that has a package.xml) there will be a file containing changelog entries. The recommended filename is CHANGELOG.rst.
 
-* This file is prepended with a new entry for every new release of a package.
+* A ROS infrastructure library will look for a changelog files following naming and placement conventions and preferences, to be used by any ROS tool that wants to process changelogs (e.g. bloom). The places that will be searched are:
+
+1. <package_root>/CHANGELOG.rst
+2. <package_root>/README.rst
+3. <package_root>/doc/CHANGELOG.rst
+
+* The first file found that way shall contain a list of sections for each version which is prepended with a new entry for every new release of a package.
+
+* The library will allow extraction of version numbers and respective text blocks from the document
+
+* The sections for any such file ending with .rst has to be be a valid ReStructuredText [4]_ document.
 
 * bloom will emit a warning during package release if no changelog is found or if the changelog does not have an updated entry. Future versions of bloom can force changelogs as a requirement.
 
-ChangeList.txt Format
----------------------
-The format for the ChangeList.txt file is a very limited subset of ReStructuredText (RST) markup that uses the following features of RST:
+CHANGELOG rst Format
+--------------------
+For now, we will only support RST syntax for changelogs as this format is already widely used in places including ROS, GitHub, and Python. Other markup support may be added in the future if requested.
 
-* Second-level headings (dashed lines)
+A document containing the changelogs must therefore be a valid RST document. Such a document will be processed by an RST parser (ignoring file inclusion directives, as those also do not work on GitHub). From the RST specification [4]_ we will use one section without subsections for one changelog entry, and within that we will allow
 
-* Bullet points
+* paragraphs
+* transitions
+* blank lines
+* hyperlinks
+* comments
+* bullet lists
+* enumeration lists
+* inline markup
+* directives (may be invisible in processed changelog)
 
-* Embedded URIs 
+ For any description of changes. Inline markup transformation rules may just use the raw source when transforming the log entries for deb/rpm format. We explicitly do not support the following elements *within* version sections, as changelog entries should be well writable without those, and useful transformation into condensed deb/rpm formats would be difficult. For details on these elements see [4]_.
 
-  ::
+* Definition lists
+* Field lists
+* Option Lists
+* Literal blocks
+* Line blocks
+* Block quotes
+* Doctest blocks
+* Tables
+* Subsections
 
-    `Python <http://www.python.org/>`_
+A changelog entry is defined by a heading which starts with a version number, meaning it matches the regular expression `^[0-9]+\.[0-9_]+\.[0-9_]+` (three positive integers separate by single dots). It may not contain subsections. Version sections must follow each other in the document in descending version number order. However The need not be all in the same parent section nor on the same section level.
 
-  Turns into 
-    `Python <http://www.python.org/>`_
-
-At the moment, we choose not to support all of RST to keep the format simple and non-overwhelming. We also choose to do this to make integration with bloom and the wiki as straightforward as possible. In the future we may loosen the constraints of the format and allow more features from RST.
-
-The format is as follows:
+The recommended format is as follows:
 
 ::
 
@@ -104,53 +122,149 @@ The format is as follows:
     * Change n
       Optional Texts
 
-ChangeList.txt Example
-----------------------
+But many variations are possible with the elements allowed. The following example uses a lot of variations to show what possibilities exist.
+
+
+CHANGELOG.rst Example
+---------------------
 ::
 
-    0.1.26
-    ------
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+    Changelog for package foo
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    This table is allowed here because it is not part of a version section.
+    == ==
+    1  1
+    == ==
+    1  2
+    == ==
+
+    0.1
+    ===
+
+    0.1.26 (stable)
+    ---------------
     * Utilizes caching to improve query performance
     * Simplified API calls based on (https://github.com/ros/robot_model)
       Note that these changes are based on REP 192
     * Fixed synchronization issue on startup
 
+    .. not mentioning secret feature on purpose
+
     0.1.25
     ------
-    * Added thread safety
-    * Replaced custom XML parser with `TinyXML <http://www.grinninglizard.com/tinyxml/>`_.
-    * Fixed regression introduced in 0.1.22
+
+    - Added thread safety
+    - Replaced custom XML parser with `TinyXML <http://www.grinninglizard.com/tinyxml/>`_.
+    - Fixed regression introduced in 0.1.22
+
+    ----
+
+    The library should now compile under Win32
 
     0.1.0
     -----
-     * First public stable release
+
+     First public *stable* release
+
+    0.0
+    ---
 
     0.0.1
-    -----
-     * Initial release, API follows REP 243s
+    +++++
 
+     1. Initial release
+     2. Initial bugs
+
+
+ROS Wiki Integration
+--------------------
+At the very least, the ROS wiki should link to the changelog in its source repository if publicly available. However, it is preferable if a custom wiki macro is written to pull the changelog from the repository and render it directly on the wiki.
 
 Rationale
 =========
 
 The proposed format has the following properties that help meet the design requirements:
 
-* Extremely simple and very similar to how changelogs are typically written on the wiki
+* Changelogs will now be in-source while remaining optional
 
-* When combined with the corresponding package.xml, enough information is provided to meet the requirements of .deb and .rpm changelog formats.
+* Wiki integration possible with simple solutions
 
-* Easy to parse as syntax is simple and RST-compatible. Parsing without RST-parser also very easy.
+* Simple markup and very similar to how changelogs are typically written on the wiki and other open source projects
+
+* Can reuse RST parsers. See [6]_
+
+* Can be embedded in sphinx docs via include directive or by putting into doc folder.
+
+* The use of RST for markup allows us to automatically generated documentation without changes. 
+
+* Markup allows many different ways of writing changes as long as this can be transformed into brief format for deb/rpm content
+
+* When combined with the corresponding package.xml, enough information is provided to meet the full requirements of .deb and .rpm changelog formats (date, package name, etc.)
 
 * No redundant information from package.xml
 
+
 Concerns
 ========
+
 * How to link to tickets/issues in bug tracker without having to give full URL?
+
+ Would be nice if GitHub did this for us on their website, but currently it does not
+
 * How much of RST should be supported?
+
+ * Outside section entries, no reason to forbid full RST
+ * Inside section entries, we only want to support things that can easily be transformed into deb/rpm format, though some loss of quality might be acceptable. Things to consider:
+
+  * Substitutions http://docutils.sourceforge.net/docs/ref/rst/directives.html#replacement-text
+  * References http://docutils.sourceforge.net/docs/ref/rst/directives.html#references
+  * Inclusion of other files (disabled on github)
+  * Nested lists
+  * Definition lists (could also be used for version!)
+  * Directives, such as `. note:: foo`
+
+  REP now states some definitely allowed and forbidden elements. More may be allowed if users demand that.
+
+* Other markup language support. See [5]_
+
+ Not urgent, leave out for now.
+
+* Name and placement
+
+ * An early suggestion "ChangeList.txt" was rejected due to similarity to CMake "CMakeLists.txt".
+ * The RST extension makes it possible for github to render the file, and allows us to later possibly also support other markup flavors
+ * The package root is a common default way for such meta information, a "doc" subfolder is useful for static documentation. Sphinx does not allow to refer to documents outside the doc folder via toc-trees, but it does allow inclusion of files like this::
+
+    .. include:: ../CHANGELOG.rst
+
+ So we went for CHANGELOG.rst in root as ideal place, with alternatives for convenience. more alternatives could be offered if users demand for it.
+
+* README.rst fallback: When users have a small package, it may be more convenient to put changelog into the README.rst. Could changelog tooling(bloom) fall back to try README.rst for changelog entries?
+
+ Currently not loss by allowing this
+
+* inline markup transformation rules: When creating deb/rpm changelogs from RST, a problem is how to deal with unicode and complex inline markup. Alternatives:
+
+ * Forbid all inline markup
+ * Support some inline markup nicely, forbid all that we do not transform
+ * Support some inline markup nicely, treat other markup as raw source
+ * Support all inline markup nicely
+
+ The actual transformations to happen are for other tools to decide. For now, we shall support some markup nicely (hyperrefs), and treat other markup as raw source.
+
+ * Wiki display: We could display the changelog in the wiki as raw text, try to render the RST, display what goes into the deb, or merely link to the source file in its home repo.
+
+  * raw display is quickest for the users and easiest for us, maybe
+  * rendered display is nicer to the eye, allows following embedded hyperlinks
+  * link to the source location is a bit worse for the users (navigating separate sites, but may be least effort)
+
+
 
 Popular Package Changelog Formats
 =================================
-For reference, here are the changelog formats for .deb [1] and .rpm [2] packages. Both package formats expect a changelog as prerequiste to creating a package.
+For reference, here are the changelog formats for .deb [1]_ and .rpm [2]_ packages. Both package formats expect a changelog as prerequisite to creating a package.
 
 deb
 ---
@@ -181,14 +295,25 @@ rpm
   * Wed Jun 14 2003 Joe Packager <joe at gmail.com> - 1.0-2
   - Added README file (#42).
 
+Resources
+=========
+
+A prototype implementation of a library that parses any RST document and extracts changelog entries as described here is provided as ongiong effort here [6]_.
+
 References
 ==========
-* [1] Debian Package Changelog Requirements
-  (http://www.debian.org/doc/debian-policy/ch-source.html)
-* [2] Fedora RPM Package Changelog Requirements
-  (http://fedoraproject.org/wiki/Packaging:Guidelines#Changelogs)
-* [3] Tully Foote Proposal for Stack Changelogs (9-03-2010)
-  (http://code.ros.org/lurker/message/20100903.213420.d959fddc.en.html)
+.. [1] Debian Package Changelog Requirements
+   (http://www.debian.org/doc/debian-policy/ch-source.html)
+.. [2] Fedora RPM Package Changelog Requirements
+   (http://fedoraproject.org/wiki/Packaging:Guidelines#Changelogs)
+.. [3] Tully Foote Proposal for Stack Changelogs (9-03-2010)
+   (http://code.ros.org/lurker/message/20100903.213420.d959fddc.en.html)
+.. [4] reStructuredText (RST)
+   (http://docutils.sourceforge.net/rst.html)
+.. [5] Github Markup languages
+   (https://github.com/github/markup)
+.. [6] Prototype python script
+   (https://github.com/tkruse/changelog_rst.git)
 
 Copyright
 =========
