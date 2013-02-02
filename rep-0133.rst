@@ -318,6 +318,10 @@ workspaces.
 Design decisions
 ================
 
+This section describes the alternative possibilities that were
+considerd. The first choice in each list is what made it into the
+specificaton.
+
 A. Alternatives for VCS workspace activation
 --------------------------------------------
 
@@ -367,8 +371,9 @@ harm the users source tree.
 
 wstool could still generate a shell file (e.g. setup.sh,
 wstool_env.sh) which does nothing else than setting an environment
-variable, e.g. ROS_WORKSPACE, and rely on the user to source it.  Such
-a file may also be confusing because it does not set up a catkin
+variable, e.g. ROS_WORKSPACE, and rely on the user to source it.
+
+Such a file may also be confusing because it does not set up a catkin
 environment.
 
 No deactivation required.
@@ -546,33 +551,37 @@ usual operation if the subfolder is listed with a version in the
 D. "other" and "setup-file" elements in wstool
 ----------------------------------------------
 
-Currently, "other" and "setup-file" elements in a catkin workspace have no effect
-whatsoever. This can be confusing to users if they happen to see such
+Currently, "other" and "setup-file" elements in a catkin workspace
+have no effect whatsoever. They have effect only in rosbuild
+workspaces. This can be confusing to users if they happen to see such
 elements in rosinstall files for rosbuild.
 
-1. Raise error whenever detecting a non-vcs element
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-wstool command whenever a .rosinstall file it reads has a non-vcs
-element.
-
-This allows very consistent usage of rosinstall files in the
-new environment.
-
-2. Forbid adding "other" elements for wstool, ignore existing
+1. Forbid adding "other" elements for wstool, ignore existing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 wstool commands fail if working on files having an "other" element.
 
 It is slightly inconsistent, but allows the code base to remain
-largely the same.
+largely the same. This should not break anything. This also allows to
+invoke wstool commands on existing rosws workspaces, which may be a
+small bonus.
+
+2. Raise error whenever detecting a non-vcs element
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wstool command raises an error whenever a .rosinstall file it reads
+has a non-vcs element.
+
+This allows very consistent usage of rosinstall files in the
+new environment.
 
 3. Ignore "other" elements in wstool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-wstool does not create "other" elements, and when reading .rosinstall
-files, it ignores "other" elements as if they were commented out
-(e.g. they are not shown on wstool info).
+wstool does not create "other" elements, and but does not raise an
+error when this is attempted neither. When reading .rosinstall files,
+it ignores "other" elements as if they were commented out (e.g. they
+are not shown on wstool info).
 
 This is very inconsistent, but allows even more of the code base to
 remain largely the same.
