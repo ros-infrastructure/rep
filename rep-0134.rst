@@ -186,6 +186,22 @@ processing approach for an isolated build approach. This configures
 and builds each package before configuring and building dependent
 packages.
 
+Alternatives
+============
+
+This section reasons about alternative design choices and why they
+were rejected.
+
+catkin_make command option
+--------------------------
+
+An option would have been to extend catkin_make with an option like
+--isolated. However the commandline syntax between catkin_make and
+catkin_make_isolated varies somewhat, as well as the build result.
+However, currently discussed future changes to catkin_make might
+change this (consider `catkin_cmake` command).
+
+
 Reference Implementation
 ========================
 
