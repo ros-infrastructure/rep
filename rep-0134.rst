@@ -23,7 +23,7 @@ of the package.xml::
 
   <build_type>catkin(default)|cmake</build_type>
 
-Catkin will use the value of this tag to determine how to treat a
+Catkin commands will use the value of this tag to determine how to treat a
 package.  Currently only two values are defined, "catkin" and "cmake",
 but further build types may be added later (possible examples could be
 make, autotools, rosbuild). "catkin" is the default value for this
