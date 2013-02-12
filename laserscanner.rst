@@ -1,0 +1,208 @@
+REP: XXXX
+Title: LaserScan Common Topics, Parameters, and Diagnostic Keys
+Author: Chad Rockey <chadrockey@willowgarage.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 07-Feb-2013
+Post-History: XX-Feb-2013
+
+
+Abstract
+========
+
+This REP defines common topic names, parameter names, and diagnostic key names for LaserScanners.
+
+Specification
+=============
+
+Topics
+----------
+* scan
+
+  - Traditional single return output. (sensor_msgs/LaserScan)
+
+    This is the most compatible topic and represents output from a laser scanner that 
+    cannot return multiple returns per beam.  This topic is not present for all scanners, but 
+    scanners must output either *scan* or *echoes*.
+
+* echoes
+
+  - Output of a laser scanner capable of multiple returns per beam.  
+    (sensor_msgs/MultiEchoLaserScan)
+
+    This is the topic that is designed to give the most information to users of LaserScans.  
+    sensor_msgs/MultiEchoLaserScan is not required to be used by clients.  This topic is not 
+    present for all scanners, but scanners must output either *scan* or *echoes*.
+
+* first
+
+  - Output of the first return from a multi echo laser scanner. (sensor_msgs/LaserScan)
+
+    This topic represents the first return (distance closest to the laser scanner).  It is typically 
+    published by a support library that converts sensor_msgs/MultiEchoLaserScans into 
+    sensor_msgs/LaserScans.
+
+* last
+
+  - Output of the last return from a multi echo laser scanner. (sensor_msgs/LaserScan)
+
+    This topic represents the last return (distance furthest from the laser scanner).  It is typically 
+    published by a support library that converts sensor_msgs/MultiEchoLaserScans into 
+    sensor_msgs/LaserScans.
+
+* intense
+
+  - Output of the most intense return from a multi echo laser scanner. (sensor_msgs/LaserScan)
+
+    This topic represents the most intense return (brightest value).  It is typically published by a 
+    support library that converts sensor_msgs/MultiEchoLaserScans into 
+    sensor_msgs/LaserScans.
+
+Parameters
+----------
+
+* ~ip_address (string)
+
+  - Location of the device on the network (only valid for ethernet devices).
+
+* ~ip_port (int)
+
+  - IP port number. (1 to 65535)
+
+* ~serial_port (string)
+
+  - This represents the serial port device (COM4, /dev/tty/USB0).
+
+* ~serial_baud (int)
+
+  - Data transfer rate for a serial device (9600, 115200, and so on)
+
+* ~frame_id (string)
+
+  - The frame in which laser scans will be returned. This frame should be at the optical center of  
+    the laser, with the x-axis along the zero degree ray, and the y-axis along the 90 degree ray.
+
+* ~calibrate_time (boolean)
+
+  - Whether the node should calibrate the device's time offset on startup. If true, the node will    
+    exchange of series of messages with the device in order to determine the time delay in the 
+    connection. This calibration step is necessary to produce accurate time stamps on scans.
+
+* ~time_offset (double)
+
+  - An manually calibrated offset to add to the timestamp before publication of a message.
+
+* ~intensity (boolean)
+
+  - If true, the laser will not publish intensity to save bandwidth.
+
+* ~min_angle (double)
+
+  - Controls the angle of the first range measurement in radians.  (If supported by the hardware; it 
+    is not recommended to implement this feature in software.)
+
+* ~max_angle (double)
+
+  - Controls the angle of the last range measurement in radians.  (If supported by the hardware; it 
+    is not recommended to implement this feature in software.)
+
+* ~cluster (int)
+
+  - The number of adjacent range measurements to cluster into a single reading; the shortest reading 
+    from the cluster is reported.  (If supported by the hardware; it is not recommended to implement 
+    this feature in software.)
+
+* ~skip (int)
+
+  - The number of input messages to skip between each output message.  The device will publish 1    
+    message for every N skipped messages.  Example: if skip is set to '2', the device will publish 1 
+    message and then 'drop' the following 2 message - a 66.7% reduction in output rate.  (If 
+    supported by the hardware; it is not recommended to implement this feature in software.)
+
+Diagnostic Keys
+---------------
+
+Devices should publish as many of the following keys that are easy to assume or read from hardware.  These key/value pairs are common among devices of this type.  This list is not considered to be exhaustive and drivers are encouraged to add key/value pairs specific to the hardware.
+
+* "IP Address"
+
+  - Location of the device on the network ex (192.168.1.10) (only valid for ethernet devices).
+
+* "IP Port"
+
+  - IP port number. ex (1 to 65535) (only valid for ethernet devices)
+
+* "Serial Port"
+
+  - This represents the serial port device ex (COM4, /dev/tty/USB0).
+
+* "Serial Baud"
+
+  - Data transfer rate for a serial device ex (9600, 115200)
+
+* "Vendor Name"
+
+  - Name of the device vendor. ex (Hokuyo Automatic Co, Ltd)
+
+* "Product Name"
+
+  - Name of the product or model. ex (UTM-30LX-EW)
+
+* "Firmware Version"
+
+  - Description of the current Firmware version if the hardware has programmable features.
+    ex (3.3.01)
+
+* "Firmware Date"
+
+  - Date that the last Firmware version was compiled. ex (23 June 2008)
+
+* "Protocol Version"
+
+  - Description of the communication protocol used.  ex (SCIP 2.0), (LMS COLA-B UDP)
+
+* "Device ID"
+
+  - Serial number or other unique identifier ex (H0906091).'
+
+* "Computed Latency"
+
+  - Offset added to header timestamp to reflect latency in data stream.  ex (-0.013 s)
+
+* "User Time Offset"
+
+  - Offset added to the header timestamp from the parameter '~time_offset'.  ex (-0.551 s)
+
+Rationale
+=========
+
+ROS is built on common messages as interfaces to data.  These messages allow software written without the other's knowledge to work together the first time and produce valid output.  In much the same way as these common messages provide consistent software interfaces, this REP provides a consistent user interface to drivers.
+
+The common topics provide easy to connect nodes via launch files between drivers and processing software. Common parameters provide a way to easily reuse configurations between different devices when applicable.  Finally, common topics, parameters, and diagnostic keys provide a consistent user experience between drivers.
+
+The common names also provide a consistent and documented source of names and diagnostics - freeing the author to make better defined software that's more easily validated.
+
+Backwards Compatibility
+=======================
+
+It is up to the maintainer of a driver to determine if the driver should be updated to follow this REP.  If a maintainer chooses to update the driver, the current usage should at minimum follow a tick tock pattern where the old usage is deprecated and warns the user, followed by removal of the old usage.  The maintainer may choose to support both standard and custom usage, as well as extend this usage or implement this usage partially depending on the specifics of the driver.
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
+
