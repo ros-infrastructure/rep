@@ -93,7 +93,7 @@ Parameters
 
   - An manually calibrated offset (in seconds) to add to the timestamp before publication of a message.
 
-* ~intensity (boolean)
+* ~publish_intensity (boolean)
 
   - If true, the laser will not publish intensity to save bandwidth.
 
