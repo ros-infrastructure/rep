@@ -97,12 +97,12 @@ Parameters
 
   - If true, the laser will not publish intensity to save bandwidth.
 
-* ~min_angle (double)
+* ~angle_min (double)
 
   - Controls the angle of the first range measurement in radians.  (If supported by the hardware; it 
     is not recommended to implement this feature in software.)
 
-* ~max_angle (double)
+* ~angle_max (double)
 
   - Controls the angle of the last range measurement in radians.  (If supported by the hardware; it 
     is not recommended to implement this feature in software.)
