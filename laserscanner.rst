@@ -91,7 +91,7 @@ Parameters
 
 * ~time_offset (double)
 
-  - An manually calibrated offset to add to the timestamp before publication of a message.
+  - An manually calibrated offset (in seconds) to add to the timestamp before publication of a message.
 
 * ~intensity (boolean)
 
