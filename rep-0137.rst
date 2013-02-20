@@ -1,0 +1,245 @@
+REP: 137
+Title: ROS distribution files
+Author: Tully Foote, Dirk Thomas, Paul Mathieu
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 04-Feb-2013
+
+.. contents::
+
+Abstract
+========
+This REP defines and describes the set of ROS distribution files needed to
+maintain consistency among a ROS distribution and facilitate the build process.
+This is required by the Bloom release process, as well as the build process on a
+Jenkins build farm.
+
+Motivation
+==========
+ROS is distributed in the form of a software distribution that integrates
+software written by various contributors into a coherent set of packages.
+As such, the release and build systems need a reliable, centralized way to
+gather information about these packages.
+As ROS aspires to be a ubiquitous software platform for robotic applicarions,
+the release and packaging systems must also be versatile and extendable as to
+allow for a wide range of use cases. This REP primarily targets custom
+buildfarms, and aims at providing the required infrastructure for this purpose.
+Rosdistro release files have been used by different tools to provide a
+centralized list of packages that a ROS distribution contains and maintains.
+These files take the form of YAML files and are easily readable and editable.
+However, no formal description of the syntax of these files was given so far.
+
+The Rosdistro release files will serve several purposes:
+
+ * describe each ROS distribution and provide all necessary information to
+   reconstruct a whole distribution from scratch
+ * provide build information to be used by automated build processes,
+   independently of the build process being used
+ * ease offline/experimental builds by using a simple file structure and easily
+   editable files
+
+Design requirements
+===================
+Different ROS core components utilize existing distribution files, for which no
+formal specification was writtren. In order to minimize the potential
+compatibility issues, changes to exsisting files and structures should not be
+substantial.
+
+Two different uses were identified for these files:
+ * release process
+ * build & distribution process
+
+It should notably be understood that the release process is independant to the
+build process, but that the build process cannot be independant to the release
+process.
+
+As a result, two sets of files are needed, and the build process needs to rely
+on the release files to work.
+The release files are used to define a ROS distribution, ie. a named list of
+packages defining a specific, consistent API.
+The set of release files should then be used by rosdistro to provide a
+centralized way to access information related to a ROS distribution.
+
+A build file that will serve as a configuration file to setup a buildfarm for a
+specific use case is also required.
+
+Proposition
+===========
+We propose to use a structure consisting in the following:
+
+ * release:
+    * master file
+    * distribution files
+ * build:
+    * build.yaml
+
+
+Rationale
+=========
+The release files are organized in a repository. A repository makes it easier
+to keep all the information centralized, and gives flexibility to copy or
+modify it.
+
+YAML
+----
+We want to use the YAML file format for these files for two reasons:
+ * it is easily readable and editable by both humans and machines
+ * a YAML file can be extended with minimal impact on backward compatibility
+
+In order to facilitate compatibility and extendability, the following rules
+are proposed:
+ * each file has a version number
+ * each file has a type that links it to a specification
+ * lists of elements, even in the form of dictionary entries, should be put
+   under a named element of the file, ie. no top-level lists.
+
+In addition to these design rules, and to the YAML syntax, and for the sake of
+clarity and uniformity, we propose the following formatting rules:
+
+ * indentation is two (2) spaces
+ * items are listed in alphabetical order
+ * lists of short words (eg. packages) are written using the inline form
+   (square brackets)
+ * no trailing spaces are allowed
+
+Master file
+-----------
+This is the file containing a list of all the available ROS
+distributions, along with links pointing to specific distribution files.
+Paths are relative to the master file file.
+The goal of this file is to have a practical way to fetch information about a
+given ROS distribution, and to serve as a master directory of distributions
+that a rosdistro repository contains. It should contain a list of distributions
+with links to distribution files that actually contain all the information
+related to it.
+
+Distribution file
+-----------------
+Each yaml file referenced in the master file file is called a distribution
+file. It contains a list of all the packages that are included in the ROS
+software distribution along with their version and the release repository from
+which they shall be fetched, as well as a list of supported target
+architectures/linux distributions.
+
+Build file
+---------
+This file is used by the buildfarm scripts (catkin-debs) to build ROS packages.
+It contains a link to the rosdistros file and is not meant to be hosted in the
+same place as the previous files.
+
+
+Specification
+=============
+Master file
+-----------
+
+ * distros: list of released ROS distributions. Each distribution must have
+   one of the following items:
+    * devel: path to the devel distribution file
+    * doc: path to the documentation folder
+    * release: path to the release distribution file
+ * type: must be 'rosdistros'
+ * version: a version number, used to track file format changes
+
+Example:
+
+::
+
+  distros:
+    groovy:
+      devel: releases/groovy-devel.yaml
+      doc: doc/groovy
+      release: releases/groovy.yaml
+    hydro:
+      devel: releases/hydro-devel.yaml
+      doc: doc/hydro
+      release: releases/hydro.yaml
+  type: rosdistros
+  version: 2.0
+
+
+distibution file
+----------------
+
+ * release-name: the name of the ROS distribution to build
+ * repositories: the contents of the distribution. A list of repositories that
+   contain packages.
+    * url: the git URL to to the repository base
+    * version: the version of the repository
+    * packages: an optional list of packages (if the repository has more than
+      one)
+ * targets: a list of target platforms for which to build
+   This is currently a list of ubuntu/debian distributions, but will most likely
+   be extended into a list of paltforms.
+   Each platform can have different CPU architectures for which to build
+ * type: must be 'distribution'
+ * version: a version number, used to track file format changes
+
+Example:
+
+::
+
+  release-name: groovy
+  repositories:
+    actionlib:
+      url: git://github.com/ros-gbp/actionlib-release.git
+      version: 1.9.11-0
+    ar_track_alvar:
+      url: https://github.com/ros-gbp/ar_track_alvar-release.git
+      version: 0.3.0-0
+    bond_core:
+      url: git://github.com/ros-gbp/bond_core-release.git
+      version: 1.7.10-0
+      packages:
+          bond:
+          bond_core:
+          bondcpp:
+          bondpy:
+          smclib:
+  targets:
+    oneiric: &pc ['amd64', 'i386']
+    precise: ['amd64', 'i386', 'armel']
+    quantal: *pc
+    wheezy: ['armhf']
+  type: distribution
+  version: 1.0
+
+
+build file
+----------
+ * type: must be 'build'
+ * version: a version number, used to track file format changes
+
+Example:
+
+::
+
+  build:
+    from-distro:
+      blacklist: [pr2-common]
+    third-party: my-packages.yaml
+  distribution: groovy
+  notify-maintainers: no
+  rosdistro-repo: http://raw.github.com/ros/rosdistro/master
+  targets:
+    whitelist:
+      - distro: precise
+    blacklist:
+      - arch: armhf
+      - arch: armel
+  type: build
+  version: 1.0
+
+
+Resources
+=========
+
+References
+==========
+.. [1] (very good reference here)
+   (http://a.reference.here/would/be/cool.html)
+
+Copyright
+=========
+This document has been placed in the public domain.
