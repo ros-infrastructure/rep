@@ -80,14 +80,50 @@ This section is reserved for feedback from the community.
 Resources
 =========
 
-TODO: Link to the updated bloom tutorials and documentation regarding third party packages.
+There are updated bloom tutorials on the ROS wiki which explain how to release third party packages per this recommendation. [2]_
 
-TODO: Provide example package.xml and install rules
+Example package.xml
+-------------------
+
+Here is an example package.xml template for a third party package being released::
+
+  <?xml version="1.0"?>
+  <package>
+    <name>foo</name>
+    <version>:{version}</version>
+    <description>The foo package</description>
+
+    <maintainer email="user@todo.todo">user</maintainer>
+    <license>BSD</license>
+
+    <run_depend>catkin</run_depend>
+    <buildtool_depend>cmake</buildtool_depend>
+    <build_depend>boost</build_depend>
+    <run_depend>boost</run_depend>
+
+    <export>
+      <build_type>cmake</build_type>
+    </export>
+  </package>
+
+In the above example the package is called foo, and the :{version} token is replaced with the version being released by bloom. If placing directly in the upstream branch, the version would need to be maintained by the developer manually.
+
+Example CMake package.xml Install Rule
+--------------------------------------
+
+Here is an example CMake install rule for a package.xml::
+
+  # Install catkin package.xml
+  install(FILES package.xml DESTINATION share/foo)
+
+Where the package name is foo.
 
 References
 ==========
 .. [1] Download and build Make Scripts
    (https://github.com/ros/ros/tree/groovy-devel/core/mk)
+.. [2] Bloom Third Party Release Tutorial
+   (http://ros.org/wiki/bloom/Tutorials/ReleaseThirdParty)
 
 Copyright
 =========
