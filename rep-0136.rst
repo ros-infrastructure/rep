@@ -76,6 +76,24 @@ The recommendation of this REP for releasing third party packages in the ROS com
 
 This provides the least intrusive, but most automated and correct method for releasing non-catkin packages through the ROS infrastructure.
 
+Consequences
+============
+This recommendation advises users to not put catkin_package(...) in their CMakeLists.txt, and normally the CMake call to catkin_package(...) generates both CMake find_package(...) infrastructure and pkg-config infrastructure for the package. Since the third party package is not getting this infrastructure generated, packages which depend on it must find and use it as the third party package's developer intended. For example, OpenCV should be found using its original find_package(...) infrastructure rather than the catkin generated find_package(...) infrastructure. So, rather than this::
+
+  find_package(catkin REQUIRED COMPONENTS opencv2)
+  ...
+  include_directories(${catkin_INCLUDE_DIRS})
+  ...
+  target_link_libraries(foo_target ${catkin_LIBRARIES})
+
+The dependent packages should instead follow OpenCV's recommendation::
+
+  find_package(OpenCV REQUIRED)
+  ...
+  include_directories(${OpenCV_INCLUDE_DIRS})
+  ...
+  target_link_libraries(foo_target ${OpenCV_LIBRARIES})
+
 Concerns
 ========
 This section is reserved for feedback from the community.
