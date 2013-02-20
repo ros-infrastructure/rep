@@ -47,8 +47,9 @@ compatibility issues, changes to exsisting files and structures should not be
 substantial.
 
 Two different uses were identified for these files:
- * release process
- * build & distribution process
+
+* release process
+* build & distribution process
 
 It should notably be understood that the release process is independant to the
 build process, but that the build process cannot be independant to the release
