@@ -15,6 +15,10 @@ This REP forms the recommendation for how to handle releases of third party, non
 
 Motivation
 ==========
+In this context a third party package is a software package which exists outside of the ROS ecosystem, and is used by packages in the ROS ecosystem, but are not released widely as a system dependency. These software packages might be designed to be used outside of the ROS ecosystem, but are not big enough or mature enough to be released into operating system package managers. An example of this is the console_bridge package, which can be used outside of ROS, but is heavily utilized by ROS.
+
+Additionally, sometimes a software package which is released as a system dependency can be released as a third party package in order to provide a specific version or patched version of the software package. A good example of this is OpenCV which has official Ubuntu packages, but those are not suitable for release with ROS. So, instead a custom release of OpenCV is released as a third party package. While these exceptions are important to have, developers should strive to utilize the packages provided by package managers when possible, because this reduces special cases, reduces developer overhead, and makes ROS more portable.
+
 Historically, third party packages have been *wrapped* in rosbuild packages, using one of the *download_and_build* Make scripts [1]_. This has since been discouraged [2]_, as it often lead to failures on the build farm and generally is considered bad form for a package. One of the reasons for the popularity of this method of "wrapping" packages was that it was not easy to work with or release third party packages along side rosbuild. Therefore one of the design goals of catkin was to make integration with third party packages easier, and for build time that is accomplished by reducing custom infrastructure and depending more on conventional tools like CMake. There are still some custom tools for the release system which provide infrastructure for the highly distributed and modular ROS ecosystem, and there should be a recommended process for releasing third party packages with these custom tools such that they integrate into the build farm and deployment infrastructure for ROS.
 
 Design Requirements
@@ -52,7 +56,7 @@ This can be solved by putting a package.xml in the upstream of the third party p
 
 Install a catkin package.xml
 ----------------------------
-Normally the package.xml is installed by default when catkin_package(...) is invoked from CMake. For third party packages which build with CMake, invoking catkin_package(...) from their CMakeLists.txt is a possible solution, but is not recommended. In stead the third party packages should make a custom install rule for the package.xml using the preferred method for their build system. This install rule can be placed in the upstream repository along with a package.xml if that is acceptable for the maintainers. Having the package.xml and an install rule for it in the upstream means now patches or injects in the release repository and makes for the cleanest solution, while also not making a dependency on catkin or ROS.
+Normally the package.xml is installed by default when catkin_package(...) is invoked from CMake. For third party packages which build with CMake, invoking catkin_package(...) from their CMakeLists.txt is a possible solution, but is not recommended. Instead the third party packages should make a custom install rule for the package.xml using the preferred method for their build system. This install rule can be placed in the upstream repository along with a package.xml if that is acceptable for the maintainers. Having the package.xml and an install rule for it in the upstream means now patches or injects in the release repository and makes for the cleanest solution, while also not making a dependency on catkin or ROS.
 
 Have setup.*sh Files After Installation
 ---------------------------------------
