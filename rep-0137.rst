@@ -32,12 +32,12 @@ However, no formal description of the syntax of these files was given so far.
 
 The Rosdistro release files will serve several purposes:
 
- * describe each ROS distribution and provide all necessary information to
-   reconstruct a whole distribution from scratch
- * provide build information to be used by automated build processes,
-   independently of the build process being used
- * ease offline/experimental builds by using a simple file structure and easily
-   editable files
+* describe each ROS distribution and provide all necessary information to
+  reconstruct a whole distribution from scratch
+* provide build information to be used by automated build processes,
+  independently of the build process being used
+* ease offline/experimental builds by using a simple file structure and easily
+  editable files
 
 Design requirements
 ===================
@@ -69,11 +69,11 @@ Proposition
 ===========
 We propose to use a structure consisting in the following:
 
- * release:
-    * master file
-    * distribution files
- * build:
-    * build.yaml
+* release:
+  * master file
+  * distribution files
+* build:
+  * build.yaml
 
 
 Rationale
@@ -85,24 +85,26 @@ modify it.
 YAML
 ----
 We want to use the YAML file format for these files for two reasons:
- * it is easily readable and editable by both humans and machines
- * a YAML file can be extended with minimal impact on backward compatibility
+
+* it is easily readable and editable by both humans and machines
+* a YAML file can be extended with minimal impact on backward compatibility
 
 In order to facilitate compatibility and extendability, the following rules
 are proposed:
- * each file has a version number
- * each file has a type that links it to a specification
- * lists of elements, even in the form of dictionary entries, should be put
-   under a named element of the file, ie. no top-level lists.
+
+* each file has a version number
+* each file has a type that links it to a specification
+* lists of elements, even in the form of dictionary entries, should be put
+  under a named element of the file, ie. no top-level lists.
 
 In addition to these design rules, and to the YAML syntax, and for the sake of
 clarity and uniformity, we propose the following formatting rules:
 
- * indentation is two (2) spaces
- * items are listed in alphabetical order
- * lists of short words (eg. packages) are written using the inline form
-   (square brackets)
- * no trailing spaces are allowed
+* indentation is two (2) spaces
+* items are listed in alphabetical order
+* lists of short words (eg. packages) are written using the inline form
+  (square brackets)
+* no trailing spaces are allowed
 
 Master file
 -----------
@@ -135,13 +137,13 @@ Specification
 Master file
 -----------
 
- * distros: list of released ROS distributions. Each distribution must have
-   one of the following items:
-    * devel: path to the devel distribution file
-    * doc: path to the documentation folder
-    * release: path to the release distribution file
- * type: must be 'rosdistros'
- * version: a version number, used to track file format changes
+* distros: list of released ROS distributions. Each distribution must have
+  one of the following items:
+  * devel: path to the devel distribution file
+  * doc: path to the documentation folder
+  * release: path to the release distribution file
+* type: must be 'rosdistros'
+* version: a version number, used to track file format changes
 
 Example:
 
@@ -163,19 +165,19 @@ Example:
 distibution file
 ----------------
 
- * release-name: the name of the ROS distribution to build
- * repositories: the contents of the distribution. A list of repositories that
-   contain packages.
-    * url: the git URL to to the repository base
-    * version: the version of the repository
-    * packages: an optional list of packages (if the repository has more than
-      one)
- * targets: a list of target platforms for which to build
-   This is currently a list of ubuntu/debian distributions, but will most likely
-   be extended into a list of paltforms.
-   Each platform can have different CPU architectures for which to build
- * type: must be 'distribution'
- * version: a version number, used to track file format changes
+* release-name: the name of the ROS distribution to build
+* repositories: the contents of the distribution. A list of repositories that
+  contain packages.
+  * url: the git URL to to the repository base
+  * version: the version of the repository
+  * packages: an optional list of packages (if the repository has more than
+    one)
+* targets: a list of target platforms for which to build
+  This is currently a list of ubuntu/debian distributions, but will most likely
+  be extended into a list of paltforms.
+  Each platform can have different CPU architectures for which to build
+* type: must be 'distribution'
+* version: a version number, used to track file format changes
 
 Example:
 
@@ -209,8 +211,8 @@ Example:
 
 build file
 ----------
- * type: must be 'build'
- * version: a version number, used to track file format changes
+* type: must be 'build'
+* version: a version number, used to track file format changes
 
 Example:
 
