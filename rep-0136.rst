@@ -15,7 +15,7 @@ This REP forms the recommendation for how to handle releases of third party, non
 
 Motivation
 ==========
-Historically, third party packages have been *wrapped* in rosbuild packages, using one of the *download_and_build* Make scripts [1]_. This has since been discouraged, as it often lead to failures on the build farm and generally is considered bad form for a package. One of the reasons for the popularity of this method of "wrapping" packages was that it was not easy to work with or release third party packages along side rosbuild. Therefore one of the design goals of catkin was to make integration with third party packages easier, and for build time that is accomplished by reducing custom infrastructure and depending more on conventional tools like CMake. There are still some custom tools for the release system which provide infrastructure for the highly distributed and modular ROS ecosystem, and there should be a recommended process for releasing third party packages with these custom tools such that they integrate into the build farm and deployment infrastructure for ROS.
+Historically, third party packages have been *wrapped* in rosbuild packages, using one of the *download_and_build* Make scripts [1]_. This has since been discouraged [2]_, as it often lead to failures on the build farm and generally is considered bad form for a package. One of the reasons for the popularity of this method of "wrapping" packages was that it was not easy to work with or release third party packages along side rosbuild. Therefore one of the design goals of catkin was to make integration with third party packages easier, and for build time that is accomplished by reducing custom infrastructure and depending more on conventional tools like CMake. There are still some custom tools for the release system which provide infrastructure for the highly distributed and modular ROS ecosystem, and there should be a recommended process for releasing third party packages with these custom tools such that they integrate into the build farm and deployment infrastructure for ROS.
 
 Design Requirements
 ===================
@@ -80,7 +80,7 @@ This section is reserved for feedback from the community.
 Resources
 =========
 
-There are updated bloom tutorials on the ROS wiki which explain how to release third party packages per this recommendation. [2]_
+There are updated bloom tutorials on the ROS wiki which explain how to release third party packages per this recommendation. [3]_
 
 Example package.xml
 -------------------
@@ -122,7 +122,9 @@ References
 ==========
 .. [1] Download and build Make Scripts
    (https://github.com/ros/ros/tree/groovy-devel/core/mk)
-.. [2] Bloom Third Party Release Tutorial
+.. [2] Download and Build Mailing List Thread
+   (https://code.ros.org/lurker/message/20110207.202716.0ea9ac11.en.html)
+.. [3] Bloom Third Party Release Tutorial
    (http://ros.org/wiki/bloom/Tutorials/ReleaseThirdParty)
 
 Copyright
