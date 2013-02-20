@@ -22,6 +22,7 @@ Design Requirements
 During the Groovy release cycle the existing processes were vetted and several different strategies came of that experience, but some general design requirements have been identified. In particular, after a release, a third party library should:
 
 * Have a catkin package.xml
+ * With a <build_type>cmake</build_type> tag inside the <export> tag
 * Install a catkin package.xml
 * Have setup.*sh files after installation
 
@@ -31,7 +32,7 @@ The rationale for the design requirements are as follows:
 
 Having a catkin package.xml
 ---------------------------
-Having a package.xml allows tools like bloom to extract meta data which other wise must be continuously be asked for or stored in some other way.  The useful meta data in the package.xml that isn't usually shipped with packages in a standard way are things like versioned build, run, and test dependencies, authors, maintainers, license, description, and version. Having this meta information in the package.xml makes it possible for the release tools to generate similar description files for multiple platforms (debian, fedora, Homebrew).
+Having a package.xml allows tools like bloom to extract meta data which other wise must be continuously be asked for or stored in some other way.  The useful meta data in the package.xml that isn't usually shipped with packages in a standard way are things like versioned build, run, and test dependencies, authors, maintainers, license, description, and version. Having this meta information in the package.xml makes it possible for the release tools to generate similar description files for multiple platforms (debian, fedora, Homebrew). The <build_type> tag allows tools like catkin_make_isolated to know how to build it along side catkin packages in a non-homogeneous workspace.
 
 Installing a catkin package.xml
 -------------------------------
@@ -63,11 +64,13 @@ The recommendation of this REP for releasing third party packages in the ROS com
 
 * Inject a templated package.xml into the upstream using bloom
  * Optionally, put the package.xml in the actual upstream repository
+ * Have a <build_type> tag in the <export> tag of the package.xml templates
 * Add an install rule for the package.xml as patch in the release branch using bloom
  * Optionally, put the install rule for the package.xml into the actual upstream repository
 * Have a run_depend on catkin in the package.xml(s)
 
-This provides the least intrusive, but most automated and correct method for releasing non catkin packages through the ROS infrastructure.
+
+This provides the least intrusive, but most automated and correct method for releasing non-catkin packages through the ROS infrastructure.
 
 Concerns
 ========
