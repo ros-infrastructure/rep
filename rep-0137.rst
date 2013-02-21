@@ -180,7 +180,7 @@ distibution file
 * repositories: the contents of the distribution. A list of repositories that
   contain packages.
 
-  * url: the git URL to to the repository base
+  * url: the URL to to the release repository
   * version: version number packages will be released for
   * packages: an optional list of packages (if the repository has more than
     one) If this list is omitted, then a single package named after the
