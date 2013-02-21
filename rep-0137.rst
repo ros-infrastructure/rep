@@ -235,11 +235,9 @@ build file
   * blacklist: list of packages not to build. Any downstream package will also
     not be built (default: empty)
   * build-distro: [bool] build packages from the distribution file (default:yes)
-  * package-list:
-
-    * file: path to a file containing a list of packages to be built
-    * ros-repo: URI to a ROS repository containing all the ROS packages needed
-      by the packages being built
+    Note: when not building a whole distro, the build system will need to know
+    where to find the required ros software
+  * package-list: path to a file containing a list of packages to be built
 
 * targets: specify the target platforms
   (default: build all targets defined in the distribution file)
@@ -284,9 +282,7 @@ Example 3: building a set of packages on top of ROS
 
   build:
     build-distro: no
-    package-list:
-      file: file:///path/to/package-list.yaml
-      ros-repo: http://packages.ros.org
+    package-list: file:///path/to/package-list.yaml
   distribution: groovy
   rosdistro-master: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
   type: build
