@@ -113,7 +113,7 @@ Master file
 -----------
 This is the file containing a list of all the available ROS
 distributions, along with links pointing to specific distribution files.
-Paths are relative to the master file file.
+Paths can be either relative to the master file or absolute.
 The goal of this file is to have a practical way to fetch information about a
 given ROS distribution, and to serve as a master directory of distributions
 that a rosdistro repository contains. It should contain a list of distributions
@@ -150,8 +150,9 @@ Master file
 * distros: list of released ROS distributions. Each distribution must have
   one of the following items:
 
-  * devel: path to the devel distribution file
-  * doc: path to the documentation folder
+  * devel: path to the devel distribution file TODO: explain the difference
+    with release distribution file
+  * doc: path to the documentation folder TODO: explain more
   * release: path to the release distribution file
 
 * type: must be 'rosdistros'
@@ -177,19 +178,22 @@ Example:
 distibution file
 ----------------
 
-* release-name: the name of the ROS distribution to build
+* release-name: the name of the ROS distribution to build. Note: this field is
+  inherited from legacy distribution files, changing it may break something.
 * repositories: the contents of the distribution. A list of repositories that
   contain packages.
 
   * url: the git URL to to the repository base
   * version: the version of the repository
   * packages: an optional list of packages (if the repository has more than
-    one)
+    one) If this list is omitted, then a single package named after the
+    repository will be released
 
-* targets: a list of target platforms for which to build
+* targets: a list of target platforms for which packages are released
   This is currently a list of ubuntu/debian distributions, but will most likely
   be extended into a list of paltforms.
-  Each platform can have different CPU architectures for which to build
+  Each platform can have different CPU architectures for which to build. Each
+  platform will result in a different bloom release
 * type: must be 'distribution'
 * version: a version number, used to track file format changes
 
@@ -225,28 +229,24 @@ Example:
 
 build file
 ----------
-* build: describes what set of packages should be built. Should be one of the
-  following:
+* build: describes what set of packages should be built. (default: build all
+  packages olf the ROS distribution
 
-  * distribution: [bool] build packages from the distribution file
+  * blacklist: list of packages not to build. Any downstream package will also
+    not be built (default: empty)
+  * build-distro: [bool] build packages from the distribution file (default:yes)
   * package-list:
 
     * file: path to a file containing a list of packages to be built
     * ros-repo: URI to a ROS repository containing all the ROS packages needed
       by the packages being built
 
-* targets: specify the target platforms, by means of a whitelist and/or a
-  blacklist (default: build all targets defined in the distribution file)
+* targets: specify the target platforms
+  (default: build all targets defined in the distribution file)
+  Elements of the list are:
 
-  * blacklist: a list of arches/OSes for which not to build anything. (default:
-    empty, all packages will be built) Elements of the list are:
-
-    * arch: CPU architecture (default: any)
-    * distro: OS variant (default: any)
-
-  * whitelist: if specified, restrains the list of target platforms to the list
-    specified (can be fine-tuned with the blacklist). (default: all) Elements
-    are the same as those for the blacklist
+  * arch: CPU architecture (default: any)
+  * distro: OS variant (default: any)
 
 * type: must be 'build'
 * version: a version number, used to track file format changes
@@ -255,14 +255,38 @@ Example 1: official ROS build
 
 ::
 
-  build:
-    distribution: yes
   distribution: groovy
   rosdistro-master: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
   targets:
-    whitelist:
-      - arch: amd64
-      - arch: i386
+    - arch: amd64
+    - arch: i386
+  type: build
+  version: 1.0
+
+Example 2: building for ubuntu precise armel with custom rosdistro repo and
+without pr2 support
+
+::
+
+  build:
+    blacklist: [pr2-common]
+  distribution: groovy
+  rosdistros-master: file:///path/to/my/repo/rosdistros-custom.yaml
+  targets:
+    - arch: armel
+      distro: precise
+  type: build
+  version: 1.0
+
+Example 3: building a set of packages on top of ROS
+
+::
+
+  build:
+    build-distro: no
+    package-list:
+      file: file:///path/to/package-list.yaml
+      ros-repo: http://packages.ros.org
   type: build
   version: 1.0
 
