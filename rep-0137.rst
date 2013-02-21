@@ -230,7 +230,7 @@ Example:
 build file
 ----------
 * build: describes what set of packages should be built. (default: build all
-  packages olf the ROS distribution
+  packages of the ROS distribution)
 
   * blacklist: list of packages not to build. Any downstream package will also
     not be built (default: empty)
@@ -287,6 +287,8 @@ Example 3: building a set of packages on top of ROS
     package-list:
       file: file:///path/to/package-list.yaml
       ros-repo: http://packages.ros.org
+  distribution: groovy
+  rosdistro-master: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
   type: build
   version: 1.0
 
