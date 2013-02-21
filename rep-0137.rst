@@ -134,6 +134,13 @@ This file is used by the buildfarm scripts (catkin-debs) to build ROS packages.
 It contains a link to the rosdistros file and is not meant to be hosted in the
 same place as the previous files.
 
+The purpose of this file is to describe a use case needing a build farm.
+Use cases treated here are the following scenarii:
+
+* setup of an 'official' ROS build farm
+* building ROS for experimental platforms (ARM, OSX...)
+* building a set of packages on top of ROS
+
 
 Specification
 =============
@@ -218,26 +225,44 @@ Example:
 
 build file
 ----------
+* build: describes what set of packages should be built. Should be one of the
+  following:
+
+  * distribution: [bool] build packages from the distribution file
+  * package-list:
+
+    * file: path to a file containing a list of packages to be built
+    * ros-repo: URI to a ROS repository containing all the ROS packages needed
+      by the packages being built
+
+* targets: specify the target platforms, by means of a whitelist and/or a
+  blacklist (default: build all targets defined in the distribution file)
+
+  * blacklist: a list of arches/OSes for which not to build anything. (default:
+    empty, all packages will be built) Elements of the list are:
+
+    * arch: CPU architecture (default: any)
+    * distro: OS variant (default: any)
+
+  * whitelist: if specified, restrains the list of target platforms to the list
+    specified (can be fine-tuned with the blacklist). (default: all) Elements
+    are the same as those for the blacklist
+
 * type: must be 'build'
 * version: a version number, used to track file format changes
 
-Example:
+Example 1: official ROS build
 
 ::
 
   build:
-    from-distro:
-      blacklist: [pr2-common]
-    third-party: my-packages.yaml
+    distribution: yes
   distribution: groovy
-  notify-maintainers: no
-  rosdistro-repo: http://raw.github.com/ros/rosdistro/master
+  rosdistro-master: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
   targets:
     whitelist:
-      - distro: precise
-    blacklist:
-      - arch: armhf
-      - arch: armel
+      - arch: amd64
+      - arch: i386
   type: build
   version: 1.0
 
