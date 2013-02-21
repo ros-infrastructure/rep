@@ -219,9 +219,9 @@ Example:
           bondpy:
           smclib:
   targets:
-    oneiric: &pc ['amd64', 'i386']
+    oneiric: ['amd64', 'i386']
     precise: ['amd64', 'i386', 'armel']
-    quantal: *pc
+    quantal: ['amd64', 'i386']
     wheezy: ['armhf']
   type: distribution
   version: 1.0
