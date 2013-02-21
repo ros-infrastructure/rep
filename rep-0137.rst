@@ -12,8 +12,8 @@ Abstract
 ========
 This REP defines and describes the set of ROS distribution files needed to
 maintain consistency among a ROS distribution and facilitate the build process.
-This is required by the Bloom release process, as well as the build process on a
-Jenkins build farm.
+The intention is to make the build process on a
+Jenkins build farm easier and straightforward.
 
 Motivation
 ==========
@@ -21,27 +21,24 @@ ROS is distributed in the form of a software distribution that integrates
 software written by various contributors into a coherent set of packages.
 As such, the release and build systems need a reliable, centralized way to
 gather information about these packages.
-As ROS aspires to be a ubiquitous software platform for robotic applicarions,
+As ROS aspires to be a ubiquitous software platform for robotic applications,
 the release and packaging systems must also be versatile and extendable as to
 allow for a wide range of use cases. This REP primarily targets custom
 buildfarms, and aims at providing the required infrastructure for this purpose.
-Rosdistro release files have been used by different tools to provide a
-centralized list of packages that a ROS distribution contains and maintains.
+Release files are used to release and build packages for ROS.
 These files take the form of YAML files and are easily readable and editable.
 However, no formal description of the syntax of these files was given so far.
 
 The Rosdistro release files will serve several purposes:
 
 * describe each ROS distribution and provide all necessary information to
-  reconstruct a whole distribution from scratch
-* provide build information to be used by automated build processes,
-  independently of the build process being used
-* ease offline/experimental builds by using a simple file structure and easily
+  release and build the whole distribution
+* ease custom builds and extensions by using a simple file structure and easily
   editable files
 
 Design requirements
 ===================
-Different ROS core components utilize existing distribution files, for which no
+Various ROS core components utilize existing distribution files, for which no
 formal specification was writtren. In order to minimize the potential
 compatibility issues, changes to exsisting files and structures should not be
 substantial.
@@ -51,10 +48,9 @@ Two different uses were identified for these files:
 * release process
 * build & distribution process
 
-It should notably be understood that the release process is independant to the
-build process, but that the build process cannot be independant to the release
-process.
-
+The build process can only work on released packages, and will require
+information needed by the release process, but the release process should
+stay independent of the build process.
 As a result, two sets of files are needed, and the build process needs to rely
 on the release files to work.
 The release files are used to define a ROS distribution, ie. a named list of
@@ -76,7 +72,7 @@ We propose to use a structure consisting in the following:
 
 * build:
 
-  * build.yaml
+  * build file
 
 
 Rationale
@@ -116,9 +112,7 @@ distributions, along with links pointing to specific distribution files.
 Paths can be either relative to the master file or absolute.
 The goal of this file is to have a practical way to fetch information about a
 given ROS distribution, and to serve as a master directory of distributions
-that a rosdistro repository contains. It should contain a list of distributions
-with links to distribution files that actually contain all the information
-related to it.
+available for release.
 
 Distribution file
 -----------------
@@ -130,14 +124,14 @@ architectures/linux distributions.
 
 Build file
 ---------
-This file is used by the buildfarm scripts (catkin-debs) to build ROS packages.
-It contains a link to the rosdistros file and is not meant to be hosted in the
-same place as the previous files.
+This file is used by the buildfarm scripts to build ROS packages.
+It contains a link to the master file and a reference of the ROS distribution
+for which the software is built.
 
 The purpose of this file is to describe a use case needing a build farm.
 Use cases treated here are the following scenarii:
 
-* setup of an 'official' ROS build farm
+* building a full ROS distribution
 * building ROS for experimental platforms (ARM, OSX...)
 * building a set of packages on top of ROS
 
@@ -146,17 +140,20 @@ Specification
 =============
 Master file
 -----------
+This file serves as a dictionnary of available ROS distributions. It contains
+links to distribution files, to doc folders and optionally to a rosdistro
+server cache.
 
-* distros: list of released ROS distributions. Each distribution must have
-  one of the following items:
+* distros: list of released ROS distributions.
 
   * devel: path to the devel distribution file TODO: explain the difference
     with release distribution file
   * doc: path to the documentation folder TODO: explain more
   * release: path to the release distribution file
+  * deps_cache: link to a rosdistro cache tarball
 
-* type: must be 'rosdistros'
-* version: a version number, used to track file format changes
+* type: must be 'ros-distribution'
+* version: version number. This REP describes version 1
 
 Example:
 
@@ -167,41 +164,46 @@ Example:
       devel: releases/groovy-devel.yaml
       doc: doc/groovy
       release: releases/groovy.yaml
+      deps_cache: http://www.ros.org/rosdistro/groovy-dependencies.tar.gz
     hydro:
       devel: releases/hydro-devel.yaml
       doc: doc/hydro
       release: releases/hydro.yaml
-  type: rosdistros
-  version: 2.0
+  type: ros-distributions
+  version: 1
 
 
 distibution file
 ----------------
 
-* release-name: the name of the ROS distribution to build. Note: this field is
-  inherited from legacy distribution files, changing it may break something.
+* name: the name of the ROS distribution for which to build
 * repositories: the contents of the distribution. A list of repositories that
   contain packages.
 
   * url: the git URL to to the repository base
-  * version: the version of the repository
+  * version: version number packages will be released for
   * packages: an optional list of packages (if the repository has more than
     one) If this list is omitted, then a single package named after the
-    repository will be released
+    repository will be released, which will be searched for at the root of the
+    repository. Each package in this list has the following
+    form:
+
+    * *package_name*: subfolder in which the package is stored. Default:
+      *package_name*
 
 * targets: a list of target platforms for which packages are released
   This is currently a list of ubuntu/debian distributions, but will most likely
   be extended into a list of paltforms.
   Each platform can have different CPU architectures for which to build. Each
   platform will result in a different bloom release
-* type: must be 'distribution'
-* version: a version number, used to track file format changes
+* type: must be 'ros-distribution'
+* version: version number. This REP describes version 1
 
 Example:
 
 ::
 
-  release-name: groovy
+  name: groovy
   repositories:
     actionlib:
       url: git://github.com/ros-gbp/actionlib-release.git
@@ -210,84 +212,94 @@ Example:
       url: https://github.com/ros-gbp/ar_track_alvar-release.git
       version: 0.3.0-0
     bond_core:
-      url: git://github.com/ros-gbp/bond_core-release.git
-      version: 1.7.10-0
       packages:
           bond:
           bond_core:
           bondcpp:
           bondpy:
           smclib:
+      url: git://github.com/ros-gbp/bond_core-release.git
+      version: 1.7.10-0
   targets:
     oneiric: ['amd64', 'i386']
     precise: ['amd64', 'i386', 'armel']
     quantal: ['amd64', 'i386']
     wheezy: ['armhf']
-  type: distribution
-  version: 1.0
+  type: ros-distribution
+  version: 1
 
 
 build file
 ----------
-* build: describes what set of packages should be built. (default: build all
+* distribution: name of the distribution for rhich to build. This name will be
+  looked for in the master file
+* master-file: URL to a master file
+* notify-maintainers: [bool] optional flag used to disable maintainer
+  notifications of build failures. (default: yes)
+* packages: describes what set of packages should be built. (default: build all
   packages of the ROS distribution)
 
   * blacklist: list of packages not to build. Any downstream package will also
     not be built (default: empty)
-  * build-distro: [bool] build packages from the distribution file (default:yes)
-    Note: when not building a whole distro, the build system will need to know
-    where to find the required ros software
-  * package-list: path to a file containing a list of packages to be built
+  * whitelist: exclusive list of packages to build. Any upstream package will
+    also be built (default: build all)
 
 * targets: specify the target platforms
   (default: build all targets defined in the distribution file)
   Elements of the list are:
 
   * arch: CPU architecture (default: any)
-  * distro: OS variant (default: any)
+  * distribution: OS codename (default: any)
 
-* type: must be 'build'
-* version: a version number, used to track file format changes
+* type: must be 'ros-build'
+* version: version number. This REP describes version 1
 
-Example 1: official ROS build
+Example 1: full ROS build (amd64 & i386)
 
 ::
 
   distribution: groovy
-  rosdistro-master: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
+  master-file: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
   targets:
     - arch: amd64
     - arch: i386
-  type: build
-  version: 1.0
+  type: ros-build
+  version: 1
 
-Example 2: building for ubuntu precise armel with custom rosdistro repo and
-without pr2 support
+Example 2: building a restricted set for ubuntu precise armel
 
 ::
 
-  build:
-    blacklist: [pr2-common]
+  packages:
+    whitelist: [ros-comm]
   distribution: groovy
-  rosdistros-master: file:///path/to/my/repo/rosdistros-custom.yaml
+  master-file: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
+  notify-maintainers: no
   targets:
     - arch: armel
-      distro: precise
+      distribution: precise
   type: build
-  version: 1.0
+  version: 1
 
 Example 3: building a set of packages on top of ROS
 
 ::
 
-  build:
-    build-distro: no
-    package-list: file:///path/to/package-list.yaml
   distribution: groovy
-  rosdistro-master: http://raw.github.com/ros/rosdistro/master/rosdistros.yaml
+  master-file: file://path/to/my/rosdistros-custom.yaml
   type: build
-  version: 1.0
+  version: 1
 
+
+Compatibility issues
+====================
+
+To ensure compatibility with fuerte and earlier build scripts, the following
+item is required in distribution files:
+
+::
+
+  gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
 
 Resources
 =========
