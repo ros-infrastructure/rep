@@ -18,11 +18,11 @@ buildfarms.
 Motivation
 ==========
 A ROS distribution consists of numerous software packages maintained by various
-contributors. Together they form a coherent set called ROS. Since ROS aspires
-to be an ubiquitous software platform for robotic applications it is used on
-various platforms and architectures. Until now there was only one buildfarm
+contributors. Together they form a coherent set. Until now there was only one buildfarm
 responsible for running unit tests and generating Debian packages for various
-Ubuntu versions. However, no formal description of the semantic of the files
+Ubuntu versions. Going forward expanding the current capabilities to support 
+other platforms an architectures will be important.  
+However, no formal description of the semantic of the files
 used in that process was given so far.
 
 This REP aims to specify all information and file formats necessary to release
@@ -30,8 +30,8 @@ and package ROS distributions for various platforms and architectures. By
 formalizing these data structures it should be enabled to:
 
 * release packages using bloom for all targeted platforms and architectures
-* run unit tests for packages on various platforms and architectures
-* build binary packages for various platforms and architectures
+* run unit tests for packages on selected platforms and architectures
+* build binary packages for selected platforms and architectures
 
 Beyond that the goal of this REP is to:
 
@@ -40,7 +40,7 @@ Beyond that the goal of this REP is to:
 * enable building binary packages for (experimental) platforms and
   architectures
 * enable building binary packages of custom packages on-top of the existing ROS
-  distributions, i.e. for close-source/proprietary projects
+  distributions, supporting both open source and proprietary projects.
 
 Design requirements
 ===================
@@ -49,7 +49,8 @@ The information formalized in this REP are used in three separate processes:
 * releasing a package, which is the step from an upstream software package to
   a platform specific source package (usually a tarball including platform
   specific metainformation)
-* running unit tests for packages
+* running processes on individual packages to be able to index or analyze them 
+such as auto generated code documentation and unit tests
 * building binary packages for a specific platform and architecture
 
 The release process should stay independent of the build process. The testing
