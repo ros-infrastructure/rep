@@ -10,47 +10,53 @@ Created: 04-Feb-2013
 
 Abstract
 ========
-This REP defines and describes the set of ROS distribution files needed to
-maintain consistency among a ROS distribution and facilitate the build process.
-The intention is to make the build process on a
-Jenkins build farm easier and straightforward.
+This REP specifies a set of files which define a ROS distribution and
+facilitate the build and packaging process. The intention is to formalize the
+existing infrastructure and simplify hosting (potentially customized) ROS
+buildfarms.
 
 Motivation
 ==========
-ROS is distributed in the form of a software distribution that integrates
-software written by various contributors into a coherent set of packages.
-As such, the release and build systems need a reliable, centralized way to
-gather information about these packages.
-As ROS aspires to be a ubiquitous software platform for robotic applications,
-the release and packaging systems must also be versatile and extendable as to
-allow for a wide range of use cases. This REP primarily targets custom
-buildfarms, and aims at providing the required infrastructure for this purpose.
-Release files are used to release and build packages for ROS.
-These files take the form of YAML files and are easily readable and editable.
-However, no formal description of the syntax of these files was given so far.
+A ROS distribution consists of numerous software packages maintained by various
+contributors. Together they form a coherent set called ROS. Since ROS aspires
+to be an ubiquitous software platform for robotic applications it is used on
+various platforms and architectures. Until now there was only one buildfarm
+responsible for running unit tests and generating Debian packages for various
+Ubuntu versions. However, no formal description of the semantic of the files
+used in that process was given so far.
 
-The Rosdistro release files will serve several purposes:
+This REP aims to specify all information and file formats necessary to release
+and package ROS distributions for various platforms and architectures. By
+formalizing these data structures it should be enabled to:
 
-* describe each ROS distribution and provide all necessary information to
-  release and build the whole distribution
-* ease custom builds and extensions by using a simple file structure and easily
-  editable files
+* release packages using bloom for all targeted platforms and architectures
+* run unit tests for packages on various platforms and architectures
+* build binary packages for various platforms and architectures
+
+Beyond that the goal of this REP is to:
+
+* simplify the setup of a buildfarm which builds and tests a ROS distribution,
+  i.e. building and testing individual ROS distributions on separate buildfarms
+* enable building binary packages for (experimental) platforms and
+  architectures
+* enable building binary packages of custom packages on-top of the existing ROS
+  distributions, i.e. for close-source/proprietary projects
 
 Design requirements
 ===================
-Various ROS core components utilize existing distribution files, for which no
-formal specification was writtren. In order to minimize the potential
-compatibility issues, changes to exsisting files and structures should not be
-substantial.
+The information formalized in this REP are used in three separate processes:
 
-Two different uses were identified for these files:
+* releasing a package, which is the step from an upstream software package to
+  a platform specific source package (usually a tarball including platform
+  specific metainformation)
+* running unit tests for packages
+* building binary packages for a specific platform and architecture
 
-* release process
-* build & distribution process
+The release process should stay independent of the build process. The testing
+can be performed on either the upstream source or on the released tarball
+(depending on if the upstream source contains enough information to run the
+test suite). The build process can only work on released packages.
 
-The build process can only work on released packages, and will require
-information needed by the release process, but the release process should
-stay independent of the build process.
 As a result, two sets of files are needed, and the build process needs to rely
 on the release files to work.
 The release files are used to define a ROS distribution, ie. a named list of
