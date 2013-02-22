@@ -91,18 +91,18 @@ Parameters
 
 * ~time_offset (double)
 
-  - An manually calibrated offset to add to the timestamp before publication of a message.
+  - An manually calibrated offset (in seconds) to add to the timestamp before publication of a message.
 
-* ~intensity (boolean)
+* ~publish_intensity (boolean)
 
   - If true, the laser will not publish intensity to save bandwidth.
 
-* ~min_angle (double)
+* ~angle_min (double)
 
   - Controls the angle of the first range measurement in radians.  (If supported by the hardware; it 
     is not recommended to implement this feature in software.)
 
-* ~max_angle (double)
+* ~angle_max (double)
 
   - Controls the angle of the last range measurement in radians.  (If supported by the hardware; it 
     is not recommended to implement this feature in software.)
