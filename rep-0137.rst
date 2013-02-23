@@ -1,0 +1,292 @@
+REP: 137
+Title: ROS distribution files
+Author: Tully Foote, Dirk Thomas, Paul Mathieu
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 04-Feb-2013
+
+.. contents::
+
+Abstract
+========
+This REP specifies a set of files which define ROS distributions and
+facilitate the build and packaging process. The intention is to formalize the
+existing infrastructure and simplify hosting of (potentially customized) ROS
+buildfarms.
+
+Motivation
+==========
+A ROS distribution consists of numerous software packages maintained by various
+contributors forming a coherent set. Until now there was
+only one buildfarm responsible for running unit tests and generating Debian
+packages for various Ubuntu versions and no formal description of the semantics
+of the files used in that process was given so far. Expanding the
+current capabilities to support other platforms and architectures will be
+important extensions.
+
+This REP aims to specify all information and file formats necessary to release
+and package ROS distributions for various platforms and architectures. By
+formalizing these data structures it should be enabled to:
+
+* release packages using bloom [1]_ for all targeted platforms
+* run unit tests for packages on selected platforms and architectures
+* build binary packages for selected platforms and architectures
+
+The use cases this REP is designed to address are:
+
+1. simplify the setup of a buildfarm which builds and tests a ROS distribution,
+   i.e. building and testing individual ROS distributions on separate buildfarms
+2. enable building binary packages for (experimental) platforms and
+   architectures
+3. enable building binary packages of custom packages on-top of the existing ROS
+   distributions for publicly or privately hosted projects
+
+Design requirements
+===================
+The information formalized in this REP is used in four separate processes:
+
+* releasing a package
+  This is the process of exporting upstream source and generating platform
+  specific build files specific metainformation)
+* running automated tests
+* running documentation jobs
+* building binary packages for a specific platform and architecture
+
+There should be a single configuration which contains (or references) all
+information required to run the above processes.
+The configuration must be easily readable and editable by both humans as well
+as machines and be extendable with future functionality.
+
+The set of packages for which to build binary packages must be configurable
+for each platform and architecture.
+
+The release process should stay independent of the build process. The testing
+can be performed on either the upstream source or on the released tarball
+(depending on if the upstream source contains enough information to run the
+test suite). The build process can only work on released packages.
+
+Each configuration file must contain a label which identifies the semantics
+of the file as well as a version number to enable future format updates.
+
+Rationale
+=========
+A single configuration containing or referencing all required information
+allows for a single entry point for automated processing in the above
+mentioned processes.
+
+Specifying individual subsets of packages per platform and architecture is
+necessary since not all released packages can and should be build on all
+platforms and architectures.
+
+The information for the various processes should be separated from each other
+to ease customizing individual processes. This is especially necessary since
+different processes will be run by separate entities.
+
+Specification
+=============
+
+Master file
+-----------
+The master file act as a single configuration entrypoint which lists all
+available ROS distributions, along with references pointing to further process
+specific information.
+The references can be either relative to the master file or absolute.
+
+The information stored in the master file is:
+
+* distributions: a list of ROS distributions
+
+  For each distribution further information are referenced:
+
+  * release: reference to the release distribution file
+  * release-build: list of references to the build files used to build the binary packages
+  * test: reference to the distribution file used for tests
+  * test-build: list of references to the build file used to run the tests
+  * doc: reference to the documentation folder TODO: explain more
+  * distribution-cache: reference to a distribution cache
+
+* type: must be 'ros-distributions'
+* version: version number, this REP describes version 1
+
+Distribution file
+-----------------
+A distribution is identified by the code name of the ROS distribution.
+Each distribution contains the following:
+
+* repositories: a list of repositories which are identified by unique names
+
+  * url: the URL of the release repository
+    The URL should be writable (with the appropriate credentials).
+  * version: version number packages will be released for
+
+  * packages: an optional list of packages (if the repository has more than one).
+    For each package a relative path in the repository can be specified.
+    If that path is omitted, then a subfolder with the name of the package is expected.
+    If this list is omitted, then a single package named after the
+    repository is expected to be in the root of the repository.
+
+* targets: a list of target platforms for which packages are released.
+  These names are OS code names as determined by 'rospkg.os_detect'.
+  Each target platform will result in a different bloom release.
+
+* type: must be 'ros-distribution'
+* version: version number, this REP describes version 1
+
+Build file
+----------
+* package-whitelist: a list of packages to build.
+  If this is omitted all packages specified in the distribution file are build.
+  Any upstream packages are implicitly included.
+* package-blacklist: a list of packages excluded from build.
+  If this is omitted no packages are excluded.
+  Any downstream package are implicitly excluded.
+  The blacklist overrides the whitelist.
+
+* targets: a list of targets for which packages are build.
+  Each target consists of a platform (OS code name) and CPU architecture.
+  Code names specified in the list must be listed in the corresponding 
+  distribution file.
+
+* notify-maintainers: optional boolean flag used to disable maintainer
+  notifications of build failures. (default: true)
+
+* type: must be 'ros-build'
+* version: version number, this REP describes version 1
+
+Test file
+---------
+The test file uses the same specification as the distribution file, but does not
+use a list of targets.
+The test file references either source repositories or release branches from
+release repositories on which tests will be run.
+
+* type: must be 'ros-test'
+
+Documentation directory
+-----------------------
+The directory contains .rosinstall files which list repositories which should be used to generate API documentation.
+
+Distribution cache file
+-----------------------
+Collection of all meta information of the ROS distribution, including all the information from the package.xml files.
+The cache must reference the distribution file and store a hash of the version it was build from to be able to detect if the cache is invalid.
+The format of that cache is considered an implementation detail and is not specified in this REP.
+
+Compatibility issues
+====================
+
+To ensure a proper error message for older tools, the following
+item is required in distribution files:
+
+::
+
+  gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
+
+Affected tools
+--------------
+
+* bloom
+* buildfarm
+* catkin-deb
+* reprepro-updater
+* rosdep
+* rosdistro
+* roslocate
+
+File format
+===========
+
+We want to use the YAML file format for these files.
+In order to facilitate compatibility and extendability, the following rule is proposed:
+
+* lists of elements, even in the form of dictionary entries, should be put
+  under a named element of the file, ie. no top-level lists.
+
+In addition to these design rules, and to the YAML syntax, and for the sake of
+clarity and uniformity, we propose the following formatting rules:
+
+* indentation is two (2) spaces
+* items are listed in alphabetical order
+* lists of short words (eg. packages) are written using the inline form
+  (square brackets)
+* no trailing spaces are allowed
+
+Master file
+-----------
+A master file referencing multiple distribution and build files.
+
+::
+
+  distributions:
+    groovy:
+      release: releases/groovy.yaml
+      release-build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
+      test: tests/groovy.yaml
+      test-build: [tests/groovy-build.yaml]
+      doc: doc/groovy
+      distribution-cache: http://www.example.com/groovy-distribution-cache
+    hydro:
+      ...
+  type: ros-distributions
+  version: 1
+
+Distribution file
+-----------------
+A distribution file listing a couple of repositories and packages and the target platforms.
+
+::
+
+  repositories:
+    actionlib:
+      url: https://github.com/ros-gbp/actionlib-release.git
+      version: 1.9.11-0
+    ar_track_alvar:
+      url: https://github.com/ros-gbp/ar_track_alvar-release.git
+      version: 0.3.0-0
+      packages:
+        ar_track_alvar: artrackalvar
+    bond_core:
+      url: https://github.com/ros-gbp/bond_core-release.git
+      version: 1.7.10-0
+      packages:
+        bond:
+        bond_core:
+        bondcpp:
+        bondpy:
+        smclib:
+  targets: [oneiric, precise, quantal, wheezy]
+  type: ros-distribution
+  version: 1
+
+Build file
+----------
+A build file selecting a subset of packages from the distribution and specifying the platforms and architectures.
+
+::
+
+  package-whitelist: [ros_tutorials]
+  package-blacklist: [turtlesim]
+  targets:
+    oneiric: [amd64, i386]
+    precise: [amd64, i386, armel]
+  notify-maintainers: false
+  type: ros-build
+  version: 1
+
+Use case examples
+=================
+TODO describe all files necessary to cover each use case.
+
+Resources
+=========
+
+References
+==========
+.. [1] TODO: put a link to bloom help/spec
+   (http://a.reference.here/would/be/cool.html)
+
+Copyright
+=========
+This document has been placed in the public domain.
+
