@@ -86,6 +86,16 @@ different processes will be run by separate entities.
 Specification
 =============
 
+This REP intends to give a formal specification for some files that are already
+in use:
+* current distribution files (groovy.yaml)
+* targets.yaml
+
+The changes to the distribution file are minimal, such as adding type and
+version fields, and can be performed by a script.
+
+The targets.yaml file will be split and merged in the distribution files.
+
 Master file
 -----------
 The master file act as a single configuration entrypoint which lists all
@@ -116,17 +126,17 @@ Each distribution contains the following:
 
 * repositories: a list of repositories which are identified by unique names
 
-  * url: the URL of the release repository
+  * url: the URL of the release git repository
     The URL should be writable (with the appropriate credentials).
-  * version: version number packages will be released for
-
+  * version: version number for which packages are released. For git and hg this
+    can be a tag, branch or hash.
   * packages: an optional list of packages (if the repository has more than one).
     For each package a relative path in the repository can be specified.
     If that path is omitted, then a subfolder with the name of the package is expected.
     If this list is omitted, then a single package named after the
     repository is expected to be in the root of the repository.
 
-* targets: a list of target platforms for which packages are released.
+* platforms: a list of target platforms for which packages are released.
   These names are OS code names as determined by 'rospkg.os_detect'.
   Each target platform will result in a different bloom release.
 
@@ -145,21 +155,26 @@ Build file
 
 * targets: a list of targets for which packages are build.
   Each target consists of a platform (OS code name) and CPU architecture.
-  Code names specified in the list must be listed in the corresponding 
+  Code names specified in the list must be listed in the corresponding
   distribution file.
 
 * notify-maintainers: optional boolean flag used to disable maintainer
-  notifications of build failures. (default: true)
+  notifications of build failures. This is useful for offline/experimental
+  buildfarms. (default: true)
 
 * type: must be 'ros-build'
 * version: version number, this REP describes version 1
 
 Test file
 ---------
-The test file uses the same specification as the distribution file, but does not
-use a list of targets.
+The test file uses a specification similar to the distribution file, but does not
+use a list of targets, and is not limited to git repositories.
 The test file references either source repositories or release branches from
 release repositories on which tests will be run.
+
+* repositories
+
+  * type: the type of SCM in use. Typically 'git', 'svn'...
 
 * type: must be 'ros-test'
 
@@ -186,31 +201,38 @@ item is required in distribution files:
 Affected tools
 --------------
 
-* bloom
-* buildfarm
-* catkin-deb
-* reprepro-updater
-* rosdep
-* rosdistro
-* roslocate
+* bloom: bloom relies on rosdep to retrieve the list of targets. Changes to
+  bloom are thought to be minimal (probably none)
+* buildfarm: the buildfarm needs to know for which target/architecture it
+  builds packages. It hsould use rosdistro for that purpose
+* catkin-debs: actual tools use an internal rosdistro implementation that does
+  not correspond to this REP
+* reprepro-updater: needs a list of supported targets to generate repositories,
+  should rely on rosdistro
+* rosdep: rosdep also provides a list of targets (the old targets.yaml file),
+  should rely on rosdistro
+* rosdistro: this is the preferred implementation of the specifications listed
+  in this REP. All other tools should use rosdistro
+* roslocate: should be updated to use rosdistro
+* rosdoc/rosdoc-lite: should be updated to use rosdistro
 
 File format
 ===========
 
-We want to use the YAML file format for these files.
-In order to facilitate compatibility and extendability, the following rule is proposed:
+Files use YAML 1.1 for the sake of human and machine readability and
+write-ability.
+As a good practice, the should contain a header such as:
 
-* lists of elements, even in the form of dictionary entries, should be put
-  under a named element of the file, ie. no top-level lists.
+::
 
-In addition to these design rules, and to the YAML syntax, and for the sake of
-clarity and uniformity, we propose the following formatting rules:
+  %YAML 1.1
+  # distribution file
+  # this file describes a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
 
-* indentation is two (2) spaces
-* items are listed in alphabetical order
-* lists of short words (eg. packages) are written using the inline form
-  (square brackets)
-* no trailing spaces are allowed
+Examples
+========
 
 Master file
 -----------
@@ -233,7 +255,7 @@ A master file referencing multiple distribution and build files.
 
 Distribution file
 -----------------
-A distribution file listing a couple of repositories and packages and the target platforms.
+A distribution file listing repositories and packages and the target platforms.
 
 ::
 
@@ -255,7 +277,7 @@ A distribution file listing a couple of repositories and packages and the target
         bondcpp:
         bondpy:
         smclib:
-  targets: [oneiric, precise, quantal, wheezy]
+  platforms: [oneiric, precise, quantal, wheezy]
   type: ros-distribution
   version: 1
 
@@ -276,15 +298,98 @@ A build file selecting a subset of packages from the distribution and specifying
 
 Use case examples
 =================
-TODO describe all files necessary to cover each use case.
+Full ROS build
+--------------
+This corresponds to building ROS for officially supported platforms and
+architectures. This example shows the different files needed for ROS groovy.
 
-Resources
-=========
+master.yaml:
+
+::
+
+  %YAML 1.1
+  # master file
+  # this file describes the available ROS distributions
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: ros-distributions
+  version: 1
+  distributions:
+    groovy:
+      release: release/groovy.yaml
+      release-build: [release/groovy-build.yaml]
+      test: test/groovy.yaml
+      test-build: [test/groovy-build.yaml]
+      doc: doc/
+      distribution-cache: http://ros.org/rosdistro/groovy-cache.tar.gz
+
+release/groovy.yaml:
+
+::
+
+  %YAML 1.1
+  # distribution file
+  # this file describes a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
+  type: ros-distribution
+  version: 1
+  repositories:
+    ...
+    # here the contents of the current groovy.yaml:repositories
+
+release/groovy-build.yaml:
+
+::
+
+  %YAML 1.1
+  # build file
+  # this file describes a build of a ROS distribution
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: ros-build
+  version: 1
+  targets:
+    oneiric: [amd64, i386]
+    precise: [amd64, i386]
+    quantal: [amd64, i386]
+
+test/groovy.yaml:
+
+::
+
+  %YAML 1.1
+  # test file
+  # this file describes test repositories for a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: ros-test
+  version: 1
+  repositories:
+    ...
+    # here the contents of the current groovy-devel.yaml:repositories
+
+test/groovy-build.yaml:
+
+::
+
+  %YAML 1.1
+  # build file
+  # this file describes a build of a ROS distribution
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: ros-build
+  version: 1
+  targets:
+    oneiric: [amd64, i386]
+    precise: [amd64, i386]
+    quantal: [amd64, i386]
 
 References
 ==========
-.. [1] TODO: put a link to bloom help/spec
-   (http://a.reference.here/would/be/cool.html)
+.. [1] Bloom: a release automation tool
+   (http://www.ros.org/wiki/bloom)
 
 Copyright
 =========
