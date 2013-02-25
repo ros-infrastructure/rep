@@ -56,7 +56,7 @@ This can be solved by putting a package.xml in the upstream of the third party p
 
 Install a catkin package.xml
 ----------------------------
-Normally the package.xml is installed by default when catkin_package(...) is invoked from CMake. For third party packages which build with CMake, invoking catkin_package(...) from their CMakeLists.txt is a possible solution, but is not recommended. Instead the third party packages should make a custom install rule for the package.xml using the preferred method for their build system. This install rule can be placed in the upstream repository along with a package.xml if that is acceptable for the maintainers. Having the package.xml and an install rule for it in the upstream means now patches or injects in the release repository and makes for the cleanest solution, while also not making a dependency on catkin or ROS.
+Normally the package.xml is installed by default when catkin_package(...) is invoked from CMake. For third party packages which build with CMake, invoking catkin_package(...) from their CMakeLists.txt is a possible solution, but is not recommended. Instead the third party packages should make a custom install rule for the package.xml using the preferred method for their build system. This install rule can be placed in the upstream repository along with a package.xml if that is acceptable for the maintainers. Having the package.xml and an install rule for it in the upstream sources means no patches or injects in the release repository, resulting in the cleanest solution while also not depending on catkin or ROS.
 
 Have setup.*sh Files After Installation
 ---------------------------------------
