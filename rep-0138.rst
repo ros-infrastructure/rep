@@ -1,4 +1,4 @@
-REP: XXXX
+REP: 138
 Title: LaserScan Common Topics, Parameters, and Diagnostic Keys
 Author: Chad Rockey <chadrockey@willowgarage.com>
 Status: Draft
