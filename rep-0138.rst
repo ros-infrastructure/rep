@@ -21,13 +21,18 @@ Topics
 
 The following topics are expected to be common to many devices.  Note that some of these topics are published by support libraries.
 
+Required for Single Echo LaserScanners
+'''''''''''''''''''''''''''''''''''''''
+
 * scan
 
   - Traditional single return output. (sensor_msgs/LaserScan)
 
     This is the most compatible topic and represents output from a laser scanner that 
-    cannot return multiple returns per beam.  This topic is not present for all scanners, but 
-    scanners must output either *scan* or *echoes*.
+    cannot return multiple returns per beam.  This topic is not present for multi-echo laserscanners in multi-echo modes.
+
+Required for Multiecho LaserScanners
+''''''''''''''''''''''''''''''''''''
 
 * echoes
 
@@ -36,7 +41,12 @@ The following topics are expected to be common to many devices.  Note that some 
 
     This is the topic that is designed to give the most information to users of LaserScans.  
     sensor_msgs/MultiEchoLaserScan is not required to be used by clients.  This topic is not 
-    present for all scanners, but scanners must output either *scan* or *echoes*.
+    present for single echo laserscanners or multi-echo laserscanners in single echo mode.
+
+Typically Provided by support Libraries
+'''''''''''''''''''''''''''''''''''''''
+
+The following topics are typically published by a support library, nodelet, or node.  The driver can directly publish onto these topics if the modes are supported in hardware as a primary method of data acquisition.
 
 * first
 
@@ -209,5 +219,4 @@ This document has been placed in the public domain.
    fill-column: 70
    coding: utf-8
    End:
-
 
