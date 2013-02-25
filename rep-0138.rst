@@ -43,7 +43,7 @@ Required for Multiecho LaserScanners
     sensor_msgs/MultiEchoLaserScan is not required to be used by clients.  This topic is not 
     present for single echo laserscanners or multi-echo laserscanners in single echo mode.
 
-Typically Provided by support Libraries
+Typically Provided by Support Libraries
 '''''''''''''''''''''''''''''''''''''''
 
 The following topics are typically published by a support library, nodelet, or node.  The driver can directly publish onto these topics if the modes are supported in hardware as a primary method of data acquisition.
