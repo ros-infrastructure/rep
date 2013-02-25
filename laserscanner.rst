@@ -18,6 +18,9 @@ Specification
 
 Topics
 ----------
+
+The following topics are expected to be common to many devices.  Note that some of these topics are published by support libraries.
+
 * scan
 
   - Traditional single return output. (sensor_msgs/LaserScan)
@@ -61,6 +64,8 @@ Topics
 
 Parameters
 ----------
+
+Devices should access as many of these parameters as are relevant.  For example, older devices connect via serial while newer often connect over ethernet.  In this case, newer devices would use ip_address/ip_port, while older devices would use serial_port/serial_baud.  If a parameter is not supported by hardware, it is not necessary to read/write to that parameter.
 
 * ~ip_address (string)
 
