@@ -29,7 +29,7 @@ Required for Single Echo LaserScanners
   - Traditional single return output. (sensor_msgs/LaserScan)
 
     This is the most compatible topic and represents output from a laser scanner that 
-    cannot return multiple returns per beam.  This topic is not present for multi-echo laserscanners in multi-echo modes.
+    is not providing multiple returns per beam.  This topic is not present for multi-echo laserscanners in multi-echo modes.
 
 Required for Multiecho LaserScanners
 ''''''''''''''''''''''''''''''''''''
@@ -43,10 +43,10 @@ Required for Multiecho LaserScanners
     sensor_msgs/MultiEchoLaserScan is not required to be used by clients.  This topic is not 
     present for single echo laserscanners or multi-echo laserscanners in single echo mode.
 
-Typically Provided by Support Libraries
-'''''''''''''''''''''''''''''''''''''''
+Optional Topics for Backwards Compatibility
+'''''''''''''''''''''''''''''''''''''''''''
 
-The following topics are typically published by a support library, nodelet, or node.  The driver can directly publish onto these topics if the modes are supported in hardware as a primary method of data acquisition.
+To provide compatibility with libraries that do not support sensor_msgs/MultiEchoLaserScan, the following optional topics are defined.  They are typically published by a support library, nodelet, or node.  The driver can directly publish onto these topics if the modes are supported in hardware as a primary method of data acquisition.
 
 * first
 
