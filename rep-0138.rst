@@ -64,7 +64,7 @@ The following topics are typically published by a support library, nodelet, or n
     published by a support library that converts sensor_msgs/MultiEchoLaserScans into 
     sensor_msgs/LaserScans.
 
-* intense
+* most_intense
 
   - Output of the most intense return from a multi echo laser scanner. (sensor_msgs/LaserScan)
 
