@@ -102,7 +102,7 @@ Devices should access as many of these parameters as are relevant.  For example,
 
   - Whether the node should calibrate the device's time offset on startup. If true, the node will    
     exchange of series of messages with the device in order to determine the time delay in the 
-    connection. This calibration step is necessary to produce accurate time stamps on scans.
+    connection. This calibration step is necessary to produce accurate timestamps on scans.
 
 * ~time_offset (double)
 
@@ -110,7 +110,7 @@ Devices should access as many of these parameters as are relevant.  For example,
 
 * ~publish_intensity (boolean)
 
-  - If true, the laser will not publish intensity to save bandwidth.
+  - If true, the laser will publish intensity.  If false, the laser will not publish intensity to save bandwidth.  Should be implemented in hardware if possible, but otherwise may be implemented in software.
 
 * ~angle_min (double)
 
