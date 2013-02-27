@@ -49,6 +49,7 @@ The format of the changelog should have the following properties:
 
 Specification
 =============
+
 The recommended specification is very simple:
 * Each changelog will be specified in ReStructuredText (RST) with additional constraints
 
