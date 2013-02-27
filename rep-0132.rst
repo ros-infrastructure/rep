@@ -45,7 +45,7 @@ The format of the changelog should have the following properties:
 
 * **GitHub Integration** - Since ROS packages are being moved to GitHub (and GitHub practices are copied by other hosting solutions), it would be good to comply with GitHub display of files. [5]_
 
-* **Flexibility** - While we like standard syntax, developers should get as much freedom to do changelogs their own way as we can provide.
+* **Flexibility** - While we like standard syntax, developers should get as much freedom to do changelogs their own way as we can provide. This includes the freedom to put non-changelog contents into the same file as used for the Changelog, such as using the README.rst file on github as a project homepage with an Introduction, installation instructions and so on.
 
 Specification
 =============
@@ -60,11 +60,11 @@ Specification
 2. <package_root>/README.rst
 3. <package_root>/doc/CHANGELOG.rst
 
-* The first file found that way shall contain a list of sections for each version which is prepended with a new entry for every new release of a package.
+* The first file found that way shall contain (among arbitrary other rst content) sections for versions in descending order. Such changelog sections are distinguished from non-changelog sections via naming convention on the section title.
 
 * The library will allow extraction of version numbers and respective text blocks from the document
 
-* The sections for any such file ending with .rst has to be be a valid ReStructuredText [4]_ document.
+* A changelog file ending with .rst has to be be a valid ReStructuredText [4]_ document. (Other formats may be supported in the future)
 
 * bloom will emit a warning during package release if no changelog is found or if the changelog does not have an updated entry. Future versions of bloom can force changelogs as a requirement.
 
@@ -72,7 +72,10 @@ CHANGELOG rst Format
 --------------------
 For now, we will only support RST syntax for changelogs as this format is already widely used in places including ROS, GitHub, and Python. Other markup support may be added in the future if requested.
 
-A document containing the changelogs must therefore be a valid RST document. Such a document will be processed by an RST parser (ignoring file inclusion directives, as those also do not work on GitHub). From the RST specification [4]_ we will use one section without subsections for one changelog entry, and within that we will allow
+A document containing the changelogs must therefore be a valid RST document. Such a document will be processed by an RST parser (ignoring file inclusion directives, as those also do not work on GitHub).
+
+While the document on the whole may contain arbitrary RST elements, inside changelog sections we restrict the allowed set of RST elements.
+From the RST specification [4]_ we will use one section without subsections for one changelog entry, and within that we will allow
 
 * paragraphs
 * transitions
