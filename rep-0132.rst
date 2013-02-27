@@ -50,10 +50,9 @@ The format of the changelog should have the following properties:
 Specification
 =============
 
-The recommended specification is very simple:
 * Each changelog will be specified in ReStructuredText (RST) with additional constraints
 
-* For each package (i.e. every chunk of code that has a package.xml) there will be a file containing changelog entries. The recommended filename is CHANGELOG.rst.
+* Each package (i.e. every chunk of code that has a package.xml) may contain a single file used to list changelog entries. The recommended filename is CHANGELOG.rst.
 
 * A ROS infrastructure library will look for a changelog files following naming and placement conventions and preferences, to be used by any ROS tool that wants to process changelogs (e.g. bloom). The places that will be searched are:
 
