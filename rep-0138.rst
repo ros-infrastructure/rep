@@ -106,7 +106,7 @@ Devices should access as many of these parameters as are relevant.  For example,
 
 * ~time_offset (double)
 
-  - An manually calibrated offset (in seconds) to add to the timestamp before publication of a message.
+  - A manually calibrated offset (in seconds) to add to the timestamp before publication of a message.
 
 * ~publish_intensity (boolean)
 
