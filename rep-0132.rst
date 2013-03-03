@@ -251,7 +251,7 @@ Concerns
   * rendered display is nicer to the eye, allows following embedded hyperlinks
   * link to the source location is a bit worse for the users (navigating separate sites, but may be least effort)
 
-
+* rosbuild stacks and package support?
 
 Popular Package Changelog Formats
 =================================
