@@ -45,7 +45,7 @@ The format of the changelog should have the following properties:
 
 * **GitHub Integration** - Since ROS packages are being moved to GitHub (and GitHub practices are copied by other hosting solutions), it would be good to comply with GitHub display of files. [5]_
 
-* **Flexibility** - While we like standard syntax, developers should get as much freedom to do changelogs their own way as we can provide. This includes the freedom to put non-changelog contents into the same file as used for the Changelog, such as using the README.rst file on github as a project homepage with an Introduction, installation instructions and so on.
+* **Flexibility** - While we like standard syntax, developers should get as much freedom to do changelogs their own way as we can provide.
 
 Specification
 =============
@@ -54,13 +54,9 @@ Specification
 
 * Each package (i.e. every chunk of code that has a package.xml) may contain a single file used to list changelog entries. The recommended filename is CHANGELOG.rst.
 
-* A ROS infrastructure library will look for a changelog files following naming and placement conventions and preferences, to be used by any ROS tool that wants to process changelogs (e.g. bloom). The places that will be searched are:
+* A ROS infrastructure library will look for a changelog named CHANGELOG.rst in the package root of a ROS package.
 
-1. <package_root>/CHANGELOG.rst
-2. <package_root>/README.rst
-3. <package_root>/doc/CHANGELOG.rst
-
-* The first file found that way shall contain (among arbitrary other rst content) sections for versions in descending order. Such changelog sections are distinguished from non-changelog sections via naming convention on the section title.
+* The first file found that way shall contain sections for versions in descending order. Such changelog sections are distinguished from non-changelog sections via naming convention on the section title.
 
 * The library will allow extraction of version numbers and respective text blocks from the document
 
@@ -74,8 +70,7 @@ For now, we will only support RST syntax for changelogs as this format is alread
 
 A document containing the changelogs must therefore be a valid RST document. Such a document will be processed by an RST parser (ignoring file inclusion directives, as those also do not work on GitHub).
 
-While the document on the whole may contain arbitrary RST elements, inside changelog sections we restrict the allowed set of RST elements.
-From the RST specification [4]_ we will use one section without subsections for one changelog entry, and within that we will allow
+From the RST specification [4]_ we will use one section without subsections for each changelog entry, and within that we will allow
 
 * paragraphs
 * transitions
@@ -87,7 +82,7 @@ From the RST specification [4]_ we will use one section without subsections for 
 * inline markup
 * directives (may be invisible in processed changelog)
 
- For any description of changes. Inline markup transformation rules may just use the raw source when transforming the log entries for deb/rpm format. We explicitly do not support the following elements *within* version sections, as changelog entries should be well writable without those, and useful transformation into condensed deb/rpm formats would be difficult. For details on these elements see [4]_.
+For any description of changes. Inline markup transformation rules may just use the raw source when transforming the log entries for deb/rpm format. We explicitly forbid the following elements within version sections, as changelog entries should be well writable without those, and useful transformation into condensed deb/rpm formats would be difficult. For details on these elements see [4]_.
 
 * Definition lists
 * Field lists
@@ -135,13 +130,6 @@ CHANGELOG.rst Example
     ^^^^^^^^^^^^^^^^^^^^^^^^^
     Changelog for package foo
     ^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    This table is allowed here because it is not part of a version section.
-    == ==
-    1  1
-    == ==
-    1  2
-    == ==
 
     0.1
     ===
@@ -200,7 +188,7 @@ The proposed format has the following properties that help meet the design requi
 
 * Can be embedded in sphinx docs via include directive or by putting into doc folder.
 
-* The use of RST for markup allows us to automatically generated documentation without changes. 
+* The use of RST for markup allows us to automatically generated documentation without changes.
 
 * Markup allows many different ways of writing changes as long as this can be transformed into brief format for deb/rpm content
 
@@ -246,7 +234,7 @@ Concerns
 
 * README.rst fallback: When users have a small package, it may be more convenient to put changelog into the README.rst. Could changelog tooling(bloom) fall back to try README.rst for changelog entries?
 
- Currently not loss by allowing this
+ The prototype library could handle such complex README files. Though no technical reason is known that would prevent this, there was too much doubt on possible unknown problems with that approach, and user confusion over multiple alternatives, so for now it was decided to not go ahead with this.
 
 * inline markup transformation rules: When creating deb/rpm changelogs from RST, a problem is how to deal with unicode and complex inline markup. Alternatives:
 
