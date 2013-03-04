@@ -15,7 +15,7 @@ This REP forms the recommendation for how to handle releases of third party, non
 
 Motivation
 ==========
-In this context a third party package is a software package which exists outside of the ROS ecosystem, is used by packages in the ROS ecosystem, but is not released widely as a system dependency. These software packages might be designed to be used outside of the ROS ecosystem, but are not big enough or mature enough to be released into operating system package managers. Instead they are released using the ROS infrastrucutre along side a ROS distribution as if they were actually ROS packages. An example of this is the console_bridge package, which can be used outside of ROS, but is heavily utilized by ROS. Since console_bridge is not packaged separately from ROS it is released as part of a ROS distribution. This REP aims to specify what is required, within the ROS infrastructure, in order to release a package like console_bridge into a ROS distribution.
+In this context a third party package is a software package which exists outside of the ROS ecosystem, is used by packages in the ROS ecosystem, but is not released widely as a system dependency. These software packages might be designed to be used outside of the ROS ecosystem, but are not big enough or mature enough to be released into operating system package managers. Instead they are released using the ROS infrastructure along side a ROS distribution as if they were actually ROS packages. An example of this is the console_bridge package, which can be used outside of ROS, but is heavily utilized by ROS. Since console_bridge is not packaged separately from ROS it is released as part of a ROS distribution. This REP aims to specify what is required, within the ROS infrastructure, in order to release a package like console_bridge into a ROS distribution.
 
 Additionally, sometimes a software package which is released as a system dependency can be released as a third party package in order to provide a specific version or patched version of the software package. A good example of this is OpenCV which has official Ubuntu packages, but for various reasons those official packages are not suitable for release with ROS. So, instead a custom release of OpenCV is released as a third party package. While these exceptions are important to have, developers should strive to utilize the packages provided by package managers when possible, because this reduces special cases, reduces developer overhead, and makes ROS more portable.
 
@@ -36,7 +36,7 @@ The rationale for the design requirements are as follows:
 
 Having a catkin package.xml
 ---------------------------
-Having a package.xml allows tools like bloom to extract meta data which other wise must be continuously be asked for or stored in some other way.  The useful meta data in the package.xml that isn't usually shipped with packages in a standard way are things like versioned build, run, and test dependencies, authors, maintainers, license, description, and version. Having this meta information in the package.xml makes it possible for the release tools to generate similar description files for multiple platforms (debian, fedora, Homebrew). The <build_type> tag allows tools like catkin_make_isolated to know how to build it along side catkin packages in a non-homogeneous workspace.
+Having a package.xml allows tools like bloom to extract meta data which other wise must be continuously be asked for or stored in some other way.  The useful meta data in the package.xml that isn't usually shipped with packages in a standard way are things like versioned build, run, and test dependencies, authors, maintainers, license, description, and version. Having this meta information in the package.xml makes it possible for the release tools to generate similar description files for multiple platforms (Debian, Fedora, Homebrew). The <build_type> tag allows tools like catkin_make_isolated to know how to build it along side catkin packages in a non-homogeneous workspace.
 
 Installing a catkin package.xml
 -------------------------------
@@ -60,7 +60,7 @@ Normally the package.xml is installed by default when catkin_package(...) is inv
 
 Have setup.*sh Files After Installation
 ---------------------------------------
-These setup.*sh files are created when catkin_package(...) is invoked in the CMake of a package. When the -DCATKIN_BUILD_BINARY_PACKAGE="1" option is passed to CMake, then no setup.*sh files are generated. This prevents collisions when packaging for debian. When packaging for debian the setup.*sh files are provided by the catkin package. In this case the easiest way to ensure that there are setup.*sh files when installing only a third party package from debian's is for that third party package to run_depend on catkin. This will cause catkin to be installed before the third party package is installed, ensuring the setup.*sh files will be in the install prefix.
+These setup.*sh files are created when catkin_package(...) is invoked in the CMake of a package. When the -DCATKIN_BUILD_BINARY_PACKAGE="1" option is passed to CMake, then no setup.*sh files are generated. This prevents collisions when packaging for Debian. When packaging for Debian the setup.*sh files are provided by the catkin package. In this case the easiest way to ensure that there are setup.*sh files when installing only a third party package from deb's is for that third party package to run_depend on catkin. This will cause catkin to be installed before the third party package is installed, ensuring the setup.*sh files will be in the install prefix.
 
 Specification
 =============
@@ -96,13 +96,13 @@ The dependent packages should instead follow OpenCV's recommendation::
 
 Concerns
 ========
-There was a concern, raised on the ros-sig-buildsystem mailing list, that this recommendation on how to release third party packages into a ROS distribution would be misconstrude as the recommendation on how to handle third party packages in general.
+There was a concern, raised on the ros-sig-buildsystem mailing list, that this recommendation on how to release third party packages into a ROS distribution would be misconstrued as the recommendation on how to handle third party packages in general.
 
-To be clear: any third party package should always be released as a ROS distribution agnostic system dependency and be treated as such when resolving it as a dependency and finding it using CMake or some other build system, i.e. the resulting debian of a third party package, for example 'foo', should be 'foo' and not 'ros-groovy-foo'.
+To be clear: any third party package should always be released as a ROS distribution agnostic system dependency and be treated as such when resolving it as a dependency and finding it using CMake or some other build system, i.e. the resulting deb of a third party package, for example 'foo', should be 'foo' and not 'ros-groovy-foo'.
 
 That being said: sometimes doing this in a ROS distribution agnostic way is not possible, e.g. ROS fuerte needs version 1 of your third party package, but ROS groovy needs API breaking version 2 of your library. In this case you might need to release a different version of your third party library with each ROS distribution, and then the recommendation in this REP is applicable.
 
-There maybe better ways to deal with these scenarios in the future (using linux distribution techniques to handle conflicting versions of third party libraries), but the refinement of releasing packages using this process are out of the scope of this REP.
+There maybe better ways to deal with these scenarios in the future (using Linux distribution techniques to handle conflicting versions of third party libraries), but the refinement of releasing packages using this process are out of the scope of this REP.
 
 Resources
 =========
