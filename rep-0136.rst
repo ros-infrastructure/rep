@@ -28,7 +28,7 @@ During the Groovy release cycle the existing processes were vetted and several d
 * Have a catkin package.xml
  * With a <build_type>cmake</build_type> tag inside the <export> tag
 * Install a catkin package.xml
-* Have setup.*sh files after installation
+* Have setup.* files after installation
 
 Rationale
 =========
@@ -42,9 +42,9 @@ Installing a catkin package.xml
 -------------------------------
 In addition to having a package.xml through the release process, the third party packages should also install the package.xml so that once deployed end users can use tools which rely on the existence of package.xml. The installation of the package.xml is normally automatic (when using catkin), but in the case of third party the package.xml simply needs to be installed. For CMake this means a custom install(...) rule, and for other systems, like autotools or SCons, the standard method of installing plain files will also work.
 
-Have setup.*sh Files After Installation
+Have setup.* Files After Installation
 ---------------------------------------
-Often the deployed binaries (debs) have a non-standard installation prefix, this allows developers to have multiple versions of ROS installed side by side, but means that third party packages which rely on pkg-config or CMake's find_package(...) infrastructure to be found by other packages will not be easily found by default as they will not be in the normal system PATH's. The setup.*sh environment files are designed to solve this problem for catkin packages, but third party packages will also need them (in the case that only third party packages are installed from debs into a given prefix).
+Often the deployed binaries (debs) have a non-standard installation prefix, this allows developers to have multiple versions of ROS installed side by side, but means that third party packages which rely on pkg-config or CMake's find_package(...) infrastructure to be found by other packages will not be easily found by default as they will not be in the normal system PATH's. The setup.* environment files are designed to solve this problem for catkin packages, but third party packages will also need them (in the case that only third party packages are installed from debs into a given prefix).
 
 Solution Alternatives
 =====================
@@ -58,16 +58,16 @@ Install a catkin package.xml
 ----------------------------
 Normally the package.xml is installed by default when catkin_package(...) is invoked from CMake. For third party packages which build with CMake, invoking catkin_package(...) from their CMakeLists.txt is a possible solution, but is not recommended. Instead the third party packages should make a custom install rule for the package.xml using the preferred method for their build system. This install rule can be placed in the upstream repository along with a package.xml if that is acceptable for the maintainers. Having the package.xml and an install rule for it in the upstream sources means no patches or injects in the release repository, resulting in the cleanest solution while also not depending on catkin or ROS.
 
-Have setup.*sh Files After Installation
+Have setup.* Files After Installation
 ---------------------------------------
-These setup.*sh files are created when catkin_package(...) is invoked in the CMake of a package. When the -DCATKIN_BUILD_BINARY_PACKAGE="1" option is passed to CMake, then no setup.*sh files are generated. This prevents collisions when packaging for Debian. When packaging for Debian the setup.*sh files are provided by the catkin package. In this case the easiest way to ensure that there are setup.*sh files when installing only a third party package from deb's is for that third party package to run_depend on catkin. This will cause catkin to be installed before the third party package is installed, ensuring the setup.*sh files will be in the install prefix.
+These setup.* files are created when catkin_package(...) is invoked in the CMake of a package. When the -DCATKIN_BUILD_BINARY_PACKAGE="1" option is passed to CMake, then no setup.* files are generated. This prevents collisions when packaging for Debian. When packaging for Debian the setup.* files are provided by the catkin package. In this case the easiest way to ensure that there are setup.* files when installing only a third party package from deb's is for that third party package to run_depend on catkin. This will cause catkin to be installed before the third party package is installed, ensuring the setup.* files will be in the install prefix.
 
 Specification
 =============
 The recommendation of this REP for releasing third party packages in the ROS community deployment infrastructure is as follows:
 
 * Inject a templated package.xml into the upstream using bloom
- * Optionally, put the package.xml in the actual upstream repository
+ * Optionally but recommended, put the package.xml in the actual upstream repository
  * Have a <build_type> tag in the <export> tag of the package.xml templates
 * Add an install rule for the package.xml as patch in the release branch using bloom
  * Optionally, put the install rule for the package.xml into the actual upstream repository
@@ -100,18 +100,13 @@ Backwards Compatibility
 In some cases there exists legacy rosbuild packages which depend on third party packages like opencv2 as if they were rosbuild based ROS packages, e.g. their manifest.xml might look like this::
 
   <package>
-    <description brief="opencv_proc">
-
-       does image processing with opencv
-
-    </description>
+    <description brief="opencv_proc">does image processing with opencv</description>
     <author>Foo Bar</author>
     <license>BSD</license>
     <url>http://ros.org/wiki/opencv_proc_node</url>
     <depend package="roscpp"/>
     <depend package="sensor_msgs"/>
     <depend package="opencv2"/>
-
   </package>
 
 Once OpenCV conforms to this recommendation, there will no longer be an opencv2.pc (previously generated by catkin), which is the file that rospack will look for when trying to build the above rosbuild package. The error would look something like this::
@@ -163,11 +158,7 @@ Once OpenCV conforms to this recommendation, there will no longer be an opencv2.
 The correct way to fix this is to update the opencv_proc rosbuild package so that the manifest.xml looks like this::
 
   <package>
-    <description brief="opencv_proc">
-
-       does image processing with opencv
-
-    </description>
+    <description brief="opencv_proc">does image processing with opencv</description>
     <author>Foo Bar</author>
     <license>BSD</license>
     <url>http://ros.org/wiki/opencv_proc_node</url>
@@ -175,7 +166,6 @@ The correct way to fix this is to update the opencv_proc rosbuild package so tha
     <depend package="sensor_msgs"/>
 
     <rosdep name="opencv2"/>
-
   </package>
 
 And so that the CMakeLists.txt follows the recommendation in the Consequences_ section.
@@ -213,10 +203,12 @@ Here is an example package.xml template for a third party package being released
     <maintainer email="user@todo.todo">user</maintainer>
     <license>BSD</license>
 
-    <run_depend>catkin</run_depend>
     <buildtool_depend>cmake</buildtool_depend>
+
     <build_depend>boost</build_depend>
+
     <run_depend>boost</run_depend>
+    <run_depend>catkin</run_depend>
 
     <export>
       <build_type>cmake</build_type>
