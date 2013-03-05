@@ -112,6 +112,10 @@ Devices should access as many of these parameters as are relevant.  For example,
 
   - If true, the laser will publish intensity.  If false, the laser will not publish intensity to save bandwidth.  Should be implemented in hardware if possible, but otherwise may be implemented in software.
 
+* ~publish_multiecho (boolean)
+
+  - If true, a multiecho laserscanner will publish sensor_msgs/MultiEchoLaserScan.  If false, the laser will publish sensor_msgs/LaserScan.  (If supported by the hardware; otherwise, please use a support library to convert MultiEchoLaserScans to LaserScans.)  This parameter is only valid for multiecho laserscanners.
+
 * ~angle_min (double)
 
   - Controls the angle of the first range measurement in radians.  (If supported by the hardware; it 
