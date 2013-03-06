@@ -242,10 +242,6 @@ Devices should publish as many of the following keys that are easy to assume or 
 
   - Signal-to-Noise ratio in decibels for visible satellites.  Order correlates to order reported in GALILEO Satellites Visible.  ex(42, 11, 25)
 
-* Total DOP
-
-  - Total Dilution of Precision - the total of multiplicative effects on GPS accuracy.  ex(7.2)
-
 * GLONASS Satellites Visible ID
 
   - GLONASS Slot numbers for the satellites visible.  ex(1, 20, 12, 22)
@@ -261,6 +257,10 @@ Devices should publish as many of the following keys that are easy to assume or 
 * GLONASS Satellites Visible SNR
 
   - Signal-to-Noise ratio in decibels for visible satellites.  Order correlates to order reported in Satellites Visible.  ex(42, 11, 25)
+
+* Total DOP
+
+  - Total Dilution of Precision - the total of multiplicative effects on GPS accuracy.  ex(7.2)
 
 * PDOP
 
