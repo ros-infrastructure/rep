@@ -170,11 +170,18 @@ Each distribution contains the following:
     The URL should be writable (with the appropriate credentials).
   * version: version number for which packages are released. This
     can be a tag, branch or hash.
+  * status: defines the status of the packages of the repository. Can be one of
+    the following: ``developped``, ``maintained``, ``unmaintained``,
+    ``end-of-life``
+  * status-description: an optional field describing in a short sentence the
+    current status of the repository
   * packages: an optional list of packages (if the repository has more than one).
-    For each package a relative path in the repository can be specified.
-    If that path is omitted, then a subfolder with the name of the package is expected.
-    If this list is omitted, then a single package named after the
-    repository is expected to be in the root of the repository.
+    Each package is a dictionnary with the following keys:
+
+    * subfolder: the relative path to the package from the repository base
+      (default: *package name*)
+    * status: overrides the repository-wide status
+    * status-description: overrides the repository-wide status description
 
 * platforms: a list of target platforms for which packages are released.
   These names are OS code names as determined by 'rospkg.os_detect'.
@@ -196,7 +203,8 @@ target platforms.
       url: https://github.com/ros-gbp/ar_track_alvar-release.git
       version: 0.3.0-0
       packages:
-        ar_track_alvar: artrackalvar
+        ar_track_alvar:
+          subfolder: artrackalvar
     bond_core:
       url: https://github.com/ros-gbp/bond_core-release.git
       version: 1.7.10-0
@@ -278,6 +286,12 @@ Distribution cache file
 Collection of all meta information of the ROS distribution, including all the information from the package.xml files.
 The cache must reference the distribution file and store a hash of the version it was build from to be able to detect if the cache is invalid.
 The format of that cache is considered an implementation detail and is not specified in this REP.
+
+Reference implementation
+------------------------
+This REP is to be implemented in a Python module called *rosdistro*. This module
+will serve as a reference implementation for this REP. Any ROS tool requesting
+information defined in this REP should use this reference API implementation.
 
 Compatibility issues
 ====================
