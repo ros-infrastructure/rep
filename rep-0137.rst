@@ -238,6 +238,9 @@ Build file
   Any downstream package are implicitly excluded.
   The blacklist overrides the whitelist.
 
+* admin-notification: email address of the build farm administrator. Anyy error
+  related to the build far itself shell be reported to this address.
+
 * targets: a list of targets for which packages are build.
   Each target consists of a platform (OS code name) and CPU architecture.
   Code names specified in the list must be listed in the corresponding
@@ -266,6 +269,7 @@ and specifying the platforms and architectures.
     oneiric: [amd64, i386]
     precise: [amd64, i386, armel]
   notify-maintainers: false
+  admin-notification: smith@example.com
   type: build
   version: 1
 
@@ -385,7 +389,7 @@ release/foo.yaml:
           subfolder: here/is/pkg2
   platforms: [precise, quantal, raring]
 
-release/groovy-build.yaml:
+release/foo-build.yaml:
 
 ::
 
@@ -400,8 +404,9 @@ release/groovy-build.yaml:
     precise: [amd64, i386]
     quantal: [amd64, i386]
     raring: [amd64, i386]
+  admin-notification: admin@foo.com
 
-test/groovy.yaml:
+test/foo.yaml:
 
 ::
 
@@ -422,7 +427,7 @@ test/groovy.yaml:
       url: https://bitbucket.org/baz-test/baz-repo
       version: default
 
-test/groovy-build.yaml:
+test/foo-build.yaml:
 
 ::
 
@@ -437,6 +442,7 @@ test/groovy-build.yaml:
     precise: [amd64, i386]
     quantal: [amd64, i386]
     raring: [amd64, i386]
+  admin-notification: admin@foo.com
 
 References
 ==========
