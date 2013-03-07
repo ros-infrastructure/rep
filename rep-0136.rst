@@ -1,0 +1,241 @@
+REP: 136
+Title: Releasing Third Party, Non catkin Packages
+Author: William Woodall
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 15-Feb-2013
+Post-History: 7-March-2013
+
+.. contents::
+
+Abstract
+========
+This REP forms the recommendation for how to handle releases of third party, non catkin packages using the ROS community release infrastructure. Specifically, this REP aims to provide a recommendation on how to release a third party package into a ROS distribution, in the event that the third party package cannot be released in a ROS distribution agnostic manner.
+
+Motivation
+==========
+In this context a third party package is a software package which exists outside of the ROS ecosystem, is used by packages in the ROS ecosystem, but is not released widely as a system dependency. These software packages might be designed to be used outside of the ROS ecosystem, but are not big enough or mature enough to be released into operating system package managers. Instead they are released using the ROS infrastructure along side a ROS distribution as if they were actually ROS packages. An example of this is the console_bridge package, which can be used outside of ROS, but is heavily utilized by ROS. Since console_bridge is not packaged separately from ROS it is released as part of a ROS distribution. This REP aims to specify what is required, within the ROS infrastructure, in order to release a package like console_bridge into a ROS distribution.
+
+Additionally, sometimes a software package which is released as a system dependency can be released as a third party package in order to provide a specific version or patched version of the software package. A good example of this is OpenCV which has official Ubuntu packages, but for various reasons those official packages are not suitable for release with ROS. So, instead a custom release of OpenCV is released as a third party package. While these exceptions are important to have, developers should strive to utilize the packages provided by package managers when possible, because this reduces special cases, reduces developer overhead, and makes ROS more portable.
+
+Historically, third party packages have been *wrapped* in rosbuild packages, using one of the *download_and_build* Make scripts [1]_. This has since been discouraged [2]_, as it often lead to failures on the build farm and generally is considered bad form for a package. One of the reasons for the popularity of this method of "wrapping" packages was that it was not easy to work with or release third party packages along side rosbuild. Therefore one of the design goals of catkin was to make integration with third party packages easier, and for build time that is accomplished by reducing custom infrastructure and depending more on conventional tools like CMake. There are still some custom tools for the release system which provide infrastructure for the highly distributed and modular ROS ecosystem, and there should be a recommended process for releasing third party packages with these custom tools such that they integrate into the build farm and deployment infrastructure for ROS.
+
+Design Requirements
+===================
+During the Groovy release cycle the existing processes were vetted and several different strategies came of that experience, but some general design requirements have been identified. In particular, after a release, a third party library should:
+
+* Have a catkin package.xml
+ * With a <build_type>cmake</build_type> tag inside the <export> tag
+* Install a catkin package.xml
+* Have setup.* files after installation
+
+Rationale
+=========
+The rationale for the design requirements are as follows:
+
+Having a catkin package.xml
+---------------------------
+Having a package.xml allows tools like bloom to extract meta data which other wise must be continuously be asked for or stored in some other way.  The useful meta data in the package.xml that isn't usually shipped with packages in a standard way are things like versioned build, run, and test dependencies, authors, maintainers, license, description, and version. Having this meta information in the package.xml makes it possible for the release tools to generate similar description files for multiple platforms (Debian, Fedora, Homebrew). The <build_type> tag allows tools like catkin_make_isolated to know how to build it along side catkin packages in a non-homogeneous workspace.
+
+Installing a catkin package.xml
+-------------------------------
+In addition to having a package.xml through the release process, the third party packages should also install the package.xml so that once deployed end users can use tools which rely on the existence of package.xml. The installation of the package.xml is normally automatic (when using catkin), but in the case of third party the package.xml simply needs to be installed. For CMake this means a custom install(...) rule, and for other systems, like autotools or SCons, the standard method of installing plain files will also work.
+
+Have setup.* Files After Installation
+---------------------------------------
+Often the deployed binaries (debs) have a non-standard installation prefix, this allows developers to have multiple versions of ROS installed side by side, but means that third party packages which rely on pkg-config or CMake's find_package(...) infrastructure to be found by other packages will not be easily found by default as they will not be in the normal system PATH's. The setup.* environment files are designed to solve this problem for catkin packages, but third party packages will also need them (in the case that only third party packages are installed from debs into a given prefix).
+
+Solution Alternatives
+=====================
+There are several ways to satisfy each of the design requirements.
+
+Have a catkin package.xml
+-------------------------
+This can be solved by putting a package.xml in the upstream of the third party package (if that is an option). This allows bloom to do things like automatically infer the version being released, and automatically fetch the correct tag for release. Previously the only other option (when putting an package.xml upstream is not a valid option) was to add a package.xml to the release repository as a patch. This is a cumbersome solution because it requires the person releasing to update this patch with the new version number each release. It also broke the bloom work flow, resulting in more, custom commands in order to do a release. Starting in bloom 0.3 and higher the work flow includes the ability to inject package.xml's into a repository and then template them on the version being released. This feature should make releasing third party packages from repositories which do not contain package.xml's easier. However, having the package.xml in the upstream repository has the added advantage of being able to be built along side other catkin packages directly from the source repository. If the package.xml is added in the release repository using bloom then the code must be fetched from the release branch of the release repository in order to be built using the catkin tools.
+
+Install a catkin package.xml
+----------------------------
+Normally the package.xml is installed by default when catkin_package(...) is invoked from CMake. For third party packages which build with CMake, invoking catkin_package(...) from their CMakeLists.txt is a possible solution, but is not recommended. Instead the third party packages should make a custom install rule for the package.xml using the preferred method for their build system. This install rule can be placed in the upstream repository along with a package.xml if that is acceptable for the maintainers. Having the package.xml and an install rule for it in the upstream sources means no patches or injects in the release repository, resulting in the cleanest solution while also not depending on catkin or ROS.
+
+Have setup.* Files After Installation
+---------------------------------------
+These setup.* files are created when catkin_package(...) is invoked in the CMake of a package. When the -DCATKIN_BUILD_BINARY_PACKAGE="1" option is passed to CMake, then no setup.* files are generated. This prevents collisions when packaging for Debian. When packaging for Debian the setup.* files are provided by the catkin package. In this case the easiest way to ensure that there are setup.* files when installing only a third party package from deb's is for that third party package to run_depend on catkin. This will cause catkin to be installed before the third party package is installed, ensuring the setup.* files will be in the install prefix.
+
+Specification
+=============
+The recommendation of this REP for releasing third party packages in the ROS community deployment infrastructure is as follows:
+
+* Inject a templated package.xml into the upstream using bloom
+ * Optionally but recommended, put the package.xml in the actual upstream repository
+ * Have a <build_type> tag in the <export> tag of the package.xml templates
+* Add an install rule for the package.xml as patch in the release branch using bloom
+ * Optionally, put the install rule for the package.xml into the actual upstream repository
+* Have a run_depend on catkin in the package.xml(s)
+
+
+This provides the least intrusive, but most automated and correct method for releasing non-catkin packages through the ROS infrastructure.
+
+Consequences
+============
+This recommendation advises users to not put catkin_package(...) in their CMakeLists.txt, and normally the CMake call to catkin_package(...) generates both CMake find_package(...) infrastructure and pkg-config infrastructure for the package. Since the third party package is not getting this infrastructure generated, packages which depend on it must find and use it as the third party package's developer intended. For example, OpenCV should be found using its original find_package(...) infrastructure rather than the catkin generated find_package(...) infrastructure. So, rather than this::
+
+  find_package(catkin REQUIRED COMPONENTS opencv2)
+  ...
+  include_directories(${catkin_INCLUDE_DIRS})
+  ...
+  target_link_libraries(foo_target ${catkin_LIBRARIES})
+
+The dependent packages should instead follow OpenCV's recommendation::
+
+  find_package(OpenCV REQUIRED)
+  ...
+  include_directories(${OpenCV_INCLUDE_DIRS})
+  ...
+  target_link_libraries(foo_target ${OpenCV_LIBRARIES})
+
+Backwards Compatibility
+-----------------------
+
+In some cases there exists legacy rosbuild packages which depend on third party packages like opencv2 as if they were rosbuild based ROS packages, e.g. their manifest.xml might look like this::
+
+  <package>
+    <description brief="opencv_proc">does image processing with opencv</description>
+    <author>Foo Bar</author>
+    <license>BSD</license>
+    <url>http://ros.org/wiki/opencv_proc_node</url>
+    <depend package="roscpp"/>
+    <depend package="sensor_msgs"/>
+    <depend package="opencv2"/>
+  </package>
+
+Once OpenCV conforms to this recommendation, there will no longer be an opencv2.pc (previously generated by catkin), which is the file that rospack will look for when trying to build the above rosbuild package. The error would look something like this::
+
+  mkdir -p bin
+  cd build && cmake -Wdev -DCMAKE_TOOLCHAIN_FILE=/opt/ros/groovy/share/ros/core/rosbuild/rostoolchain.cmake  ..
+  -- The C compiler identification is GNU 4.7.2
+  -- The CXX compiler identification is GNU 4.7.2
+  -- Check for working C compiler: /usr/lib/ccache/gcc
+  -- Check for working C compiler: /usr/lib/ccache/gcc -- works
+  -- Detecting C compiler ABI info
+  -- Detecting C compiler ABI info - done
+  -- Check for working CXX compiler: /usr/lib/ccache/c++
+  -- Check for working CXX compiler: /usr/lib/ccache/c++ -- works
+  -- Detecting CXX compiler ABI info
+  -- Detecting CXX compiler ABI info - done
+  -- Found PythonInterp: /usr/bin/python (found version "2.7.3") 
+  [rosbuild] Building package opencv_proc
+  [rosbuild] Cached build flags older than manifests; calling rospack to get flags
+  Failed to invoke /opt/ros/groovy/bin/rospack cflags-only-I;--deps-only opencv_proc
+  Package opencv2 was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `opencv2.pc'
+  to the PKG_CONFIG_PATH environment variable
+  No package 'opencv2' found
+  Traceback (most recent call last):
+    File "/usr/lib/pymodules/python2.7/rosdep2/rospack.py", line 45, in call_pkg_config
+      value = subprocess.check_output(['pkg-config', option, pkg_name])
+    File "/usr/lib/python2.7/subprocess.py", line 544, in check_output
+      raise CalledProcessError(retcode, cmd, output=output)
+  subprocess.CalledProcessError: Command '['pkg-config', '--cflags-only-I', 'opencv2']' returned non-zero exit status 1
+  [rospack] Error: could not call python function 'rosdep2.rospack.call_pkg_config'
+  
+  
+  CMake Error at /opt/ros/groovy/share/ros/core/rosbuild/public.cmake:129 (message):
+    
+  
+    Failed to invoke rospack to get compile flags for package 'opencv_proc'.  Look
+    above for errors from rospack itself.  Aborting.  Please fix the broken
+    dependency!
+  
+  Call Stack (most recent call first):
+    /opt/ros/groovy/share/ros/core/rosbuild/public.cmake:227 (rosbuild_invoke_rospack)
+    CMakeLists.txt:6 (rosbuild_init)
+  
+  
+  -- Configuring incomplete, errors occurred!
+  make[2]: *** [all] Error 1
+
+The correct way to fix this is to update the opencv_proc rosbuild package so that the manifest.xml looks like this::
+
+  <package>
+    <description brief="opencv_proc">does image processing with opencv</description>
+    <author>Foo Bar</author>
+    <license>BSD</license>
+    <url>http://ros.org/wiki/opencv_proc_node</url>
+    <depend package="roscpp"/>
+    <depend package="sensor_msgs"/>
+
+    <rosdep name="opencv2"/>
+  </package>
+
+And so that the CMakeLists.txt follows the recommendation in the Consequences_ section.
+
+The above solution is ideal, but in the event that there are many legacy packages which would need to be fixed, the third party package releaser should include a custom <legacy rosbuild name>.pc file for rospack to find. This can be accomplished by creating a custom pkg-config file and installing it, adding these changes as a commit in the release branch of the release repository.
+
+If the third party package already has a pkg-config file, but it is incorrectly named, you can just install a duplicate pkg-config file with the name that legacy rosbuild packages are expecting. This is the case with OpenCV, which installs an opencv.pc file by default, but also installs an opencv2.pc file in order to keep backwards compatibility with legacy rosbuild packages. In this solution, it is important to install a duplicate pkg-config file and not just rename the default one, because for example normal users of OpenCV will expect to find opencv.pc and rosbuild users expecting to find opencv2.pc, so both are needed.
+
+Concerns
+========
+There was a concern, raised on the ros-sig-buildsystem mailing list, that this recommendation on how to release third party packages into a ROS distribution would be misconstrued as the recommendation on how to handle third party packages in general.
+
+To be clear: any third party package should always be released as a ROS distribution agnostic system dependency and be treated as such when resolving it as a dependency and finding it using CMake or some other build system, i.e. the resulting deb of a third party package, for example 'foo', should be 'foo' and not 'ros-groovy-foo'.
+
+That being said: sometimes doing this in a ROS distribution agnostic way is not possible, e.g. ROS fuerte needs version 1 of your third party package, but ROS groovy needs API breaking version 2 of your library. In this case you might need to release a different version of your third party library with each ROS distribution, and then the recommendation in this REP is applicable.
+
+There maybe better ways to deal with these scenarios in the future (using Linux distribution techniques to handle conflicting versions of third party libraries), but the refinement of releasing packages using this process are out of the scope of this REP.
+
+Resources
+=========
+
+There are updated bloom tutorials on the ROS wiki which explain how to release third party packages per this recommendation. [3]_
+
+Example package.xml
+-------------------
+
+Here is an example package.xml template for a third party package being released::
+
+  <?xml version="1.0"?>
+  <package>
+    <name>foo</name>
+    <version>:{version}</version>
+    <description>The foo package</description>
+
+    <maintainer email="user@todo.todo">user</maintainer>
+    <license>BSD</license>
+
+    <buildtool_depend>cmake</buildtool_depend>
+
+    <build_depend>boost</build_depend>
+
+    <run_depend>boost</run_depend>
+    <run_depend>catkin</run_depend>
+
+    <export>
+      <build_type>cmake</build_type>
+    </export>
+  </package>
+
+In the above example the package is called foo, and the :{version} token is replaced with the version being released by bloom. If placing directly in the upstream branch, the version would need to be maintained by the developer manually.
+
+Example CMake package.xml Install Rule
+--------------------------------------
+
+Here is an example CMake install rule for a package.xml::
+
+  # Install catkin package.xml
+  install(FILES package.xml DESTINATION share/foo)
+
+Where the package name is foo.
+
+References
+==========
+.. [1] Download and build Make Scripts
+   (https://github.com/ros/ros/tree/groovy-devel/core/mk)
+.. [2] Download and Build Mailing List Thread
+   (https://code.ros.org/lurker/message/20110207.202716.0ea9ac11.en.html)
+.. [3] Bloom Third Party Release Tutorial
+   (http://ros.org/wiki/bloom/Tutorials/ReleaseThirdParty)
+
+Copyright
+=========
+This document has been placed in the public domain.
