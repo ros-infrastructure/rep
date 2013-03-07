@@ -1,11 +1,11 @@
 REP: 136
 Title: Releasing Third Party, Non catkin Packages
 Author: William Woodall
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 15-Feb-2013
-Post-History: ?-?-2013
+Post-History: 7-March-2013
 
 .. contents::
 
