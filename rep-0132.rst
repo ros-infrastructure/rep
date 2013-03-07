@@ -25,8 +25,9 @@ In ROS, package changelogs have traditionally been maintained as their own subpa
 
 * **Needed for Packaging** - Virtually all package formats including .deb and .rpm require changelogs as part of the package. Scraping this information from the wiki is not feasible and therefore not performed. A changelog file with a specified parsable format can be automatically converted into these package formats.
 
-DesignRequirements
-===================
+Requirements
+============
+
 The format of the changelog should have the following properties:
 
 * **In Source** - The changelog is part of the package source rather than its own wiki page.
@@ -200,6 +201,8 @@ The proposed format has the following properties that help to meet the design re
 Concerns
 ========
 
+Concerns have been discussed on ros-developers ([3]_) and in the Buildsystem SIG ([7]_).
+
 * How to link to tickets/issues in bug tracker without having to give full URL?
 
  Would be nice if GitHub did this for us on their website, but currently it does not.
@@ -307,6 +310,8 @@ References
    (https://github.com/github/markup)
 .. [6] Prototype python script
    (https://github.com/tkruse/changelog_rst.git)
+.. [7] Buildsystem SIG discussion
+   (https://groups.google.com/d/msg/ros-sig-buildsystem/L3nE9X0T2Jk/ML_1JsHLuF0J)
 
 Copyright
 =========
