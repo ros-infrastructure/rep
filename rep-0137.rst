@@ -130,7 +130,7 @@ The information stored in the master file is:
   * release-build: list of references to the build files used to build the binary packages
   * test: reference to the distribution file used for tests
   * test-build: list of references to the build file used to run the tests
-  * doc: reference to the documentation folder. The specification of this folder
+  * doc: reference to the documentation folder. The full specification of this folder
     does not belong to the scope of this REP and is considered an implementation
     detail.
   * distribution-cache: reference to a distribution cache. Whether this field is
@@ -146,6 +146,11 @@ A master file referencing multiple distribution and build files.
 
 ::
 
+  %YAML 1.1
+  # master file
+  # this file describes the available ROS distributions.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
   distributions:
     groovy:
       release: releases/groovy.yaml
@@ -195,6 +200,11 @@ target platforms.
 
 ::
 
+  %YAML 1.1
+  # distribution file
+  # this file describes a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
   repositories:
     actionlib:
       url: https://github.com/ros-gbp/actionlib-release.git
@@ -245,6 +255,11 @@ and specifying the platforms and architectures.
 
 ::
 
+  %YAML 1.1
+  # build file
+  # this file describes a build of a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
   package-whitelist: [ros_tutorials]
   package-blacklist: [turtlesim]
   targets:
@@ -266,13 +281,7 @@ release repositories on which tests will be run.
   * type: the type of SCM in use. Typically 'git', 'svn'...
   * url: the URL of the release git repository
     The URL should be writable (with the appropriate credentials).
-  * version: version number for which packages are released. For git and hg this
-    can be a tag, branch or hash.
-  * packages: an optional list of packages (if the repository has more than one).
-    For each package a relative path in the repository can be specified.
-    If that path is omitted, then a subfolder with the name of the package is expected.
-    If this list is omitted, then a single package named after the
-    repository is expected to be in the root of the repository.
+  * version: For git and hg this is the tag, branch or hash to be checked out.
 
 * type: must be 'test'
 * version: version number, this REP describes version 1
@@ -324,11 +333,10 @@ Affected tools
 
 Use case examples
 =================
-Full ROS build
---------------
-This corresponds to building ROS for officially supported platforms and
-architectures. This example shows the different files needed for ROS groovy.
-
+Full distribution build
+-----------------------
+This corresponds to building a ROS distribution called *foo* for officially
+supported platforms and architectures.
 master.yaml:
 
 ::
@@ -341,15 +349,16 @@ master.yaml:
   type: master
   version: 1
   distributions:
-    groovy:
-      release: release/groovy.yaml
-      release-build: [release/groovy-build.yaml]
-      test: test/groovy.yaml
-      test-build: [test/groovy-build.yaml]
+    foo:
+      release: release/foo.yaml
+      release-build: [release/foo-build.yaml]
+      test: test/foo.yaml
+      test-build: [test/foo-build.yaml]
       doc: doc/
-      distribution-cache: http://ros.org/rosdistro/groovy-cache.tar.gz
+      distribution-cache: http://example.com/foo-cache.tar.gz
 
-release/groovy.yaml:
+
+release/foo.yaml:
 
 ::
 
@@ -362,8 +371,19 @@ release/groovy.yaml:
   type: distribution
   version: 1
   repositories:
-    ...
-    # here the contents of the current groovy.yaml:repositories
+    bar-repo:
+      url: https://github.com/example-release/bar-repo.git
+      version: 0.1.2
+    baz-repo:
+      url: https://example.com/release/baz-repo.git
+      version: 7.7.7
+      status: end-of-life
+      status-description: the repository has not been updated since 1995
+      packages:
+        baz_pkg1:
+        baz_pkg2:
+          subfolder: here/is/pkg2
+  platforms: [precise, quantal, raring]
 
 release/groovy-build.yaml:
 
@@ -377,9 +397,9 @@ release/groovy-build.yaml:
   type: build
   version: 1
   targets:
-    oneiric: [amd64, i386]
     precise: [amd64, i386]
     quantal: [amd64, i386]
+    raring: [amd64, i386]
 
 test/groovy.yaml:
 
@@ -393,8 +413,14 @@ test/groovy.yaml:
   type: test
   version: 1
   repositories:
-    ...
-    # here the contents of the current groovy-devel.yaml:repositories
+    bar-repo:
+      type: git
+      url: https://github.com/example-test/bar-repo.git
+      version: master
+    baz-repo:
+      type: hg
+      url: https://bitbucket.org/baz-test/baz-repo
+      version: default
 
 test/groovy-build.yaml:
 
@@ -408,9 +434,9 @@ test/groovy-build.yaml:
   type: build
   version: 1
   targets:
-    oneiric: [amd64, i386]
     precise: [amd64, i386]
     quantal: [amd64, i386]
+    raring: [amd64, i386]
 
 References
 ==========
