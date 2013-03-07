@@ -96,6 +96,23 @@ version fields, and can be performed by a script.
 
 The targets.yaml file will be split and merged in the distribution files.
 
+File format
+-----------
+
+Files use YAML 1.1 for the sake of human and machine readability and
+write-ability.
+As a good practice, the should contain a header such as:
+
+::
+
+  %YAML 1.1
+  # distribution file
+  # this file describes a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+
+
+
 Master file
 -----------
 The master file act as a single configuration entrypoint which lists all
@@ -116,8 +133,27 @@ The information stored in the master file is:
   * doc: reference to the documentation folder TODO: explain more
   * distribution-cache: reference to a distribution cache
 
-* type: must be 'ros-distributions'
+* type: must be 'master'
 * version: version number, this REP describes version 1
+
+Example
+-------
+A master file referencing multiple distribution and build files.
+
+::
+
+  distributions:
+    groovy:
+      release: releases/groovy.yaml
+      release-build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
+      test: tests/groovy.yaml
+      test-build: [tests/groovy-build.yaml]
+      doc: doc/groovy
+      distribution-cache: http://www.example.com/groovy-distribution-cache
+    hydro:
+      ...
+  type: master
+  version: 1
 
 Distribution file
 -----------------
@@ -128,7 +164,7 @@ Each distribution contains the following:
 
   * url: the URL of the release git repository
     The URL should be writable (with the appropriate credentials).
-  * version: version number for which packages are released. For git and hg this
+  * version: version number for which packages are released. This
     can be a tag, branch or hash.
   * packages: an optional list of packages (if the repository has more than one).
     For each package a relative path in the repository can be specified.
@@ -140,8 +176,35 @@ Each distribution contains the following:
   These names are OS code names as determined by 'rospkg.os_detect'.
   Each target platform will result in a different bloom release.
 
-* type: must be 'ros-distribution'
+* type: must be 'distribution'
 * version: version number, this REP describes version 1
+
+**Example**: A distribution file listing repositories and packages and the
+target platforms.
+
+::
+
+  repositories:
+    actionlib:
+      url: https://github.com/ros-gbp/actionlib-release.git
+      version: 1.9.11-0
+    ar_track_alvar:
+      url: https://github.com/ros-gbp/ar_track_alvar-release.git
+      version: 0.3.0-0
+      packages:
+        ar_track_alvar: artrackalvar
+    bond_core:
+      url: https://github.com/ros-gbp/bond_core-release.git
+      version: 1.7.10-0
+      packages:
+        bond:
+        bond_core:
+        bondcpp:
+        bondpy:
+        smclib:
+  platforms: [oneiric, precise, quantal, wheezy]
+  type: distribution
+  version: 1
 
 Build file
 ----------
@@ -162,8 +225,22 @@ Build file
   notifications of build failures. This is useful for offline/experimental
   buildfarms. (default: true)
 
-* type: must be 'ros-build'
+* type: must be 'build'
 * version: version number, this REP describes version 1
+
+**Example**: A build file selecting a subset of packages from the distribution
+and specifying the platforms and architectures.
+
+::
+
+  package-whitelist: [ros_tutorials]
+  package-blacklist: [turtlesim]
+  targets:
+    oneiric: [amd64, i386]
+    precise: [amd64, i386, armel]
+  notify-maintainers: false
+  type: build
+  version: 1
 
 Test file
 ---------
@@ -172,11 +249,21 @@ use a list of targets, and is not limited to git repositories.
 The test file references either source repositories or release branches from
 release repositories on which tests will be run.
 
-* repositories
+* repositories: a list of repositories which are identified by unique names
 
   * type: the type of SCM in use. Typically 'git', 'svn'...
+  * url: the URL of the release git repository
+    The URL should be writable (with the appropriate credentials).
+  * version: version number for which packages are released. For git and hg this
+    can be a tag, branch or hash.
+  * packages: an optional list of packages (if the repository has more than one).
+    For each package a relative path in the repository can be specified.
+    If that path is omitted, then a subfolder with the name of the package is expected.
+    If this list is omitted, then a single package named after the
+    repository is expected to be in the root of the repository.
 
-* type: must be 'ros-test'
+* type: must be 'test'
+* version: version number, this REP describes version 1
 
 Documentation directory
 -----------------------
@@ -216,85 +303,6 @@ Affected tools
 * roslocate: should be updated to use rosdistro
 * rosdoc/rosdoc-lite: should be updated to use rosdistro
 
-File format
-===========
-
-Files use YAML 1.1 for the sake of human and machine readability and
-write-ability.
-As a good practice, the should contain a header such as:
-
-::
-
-  %YAML 1.1
-  # distribution file
-  # this file describes a ROS distribution.
-  # see REP 137: http://ros.org/reps/rep-0137.html
-  ---
-
-Examples
-========
-
-Master file
------------
-A master file referencing multiple distribution and build files.
-
-::
-
-  distributions:
-    groovy:
-      release: releases/groovy.yaml
-      release-build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
-      test: tests/groovy.yaml
-      test-build: [tests/groovy-build.yaml]
-      doc: doc/groovy
-      distribution-cache: http://www.example.com/groovy-distribution-cache
-    hydro:
-      ...
-  type: ros-distributions
-  version: 1
-
-Distribution file
------------------
-A distribution file listing repositories and packages and the target platforms.
-
-::
-
-  repositories:
-    actionlib:
-      url: https://github.com/ros-gbp/actionlib-release.git
-      version: 1.9.11-0
-    ar_track_alvar:
-      url: https://github.com/ros-gbp/ar_track_alvar-release.git
-      version: 0.3.0-0
-      packages:
-        ar_track_alvar: artrackalvar
-    bond_core:
-      url: https://github.com/ros-gbp/bond_core-release.git
-      version: 1.7.10-0
-      packages:
-        bond:
-        bond_core:
-        bondcpp:
-        bondpy:
-        smclib:
-  platforms: [oneiric, precise, quantal, wheezy]
-  type: ros-distribution
-  version: 1
-
-Build file
-----------
-A build file selecting a subset of packages from the distribution and specifying the platforms and architectures.
-
-::
-
-  package-whitelist: [ros_tutorials]
-  package-blacklist: [turtlesim]
-  targets:
-    oneiric: [amd64, i386]
-    precise: [amd64, i386, armel]
-  notify-maintainers: false
-  type: ros-build
-  version: 1
 
 Use case examples
 =================
@@ -312,7 +320,7 @@ master.yaml:
   # this file describes the available ROS distributions
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
-  type: ros-distributions
+  type: master
   version: 1
   distributions:
     groovy:
@@ -333,7 +341,7 @@ release/groovy.yaml:
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
-  type: ros-distribution
+  type: distribution
   version: 1
   repositories:
     ...
@@ -348,7 +356,7 @@ release/groovy-build.yaml:
   # this file describes a build of a ROS distribution
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
-  type: ros-build
+  type: build
   version: 1
   targets:
     oneiric: [amd64, i386]
@@ -364,7 +372,7 @@ test/groovy.yaml:
   # this file describes test repositories for a ROS distribution.
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
-  type: ros-test
+  type: test
   version: 1
   repositories:
     ...
@@ -379,7 +387,7 @@ test/groovy-build.yaml:
   # this file describes a build of a ROS distribution
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
-  type: ros-build
+  type: build
   version: 1
   targets:
     oneiric: [amd64, i386]
