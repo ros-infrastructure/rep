@@ -130,8 +130,12 @@ The information stored in the master file is:
   * release-build: list of references to the build files used to build the binary packages
   * test: reference to the distribution file used for tests
   * test-build: list of references to the build file used to run the tests
-  * doc: reference to the documentation folder TODO: explain more
-  * distribution-cache: reference to a distribution cache
+  * doc: reference to the documentation folder. The specification of this folder
+    does not belong to the scope of this REP and is considered an implementation
+    detail.
+  * distribution-cache: reference to a distribution cache. Whether this field is
+    a dictionary, a list or a scalar is left as an implementation detail. The
+    following examples will assume that the implementation necessitates an url.
 
 * type: must be 'master'
 * version: version number, this REP describes version 1
