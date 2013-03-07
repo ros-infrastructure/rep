@@ -319,7 +319,7 @@ item is required in distribution files:
 Affected tools
 --------------
 
-* bloom[1]_: bloom relies on rosdep to retrieve the list of targets. Changes to
+* bloom [1]_: bloom relies on rosdep to retrieve the list of targets. Changes to
   bloom are thought to be minimal (probably none)
 * buildfarm: the buildfarm needs to know for which target/architecture it
   builds packages. It hsould use rosdistro for that purpose
@@ -327,11 +327,11 @@ Affected tools
   not correspond to this REP
 * reprepro-updater: needs a list of supported targets to generate repositories,
   should rely on rosdistro
-* rosdep[2]_: rosdep also provides a list of targets (the old targets.yaml file),
+* rosdep [2]_: rosdep also provides a list of targets (the old targets.yaml file),
   should rely on rosdistro
 * rosdistro: this is the preferred implementation of the specifications listed
   in this REP. All other tools should use rosdistro
-* roslocate[3]_: should be updated to use rosdistro
+* roslocate [3]_: should be updated to use rosdistro
 * rosdoc/rosdoc-lite: should be updated to use rosdistro
 
 
