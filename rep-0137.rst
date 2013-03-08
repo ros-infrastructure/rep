@@ -48,7 +48,7 @@ The information formalized in this REP is used in four separate processes:
 
 * releasing a package
   This is the process of exporting upstream source and generating platform
-  specific build files specific metainformation)
+  specific build files specific meta-information)
 * running automated tests
 * running documentation jobs
 * building binary packages for a specific platform and architecture
@@ -176,12 +176,12 @@ Each distribution contains the following:
   * version: version number for which packages are released. This
     can be a tag, branch or hash.
   * status: defines the status of the packages of the repository. Can be one of
-    the following: ``developped``, ``maintained``, ``unmaintained``,
+    the following: ``developed``, ``maintained``, ``unmaintained``,
     ``end-of-life``
   * status-description: an optional field describing in a short sentence the
     current status of the repository
   * packages: an optional list of packages (if the repository has more than one).
-    Each package is a dictionnary with the following keys:
+    Each package is a dictionary with the following keys:
 
     * subfolder: the relative path to the package from the repository base
       (default: *package name*)
@@ -238,7 +238,7 @@ Build file
   Any downstream package are implicitly excluded.
   The blacklist overrides the whitelist.
 
-* admin-notification: email address of the build farm administrator. Anyy error
+* admin-notification: email address of the build farm administrator. Any error
   related to the build far itself shell be reported to this address.
 
 * targets: a list of targets for which packages are build.
@@ -322,7 +322,7 @@ Affected tools
 * bloom [1]_: bloom relies on rosdep to retrieve the list of targets. Changes to
   bloom are thought to be minimal (probably none)
 * buildfarm: the buildfarm needs to know for which target/architecture it
-  builds packages. It hsould use rosdistro for that purpose
+  builds packages. It should use rosdistro for that purpose
 * catkin-debs: actual tools use an internal rosdistro implementation that does
   not correspond to this REP
 * reprepro-updater: needs a list of supported targets to generate repositories,
