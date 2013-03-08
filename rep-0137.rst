@@ -240,18 +240,16 @@ Build file
   Any downstream package are implicitly excluded.
   The blacklist overrides the whitelist.
 
-* admin-notification: email address of the build farm administrator. Any error
-  related to the build far itself shell be reported to this address.
+* notifications: An optional section to configure email notifications.  
+
+  * emails: a list of emails to which to send all emails. (default: empty) 
+  * maintainers: a boolean flag used to enable email notification to listed maintainers. (default: false) 
+  * committers: a boolean flag used to enable email notification to committers. (default: false)
 
 * targets: a list of targets for which packages are build.
   Each target consists of a platform (OS code name) and CPU architecture.
   Code names specified in the list must be listed in the corresponding
   distribution file.
-
-* notify-maintainers: optional boolean flag used to disable maintainer
-  notifications of build failures. This is useful for offline/experimental
-  buildfarms. (default: true)
-
 * type: must be 'build'
 * version: version number, this REP describes version 1
 
@@ -267,11 +265,13 @@ and specifying the platforms and architectures.
   ---
   package-whitelist: [ros_tutorials]
   package-blacklist: [turtlesim]
+  notifications:
+    emails: [buildfarm-admin@example.com]
+    maintainers: true
+    committers: false
   targets:
     oneiric: [amd64, i386]
     precise: [amd64, i386, armel]
-  notify-maintainers: false
-  admin-notification: smith@example.com
   type: build
   version: 1
 
