@@ -179,9 +179,11 @@ Each distribution contains the following:
     the following: ``developed``, ``maintained``, ``unmaintained``,
     ``end-of-life``
   * status-description: an optional field describing in a short sentence the
-    current status of the repository
-  * packages: an optional list of packages (if the repository has more than one).
-    Each package is a dictionary with the following keys:
+    current status of the repository.  For example detailing the reason
+    for EOL and the recommended upgrade path.
+  * packages: an optional list of packages.  If no package is specified, 
+    one package with the name of the repository is assumed in the root of the repository.
+    Each package is a dictionary with the following optional keys:
 
     * subfolder: the relative path to the package from the repository base
       (default: *package name*)
