@@ -39,7 +39,7 @@ The use cases this REP is designed to address are:
    i.e. building and testing individual ROS distributions on separate buildfarms
 2. enable building binary packages for (experimental) platforms and
    architectures
-3. enable building binary packages of custom packages on-top of the existing ROS
+3. enable building binary packages of custom packages on top of the existing ROS
    distributions for publicly or privately hosted projects
 
 Design requirements
@@ -48,7 +48,7 @@ The information formalized in this REP is used in four separate processes:
 
 * releasing a package
   This is the process of exporting upstream source and generating platform
-  specific build files specific metainformation)
+  specific build files specific meta-information)
 * running automated tests
 * running documentation jobs
 * building binary packages for a specific platform and architecture
@@ -127,13 +127,13 @@ The information stored in the master file is:
   For each distribution further information are referenced:
 
   * release: reference to the release distribution file
-  * release-build: list of references to the build files used to build the binary packages
+  * release_build: list of references to the build files used to build the binary packages
   * test: reference to the distribution file used for tests
-  * test-build: list of references to the build file used to run the tests
-  * doc: reference to the documentation folder. The full specification of this folder
+  * test_build: list of references to the build file used to run the tests
+  * doc_folder: a reference to the documentation folder. The full specification of this folder
     does not belong to the scope of this REP and is considered an implementation
-    detail.
-  * distribution-cache: reference to a distribution cache. Whether this field is
+    detail.  In the future it might utilize a similar infrastructure to release and test files. 
+  * distribution_cache: reference to a distribution cache. Whether this field is
     a dictionary, a list or a scalar is left as an implementation detail. The
     following examples will assume that the implementation necessitates an url.
 
@@ -154,11 +154,11 @@ A master file referencing multiple distribution and build files.
   distributions:
     groovy:
       release: releases/groovy.yaml
-      release-build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
+      release_build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
       test: tests/groovy.yaml
-      test-build: [tests/groovy-build.yaml]
-      doc: doc/groovy
-      distribution-cache: http://www.example.com/groovy-distribution-cache
+      test_build: [tests/groovy-build.yaml]
+      doc_folder: doc/groovy
+      distribution_cache: http://www.example.com/groovy-distribution-cache
     hydro:
       ...
   type: master
@@ -176,17 +176,19 @@ Each distribution contains the following:
   * version: version number for which packages are released. This
     can be a tag, branch or hash.
   * status: defines the status of the packages of the repository. Can be one of
-    the following: ``developped``, ``maintained``, ``unmaintained``,
+    the following: ``developed``, ``maintained``, ``unmaintained``,
     ``end-of-life``
-  * status-description: an optional field describing in a short sentence the
-    current status of the repository
-  * packages: an optional list of packages (if the repository has more than one).
-    Each package is a dictionnary with the following keys:
+  * status_description: an optional field describing in a short sentence the
+    current status of the repository.  For example detailing the reason
+    for EOL and the recommended upgrade path.
+  * packages: an optional list of packages.  If no package is specified, 
+    one package with the name of the repository is assumed in the root of the repository.
+    Each package is a dictionary with the following optional keys:
 
     * subfolder: the relative path to the package from the repository base
       (default: *package name*)
     * status: overrides the repository-wide status
-    * status-description: overrides the repository-wide status description
+    * status_description: overrides the repository-wide status description
 
 * platforms: a list of target platforms for which packages are released.
   These names are OS code names as determined by *rospkg.os_detect* [4]_.
@@ -230,26 +232,24 @@ target platforms.
 
 Build file
 ----------
-* package-whitelist: a list of packages to build.
+* package_whitelist: a list of packages to build.
   If this is omitted all packages specified in the distribution file are build.
   Any upstream packages are implicitly included.
-* package-blacklist: a list of packages excluded from build.
+* package_blacklist: a list of packages excluded from build.
   If this is omitted no packages are excluded.
   Any downstream package are implicitly excluded.
   The blacklist overrides the whitelist.
 
-* admin-notification: email address of the build farm administrator. Anyy error
-  related to the build far itself shell be reported to this address.
+* notifications: An optional section to configure email notifications.  
+
+  * emails: a list of emails to which to send all emails. (default: empty) 
+  * maintainers: a boolean flag used to enable email notification to listed maintainers. (default: false) 
+  * committers: a boolean flag used to enable email notification to committers. (default: false)
 
 * targets: a list of targets for which packages are build.
   Each target consists of a platform (OS code name) and CPU architecture.
   Code names specified in the list must be listed in the corresponding
   distribution file.
-
-* notify-maintainers: optional boolean flag used to disable maintainer
-  notifications of build failures. This is useful for offline/experimental
-  buildfarms. (default: true)
-
 * type: must be 'build'
 * version: version number, this REP describes version 1
 
@@ -263,13 +263,15 @@ and specifying the platforms and architectures.
   # this file describes a build of a ROS distribution.
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
-  package-whitelist: [ros_tutorials]
-  package-blacklist: [turtlesim]
+  package_whitelist: [ros_tutorials]
+  package_blacklist: [turtlesim]
+  notifications:
+    emails: [buildfarm-admin@example.com]
+    maintainers: true
+    committers: false
   targets:
     oneiric: [amd64, i386]
     precise: [amd64, i386, armel]
-  notify-maintainers: false
-  admin-notification: smith@example.com
   type: build
   version: 1
 
@@ -322,7 +324,7 @@ Affected tools
 * bloom [1]_: bloom relies on rosdep to retrieve the list of targets. Changes to
   bloom are thought to be minimal (probably none)
 * buildfarm: the buildfarm needs to know for which target/architecture it
-  builds packages. It hsould use rosdistro for that purpose
+  builds packages. It should use rosdistro for that purpose
 * catkin-debs: actual tools use an internal rosdistro implementation that does
   not correspond to this REP
 * reprepro-updater: needs a list of supported targets to generate repositories,
@@ -355,11 +357,11 @@ master.yaml:
   distributions:
     foo:
       release: release/foo.yaml
-      release-build: [release/foo-build.yaml]
+      release_build: [release/foo-build.yaml]
       test: test/foo.yaml
-      test-build: [test/foo-build.yaml]
-      doc: doc/
-      distribution-cache: http://example.com/foo-cache.tar.gz
+      test_build: [test/foo-build.yaml]
+      doc_folder: doc/
+      distribution_cache: http://example.com/foo-cache.tar.gz
 
 
 release/foo.yaml:
@@ -375,14 +377,14 @@ release/foo.yaml:
   type: distribution
   version: 1
   repositories:
-    bar-repo:
-      url: https://github.com/example-release/bar-repo.git
+    bar_repo:
+      url: https://github.com/example-release/bar_repo.git
       version: 0.1.2
     baz-repo:
       url: https://example.com/release/baz-repo.git
       version: 7.7.7
       status: end-of-life
-      status-description: the repository has not been updated since 1995
+      status_description: the repository has not been updated since 1995
       packages:
         baz_pkg1:
         baz_pkg2:
@@ -404,7 +406,8 @@ release/foo-build.yaml:
     precise: [amd64, i386]
     quantal: [amd64, i386]
     raring: [amd64, i386]
-  admin-notification: admin@foo.com
+  notifications:
+    emails: [admin@example.com]
 
 test/foo.yaml:
 
@@ -418,9 +421,9 @@ test/foo.yaml:
   type: test
   version: 1
   repositories:
-    bar-repo:
+    bar_repo:
       type: git
-      url: https://github.com/example-test/bar-repo.git
+      url: https://github.com/example-test/bar_repo.git
       version: master
     baz-repo:
       type: hg
@@ -442,7 +445,9 @@ test/foo-build.yaml:
     precise: [amd64, i386]
     quantal: [amd64, i386]
     raring: [amd64, i386]
-  admin-notification: admin@foo.com
+  notifications: 
+    emails: [admin@example.com]
+    maintainers: true
 
 References
 ==========
