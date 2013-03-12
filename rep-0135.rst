@@ -96,6 +96,15 @@ It is possible to perform a tick-tock migration and warn users when the usage se
 
     }
 
+References
+==========
+
+.. [1] ros-users discussion
+   (https://code.ros.org/lurker/message/20130221.001546.b8861935.en.html)
+
+.. [2] Github discussion
+   (https://github.com/ros-infrastructure/rep/pull/22)
+
 
 Copyright
 =========
