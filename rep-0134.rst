@@ -51,6 +51,14 @@ then invokes cmake and make in an environment that includes all devel
 spaces of dependencies of a given package. Later invocations just
 invoke make.
 
+`catkin_make_isolated` will not create a CMakeLists.txt in the source
+space, in contrast to catkin_make, as this is only needed for the
+non-isolated build process. Similarly, there is no option to invoke
+configuration and build of multiple packages in a workspace with
+single commands other than by invoking `catkin_make_isolated`, in
+contrast to catkin_make which is practically equivalent to invoking
+cmake and make manually.
+
 Any other build system than catkin to be supported has to satisfy the
 following constraints:
 
