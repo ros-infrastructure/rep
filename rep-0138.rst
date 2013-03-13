@@ -1,7 +1,7 @@
 REP: 138
 Title: LaserScan Common Topics, Parameters, and Diagnostic Keys
 Author: Chad Rockey <chadrockey@willowgarage.com>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 07-Feb-2013
@@ -207,6 +207,15 @@ Backwards Compatibility
 
 It is up to the maintainer of a driver to determine if the driver should be updated to follow this REP.  If a maintainer chooses to update the driver, the current usage should at minimum follow a tick tock pattern where the old usage is deprecated and warns the user, followed by removal of the old usage.  The maintainer may choose to support both standard and custom usage, as well as extend this usage or implement this usage partially depending on the specifics of the driver.
 
++References
++==========
++
++.. [1] ros-users discussion
++   (https://code.ros.org/lurker/message/20130225.194132.55d7a174.en.html)
++
++.. [2] Github discussion
++   (https://github.com/ros-infrastructure/rep/pull/25)
++
 
 Copyright
 =========
