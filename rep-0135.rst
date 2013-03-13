@@ -1,7 +1,7 @@
 REP: 135
 Title: Driver Namespace Practices
 Author: Chad Rockey <chadrockey@willowgarage.com>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 11-Feb-2013
