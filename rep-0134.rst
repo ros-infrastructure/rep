@@ -30,15 +30,16 @@ make, autotools, rosbuild). "catkin" is the default value for this
 property that will be assumed in the absence of the tag.
 
 Having a package with a different build_type than "catkin" in the
-catkin workspace will make the catkin workspace-build (such as using
-catkin_make) fail. Instead, the user will have to invoke a new command
-`catkin_build_isolated`, which performs the build of all workspace
-projects in a different way catkin usually does. Each catkin package
-will be build using isolated cmake and make invocations for each
-package. This is necessary as non-standard catkin packages do not act
-compliantly within the configuration process (they do not generate
-catkin-compliant configuration files during configuration so that
-other packages could depend on them after configuration).
+catkin workspace will make catkin_make fail (or the equivalent call to
+cmake using the toplevel CMakeLists.txt). Instead, the user will have
+to invoke a new command `catkin_build_isolated`, which performs the
+build of all workspace projects in a different way catkin usually
+does. Each catkin package will be build using isolated cmake and make
+invocations for each package. This is necessary as non-standard catkin
+packages do not act compliantly within the configuration process (they
+do not generate catkin-compliant configuration files during
+configuration so that other packages could depend on them after
+configuration).
 
 `catkin_make_isolated` by default uses a build and devel space named
 differently than the default catkin build and devel spaces:
@@ -66,10 +67,9 @@ following constraints:
    space artifacts such that using the devel environment the
    executables can be invoked using rosrun, and other packages can be
    build on top relying on standard cmake dependency resolution
-   (find_package)
- * installing packages installs to the CMAKE_INSTALL_PREFIX (for other
-   build tools the value of this variable has to be used in a
-   toolchain specific way)
+   (find_package) * installing packages installs to the installspace,
+   that is passed to `catkin_make_isolated` using the
+   `--install-space` option.
 
 Additionally, build systems should strive to support the following:
 
@@ -135,12 +135,13 @@ The develspace folder::
 
 will contain `setup.*sh` files to use to create a runtime environment.
 
-The isolated buildspace of a package can be used to (re-)build the
-package using the make command, provided the prerequisite packages are
-in the CMAKE_PREFIX_PATH. An `env.sh` file in the isolated develspace
-of the package can be used to run cmake with a suitable
-environment.
-
+For both standard as well as non-standard packages,
+catkin_make_isolated generates environment files (`env.sh`,
+´setup.sh´) in the packages develspace. The isolated buildspace of a
+package can be used to (re-)build the package using the make command,
+provided the prerequisite packages are in the CMAKE_PREFIX_PATH. The
+`env.sh` file in the isolated develspace of the package can be used to
+run cmake with a suitable environment.
 
 A `--merge` option allows to use a single develspace for all
 packages, while the buildspaces remain isolated.
