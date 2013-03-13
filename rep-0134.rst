@@ -125,7 +125,7 @@ By default `catkin_make_isolated` will create a build folder for package `foo` a
 
   workspace/build_isolated/foo/
 
-whereas catkin_make only creates one build space for all packages at:
+whereas catkin_make only creates one build space for all packages at::
 
   workspace/buildspace
 
