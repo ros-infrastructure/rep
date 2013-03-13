@@ -5,15 +5,17 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 15-Dec-2012
-Post-History:
+Post-History: ??-??-2013
 
 
 Abstract
 ========
 
 This REP describes the new command `catkin_make_isolated` to be
-delivered with catkin [1]_, to allow isolated builds of packages and
-in that process also build of plain cmake projects.
+delivered with catkin [1]_. This command builds each item in a workspace
+in an isolated environment, providing debugging for workspaces consisting
+purely of catkin packages and enabling users to build workspaces containing
+both catkin and non-catkin packages.
 
 Specification
 =============
@@ -26,29 +28,35 @@ of the package.xml::
 Catkin commands will use the value of this tag to determine how to treat a
 package.  Currently only two values are defined, "catkin" and "cmake",
 but further build types may be added later (possible examples could be
-make, autotools, rosbuild). "catkin" is the default value for this
+make, autotools, rosbuild, or custom). "catkin" is the default value for this
 property that will be assumed in the absence of the tag.
 
-Having a package with a different build_type than "catkin" in the
-catkin workspace will make catkin_make fail (or the equivalent call to
-cmake using the toplevel CMakeLists.txt). Instead, the user will have
-to invoke a new command `catkin_build_isolated`, which performs the
-build of all workspace projects in a different way catkin usually
-does. Each catkin package will be build using isolated cmake and make
-invocations for each package. This is necessary as non-standard catkin
-packages do not act compliantly within the configuration process (they
-do not generate catkin-compliant configuration files during
-configuration so that other packages could depend on them after
-configuration).
+Having a package with a build_type other than "catkin" in a
+catkin workspace will prevent that workspace from being built normally,
+either by invoking `catkin_make` or by invoking `cmake path/to/workspace`
+on a workspace with a top-level CMakeList.txt. Instead, the user will have
+to invoke a new command `catkin_make_isolated`, which builds each package
+in the workspace individually, calling `cmake`, `make`, and possibly
+`make install` for each catkin package. This is opposed to how
+catkin workspaces are normally built, with one invocation of CMake
+which generates a single Make target for all packages in the workspace.
+This is necessary as non-standard catkin packages do not act compliantly
+within the configuration process (they do not generate catkin-compliant
+configuration files during configuration so that other packages could
+depend on them after configuration).
 
 `catkin_make_isolated` by default uses a build and devel space named
-differently than the default catkin build and devel spaces:
-`build_isolated` instead of `build`, and `devel_isolated` instead of
-`devel`.  `catkin_make_isolated` uses the information from all catkin
-package manifests in the workspace to build a valid ordering of build
-steps.  Then for each package, a build and devel subfolder are created
-in the build and devel space. For each package, `catkin_make_isolated`
-then invokes cmake and make in an environment that includes all devel
+differently than the default catkin build, devel, and install spaces:
+
+- `build_isolated` instead of `build`
+- `devel_isolated` instead of `devel`
+- `install_isolated` instead of `install`
+
+`catkin_make_isolated` uses the information from catkin package
+manifests in the workspace to construct a valid build order for the packages.
+Then for each package, a build and devel subfolder are created
+in the build and devel spaces. For each package, `catkin_make_isolated`
+then invokes `cmake` and `make` in an environment which includes all devel
 spaces of dependencies of a given package. Later invocations just
 invoke make.
 
@@ -58,26 +66,27 @@ non-isolated build process. Similarly, there is no option to invoke
 configuration and build of multiple packages in a workspace with
 single commands other than by invoking `catkin_make_isolated`, in
 contrast to catkin_make which is practically equivalent to invoking
-cmake and make manually.
+`cmake` and `make` manually.
 
 Any other build system than catkin to be supported has to satisfy the
 following constraints:
 
- * building packages with the build system must produce in the devel
-   space artifacts such that using the devel environment the
-   executables can be invoked using rosrun, and other packages can be
-   build on top relying on standard cmake dependency resolution
-   (find_package) * installing packages installs to the installspace,
-   that is passed to `catkin_make_isolated` using the
-   `--install-space` option.
+- building packages with the build system must produce in the devel
+  space artifacts such that using the devel environment the
+  executables can be invoked using `rosrun`, and other packages can be
+  build on top relying on standard CMake dependency resolution
+  (find_package)
+- installing packages installs to the install space,
+  that is passed to `catkin_make_isolated` using the
+  `--install-space` option.
 
 Additionally, build systems should strive to support the following:
 
- * Script files should not be duplicated in the devel space, but relay
-   files be used that point to the source files
- * The source file tree should not be changed by build invocations,
-   the build space should be used for build artifacts that
-   belong into the develspace.
+- Script files should not be duplicated in the devel space, but relay
+  files be used that point to the source files
+- The source file tree should not be changed by build invocations,
+  the build space should be used for build artifacts that
+  belong into the devel space.
 
 catkin_make_isolated options
 ----------------------------
@@ -95,7 +104,7 @@ can be applied. catkin_make_isolated also requires extra options::
 
 With `catkin_make` those options are not provided as they are passed
 as CMAKE variables / targets instead. In the isolated build, that is
-not possible because the actual cmake variables have to be set
+not possible because the actual CMake variables have to be set
 differently for each package, hence these options only need to exist
 in `catkin_make_isolated`.
 
@@ -112,11 +121,11 @@ Options that are currently shared with catkin_make::
 As catkin evolves, such helper options may change, this REP is not an
 attempt to capture all options for all time.
 
-By default `catkin_make_isolated` will create a build folder for package foo at::
+By default `catkin_make_isolated` will create a build folder for package `foo` at::
 
   workspace/build_isolated/foo/
 
-whereas catkin_make only creates one buildspace for all packages at:
+whereas catkin_make only creates one build space for all packages at:
 
   workspace/buildspace
 
@@ -125,11 +134,11 @@ create a build folder for package foo at::
 
   workspace/devel_isolated/foo/
 
-whereas `catkin_make` only creates one develspace for all packages at::
+whereas `catkin_make` only creates one devel space for all packages at::
 
   workspace/devel
 
-The develspace folder::
+The devel space folder::
 
   workspace/devel_isolated
 
@@ -137,26 +146,26 @@ will contain `setup.*sh` files to use to create a runtime environment.
 
 For both standard as well as non-standard packages,
 catkin_make_isolated generates environment files (`env.sh`,
-´setup.sh´) in the packages develspace. The isolated buildspace of a
+´setup.sh´) in the packages devel space. The isolated build space of a
 package can be used to (re-)build the package using the make command,
 provided the prerequisite packages are in the CMAKE_PREFIX_PATH. The
-`env.sh` file in the isolated develspace of the package can be used to
-run cmake with a suitable environment.
+`env.sh` file in the isolated devel space of the package can be used to
+run CMake with a suitable environment.
 
-A `--merge` option allows to use a single develspace for all
-packages, while the buildspaces remain isolated.
+A `--merge` option allows to use a single devel space for all
+packages, while the build spaces remain isolated.
 
 Passing `--install` will invoke `make install` for normal catkin
-packages in each isolated buildspace, and in non-standard packages, the
+packages in each isolated build space, and in non-standard packages, the
 behavior will be defined by each alternative build system support.
 
 CMake build system
 ------------------
 
-The initial support for non-standard catkin packages using the plain cmake
+The initial support for non-standard catkin packages using the plain CMake
 build system is implemented by invoking make in the isolated
-buildspace of a package. After that the cmake project is installed to
-the develspace to comply with the develspace concept.
+build space of a package. After that the CMake project is installed to
+the devel space to comply with the devel space concept.
 
 
 Motivation
@@ -165,7 +174,7 @@ Motivation
 Catkin defines a catkin package to be a folder containing a
 package.xml file satisfying the catkin syntax and a CMakeList.txt.
 
-Catkin provides cmake macros and variables, in particular the
+Catkin provides CMake macros and variables, in particular the
 `catkin_package()` macro, which performs necessary steps for a catkin
 package to be build successfully in the catkin build process.  This
 relates to the configure process of a package also generating suitable
@@ -173,11 +182,11 @@ configuration files for dependent packages, as well as placing
 suitable build artifacts in the so called devel space.
 
 However it is technically feasible to create a catkin package that
-does not use the provided catkin cmake macros or variables. The
+does not use the provided catkin CMake macros or variables. The
 CMakeLists.txt then defines a build process according to e.g. plain
-cmake rules. Such a project which is not compliant with catkin breaks
+CMake rules. Such a project which is not compliant with catkin breaks
 the default catkin build process (mainly due to the lack of
-catkin-generated cmake configuration file, and due to the absence of
+catkin-generated CMake configuration file, and due to the absence of
 valid devel space files).
 
 Several libraries in the ROS ecosystem have a complex CMakeLists.txt
@@ -191,10 +200,10 @@ alternative build process that can also include such non-standard
 catkin packages. This measure is a workaround and not currently
 intended for the majority of catkin users. Current caveats are very
 low speed, and a folder layout that is different from the layout
-generated by `catkin_make`. The develspace may also contain duplicate
+generated by `catkin_make`. The devel space may also contain duplicate
 artifacts from the source space for non-standard catkin packages,
 whereas for standard catkin packages duplication is avoided. The
-target audience are users who want to build core ros packages from
+target audience are users who want to build core ROS packages from
 source, rather than using pre-packaged distributions.
 
 The first packages to be included as non-standard catkin packages like this
@@ -205,10 +214,10 @@ Rationale
 
 The build process catkin establishes bulk-processes all catkin
 projects within the same workspace folder as if they were part of a
-single cmake project. This design was chosen to speed up the
+single CMake project. This design was chosen to speed up the
 configuration and build processes, and to allow for a single build
 space to allow easy cross-compilation. Rules exist for developers to
-follow to reduce the risk of undesired cmake namespace collisions
+follow to reduce the risk of undesired CMake namespace collisions
 between catkin packages (Some namespace collisions are desired to
 detect conflicts early that have to be resolved anyway).
 
@@ -239,7 +248,7 @@ catkin_make command option
 --------------------------
 
 An option would have been to extend catkin_make with an option like
---isolated. However the commandline syntax between catkin_make and
+--isolated. However the command line syntax between catkin_make and
 catkin_make_isolated varies somewhat, as well as the build result.
 However, currently discussed future changes to catkin_make might
 change this (consider `catkin_cmake` command).
@@ -247,11 +256,11 @@ change this (consider `catkin_cmake` command).
 catkin_make_isolated with parallel builds
 -----------------------------------------
 
-The initial prototype of `catkin_make_isolated` invokes cmake and make
+The initial prototype of `catkin_make_isolated` invokes `cmake` and `make`
 for projects in sequence. Technically, it would be possible to
-paralleliize this process for better performance when any 2 packages
+parallelize this process for better performance when any 2 packages
 do not depend on each other. That's a technically valid alternative
-that may be implemented in the future.
+that may be implemented in the future, see:
 
 https://github.com/ros/catkin/issues/330
 
@@ -259,15 +268,16 @@ catkin_make_isolated isolated environments
 ------------------------------------------
 
 The initial prototype of `catkin_make_isolated` provides an `env.sh`
-in the package's subfolder in the develspace to generate an
-environment such that dependencies can be found by cmake. With the
+in the package's subfolder in the devel space to generate an
+environment such that dependencies can be found by CMake. With the
 prototype, the environment may also contain entries locating packages
 that were not listed as dependencies for a package, which may cause
 confusion and mask missing build information. It is thinkable to
 instead provide a way to set up a build environment that strictly only
-has entries for dependendencies of a package from the workspace.
+has entries for dependencies of a package from the workspace.
 
-That's a technically valid alternative that may be implemented in the future.
+That's a technically valid alternative that may be implemented in the
+future, see:
 
 https://github.com/ros/catkin/issues/367
 
@@ -288,8 +298,6 @@ Copyright
 
 This document has been placed in the public domain.
 
-
-
 ..
    Local Variables:
    mode: indented-text
