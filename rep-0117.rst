@@ -1,6 +1,6 @@
 REP: 117
 Title: Informational Distance Measurements
-Author: Chad Rockey <chadrockey@gmail.com>
+Author: Chad Rockey <chadrockey@willowgarage.com>
 Status: Accepted
 Type: Informational
 Content-Type: text/x-rst
