@@ -250,6 +250,16 @@ Build file
   Each target consists of a platform (OS code name) and CPU architecture.
   Code names specified in the list must be listed in the corresponding
   distribution file.
+* jenkins_url: the url to the associated jenkins build farm
+* apt_repo: url of the associated apt repository
+* sync: specify the criteria that need to be verified for packages to be synced with the
+  apt repo. One or both of the following options can be set:
+
+  * minimum: integer. Specifies how many packages need to be successfully built to
+    initiate sync. (default: 1)
+  * packages: list of packages. All the packages of this list must be successfully built to
+    initiate sync. (default: [])
+  
 * type: must be 'build'
 * version: version number, this REP describes version 1
 
@@ -272,6 +282,10 @@ and specifying the platforms and architectures.
   targets:
     oneiric: [amd64, i386]
     precise: [amd64, i386, armel]
+  jenkins_url: http://jenkins.example.com:8080
+  apt_repo: http://archives.example.com/ros
+  sync:
+    packages: [ros_tutorials]
   type: build
   version: 1
 
@@ -408,6 +422,10 @@ release/foo-build.yaml:
     raring: [amd64, i386]
   notifications:
     emails: [admin@example.com]
+  jenkins_url: http://farm.example.com:8080
+  apt_repo: http://repo.example.com/
+  sync:
+    minimum: 123
 
 test/foo.yaml:
 
