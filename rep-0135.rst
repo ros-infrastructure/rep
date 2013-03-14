@@ -1,0 +1,123 @@
+REP: 135
+Title: Driver Namespace Practices
+Author: Chad Rockey <chadrockey@willowgarage.com>
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 11-Feb-2013
+Post-History: 20-Feb-2013
+
+
+Abstract
+========
+
+This REP aims to define the best practices for drivers handling namespaces.  The best practice is to avoid drivers pushing themselves into a namespace.
+
+Specification
+=============
+
+When launching a node from rosrun, the best practice is to:
+
+    ROS_NAMESPACE=my_namespace rosrun my_package my_node
+
+When launching a node from a roslaunch file, the best practice is to:
+
+    <group ns="my_namespace">
+
+        <node pkg="my_package" type="my_node" name="this_node_name" />
+
+    </group>
+
+Drivers should not add a configurable namespace to all of their topics for the purposes of grouping the topics.
+
+For example, it is not appropriate to advertise the following if the node was launched in the global namespace ('/'):
+
+    /camera/image_raw
+
+    /camera/camera_info
+
+Instead, a driver should publish the following and warn that the driver was launched in the global namespace:
+
+    image_raw
+
+    camera_info
+
+If a driver publishes many topics, it is still appropriate to push these into local namespaces for grouping.  One example is where a device contains multiple cameras such as a stereo pair or an OpenNI camera.  For example, OpenNI publishes:
+
+    depth/image_raw
+
+    depth/camera_info
+
+    rgb/image_raw
+
+    rgb/camera_info
+
+    depth_registered/image_raw
+
+    depth_registered/camera_info
+
+    ir/image_raw
+
+    ir/camera_info
+
+    projector/camera_info
+
+Rationale
+=========
+
+Traditionally, some drivers, specifically cameras, have had friendlier usage for rosrun where their topics were grouped into a namespace.  This had the advantage of avoiding collisions if two similar drivers were run manually.  However, this led to issues when scaling to more complicated drivers or when composing simple launch files.  Since it often required both topic remapping and namespace remapping, it wasn't always clear which took precedent - commonly resulting in duplicated or missing namespaces.
+
+Where nodes push all of their topics into a namespace, tools like 'rosnode list' will report the driver in the top level namespace, which could make it confusing as to which node is publishing in which namespaces.  (For example 'camera_rgb' node publishes into 'top_camera' and 'camera_mono' publishes into 'side_camera').
+
+This also affects parameters as they are usually in the node's private namespace.  It is not immediately obvious which topic streams would be affected by 'camera_rgb/~exposure' if the namespace is independent from the driver.
+
+Backwards Compatibility
+=======================
+
+All existing drivers should continue their current usage and it is up to the maintainer to determine if and when to drop support for automatic namespaces.
+
+It is possible to perform a tick-tock migration and warn users when the usage seems incorrect through code like the following:
+
+    if (ros::names::remap("camera") != "camera")
+    {
+
+        ROS_WARN("Remapping 'camera' has no effect! Start my_node in the "
+        "correct namespace instead.\nExample command-line usage:\n"
+        "\t$ ROS_NAMESPACE=%s rosrun my_package my_node",
+        ros::names::remap("camera").c_str());
+
+    }
+    if (ros::this_node::getNamespace() == "/")
+    {
+
+        ROS_WARN("Started in the global namespace! This is probably wrong. my_node should be started"
+        "in a namespace.\nExample command-line usage:\n"
+        "\t$ ROS_NAMESPACE=my_namespace rosrun my_package my_node");
+
+    }
+
+References
+==========
+
+.. [1] ros-users discussion
+   (https://code.ros.org/lurker/message/20130221.001546.b8861935.en.html)
+
+.. [2] Github discussion
+   (https://github.com/ros-infrastructure/rep/pull/22)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+
