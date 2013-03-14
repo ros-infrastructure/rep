@@ -251,15 +251,17 @@ Build file
   Code names specified in the list must be listed in the corresponding
   distribution file.
 * jenkins_url: the url to the associated jenkins build farm
-* apt_repo: url of the associated apt repository
-* sync: specify the criteria that need to be verified for packages to be synced with the
-  apt repo. One or both of the following options can be set:
+* apt_repo: url of the associated apt repository. Used for pulling build dependencies, and
+  for pushing built packages.
+* sync: specify the criteria that need to be fulfilled for packages to be synced with the
+  apt repo. Any of the following options can be set:
 
-  * minimum: integer. Specifies how many packages need to be successfully built to
-    initiate sync. (default: 1)
-  * packages: list of packages. All the packages of this list must be successfully built to
+  * package_count: integer. Specifies how many packages need to be successfully built to
+    initiate sync. (default: 0)
+  * packages: list of package names. All the packages of this list must be successfully built to
     initiate sync. (default: [])
-  
+
+  Note: this option is only used for release builds, and will be ignored in other cases.
 * type: must be 'build'
 * version: version number, this REP describes version 1
 
@@ -425,7 +427,7 @@ release/foo-build.yaml:
   jenkins_url: http://farm.example.com:8080
   apt_repo: http://repo.example.com/
   sync:
-    minimum: 123
+    package_count: 123
 
 test/foo.yaml:
 
