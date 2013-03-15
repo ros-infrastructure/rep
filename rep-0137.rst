@@ -191,6 +191,8 @@ Each distribution contains the following:
     * status_description: overrides the repository-wide status description
 
 * platforms: a list of target platforms for which packages are released.
+  Each entry of this list is a key-value pair, with the OS name as a key and
+  the list of version code names as a value.
   These names are OS code names as determined by *rospkg.os_detect* [4]_.
   Each target platform will result in a different bloom release.
 
@@ -226,7 +228,9 @@ target platforms.
         bondcpp:
         bondpy:
         smclib:
-  platforms: [oneiric, precise, quantal, wheezy]
+  platforms:
+    ubuntu: [oneiric, precise, quantal]
+    debian: [wheezy]
   type: distribution
   version: 1
 
@@ -408,7 +412,8 @@ release/foo.yaml:
         baz_pkg1:
         baz_pkg2:
           subfolder: here/is/pkg2
-  platforms: [precise, quantal, raring]
+  platforms: 
+    ubuntu: [precise, quantal, raring]
 
 release/foo-build.yaml:
 
