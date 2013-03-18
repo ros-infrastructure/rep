@@ -1,0 +1,492 @@
+REP: 137
+Title: ROS distribution files
+Author: Tully Foote, Dirk Thomas, Paul Mathieu
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 04-Feb-2013
+
+.. contents::
+
+Abstract
+========
+This REP specifies a set of files which define ROS distributions and
+facilitate the build and packaging process. The intention is to formalize the
+existing infrastructure and simplify hosting of (potentially customized) ROS
+buildfarms.
+
+Motivation
+==========
+A ROS distribution consists of numerous software packages maintained by various
+contributors forming a coherent set. Until now there was
+only one buildfarm responsible for running unit tests and generating Debian
+packages for various Ubuntu versions and no formal description of the semantics
+of the files used in that process was given so far. Expanding the
+current capabilities to support other platforms and architectures will be
+important extensions.
+
+This REP aims to specify all information and file formats necessary to release
+and package ROS distributions for various platforms and architectures. By
+formalizing these data structures it should be enabled to:
+
+* release packages using bloom [1]_ for all targeted platforms
+* run unit tests for packages on selected platforms and architectures
+* build binary packages for selected platforms and architectures
+
+The use cases this REP is designed to address are:
+
+1. simplify the setup of a buildfarm which builds and tests a ROS distribution,
+   i.e. building and testing individual ROS distributions on separate buildfarms
+2. enable building binary packages for (experimental) platforms and
+   architectures
+3. enable building binary packages of custom packages on top of the existing ROS
+   distributions for publicly or privately hosted projects
+
+Design requirements
+===================
+The information formalized in this REP is used in four separate processes:
+
+* releasing a package
+  This is the process of exporting upstream source and generating platform
+  specific build files specific meta-information)
+* running automated tests
+* running documentation jobs
+* building binary packages for a specific platform and architecture
+
+There should be a single configuration which contains (or references) all
+information required to run the above processes.
+The configuration must be easily readable and editable by both humans as well
+as machines and be extendable with future functionality.
+
+The set of packages for which to build binary packages must be configurable
+for each platform and architecture.
+
+The release process should stay independent of the build process. The testing
+can be performed on either the upstream source or on the released tarball
+(depending on if the upstream source contains enough information to run the
+test suite). The build process can only work on released packages.
+
+Each configuration file must contain a label which identifies the semantics
+of the file as well as a version number to enable future format updates.
+
+Rationale
+=========
+A single configuration containing or referencing all required information
+allows for a single entry point for automated processing in the above
+mentioned processes.
+
+Specifying individual subsets of packages per platform and architecture is
+necessary since not all released packages can and should be build on all
+platforms and architectures.
+
+The information for the various processes should be separated from each other
+to ease customizing individual processes. This is especially necessary since
+different processes will be run by separate entities.
+
+Specification
+=============
+
+This REP intends to give a formal specification for some files that are already
+in use:
+* current distribution files (groovy.yaml)
+* targets.yaml
+
+The changes to the distribution file are minimal, such as adding type and
+version fields, and can be performed by a script.
+
+The targets.yaml file will be split and merged in the distribution files.
+
+File format
+-----------
+
+Files use YAML 1.1 for the sake of human and machine readability and
+write-ability.
+As a good practice, the should contain a header such as:
+
+::
+
+  %YAML 1.1
+  # distribution file
+  # this file describes a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+
+
+
+Master file
+-----------
+The master file act as a single configuration entrypoint which lists all
+available ROS distributions, along with references pointing to further process
+specific information.
+The references can be either relative to the master file or absolute.
+
+The information stored in the master file is:
+
+* distributions: a list of ROS distributions
+
+  For each distribution further information are referenced:
+
+  * release: reference to the release distribution file
+  * release_build: list of references to the build files used to build the binary packages
+  * test: reference to the distribution file used for tests
+  * test_build: list of references to the build file used to run the tests
+  * doc_folder: a reference to the documentation folder. The full specification of this folder
+    does not belong to the scope of this REP and is considered an implementation
+    detail.  In the future it might utilize a similar infrastructure to release and test files. 
+  * distribution_cache: reference to a distribution cache. Whether this field is
+    a dictionary, a list or a scalar is left as an implementation detail. The
+    following examples will assume that the implementation necessitates an url.
+
+* type: must be 'master'
+* version: version number, this REP describes version 1
+
+Example
+-------
+A master file referencing multiple distribution and build files.
+
+::
+
+  %YAML 1.1
+  # master file
+  # this file describes the available ROS distributions.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  distributions:
+    groovy:
+      release: releases/groovy.yaml
+      release_build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
+      test: tests/groovy.yaml
+      test_build: [tests/groovy-build.yaml]
+      doc_folder: doc/groovy
+      distribution_cache: http://www.example.com/groovy-distribution-cache
+    hydro:
+      ...
+  type: master
+  version: 1
+
+Distribution file
+-----------------
+A distribution is identified by the code name of the ROS distribution.
+Each distribution contains the following:
+
+* repositories: a list of repositories which are identified by unique names
+
+  * url: the URL of the release git repository
+    The URL should be writable (with the appropriate credentials).
+  * version: version number for which packages are released. This
+    can be a tag, branch or hash.
+  * status: defines the status of the packages of the repository. Can be one of
+    the following: ``developed``, ``maintained``, ``unmaintained``,
+    ``end-of-life``
+  * status_description: an optional field describing in a short sentence the
+    current status of the repository.  For example detailing the reason
+    for EOL and the recommended upgrade path.
+  * packages: an optional list of packages.  If no package is specified, 
+    one package with the name of the repository is assumed in the root of the repository.
+    Each package is a dictionary with the following optional keys:
+
+    * subfolder: the relative path to the package from the repository base
+      (default: *package name*)
+    * status: overrides the repository-wide status
+    * status_description: overrides the repository-wide status description
+
+* platforms: a list of target platforms for which packages are released.
+  Each entry of this list is a key-value pair, with the OS name as a key and
+  the list of version code names as a value.
+  These names are OS code names as determined by *rospkg.os_detect* [4]_.
+  Each target platform will result in a different bloom release.
+
+* type: must be 'distribution'
+* version: version number, this REP describes version 1
+
+**Example**: A distribution file listing repositories and packages and the
+target platforms.
+
+::
+
+  %YAML 1.1
+  # distribution file
+  # this file describes a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  repositories:
+    actionlib:
+      url: https://github.com/ros-gbp/actionlib-release.git
+      version: 1.9.11-0
+    ar_track_alvar:
+      url: https://github.com/ros-gbp/ar_track_alvar-release.git
+      version: 0.3.0-0
+      packages:
+        ar_track_alvar:
+          subfolder: artrackalvar
+    bond_core:
+      url: https://github.com/ros-gbp/bond_core-release.git
+      version: 1.7.10-0
+      packages:
+        bond:
+        bond_core:
+        bondcpp:
+        bondpy:
+        smclib:
+  platforms:
+    ubuntu: [oneiric, precise, quantal]
+    debian: [wheezy]
+  type: distribution
+  version: 1
+
+Build file
+----------
+* package_whitelist: a list of packages to build.
+  If this is omitted all packages specified in the distribution file are build.
+  Any upstream packages are implicitly included.
+* package_blacklist: a list of packages excluded from build.
+  If this is omitted no packages are excluded.
+  Any downstream package are implicitly excluded.
+  The blacklist overrides the whitelist.
+
+* notifications: An optional section to configure email notifications.  
+
+  * emails: a list of emails to which to send all emails. (default: empty) 
+  * maintainers: a boolean flag used to enable email notification to listed maintainers. (default: false) 
+  * committers: a boolean flag used to enable email notification to committers. (default: false)
+
+* targets: a list of targets for which packages are build.
+  Each target consists of a platform (OS code name) and CPU architecture.
+  Code names specified in the list must be listed in the corresponding
+  distribution file.
+* jenkins_url: the url to the associated jenkins build farm
+* apt_mirrors: a list of urls to apt repositories used for pulling build dependencies.
+  Defaults to a list containing only the repository defined in apt_target_repository
+* apt_target_repository: url of the apt repository used for pushing built packages.
+  Note: this option is only used for release builds, and will be ignored in other cases.
+* sync: specify the criteria that need to be fulfilled for packages to be synced with the
+  apt repo. Any of the following options can be set:
+
+  * package_count: integer. Specifies how many packages need to be successfully built to
+    initiate sync. (default: 0)
+  * packages: list of package names. All the packages of this list must be successfully built to
+    initiate sync. (default: [])
+
+  Note: this option is only used for release builds, and will be ignored in other cases.
+* type: must be 'build'
+* version: version number, this REP describes version 1
+
+**Example**: A build file selecting a subset of packages from the distribution
+and specifying the platforms and architectures.
+
+::
+
+  %YAML 1.1
+  # build file
+  # this file describes a build of a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  package_whitelist: [ros_tutorials]
+  package_blacklist: [turtlesim]
+  notifications:
+    emails: [buildfarm-admin@example.com]
+    maintainers: true
+    committers: false
+  targets:
+    oneiric: [amd64, i386]
+    precise: [amd64, i386, armel]
+  jenkins_url: http://jenkins.example.com:8080
+  apt_target_repository: http://archives.example.com/ros
+  apt_mirrors: [http://archives.example.com/ros, http://packages.foo.org/repos/example]
+  sync:
+    packages: [ros_tutorials]
+  type: build
+  version: 1
+
+Test file
+---------
+The test file uses a specification similar to the distribution file, but does not
+use a list of targets, and is not limited to git repositories.
+The test file references either source repositories or release branches from
+release repositories on which tests will be run.
+
+* repositories: a list of repositories which are identified by unique names
+
+  * type: the type of SCM in use. Typically 'git', 'svn'...
+  * url: the URL of the release git repository
+    The URL should be writable (with the appropriate credentials).
+  * version: For git and hg this is the tag, branch or hash to be checked out.
+
+* type: must be 'test'
+* version: version number, this REP describes version 1
+
+Documentation directory
+-----------------------
+The directory contains .rosinstall files which list repositories which should be used to generate API documentation.
+
+Distribution cache file
+-----------------------
+Collection of all meta information of the ROS distribution, including all the information from the package.xml files.
+The cache must reference the distribution file and store a hash of the version it was build from to be able to detect if the cache is invalid.
+The format of that cache is considered an implementation detail and is not specified in this REP.
+
+Reference implementation
+------------------------
+This REP is to be implemented in a Python module called *rosdistro*. This module
+will serve as a reference implementation for this REP. Any ROS tool requesting
+information defined in this REP should use this reference API implementation.
+
+Compatibility issues
+====================
+
+To ensure a proper error message for older tools, the following
+item is required in distribution files:
+
+::
+
+  gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
+
+Affected tools
+--------------
+
+* bloom [1]_: bloom relies on rosdep to retrieve the list of targets. Changes to
+  bloom are thought to be minimal (probably none)
+* buildfarm: the buildfarm needs to know for which target/architecture it
+  builds packages. It should use rosdistro for that purpose
+* catkin-debs: actual tools use an internal rosdistro implementation that does
+  not correspond to this REP
+* reprepro-updater: needs a list of supported targets to generate repositories,
+  should rely on rosdistro
+* rosdep [2]_: rosdep also provides a list of targets (the old targets.yaml file),
+  should rely on rosdistro
+* rosdistro: this is the preferred implementation of the specifications listed
+  in this REP. All other tools should use rosdistro
+* roslocate [3]_: should be updated to use rosdistro
+* rosdoc/rosdoc-lite: should be updated to use rosdistro
+
+
+Use case examples
+=================
+Full distribution build
+-----------------------
+This corresponds to building a ROS distribution called *foo* for officially
+supported platforms and architectures.
+master.yaml:
+
+::
+
+  %YAML 1.1
+  # master file
+  # this file describes the available ROS distributions
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: master
+  version: 1
+  distributions:
+    foo:
+      release: release/foo.yaml
+      release_build: [release/foo-build.yaml]
+      test: test/foo.yaml
+      test_build: [test/foo-build.yaml]
+      doc_folder: doc/
+      distribution_cache: http://example.com/foo-cache.tar.gz
+
+
+release/foo.yaml:
+
+::
+
+  %YAML 1.1
+  # distribution file
+  # this file describes a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
+  type: distribution
+  version: 1
+  repositories:
+    bar_repo:
+      url: https://github.com/example-release/bar_repo.git
+      version: 0.1.2
+    baz-repo:
+      url: https://example.com/release/baz-repo.git
+      version: 7.7.7
+      status: end-of-life
+      status_description: the repository has not been updated since 1995
+      packages:
+        baz_pkg1:
+        baz_pkg2:
+          subfolder: here/is/pkg2
+  platforms: 
+    ubuntu: [precise, quantal, raring]
+
+release/foo-build.yaml:
+
+::
+
+  %YAML 1.1
+  # build file
+  # this file describes a build of a ROS distribution
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: build
+  version: 1
+  targets:
+    precise: [amd64, i386]
+    quantal: [amd64, i386]
+    raring: [amd64, i386]
+  notifications:
+    emails: [admin@example.com]
+  jenkins_url: http://farm.example.com:8080
+  apt_target_repository: http://repo.example.com/
+  sync:
+    package_count: 123
+
+test/foo.yaml:
+
+::
+
+  %YAML 1.1
+  # test file
+  # this file describes test repositories for a ROS distribution.
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: test
+  version: 1
+  repositories:
+    bar_repo:
+      type: git
+      url: https://github.com/example-test/bar_repo.git
+      version: master
+    baz-repo:
+      type: hg
+      url: https://bitbucket.org/baz-test/baz-repo
+      version: default
+
+test/foo-build.yaml:
+
+::
+
+  %YAML 1.1
+  # build file
+  # this file describes a build of a ROS distribution
+  # see REP 137: http://ros.org/reps/rep-0137.html
+  ---
+  type: build
+  version: 1
+  targets:
+    precise: [amd64, i386]
+    quantal: [amd64, i386]
+    raring: [amd64, i386]
+  notifications: 
+    emails: [admin@example.com]
+    maintainers: true
+  apt_mirrors: [http://repo.example.com/, http://archive.ubuntu.com/ubuntu]
+
+References
+==========
+.. [1] Bloom: a release automation tool
+   (http://www.ros.org/wiki/bloom)
+.. [2] rosdep2: http://ros.org/reps/rep-0125.html
+.. [3] roslocate: http://www.ros.org/reps/rep-0115.html
+.. [4] rospkg.os_detect: http://www.ros.org/reps/rep-0114.html
+
+Copyright
+=========
+This document has been placed in the public domain.
+
