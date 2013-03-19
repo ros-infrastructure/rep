@@ -189,6 +189,23 @@ Each distribution contains the following:
       (default: *package name*)
     * status: overrides the repository-wide status
     * status_description: overrides the repository-wide status description
+  * tags: a dict of tags which can be used by tools like bloom and
+    the rosinstall generator, preventing the need for those tools to guessing about tags in
+    release repositories, e.g. 'release/package/1.2.3' vs 'release/groovy/package/1.2.3-4'.
+    This provides a useful future proofing mechanism for tools which use tags in the
+    release repository, rather than guessing the format of the tags they can infer them
+    directly from the tag templates.
+
+    * *tag_name {release, debian, etc...}*: Format of tags are strings with {template_variables}
+      e.g. 'release/groovy/{package}/{version}' A non-exhaustive list of possible template tags:
+
+      * package - name of the package which this release tag corresponds
+      * version - full version of the package being released, e.g. 1.2.3-4
+      * upstream_version - upstream version of package being released, e.g. 1.2.3
+      * debian_distro - target debian distro codename
+      * debian_package_name - name of package, with any prefix and sanitized for debian
+
+      The only required tag_name is 'release', others like 'debian' are optional.
 
 * platforms: a list of target platforms for which packages are released.
   Each entry of this list is a key-value pair, with the OS name as a key and
@@ -213,12 +230,16 @@ target platforms.
     actionlib:
       url: https://github.com/ros-gbp/actionlib-release.git
       version: 1.9.11-0
+      tags:
+        release: release/groovy/actionlib/{version}
     ar_track_alvar:
       url: https://github.com/ros-gbp/ar_track_alvar-release.git
       version: 0.3.0-0
       packages:
         ar_track_alvar:
           subfolder: artrackalvar
+      tags:
+        release: release/{package}/{upstream_version}
     bond_core:
       url: https://github.com/ros-gbp/bond_core-release.git
       version: 1.7.10-0
@@ -228,6 +249,9 @@ target platforms.
         bondcpp:
         bondpy:
         smclib:
+      tags:
+        release: release/groovy/{package}/{version}
+        debian: debian/{debian_package_name}_{version}_{debian_distro}
   platforms:
     ubuntu: [oneiric, precise, quantal]
     debian: [wheezy]
