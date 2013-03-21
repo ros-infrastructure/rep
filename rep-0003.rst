@@ -177,10 +177,17 @@ Python
 Our intent with Python support is to track the minimum Python version
 provided in the supported Ubuntu platforms, as well as survey other
 commonly used OS platforms that support ROS to determine a reasonable
-minimum target. As of Raring Ubuntu will ship with Python 3 by default.
-While we still support Ubuntu versions which ship with Python 2 by default
-all Python scripts should provide dual compatibility with Python
+minimum target. 
+
+As of Raring Ubuntu ships with Python 3 by default.  While ROS still
+supports Ubuntu versions which ship with Python 2, all core Python
+scripts and tools should provide dual compatibility with both Python
 2.7+ and Python 3.3+.
+
+Most Raring users will need to configure their default Python
+interpreter to 2.7 for running any non-trivial ROS-based robot
+systems.  But, ROS package developers can begin porting to Python 3,
+if their dependencies are available in that version.
 
 Core Stacks
 ===========
