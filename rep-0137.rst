@@ -376,6 +376,7 @@ Affected tools
   not correspond to this REP
 * reprepro-updater: needs a list of supported targets to generate repositories,
   should rely on rosdistro
+* prerelease_website: needs a list of release and devel repositories, should rely on rosdistro
 * rosdep [2]_: rosdep also provides a list of targets (the old targets.yaml file),
   should rely on rosdistro
 * rosdistro: this is the preferred implementation of the specifications listed
