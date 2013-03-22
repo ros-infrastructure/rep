@@ -76,7 +76,7 @@ From the RST specification [4]_ we will use one section without subsections for 
 * paragraphs
 * transitions
 * blank lines
-* hyperlinks
+* references
 * comments
 * bullet lists
 * enumeration lists
@@ -95,14 +95,23 @@ Inline markup transformation rules may just use the raw source when transforming
 * tables
 * subsections
 
-A changelog entry is defined by a heading which starts with a version number, meaning it matches the regular expression `^[0-9]+\.[0-9_]+\.[0-9_]+` (three positive integers separate by single dots). It may not contain subsections. Version sections must follow each other in the document in descending version number order. However they do not need to be all in the same parent section nor on the same section level.
+A changelog entry is defined by a heading which contains a version number followed by an optional timestamp in parenthesis.
+The version number consists of three positive integers separate by single dots, i.e. `1.2.3` as specified in [8]_.
+The timestamp must be parsable by the Python function `dateutil.parser.parse`.
+Futher constraints on the timestamp require it to contain at least a full date (`YYYY-MM-DD`, ISO 8601 format) and if hours are specified also the minutes (in order to keep the timestamp readable by humans).
+So the time as well as seconds and a timezone offset are optional.
+If not time and/or timezone is specified midnight 
 
-The recommended format is as follows:
+A changelog entry may not contain subsections.
+Version sections must follow each other in the document in descending version number order.
+However they do not need to be all in the same parent section nor on the same section level.
+
+The following example shows different valid changelog entries:
 
 ::
 
-    VersionNumber x
-    ---------------
+    1.2.3 (2013-01-23)
+    ------------------
     * Change 1
       Optional Text
       .
@@ -111,18 +120,20 @@ The recommended format is as follows:
     * Change n
       Optional Text
 
-    VersionNumber x-1
-    -----------------
+    1.2.2 (2013-01-22 08:35)
+    ------------------------
     * Change 1
-      Optional Text
-      .
-      .
-      .
-    * Change n
-      Optional Texts
+    * Change 2
+
+    1.2.1 (2013-01-22 06:35 +0100)
+    ------------------------------
+    * Change
 
 But many variations are possible with the elements allowed. The following example uses a lot of variations to show what possibilities exist.
+The header (enclosed by `^` characters) and the sections with only `MAJOR.MINOR` are additional visual markup to make the changelog more readable / structure for humans to read and optional.
 
+Likewise the section `0.1.27 (forthcoming)` is only considered additional free form text as it does not match the pattern of a changelog entry.
+This is recommended practice to state changes which are already committed but not yet released.
 
 CHANGELOG.rst Example
 ---------------------
@@ -134,9 +145,14 @@ CHANGELOG.rst Example
 
     0.1
     ===
+    Free form text about this minor release.
 
-    0.1.26 (stable)
-    ---------------
+    0.1.27 (forthcoming)
+    --------------------
+    * Great new feature
+
+    0.1.26 (2012-12-26)
+    -------------------
     * Utilizes caching to improve query performance (fix https://github.com/ros/ros_comm/pull/2)
     * Simplified API calls based on (https://github.com/ros/robot_model)
       Note that these changes are based on REP 192
@@ -144,8 +160,8 @@ CHANGELOG.rst Example
 
     .. not mentioning secret feature on purpose
 
-    0.1.25
-    ------
+    0.1.25 (2012-11-25)
+    -------------------
 
     - Added thread safety
     - Replaced custom XML parser with `TinyXML <http://www.grinninglizard.com/tinyxml/>`_.
@@ -155,19 +171,19 @@ CHANGELOG.rst Example
 
     The library should now compile under Win32
 
-    0.1.0
-    -----
+    0.1.0 (2012-10-01)
+    ------------------
 
-     First public *stable* release
+    First public *stable* release
 
     0.0
     ===
 
-    0.0.1
-    -----
+    0.0.1 (2012-01-31)
+    ------------------
 
-     1. Initial release
-     2. Initial bugs
+    1. Initial release
+    2. Initial bugs
 
 
 ROS Wiki Integration
@@ -193,7 +209,7 @@ The proposed format has the following properties that help to meet the design re
 
 * Markup allows many different ways of writing changes as long as this can be transformed into brief format for deb/rpm content.
 
-* When combined with the corresponding package.xml, enough information is provided to meet the full requirements of .deb and .rpm changelog formats (date, package name, etc.)
+* When combined with the corresponding package.xml, enough information is provided to meet the full requirements of .deb and .rpm changelog formats (timestamp, package name, etc.).
 
 * No redundant information from package.xml
 
@@ -202,6 +218,23 @@ Concerns
 ========
 
 Concerns have been discussed on ros-developers ([3]_) and in the Buildsystem SIG ([7]_).
+
+* Can the timestamp of a changelog entry be optional?
+
+ While the toolchain could use the current time when a release is made the information is missing when reading the changelog in the source repository.
+ Without a timestamp it is also not clear if the version has already been release (but the maintainer did not provided a timestamp) or is forthcoming (where the maintainer did not add an annotation for that).
+
+* Can we allow free form text in the changelog entry headline?
+
+ This would make the decision if a headline is a valid changelog entry more difficult.
+ On the other hand free form text could be either placed before a changelog entry or inside the changelog entry which should be sufficient to add additional information.
+ Therefore the specification does not allow that.
+
+* How can a full changelog with multiple versions be generated?
+
+  The available information from the current package.xml and changelog file can be used to generate the changelog for the current version.
+  Older changelog can not be generated since the information from the package.xml file at that point in time might have been different (i.e. other maintainer).
+  Anyway a full changelog can be constructed based on the changelog of the previous changelog and the changelog of the current version if desired.
 
 * How to link to tickets/issues in bug tracker without having to give full URL?
 
@@ -246,12 +279,12 @@ Concerns have been discussed on ros-developers ([3]_) and in the Buildsystem SIG
  * Support some inline markup nicely, treat other markup as raw source
  * Support all inline markup nicely
 
- The actual transformations to happen are for other tools to decide. For now, we shall support some markup nicely (hyperrefs), and treat other markup as raw source.
+ The actual transformations to happen are for other tools to decide. For now, we shall support some markup nicely (references), and treat other markup as raw source.
 
  * Wiki display: We could display the changelog in the wiki as raw text, try to render the RST, display what goes into the deb, or merely link to the source file in its home repo.
 
   * raw display is quickest for the users and easiest for us, maybe
-  * rendered display is nicer to the eye, allows following embedded hyperlinks
+  * rendered display is nicer to the eye, allows following embedded references
   * link to the source location is a bit worse for the users (navigating separate sites, but may be least effort)
 
 * rosbuild stacks and package support?
@@ -312,6 +345,8 @@ References
    (https://github.com/tkruse/changelog_rst.git)
 .. [7] Buildsystem SIG discussion
    (https://groups.google.com/d/msg/ros-sig-buildsystem/L3nE9X0T2Jk/ML_1JsHLuF0J)
+.. [8] REP 127 Specification of package manifest format
+   (https://github.com/ros-infrastructure/rep/blob/master/rep-0127.rst#version)
 
 Copyright
 =========
