@@ -514,7 +514,9 @@ The empty tag is used to indicate that a package is a metapackage
 which implies that it does only have a fixed minimal
 ``CMakeLists.txt`` which will only install the package.xml file.
 This information is necessary for the ROS wiki to show the
-relationship between these metapackages and other packages.
+relationship between these metapackages and other packages and as
+a backward compatibility with rosbuild. Non-metapackages must not
+depend on metapackages but instead on the packages they depend on.
 
 The CMakeLists.txt file for a metapackage is supposed to look like::
 
