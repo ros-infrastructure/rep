@@ -91,8 +91,8 @@ in use:
 * current distribution files (groovy.yaml)
 * targets.yaml
 
-The changes to the distribution file are minimal, such as adding type and
-version fields, and can be performed by a script.
+The changes to the distribution file are minimal, such as restructuring and
+adding type and version fields, and can be performed by a script.
 
 The targets.yaml file will be split and merged in the distribution files.
 
@@ -101,73 +101,69 @@ File format
 
 Files use YAML 1.1 for the sake of human and machine readability and
 write-ability.
-As a good practice, the should contain a header such as:
+As a good practice, the files should contain a header such as:
 
 ::
 
   %YAML 1.1
-  # distribution file
-  # this file describes a ROS distribution.
+  # ROS index|distribution|build|test file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
 
-
-
-Master file
------------
-The master file act as a single configuration entrypoint which lists all
+Index file
+----------
+The index file acts as a single configuration entrypoint which lists all
 available ROS distributions, along with references pointing to further process
 specific information.
-The references can be either relative to the master file or absolute.
+The references can be either relative to the index file or absolute.
 
-The information stored in the master file is:
+The information stored in the index file is:
 
 * distributions: a list of ROS distributions
 
   For each distribution further information are referenced:
 
-  * release: reference to the release distribution file
+  * release: reference to the distribution file
   * release_build: list of references to the build files used to build the binary packages
+  * release_cache: reference to a distribution cache. Whether this field is
+    a dictionary, a list or a scalar is left as an implementation detail. The
+    following examples will assume that the implementation necessitates an url.
   * test: reference to the distribution file used for tests
   * test_build: list of references to the build file used to run the tests
   * doc_folder: a reference to the documentation folder. The full specification of this folder
     does not belong to the scope of this REP and is considered an implementation
     detail.  In the future it might utilize a similar infrastructure to release and test files. 
-  * distribution_cache: reference to a distribution cache. Whether this field is
-    a dictionary, a list or a scalar is left as an implementation detail. The
-    following examples will assume that the implementation necessitates an url.
 
-* type: must be 'master'
+* type: must be 'index'
 * version: version number, this REP describes version 1
 
 Example
 -------
-A master file referencing multiple distribution and build files.
+An index file referencing multiple distribution and build files.
 
 ::
 
   %YAML 1.1
-  # master file
-  # this file describes the available ROS distributions.
+  # ROS index file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   distributions:
     groovy:
       release: releases/groovy.yaml
       release_build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
+      release_cache: http://www.example.com/groovy-distribution-cache
       test: tests/groovy.yaml
       test_build: [tests/groovy-build.yaml]
       doc_folder: doc/groovy
-      distribution_cache: http://www.example.com/groovy-distribution-cache
     hydro:
       ...
-  type: master
+  type: index
   version: 1
 
 Distribution file
 -----------------
-A distribution is identified by the code name of the ROS distribution.
-Each distribution contains the following:
+A distribution is identified by the code name of the ROS distribution in the index file.
+Each distribution contains the following information:
 
 * repositories: a list of repositories which are identified by unique names
 
@@ -181,16 +177,16 @@ Each distribution contains the following:
   * status_description: an optional field describing in a short sentence the
     current status of the repository.  For example detailing the reason
     for EOL and the recommended upgrade path.
-  * packages: an optional list of packages.  If no package is specified, 
+  * packages: an optional list of package names.  If no package is specified, 
     one package with the name of the repository is assumed in the root of the repository.
-    Each package is a dictionary with the following optional keys:
+    For each package name a dictionary with the following optional keys is possible:
 
     * subfolder: the relative path to the package from the repository base
       (default: *package name*)
     * status: overrides the repository-wide status
     * status_description: overrides the repository-wide status description
   * tags: a dict of tags which can be used by tools like bloom and
-    the rosinstall generator, preventing the need for those tools to guessing about tags in
+    the rosinstall generator, preventing the need for those tools to guess about tags in
     release repositories, e.g. 'release/package/1.2.3' vs 'release/groovy/package/1.2.3-4'.
     This provides a useful future proofing mechanism for tools which use tags in the
     release repository, rather than guessing the format of the tags they can infer them
@@ -260,36 +256,36 @@ target platforms.
 
 Build file
 ----------
-* package_whitelist: a list of packages to build.
-  If this is omitted all packages specified in the distribution file are build.
+* package_whitelist: a list of package names to build.
+  If this is omitted all packages specified in the distribution or test file are build.
   Any upstream packages are implicitly included.
-* package_blacklist: a list of packages excluded from build.
+* package_blacklist: a list of package names excluded from build.
   If this is omitted no packages are excluded.
   Any downstream package are implicitly excluded.
   The blacklist overrides the whitelist.
 
-* notifications: An optional section to configure email notifications.  
+* notifications: An optional section to configure email notifications.
 
-  * emails: a list of emails to which to send all emails. (default: empty) 
-  * maintainers: a boolean flag used to enable email notification to listed maintainers. (default: false) 
+  * emails: a list of email addresses to which to send all notification emails. (default: empty)
+  * maintainers: a boolean flag used to enable email notification to listed maintainers. (default: false)
   * committers: a boolean flag used to enable email notification to committers. (default: false)
 
 * targets: a list of targets for which packages are build.
   Each target consists of a platform (OS code name) and CPU architecture.
   Code names specified in the list must be listed in the corresponding
   distribution file.
-* jenkins_url: the url to the associated jenkins build farm
+* jenkins_url: the url to the associated Jenkins master
 * apt_mirrors: a list of urls to apt repositories used for pulling build dependencies.
-  Defaults to a list containing only the repository defined in apt_target_repository
-* apt_target_repository: url of the apt repository used for pushing built packages.
+  Defaults to a list containing only the repository defined in apt_target_repository.
+* apt_target_repository: url of the apt repository used for pushing built packages to.
   Note: this option is only used for release builds, and will be ignored in other cases.
 * sync: specify the criteria that need to be fulfilled for packages to be synced with the
-  apt repo. Any of the following options can be set:
+  apt_target_repository. Any of the following options can be set and all of them must be fulfilled:
 
   * package_count: integer. Specifies how many packages need to be successfully built to
-    initiate sync. (default: 0)
+    perform a sync. (default: 0)
   * packages: list of package names. All the packages of this list must be successfully built to
-    initiate sync. (default: [])
+    perform a sync. (default: [])
 
   Note: this option is only used for release builds, and will be ignored in other cases.
 * type: must be 'build'
@@ -305,7 +301,7 @@ and specifying the platforms and architectures.
   # this file describes a build of a ROS distribution.
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
-  package_whitelist: [ros_tutorials]
+  package_whitelist: [ros_tutorials, common_tutorials]
   package_blacklist: [turtlesim]
   notifications:
     emails: [buildfarm-admin@example.com]
@@ -325,7 +321,7 @@ and specifying the platforms and architectures.
 Test file
 ---------
 The test file uses a specification similar to the distribution file, but does not
-use a list of targets, and is not limited to git repositories.
+have a list of platforms, and is not limited to git repositories.
 The test file references either source repositories or release branches from
 release repositories on which tests will be run.
 
@@ -341,12 +337,12 @@ release repositories on which tests will be run.
 
 Documentation directory
 -----------------------
-The directory contains .rosinstall files which list repositories which should be used to generate API documentation.
+The directory contains .rosinstall files which list repositories for which API documentation should be generate for.
 
 Distribution cache file
 -----------------------
 Collection of all meta information of the ROS distribution, including all the information from the package.xml files.
-The cache must reference the distribution file and store a hash of the version it was build from to be able to detect if the cache is invalid.
+The cache must reference the distribution file and store a hash of the distribution file it was build from to be able to detect if the cache is invalid.
 The format of that cache is considered an implementation detail and is not specified in this REP.
 
 Reference implementation
@@ -391,25 +387,24 @@ Full distribution build
 -----------------------
 This corresponds to building a ROS distribution called *foo* for officially
 supported platforms and architectures.
-master.yaml:
+index.yaml:
 
 ::
 
   %YAML 1.1
-  # master file
-  # this file describes the available ROS distributions
+  # ROS index file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
-  type: master
+  type: index
   version: 1
   distributions:
     foo:
       release: release/foo.yaml
       release_build: [release/foo-build.yaml]
+      release_cache: http://example.com/foo-cache.tar.gz
       test: test/foo.yaml
       test_build: [test/foo-build.yaml]
       doc_folder: doc/
-      distribution_cache: http://example.com/foo-cache.tar.gz
 
 
 release/foo.yaml:
@@ -514,4 +509,3 @@ References
 Copyright
 =========
 This document has been placed in the public domain.
-
