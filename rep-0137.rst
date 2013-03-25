@@ -218,8 +218,7 @@ target platforms.
 ::
 
   %YAML 1.1
-  # distribution file
-  # this file describes a ROS distribution.
+  # ROS distribution file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   repositories:
@@ -297,8 +296,7 @@ and specifying the platforms and architectures.
 ::
 
   %YAML 1.1
-  # build file
-  # this file describes a build of a ROS distribution.
+  # ROS build file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   package_whitelist: [ros_tutorials, common_tutorials]
@@ -412,8 +410,7 @@ release/foo.yaml:
 ::
 
   %YAML 1.1
-  # distribution file
-  # this file describes a ROS distribution.
+  # ROS distribution file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
@@ -440,8 +437,7 @@ release/foo-build.yaml:
 ::
 
   %YAML 1.1
-  # build file
-  # this file describes a build of a ROS distribution
+  # ROS build file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   type: build
@@ -462,8 +458,7 @@ test/foo.yaml:
 ::
 
   %YAML 1.1
-  # test file
-  # this file describes test repositories for a ROS distribution.
+  # ROS test file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   type: test
@@ -483,8 +478,7 @@ test/foo-build.yaml:
 ::
 
   %YAML 1.1
-  # build file
-  # this file describes a build of a ROS distribution
+  # ROS build file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   type: build
