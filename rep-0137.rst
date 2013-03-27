@@ -94,7 +94,7 @@ in use:
 The changes to the distribution file are minimal, such as restructuring and
 adding type and version fields, and can be performed by a script.
 
-The targets.yaml file will be split and merged in the distribution files.
+The targets.yaml file will be split and merged in the release, test and build files.
 
 File format
 -----------
@@ -106,7 +106,7 @@ As a good practice, the files should contain a header such as:
 ::
 
   %YAML 1.1
-  # ROS index|distribution|build|test file
+  # ROS index|release|build|test file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
 
@@ -123,12 +123,12 @@ The information stored in the index file is:
 
   For each distribution further information are referenced:
 
-  * release: reference to the distribution file
+  * release: reference to the release file
   * release_build: list of references to the build files used to build the binary packages
-  * release_cache: reference to a distribution cache. Whether this field is
+  * release_cache: reference to a release cache. Whether this field is
     a dictionary, a list or a scalar is left as an implementation detail. The
     following examples will assume that the implementation necessitates an url.
-  * test: reference to the distribution file used for tests
+  * test: reference to the test file
   * test_build: list of references to the build file used to run the tests
   * doc_folder: a reference to the documentation folder. The full specification of this folder
     does not belong to the scope of this REP and is considered an implementation
@@ -139,7 +139,7 @@ The information stored in the index file is:
 
 Example
 -------
-An index file referencing multiple distribution and build files.
+An index file referencing multiple release, test and build files.
 
 ::
 
@@ -151,7 +151,7 @@ An index file referencing multiple distribution and build files.
     groovy:
       release: releases/groovy.yaml
       release_build: [releases/groovy-build-ubuntu.yaml, releases/groovy-build-arm.yaml]
-      release_cache: http://www.example.com/groovy-distribution-cache
+      release_cache: http://www.example.com/groovy-cache
       test: tests/groovy.yaml
       test_build: [tests/groovy-build.yaml]
       doc_folder: doc/groovy
@@ -160,10 +160,10 @@ An index file referencing multiple distribution and build files.
   type: index
   version: 1
 
-Distribution file
------------------
-A distribution is identified by the code name of the ROS distribution in the index file.
-Each distribution contains the following information:
+Release file
+------------
+A release is identified by the code name of the ROS distribution in the index file.
+Each release file contains the following information:
 
 * repositories: a list of repositories which are identified by unique names
 
@@ -209,16 +209,16 @@ Each distribution contains the following information:
   These names are OS code names as determined by *rospkg.os_detect* [4]_.
   Each target platform will result in a different bloom release.
 
-* type: must be 'distribution'
+* type: must be 'release'
 * version: version number, this REP describes version 1
 
-**Example**: A distribution file listing repositories and packages and the
+**Example**: A release file listing repositories and packages and the
 target platforms.
 
 ::
 
   %YAML 1.1
-  # ROS distribution file
+  # ROS release file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   repositories:
@@ -250,13 +250,13 @@ target platforms.
   platforms:
     ubuntu: [oneiric, precise, quantal]
     debian: [wheezy]
-  type: distribution
+  type: release
   version: 1
 
 Build file
 ----------
 * package_whitelist: a list of package names to build.
-  If this is omitted all packages specified in the distribution or test file are build.
+  If this is omitted all packages specified in the release or test file are build.
   Any upstream packages are implicitly included.
 * package_blacklist: a list of package names excluded from build.
   If this is omitted no packages are excluded.
@@ -272,7 +272,7 @@ Build file
 * targets: a list of targets for which packages are build.
   Each target consists of a platform (OS code name) and CPU architecture.
   Code names specified in the list must be listed in the corresponding
-  distribution file.
+  release or test file.
 * jenkins_url: the url to the associated Jenkins master
 * apt_mirrors: a list of urls to apt repositories used for pulling build dependencies.
   Defaults to a list containing only the repository defined in apt_target_repository.
@@ -290,7 +290,7 @@ Build file
 * type: must be 'build'
 * version: version number, this REP describes version 1
 
-**Example**: A build file selecting a subset of packages from the distribution
+**Example**: A build file selecting a subset of packages from the release or test file
 and specifying the platforms and architectures.
 
 ::
@@ -318,7 +318,7 @@ and specifying the platforms and architectures.
 
 Test file
 ---------
-The test file uses a specification similar to the distribution file, but does not
+The test file uses a specification similar to the release file, but does not
 have a list of platforms, and is not limited to git repositories.
 The test file references either source repositories or release branches from
 release repositories on which tests will be run.
@@ -337,10 +337,10 @@ Documentation directory
 -----------------------
 The directory contains .rosinstall files which list repositories for which API documentation should be generate for.
 
-Distribution cache file
+Release cache file
 -----------------------
 Collection of all meta information of the ROS distribution, including all the information from the package.xml files.
-The cache must reference the distribution file and store a hash of the distribution file it was build from to be able to detect if the cache is invalid.
+The cache must reference the release file and store a hash of the release file it was build from to be able to detect if the cache is invalid.
 The format of that cache is considered an implementation detail and is not specified in this REP.
 
 Reference implementation
@@ -353,7 +353,7 @@ Compatibility issues
 ====================
 
 To ensure a proper error message for older tools, the following
-item is required in distribution files:
+item is required in release files:
 
 ::
 
@@ -410,11 +410,11 @@ release/foo.yaml:
 ::
 
   %YAML 1.1
-  # ROS distribution file
+  # ROS release file
   # see REP 137: http://ros.org/reps/rep-0137.html
   ---
   gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
-  type: distribution
+  type: release
   version: 1
   repositories:
     bar_repo:
