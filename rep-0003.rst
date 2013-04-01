@@ -180,8 +180,8 @@ commonly used OS platforms that support ROS to determine a reasonable
 minimum target.
 
 As of Raring, Ubuntu ships with Python 3.3 as its default interpreter.
-ROS Hydro also supports Precise and Quantal, both provide a default
-Python 2.7 interpreter and Python 3.2 as an option. To work
+ROS Hydro also supports Precise and Quantal. Both provide a default
+Python 2.7 interpreter with Python 3.2 as an option. To work
 bilingually on all these distributions, the core Python scripts and
 tools need to be compatible with Python 2.7, 3.2 and 3.3. ROS package
 developers can begin porting to Python 3.x, as soon as their
