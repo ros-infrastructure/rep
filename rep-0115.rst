@@ -1,7 +1,7 @@
 REP: 115
 Title: rosco and roslocate tools for rosinstall
 Author: Ken Conley <kwc@willowgarage.com>
-Status: Accepted
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 01-Sep-2011
