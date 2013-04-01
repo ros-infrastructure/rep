@@ -26,7 +26,9 @@ Design Requirements
 During the Groovy release cycle the existing processes were vetted and several different strategies came of that experience, but some general design requirements have been identified. In particular, after a release, a third party library should:
 
 * Have a catkin package.xml
+
  * With a <build_type>cmake</build_type> tag inside the <export> tag
+
 * Install a catkin package.xml
 * Have setup.* files after installation
 
@@ -67,10 +69,14 @@ Specification
 The recommendation of this REP for releasing third party packages in the ROS community deployment infrastructure is as follows:
 
 * Inject a templated package.xml into the upstream using bloom
+
  * Optionally but recommended, put the package.xml in the actual upstream repository
  * Have a <build_type> tag in the <export> tag of the package.xml templates
+
 * Add an install rule for the package.xml as patch in the release branch using bloom
+
  * Optionally, put the install rule for the package.xml into the actual upstream repository
+
 * Have a run_depend on catkin in the package.xml(s)
 
 
