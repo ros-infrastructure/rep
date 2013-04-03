@@ -96,7 +96,7 @@ Hydro Medusa (Apr 2013)
 - C++03
 - Boost 1.48
 - Lisp SBCL 1.0.x
-- Python 2.7+ (but < 3) and 3.3+
+- Python 2.7
 - CMake 2.8.3
 
 Motivation
@@ -174,13 +174,20 @@ future updates in the 1.0.x series as appropriate.
 Python
 ------
 
-Our intent with Python support is to track the minimum Python version
-provided in the supported Ubuntu platforms, as well as survey other
-commonly used OS platforms that support ROS to determine a reasonable
-minimum target. As of Raring Ubuntu will ship with Python 3 by default.
-While we still support Ubuntu versions which ship with Python 2 by default
-all Python scripts should provide dual compatibility with Python
-2.7+ and Python 3.3+.
+Our intent with Python is to track the minimum version provided in the
+supported Ubuntu platforms, as well as survey other commonly used OS
+platforms that support ROS to determine a reasonable minimum target.
+
+Ubuntu has announced plans to release 14.04 in April 2014 with Python
+3 as its default interpreter. Some ROS infrastructure and core scripts
+already work with Python 3 since Groovy. But, it remains difficult to
+set up a test environment so ROS package developers can also port to
+Python 3.
+
+The preferred migration strategy is to support both Python 2.7 and
+Python >= 3.2 in each source script. Supporting any version earlier
+than 2.6 makes that task harder. Python 3.0 and 3.1 will probably
+never be supported explicitly, although some things may work.
 
 Core Stacks
 ===========
