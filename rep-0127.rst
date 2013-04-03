@@ -525,6 +525,12 @@ The CMakeLists.txt file for a metapackage is supposed to look like::
   find_package(catkin REQUIRED)
   catkin_metapackage()
 
+Because the metapackage CMakeLists.txt contains a catkin macro,
+the metapackage must also have a tag declaring a buildtool dependency
+on catkin::
+
+  <buildtool_depend>catkin</buildtool_depend>
+
 
 Concerns
 ========
