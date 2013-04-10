@@ -15,7 +15,7 @@ This REP describes incorporating package changelogs (i.e. a list of changes made
 
 Motivation
 ==========
-In ROS, package changelogs have traditionally been maintained as their own subpage within a package's ROS wiki page. These changelogs have had to be maintained separately from their codebases. This approach has had some drawbacks:
+In ROS, package changelogs have traditionally been maintained as their own page within a package's ROS wiki page. These changelogs have had to be maintained separately from their codebases. This approach has had some drawbacks:
 
 * **Hard to Find** - As changelogs are isolated from code, they can be difficult to find and correlate with particular versions of code. By making them part of the source tree, you can determine what has changed by inspecting the package itself.
 
@@ -32,46 +32,40 @@ The format of the changelog should have the following properties:
 
 * **In Source** - The changelog is part of the package source rather than its own wiki page.
 
-* **Wiki Integration** - The changelog is displayed on the wiki as in the past, but now pulled from SCM rather than being directly edited -- just like package headers.
+* **Wiki Integration** - The changelog is displayed on the wiki as in the past, but now pulled from SCM rather than being directly edited -- just like package wiki headers.
 
-* **Syntax** - Simple, easily parseable syntax. Markup languages like YAML are likely overkill.
+* **Syntax** - Simple, easily parseable syntax.
 
-* **Package Compatible** - Satisfies the required fields for .deb/.rpm changelogs.
+* **Packaging Compatible** - The changelog, along with information from the package.xml, should satisfy the required fields for .deb/.rpm changelogs.
 
 * **Non-redundant** - Does not contain redundant information found elsewhere such as package.xml.
 
-* **Optional but Recommended** - Should not be required, but highly recommended with tools such as bloom giving warnings.
+* **Optional but Recommended** - Should not be required, but highly recommended with tools such as bloom giving warnings when the changelog is missing.
 
 * **Generated Documentation** - It is good practice to also include changelogs in generated static documentation. As we use Sphinx, a format that it can process would be ideal.
 
 * **GitHub Integration** - Since ROS packages are being moved to GitHub (and GitHub practices are copied by other hosting solutions), it would be good to comply with GitHub display of files. [5]_
 
-* **Flexibility** - While we like standard syntax, developers should get as much freedom to do changelogs their own way as we can provide.
+* **Flexibility** - While standardized syntax is preferred, changelogs should be as flexible as is reasonably possible.
 
 Specification
 =============
 
-* Each changelog will be specified in ReStructuredText (RST) with additional constraints.
+* Changelogs will be written in ReStructuredText (RST)[4]_ with additional constraints.
 
-* Each package (i.e. every chunk of code that has a package.xml) may contain a single file used to list changelog entries. The recommended filename is CHANGELOG.rst.
+* Each package (catkin package, containing a package.xml) may contain a single CHANGELOG.rst file used to list changelog entries.
 
-* A changelog file ending with .rst has to be be a valid ReStructuredText [4]_ document. (Other formats may be supported in the future)
+* The CHANGELOG.rst file for a package must be a peer of the package.xml for that package, i.e. in the root of the package directory.
 
-* The file must be in the same folder as the package.xml file, namely in the root folder of a package.
+* The CHANGELOG.rst file may contain a RST section for each version of the package released. The sections are detected based on a section title format convention. The sections should be listed in descending version order by convention, but the ordering will not be enforced.
 
-* The file shall contain sections for versions in descending order. Such changelog sections are distinguished from non-changelog sections (like TOC) via naming convention on the section title.
-
-* The library will allow extraction of version numbers and respective text blocks from the document.
-
-* bloom will emit a warning during package release if no changelog is found or if the changelog does not contain an entry for the released version. Future versions of bloom can force changelogs as a requirement.
+* The RST section title for each version will follow the required format or it will be ignored. The format will simply be ``<version> (<date>)``, where both the canonical version (major.minor.patch) and date are required.
 
 CHANGELOG rst Format
 --------------------
-For now, we will only support RST syntax for changelogs as this format is already widely used in places including ROS, GitHub, and Python. Other markup support may be added in the future if requested.
+The changelog document must be valid RST. The document will be processed by an RST parser (ignoring file inclusion directives, as those also do not work on GitHub).
 
-A document containing the changelogs must therefore be a valid RST document. Such a document will be processed by an RST parser (ignoring file inclusion directives, as those also do not work on GitHub).
-
-From the RST specification [4]_ we will use one section without subsections for each changelog entry, and within that we will allow
+The changelog file will use one section without subsections for each changelog entry, and within that other elements from the RST specification [4]_ are allowed:
 
 * paragraphs
 * transitions
@@ -83,7 +77,7 @@ From the RST specification [4]_ we will use one section without subsections for 
 * inline markup
 * directives (may be invisible in processed changelog)
 
-Inline markup transformation rules may just use the raw source when transforming the log entries for deb/rpm format. We explicitly forbid the following elements within version sections, as changelog entries should be well writable without those, and useful transformation into condensed deb/rpm formats would be difficult. For details on these elements see [4]_.
+Inline markup may not be preserved when transforming the log entries for deb/rpm format. The following elements of the RST specification [4]_ are explicitly forbidden in the version sections of the changelog:
 
 * definition lists
 * field lists
@@ -95,20 +89,15 @@ Inline markup transformation rules may just use the raw source when transforming
 * tables
 * subsections
 
-A changelog entry is defined by a heading which contains a version number followed by an optional timestamp in parenthesis.
-The version number consists of three positive integers separate by single dots, i.e. `1.2.3` as specified in [8]_.
-The timestamp must be parsable by the Python function `dateutil.parser.parse`.
-Futher constraints on the timestamp require it to contain at least a full date (`YYYY-MM-DD`, ISO 8601 format) and if hours are specified also the minutes (in order to keep the timestamp readable by humans).
-So the time as well as seconds and a timezone offset are optional.
-If not time and/or timezone is specified midnight 
+A changelog entry is defined by a heading which contains a version number followed by the date in parenthesis.
+The version number consists of three positive integers separate by single dots, e.g. `1.2.3` as specified in [8]_.
+The date must be parseable by the Python dateutil module, i.e. ``dateutil.parser.parse(...)``.
+The date should at least contain a full date (`YYYY-MM-DD`, ISO 8601 format).
+The rest of the elements in the date are optional, but should be included in order, e.g. you should not specify seconds without minutes and hours. Additional elements are: hours and minutes (together), seconds, and timezone offset.
 
-A changelog entry may not contain subsections.
-Version sections must follow each other in the document in descending version number order.
-However they do not need to be all in the same parent section nor on the same section level.
+A changelog version section may not contain subsections, but it may be a subsection itself.
 
-The following example shows different valid changelog entries:
-
-::
+The following example shows a few valid changelog entries::
 
     1.2.3 (2013-01-23)
     ------------------
@@ -129,15 +118,7 @@ The following example shows different valid changelog entries:
     ------------------------------
     * Change
 
-But many variations are possible with the elements allowed. The following example uses a lot of variations to show what possibilities exist.
-The header (enclosed by `^` characters) and the sections with only `MAJOR.MINOR` are additional visual markup to make the changelog more readable / structure for humans to read and optional.
-
-Likewise the section `0.1.27 (forthcoming)` is only considered additional free form text as it does not match the pattern of a changelog entry.
-This is recommended practice to state changes which are already committed but not yet released.
-
-CHANGELOG.rst Example
----------------------
-::
+This is a standard example, but more variations are possible with the allowed RST elements. The following example uses a lot of variations to show what possibilities exist::
 
     ^^^^^^^^^^^^^^^^^^^^^^^^^
     Changelog for package foo
@@ -185,10 +166,13 @@ CHANGELOG.rst Example
     1. Initial release
     2. Initial bugs
 
+In the above example, the header (enclosed by `^` characters) and the sections with only `MAJOR.MINOR` are additional visual markup to make the changelog more readable / structure for humans to read, but will be ignored by tools which process the changelogs, e.g. bloom will not insert these elements into the debian changelog file.
+
+Similarly the section `0.1.27 (forthcoming)` does not match the format of the version section title, so it ignored when being parsed by tools like bloom. This is recommended practice to state changes which are already committed but not yet released.
 
 ROS Wiki Integration
 --------------------
-At the very least, the ROS wiki should link to the changelog in its source repository if publicly available. However, it is preferable if a custom wiki macro is written to pull the changelog from the repository and render it directly on the wiki.
+The ROS wiki shall have a macro which users can point directly to the URL of the CHANGELOG.rst file. The ROS wiki will also have the changelog automatically embedded by rosdoc-lite when the package is parsed by the documentation indexer, such that the macro should only be needed for packages which are not indexed by the documentation system.
 
 Rationale
 =========
@@ -197,22 +181,17 @@ The proposed format has the following properties that help to meet the design re
 
 * Changelogs will be in-source while remaining optional.
 
-* Wiki integration is possible with simple solutions.
+* Wiki integration is simple to realize.
 
 * Simple markup and very similar to how changelogs are typically written on the wiki and other open source projects.
 
-* Can reuse RST parsers. See [6]_
+* Can reuse RST parsers. See [6]_, [9]_
 
 * Can be embedded in sphinx docs via include directive.
 
-* The use of RST for markup allows us to automatically generated documentation without changes.
+* When combined with the corresponding package.xml, enough information is provided to meet the full requirements of .deb and .rpm changelog formats (timestamp, package name, etc...).
 
-* Markup allows many different ways of writing changes as long as this can be transformed into brief format for deb/rpm content.
-
-* When combined with the corresponding package.xml, enough information is provided to meet the full requirements of .deb and .rpm changelog formats (timestamp, package name, etc.).
-
-* No redundant information from package.xml
-
+* Minimal redundant information from package.xml
 
 Concerns
 ========
@@ -329,6 +308,8 @@ Resources
 
 A prototype implementation of a library that parses any RST document and extracts changelog entries as described here is provided as ongoing effort here [6]_.
 
+Since then an official implementation has been merged into catkin_pkg which will be used by rosdoc-lite and bloom: [9]_
+
 References
 ==========
 .. [1] Debian Package Changelog Requirements
@@ -347,6 +328,8 @@ References
    (https://groups.google.com/d/msg/ros-sig-buildsystem/L3nE9X0T2Jk/ML_1JsHLuF0J)
 .. [8] REP 127 Specification of package manifest format
    (https://github.com/ros-infrastructure/rep/blob/master/rep-0127.rst#version)
+.. [9] Implementation in catkin_pkg
+   (https://github.com/ros-infrastructure/catkin_pkg/blob/master/src/catkin_pkg/metapackage.py)
 
 Copyright
 =========
