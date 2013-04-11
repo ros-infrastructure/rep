@@ -1,11 +1,11 @@
 REP: 132
 Title: Incorporation of Changelogs into Package Source Tree
 Author: Tully Foote, Thibault Kruse, Mirza Shah, Dirk Thomas, William Woodall
-Status: Draft
+Status: Active
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 22-Jan-2013
-Post-History: ?-?-2013
+Post-History: 10-April-2013
 
 .. contents::
 
