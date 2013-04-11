@@ -59,7 +59,7 @@ Specification
 
 * The CHANGELOG.rst file may contain a RST section for each version of the package released. The sections are detected based on a section title format convention. The sections should be listed in descending version order by convention, but the ordering will not be enforced.
 
-* The RST section title for each version will follow the required format or it will be ignored. The format will simply be ``<version> (<date>)``, where both the canonical version (major.minor.patch) and date are required.
+* The RST section title for each version will follow the required format or it will be ignored. The format will simply be ``<version> (<timestamp>)``, where both the canonical version (major.minor.patch) and timestamp are required.
 
 CHANGELOG rst Format
 --------------------
@@ -89,11 +89,11 @@ Inline markup may not be preserved when transforming the log entries for deb/rpm
 * tables
 * subsections
 
-A changelog entry is defined by a heading which contains a version number followed by the date in parenthesis.
+A changelog entry is defined by a heading which contains a version number followed by the timestamp in parenthesis.
 The version number consists of three positive integers separate by single dots, e.g. `1.2.3` as specified in [8]_.
-The date must be parseable by the Python dateutil module, i.e. ``dateutil.parser.parse(...)``.
-The date should at least contain a full date (`YYYY-MM-DD`, ISO 8601 format).
-The rest of the elements in the date are optional, but should be included in order, e.g. you should not specify seconds without minutes and hours. Additional elements are: hours and minutes (together), seconds, and timezone offset.
+The timestamp must be parseable by the Python dateutil module, i.e. ``dateutil.parser.parse(...)``.
+The timestamp should at least contain a full date (`YYYY-MM-DD`, ISO 8601 format).
+The rest of the elements in the timestamp are optional, but should be included in order, e.g. you should not specify seconds without minutes and hours. Additional elements are: hours and minutes (together), seconds, and timezone offset.
 
 A changelog version section may not contain subsections, but it may be a subsection itself.
 
