@@ -15,7 +15,7 @@ This REP describes incorporating package changelogs (i.e. a list of changes made
 
 Motivation
 ==========
-In ROS, package changelogs have traditionally been maintained as their own page within a package's ROS wiki page. These changelogs have had to be maintained separately from their codebases. This approach has had some drawbacks:
+In ROS, package changelogs have traditionally been maintained as their own page within a package's ROS wiki page. These changelogs have had to be maintained separately from their code bases. This approach has had some drawbacks:
 
 * **Hard to Find** - As changelogs are isolated from code, they can be difficult to find and correlate with particular versions of code. By making them part of the source tree, you can determine what has changed by inspecting the package itself.
 
@@ -23,7 +23,7 @@ In ROS, package changelogs have traditionally been maintained as their own page 
 
 * **Syntactic Inconsistency** - Even among well-maintained changelogs there is an inconsistency in the layout of these lists across the ROS wiki. The lack of consistency makes it harder for both people and machines to parse the data in these logs. This is an opportunity to constrain the structural and syntactic format of the changelogs so that they are consistent across packages.
 
-* **Needed for Packaging** - Virtually all package formats including .deb and .rpm require changelogs as part of the package. Scraping this information from the wiki is not feasible and therefore not performed. A changelog file with a specified parsable format can be automatically converted into these package formats.
+* **Needed for Packaging** - Virtually all package formats including .deb and .rpm require changelogs as part of the package. Scraping this information from the wiki is not feasible and therefore not performed. A changelog file with a specified parseable format can be automatically converted into these package formats.
 
 Requirements
 ============
@@ -241,13 +241,13 @@ Concerns have been discussed on ros-developers ([3]_) and in the Buildsystem SIG
 
  * An early suggestion "ChangeList.txt" was rejected due to similarity to CMake "CMakeLists.txt".
  * The RST extension makes it possible for GitHub to render the file, and allows us to later possibly also support other markup flavors.
- * The package root is a common default way for such meta information, a "doc" subfolder is useful for static documentation. Sphinx does not allow to refer to documents outside the doc folder via toc-trees, but it does allow inclusion of files like this::
+ * The package root is a common default way for such meta information, a "doc" sub folder is useful for static documentation. Sphinx does not allow to refer to documents outside the doc folder via toc-trees, but it does allow inclusion of files like this::
 
     .. include:: ../CHANGELOG.rst
 
- So we went for CHANGELOG.rst in root as ideal place. Alternatives are not planned to have a single location to check for the existance of a changelog.
+ So we went for CHANGELOG.rst in root as ideal place. Alternatives are not planned to have a single location to check for the existence of a changelog.
 
-* README.rst fallback: When users have a small package, it may be more convenient to put changelog into the README.rst. Could changelog tooling(bloom) fall back to try README.rst for changelog entries?
+* README.rst fall back: When users have a small package, it may be more convenient to put changelog into the README.rst. Could changelog tooling(bloom) fall back to try README.rst for changelog entries?
 
  The prototype library could handle such complex README files. Though no technical reason is known that would prevent this, there was too much doubt on possible unknown problems with that approach, and user confusion over multiple alternatives, so for now it was decided to not go ahead with this.
 
