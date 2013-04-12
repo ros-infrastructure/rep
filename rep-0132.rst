@@ -288,6 +288,10 @@ deb
         [optional blank line(s), stripped]
   -- maintainer name <email address>[two spaces]  date
 
+The Debian Policy manual [1]_ goes further to describe the maintainer as:
+
+*The maintainer name and email address used in the changelog should be the details of the person uploading this version. They are not necessarily those of the usual package maintainer.*
+
 rpm
 ---
 
