@@ -176,7 +176,7 @@ The ROS wiki shall have a macro which users can point directly to the URL of the
 
 Best Practices
 --------------
-There are several rules which are good ideas and strongly encourage, but either shouldn't be or cannot be enforced.
+There are several rules which are good ideas and strongly encouraged, but either shouldn't be or cannot be enforced.
 
 Have a Valid Section for each Version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -213,7 +213,7 @@ This is informal and not required at all, the entry might look like this::
     - More changes
     - Changed a thing
 
-This is really a convenience for people reading the CHANGELOG.rst because this informatoin can be obtained by the information in the VCS history of the package. It is a good idea to include this information if someone other than one of the normal maintainers (listed in the package.xml) released the package.
+This is really a convenience for people reading the CHANGELOG.rst because this information can be obtained by the information in the VCS history of the package. It is a good idea to include this information if someone other than one of the normal maintainers (listed in the package.xml) released the package.
 
 Change Author Tagging
 ^^^^^^^^^^^^^^^^^^^^^
