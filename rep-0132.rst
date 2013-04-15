@@ -1,11 +1,11 @@
 REP: 132
 Title: Incorporation of Changelogs into Package Source Tree
 Author: Tully Foote, Thibault Kruse, Mirza Shah, Dirk Thomas, William Woodall
-Status: Draft
+Status: Active
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 22-Jan-2013
-Post-History: ?-?-2013
+Post-History: 10-April-2013
 
 .. contents::
 
@@ -174,6 +174,58 @@ ROS Wiki Integration
 --------------------
 The ROS wiki shall have a macro which users can point directly to the URL of the CHANGELOG.rst file. The ROS wiki will also have the changelog automatically embedded by rosdoc-lite when the package is parsed by the documentation indexer, such that the macro should only be needed for packages which are not indexed by the documentation system.
 
+Best Practices
+--------------
+There are several rules which are good ideas and strongly encouraged, but either shouldn't be or cannot be enforced.
+
+Have a Valid Section for each Version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+One rule is to have a valid version section for each version of a package released. For example, it is considered bad form to have changelog sections for 1.0.0 and 1.0.1 but not 1.0.2. This is confusing to anyone who is reading the raw CHANGELOG.rst file and requires tools like rosdoc-lite and bloom to fill the gap. This rule is highly recommended and if the developer chooses to skip a version, the release tools will protest, but allow it. This rule comes up because packages which share a single source repository must maintain the same version, so when changes in one package cause the version to increase in its peers, the peers may have no new changes to report. In this case the recommendation is to have an empty section like this::
+
+    0.3.5 (2013-05-09 16:36:55 -0700)
+    ---------------------------------
+
+    0.3.4 (2013-04-09 16:36:55 -0700)
+    ---------------------------------
+    - More changes
+    - Changed a thing
+
+Alternatively you can give a simple message why this section is blank::
+
+    0.3.5 (2013-05-09 16:36:55 -0700)
+    ---------------------------------
+    - Released along with other packages, no changes
+
+    0.3.4 (2013-04-09 16:36:55 -0700)
+    ---------------------------------
+    - More changes
+    - Changed a thing
+
+Listing the Release Author
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+This rule is a "nice to have" rule which comes up when someone other than the normal maintainer releases a package. To clarify this is the person who: updated the version in the package.xml, updated the CHANGELOG.rst (adding the date of the release and ensuring the log is complete), and tagged the version in the VCS. This is not neccissarily the person who ran the package through the "release pipeline" using tools like bloom.
+
+This is informal and not required at all, the entry might look like this::
+
+    0.3.4 (2013-04-09 16:36:55 -0700)
+    ---------------------------------
+    - Released by: Sally <sally@example.com>
+    - More changes
+    - Changed a thing
+
+This is really a convenience for people reading the CHANGELOG.rst because this information can be obtained by the information in the VCS history of the package. It is a good idea to include this information if someone other than one of the normal maintainers (listed in the package.xml) released the package.
+
+Change Author Tagging
+^^^^^^^^^^^^^^^^^^^^^
+This rule comes up when multiple people are maintaining a single package. The idea is to "tag" some or all of the changes in the CHANGELOG.rst with authors of those changes. It would look something like this::
+
+    0.3.4 (2013-04-09 16:36:55 -0700)
+    ---------------------------------
+    - More changes @steve
+    - Changed a thing - John Doe <jdoe@example.com>
+
+The format of the "tagging" is not formal and is in no way required or utilized by ROS infrastructure tools. This recommendation is just a "nice to have" as all of this information is obtainable from the VCS using tools like `git annotate` or `git blame`.
+
 Rationale
 =========
 
@@ -287,6 +339,10 @@ deb
     * even more change details
         [optional blank line(s), stripped]
   -- maintainer name <email address>[two spaces]  date
+
+The Debian Policy manual [1]_ goes further to describe the maintainer as:
+
+*The maintainer name and email address used in the changelog should be the details of the person uploading this version. They are not necessarily those of the usual package maintainer.*
 
 rpm
 ---
