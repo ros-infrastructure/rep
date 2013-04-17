@@ -288,6 +288,8 @@ the packages specified in the release file:
   Code names specified in the list must be listed in the corresponding
   release or source file.
 * jenkins_url: the url to the associated Jenkins master
+* jenkins_sourcedeb_job_timeout: the timeout in minutes for the sourcedeb jobs (optional).
+* jenkins_binarydeb_job_timeout: the timeout in minutes for the binarydeb jobs (optional).
 * apt_mirrors: a list of urls to apt repositories used for pulling build dependencies.
   Defaults to a list containing only the repository defined in apt_target_repository.
 * apt_target_repository: url of the apt repository to which built packages will be pushed.
@@ -370,6 +372,7 @@ any kind of dependencies.
 
 * targets: as specified for the release build file.
 * jenkins_url: as specified for the release build file.
+* jenkins_job_timeout: the timeout in minutes for each job (optional).
 * apt_mirrors: as specified for the release build file, but the default is an empty list.
 
 * type: must be 'source-build'
@@ -410,6 +413,7 @@ The documentation build file uses a specification similar to the source build fi
 * targets: as specified for the source build file. But the list of targets
   must only have one entry.
 * jenkins_url: as specified for the source build file.
+* jenkins_job_timeout: the timeout in minutes for each job (optional).
 * apt_mirrors: as specified for the source build file.
 
 * doc_tag_index_repository: a repository storing the tag index
