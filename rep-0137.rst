@@ -140,7 +140,7 @@ The information stored in the index file is:
     following examples will assume that the implementation necessitates an url.
   * source: reference to the source file
   * source_builds: list of references to the source-build files used to run the tests
-  * doc: reference to the doc file 
+  * doc: reference to the doc file
   * doc_builds: list of references to the doc-build files used to run the documentation
 
 * type: must be 'index'
@@ -188,7 +188,7 @@ Each release file contains the following information:
   * status_description: an optional field describing in a short sentence the
     current status of the repository.  For example detailing the reason
     for EOL and the recommended upgrade path.
-  * packages: an optional list of package names.  If no package is specified, 
+  * packages: an optional list of package names.  If no package is specified,
     one package with the name of the repository is assumed in the root of the repository.
     For each package name a dictionary with the following optional keys is possible:
 
@@ -214,10 +214,9 @@ Each release file contains the following information:
 
       The only required tag_name is 'release', others like 'debian' are optional.
 
-* platforms: a list of target platforms for which packages are released.
-  Each entry of this list is a key-value pair, with the OS name as a key and
-  the list of version code names as a value.
-  These names are OS code names as determined by *rospkg.os_detect* [4]_.
+* platforms: a dict of target platforms for which packages are released.
+  Each key contains the OS name while the value is a list of OS code names.
+  These OS names and OS code names are determined by *rospkg.os_detect* [4]_.
   Each target platform will result in a different bloom release.
 
 * type: must be 'release'
@@ -283,18 +282,20 @@ the packages specified in the release file:
   * maintainers: a boolean flag used to enable email notification to listed maintainers. (default: false)
   * committers: a boolean flag used to enable email notification to committers. (default: false)
 
-* targets: a list of targets for which packages are build.
-  Each target consists of a platform (OS code name) and CPU architecture.
-  Code names specified in the list must be listed in the corresponding
-  release or source file.
+* targets: a nested dict of targets for which packages are build.
+  The first level key contains the OS name.
+  The second level key contains the OS code name.
+  The third level key contains the CPU architecture.
+  The OS names and OS code names specified must be listed as a platform in the
+  corresponding release or source file.
+  Each level can contain a key `_config` which can contain a dict with arbitrary data.
+  These configurations can be used to specify target specific information
+  (e.g. `apt_target_repository` or `yum_repository`).
 * jenkins_url: the url to the associated Jenkins master
 * jenkins_sourcedeb_job_timeout: the timeout in minutes for the sourcedeb jobs (optional).
 * jenkins_binarydeb_job_timeout: the timeout in minutes for the binarydeb jobs (optional).
-* apt_mirrors: a list of urls to apt repositories used for pulling build dependencies.
-  Defaults to a list containing only the repository defined in apt_target_repository.
-* apt_target_repository: url of the apt repository to which built packages will be pushed.
-* sync: specify the criteria that need to be fulfilled for packages to be synced with the
-  apt_target_repository. Any of the following options can be set and all of them must be fulfilled:
+* sync: specify the criteria that need to be fulfilled for packages to be synced.
+  Any of the following options can be set and all of them must be fulfilled:
 
   * package_count: integer. Specifies how many packages need to be successfully built to
     perform a sync. (default: 0)
@@ -320,11 +321,17 @@ and specifying the platforms and architectures.
     maintainers: true
     committers: false
   targets:
-    oneiric: [amd64, i386]
-    precise: [amd64, i386, armel]
+    _config:
+      apt_target_repository: http://archives.example.com/ros
+      apt_mirrors: [http://archives.example.com/ros, http://packages.foo.org/repos/example]
+    oneiric:
+      amd64:
+      i386:
+    precise:
+      amd64:
+      i386:
+      armel:
   jenkins_url: http://jenkins.example.com:8080
-  apt_target_repository: http://archives.example.com/ros
-  apt_mirrors: [http://archives.example.com/ros, http://packages.foo.org/repos/example]
   sync:
     packages: [ros_tutorials]
   type: release-build
@@ -358,7 +365,7 @@ Since the repository type is not limited to git each repository has to specify a
 Source build file
 -----------------
 The source build file uses a specification similar to the release build file, but does not
-have an apt_target_repository and sync information.
+have sync information.
 Also the white- and blacklist is on a repository level and does not consider
 any kind of dependencies.
 
@@ -373,7 +380,6 @@ any kind of dependencies.
 * targets: as specified for the release build file.
 * jenkins_url: as specified for the release build file.
 * jenkins_job_timeout: the timeout in minutes for each job (optional).
-* apt_mirrors: as specified for the release build file, but the default is an empty list.
 
 * type: must be 'source-build'
 * version: version number, this REP describes version 1
@@ -414,7 +420,6 @@ The documentation build file uses a specification similar to the source build fi
   must only have one entry.
 * jenkins_url: as specified for the source build file.
 * jenkins_job_timeout: the timeout in minutes for each job (optional).
-* apt_mirrors: as specified for the source build file.
 
 * doc_tag_index_repository: a repository storing the tag index
 
@@ -435,12 +440,9 @@ information defined in this REP should use this reference API implementation.
 Compatibility issues
 ====================
 
-To ensure a proper error message for older tools, the following
-item is required in release files:
-
-::
-
-  gbp-repos: {You must update to a newer rosdep version by calling..sudo apt-get update && sudo apt-get install python-rosdep (make sure to uninstall the pip version on Ubuntu):}
+Since the new files are stored under a different URL (not in a releases
+subfolder in the rosdistro repository) the old tools will fail at some point
+when the information is not fetchable anymore form the old URL.
 
 Affected tools
 --------------
