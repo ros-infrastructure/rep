@@ -1,11 +1,11 @@
 REP: 137
 Title: ROS distribution files
 Author: Tully Foote, Dirk Thomas, Paul Mathieu
-Status: Draft
+Status: Accepted
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 04-Feb-2013
-Post-History: 16-April-2013
+Post-History: 19-April-2013
 
 .. contents::
 
