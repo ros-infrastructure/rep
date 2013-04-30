@@ -324,13 +324,14 @@ and specifying the platforms and architectures.
     _config:
       apt_target_repository: http://archives.example.com/ros
       apt_mirrors: [http://archives.example.com/ros, http://packages.foo.org/repos/example]
-    oneiric:
-      amd64:
-      i386:
-    precise:
-      amd64:
-      i386:
-      armel:
+    ubuntu:
+      oneiric:
+        amd64:
+        i386:
+      precise:
+        amd64:
+        i386:
+        armel:
   jenkins_url: http://jenkins.example.com:8080
   sync:
     packages: [ros_tutorials]
