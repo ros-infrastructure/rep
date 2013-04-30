@@ -96,7 +96,7 @@ TurtleBot software runs without modification on the robot and to
 ensure accessory compatibility between TurtleBot compatible robots. 
 
 * The robot must have a rgbd camera with a base_link to
-  camera_rgb_frame translation of [x:-0.087m, y:-0.005m, z:0.287m], as
+  camera_rgb_frame translation of [x:-0.087m, y:-0.0125m, z:0.287m], as
   specified in the turtlebot.xacro file in the turtlebot_description
   package. 
 
