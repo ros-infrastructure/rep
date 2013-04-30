@@ -484,7 +484,7 @@ independent and therefore does not contain any architecture specific
 code.
 
 <deprecated>
-'''''''''''''''''''''''''''
+''''''''''''
 
 The tag is used to indicate that a package is deprecated which enables
 to notify users about that fact.  The tag may either be empty or
@@ -530,6 +530,10 @@ the metapackage must also have a tag declaring a buildtool dependency
 on catkin::
 
   <buildtool_depend>catkin</buildtool_depend>
+
+Besides that a metapackage can have run dependencies on other packages
+and metapackages. Additional buildtool dependencies or build and test
+dependencies are not permitted.
 
 
 Concerns
