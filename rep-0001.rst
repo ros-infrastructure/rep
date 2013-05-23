@@ -76,7 +76,7 @@ The REP process begins with a new idea for ROS.  It is highly
 recommended that a single REP contain a single key proposal or new
 idea. Small enhancements or patches often don't need
 a REP and can be injected into the ROS development work flow with a
-patch submission to the ROS `issue tracker`_. The more focussed the
+patch submission to the REP `issue tracker`_. The more focussed the
 REP, the more successful it tends to be.  The REP editor reserves the
 right to reject REP proposals if they appear too unfocussed or too
 broad.  If in doubt, split your REP into several well-focussed ones.
@@ -349,7 +349,7 @@ factors, such as the maturity of the REP, the preferences of the REP
 author, and the nature of your comments.  For the early draft stages
 of the REP, it's probably best to send your comments and changes
 directly to the REP author.  For more mature, or finished REPs you may
-want to submit corrections to the ROS `issue tracker`_ so that your
+want to submit corrections to the REP `issue tracker`_ so that your
 changes don't get lost.  If the REP author is a ROS developer, assign the
 bug/patch to him, otherwise assign it to the REP editor.
 
@@ -450,7 +450,7 @@ References and Footnotes
    (http://ros.org/reps/rep-0012.html)
 
 .. _issue tracker:
-   http://code.ros.org/trac/ros/
+   https://github.com/ros-infrastructure/rep/issues
 
 .. _Open Publication License: http://www.opencontent.org/openpub/
 
