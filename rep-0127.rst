@@ -160,7 +160,6 @@ have been discussed in [8]_ and are described with:
 
  * `\<build_depend\> (multiple)`_
  * `\<buildtool_depend\> (multiple)`_
- * `\<depend\> (multiple)`_
  * `\<run_depend\> (multiple)`_
  * `\<test_depend\> (multiple)`_
  * `\<conflict\> (multiple)`_
@@ -400,23 +399,11 @@ Attributes
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
-<depend> (multiple)
------------------------
-
-Declares a ROS dep key for this package that is *both* a
-`\<build_depend\>` and a `\<run_depend\>`.
-
-Attributes
-''''''''''
-
- The same attributes as for `\<build_depend\> (multiple)`_.
-
-
 <run_depend> (multiple)
 -----------------------
 
 Declares a ROS dep key that this package depends on either at run-time
-or in an exported build interface.
+or as part of some exported build interface.
 
 Attributes
 ''''''''''
