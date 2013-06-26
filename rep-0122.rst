@@ -391,10 +391,11 @@ necessary before developers could run their modified code.  This made
 it less convenient and increased the round-trip time during
 development substantially.
 
-In Groovy the build folder contains a subdirectory ``buildspace``
-which resembles the same structure than an installation.  The content
-of that folder also follows FHS conventions.  It enables to run any
-application from buildspace as well as if it would be installed.
+In Groovy the build folder contains a subdirectory or sibling folder
+``devel`` which resembles the same structure than an
+installation.  The content of that folder also follows FHS
+conventions.  It enables to run any application from devel space as
+well as if it would be installed.
 
 
 catkin tag in manifest
