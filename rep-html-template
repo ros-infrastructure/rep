@@ -67,9 +67,9 @@ pageTracker._trackPageview();
           <td valign="middle"> 
             <a href="/wiki/About%%20ros.org">About</a> 
             |
-            <a href="/wiki/Mailing%%20Lists">Mailing Lists</a> 
+            <a href="/wiki/Support">Support</a> 
             |
-            <a href="http://code.ros.org/">code.ros.org</a> 
+            <a href="http://answers.ros.org">answers.ros.org</a> 
           </td> 
           <td valign="middle" align="right"> 
  
