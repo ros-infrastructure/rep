@@ -7,14 +7,14 @@ Content-Type: text/x-rst
 Created: 12-Sep-2012
 Post-History: 22-Sep-2012
 
-Table of Contents
-=================
+Outline
+=======
 
 #. Abstract_
 #. Motivation_
 #. Rationale_
-#. Data_
-#. Concerns_
+#. `Data representation`_
+#. Compatibility_
 #. Specification_
 #. References_
 #. Copyright_
@@ -23,11 +23,11 @@ Table of Contents
 Abstract
 ========
 
-This REP specifies the first package manifest format, initially
-released with Groovy Galapagos.  It is only relevant for packages
-using the new ``catkin`` buildsystem.  The new ``package.xml``
-filename replaces ``stack.xml`` and ``manifest.xml``, used with the
-earlier ``rosbuild`` tools.
+This REP specifies a new package manifest format, initially released
+with Groovy Galapagos.  It is only relevant for packages using the new
+catkin buildsystem.  The new ``package.xml`` file replaces
+``stack.xml`` and ``manifest.xml``, used with the earlier rosbuild
+tools.
 
 
 Motivation
@@ -64,16 +64,16 @@ information.  Several tools, like the buildfarm and the wiki, need to
 use that information.  They only need to fetch one file from each
 source package.
 
-Catkin-only - no rosbuild information inside
---------------------------------------------
+Catkin-only specification
+-------------------------
 
-The file only specifies information needed for a ROS ecosystem which
-is entirely based on ``catkin``.  Any additional information necessary
-for backward compatibility with ``rosbuild`` is kept separate (i.e. in
-the legacy ``manifest.xml`` files).  This enable to easily remove the
-legacy files in the future.  Legacy files required for rosbuild
-interaction are fully generated from the new ``package.xml`` and the
-``CMakeLists.txt``, rather than manually maintained.
+The ``package.xml`` file only contains information needed for a ROS
+catkin system.  Any additional information necessary for backward
+compatibility with rosbuild is kept separate, in the ``manifest.xml``
+files.  This makes it easy to remove the legacy files in the future.
+Legacy files required for rosbuild interaction are fully generated
+from the new ``package.xml`` and the ``CMakeLists.txt``, and need not
+be maintained manually.
 
 Store normalized data
 ---------------------
@@ -100,8 +100,8 @@ Additional, mostly optional, information is stored in attributes of
 the related tag instead of grouping multiple tags inside a parent tag.
 
 
-Data
-====
+Data representation
+===================
 
 <package>
 ---------
@@ -230,10 +230,7 @@ Package names are used in various contexts:
 
  * namespaces
  * variables
- * part of a binary package name (i.e. Debian, Fedora)
-
-  * http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Source
-  * http://fedoraproject.org/wiki/Packaging:NamingGuidelines#Common_Character_Set_for_Package_Naming
+ * part of a binary package name (i.e. Debian [4]_, Fedora [5]_)
 
 All ROS package names must be mapped to these conventions without
 generating collision.  Therefore only lower case letters (a-z),
@@ -261,7 +258,7 @@ Attributes
   the same ABI version all dependent packages do not need to be
   rebuilt.
 
-.. todo:: 
+.. warning:: 
 
   This abi attribute is not fully specified.  Is it even allowed?  Do
   any current tools support it?
@@ -338,7 +335,7 @@ Attributes
  ``type="TYPE"`` *(optional)*
 
  The type should be one of the following identifiers: ``website``
- (default), ``bugtracker`` and ``repository``.
+ (default), ``bugtracker`` or ``repository``.
 
 
 <author> (multiple)
@@ -358,7 +355,8 @@ Attributes
 <build_depend> (multiple)
 -------------------------
 
-Declares a rosdep key that this package requires at build-time.
+Declares a rosdep key or ROS package name that this package requires
+at build-time.
 
 The ``build`` and ``buildtool`` dependencies are used to determine
 the build order of multiple packages.
@@ -400,10 +398,11 @@ Attributes
 <buildtool_depend> (multiple)
 -----------------------------
 
-Declares a rosdep key for a tool that is executed during the
-build process.  For cross-compilation, one must distinguish these from
-normal build dependencies, which may be linked with your package and
-must be compiled for the target architecture, not the build system.
+Declares a rosdep key or ROS package name for a tool that is executed
+during the build process.  For cross-compilation, one must distinguish
+these from normal build dependencies, which may be linked with your
+package and must be compiled for the target architecture, not the
+build system.
 
 Attributes 
 ''''''''''
@@ -414,8 +413,8 @@ Attributes
 <run_depend> (multiple)
 -----------------------
 
-Declares a rosdep key that this package needs either at
-run-time or as part of some exported build interface.
+Declares a rosdep key or ROS package name that this package needs
+either at run-time or as part of some exported build interface.
 
 The ``<run_depend>`` declares two different types of package
 dependencies.  One is for shared libraries, executables, Python
@@ -438,12 +437,11 @@ Attributes
 <test_depend> (multiple)
 ------------------------
 
-Declares a rosdep key that your package needs for running its
-unit tests.
+Declares a rosdep key or ROS package name that your package needs for
+running its unit tests.
 
-A ``<test_depend>`` may not reference any package already declared
-using a ``<build_depend>``, ``<buildtool_depend>`` or
-``<run_depend>``.
+A ``<test_depend>`` may not reference any package also declared using
+a ``<build_depend>``, ``<buildtool_depend>`` or ``<run_depend>``.
 
 Attributes
 ''''''''''
@@ -454,9 +452,10 @@ Attributes
 <conflict> (multiple)
 ---------------------
 
-Declares a rosdep key with which your package conflicts.  This
-package and the conflicting package cannot be installed at the same
-time.  This maps to ``conflicts`` for both ``dpkg`` and ``rpms``.
+Declares a rosdep key or ROS package name with which your package
+conflicts.  This package and the conflicting package cannot be
+installed at the same time.  This maps to ``conflicts`` for both
+``dpkg`` and ``rpms``.
 
 For a detailed explanation how these relationships are used see
 [4]_ and [5]_.
@@ -470,8 +469,8 @@ Attributes
 <replace> (multiple)
 --------------------
 
-Declares a rosdep key that your package replaces.  This maps to
-``Replaces`` for ``dpkg`` and ``Obsoletes`` for ``rpms``.
+Declares a rosdep key or ROS package name that your package replaces.
+This maps to ``Replaces`` for ``dpkg`` and ``Obsoletes`` for ``rpms``.
 
 Attributes
 ''''''''''
@@ -533,24 +532,23 @@ generated by this package, i.e. in ``gencpp`` this is set to ``cpp``::
 <metapackage/>
 ''''''''''''''
 
-This empty tag marks this as a metapackage, which is a special-purpose
-catkin package for grouping other packages.  Users who install a
-metapackage binary will also get all packages directly or indirectly
-included in that group.  Metapackages must not install any code or
-other files, the ``package.xml`` gets installed automatically.  They
-can depend on other metapackages, if desired, but regular catkin
-packages may not.
+This empty tag declares a special kind of catkin package used for
+grouping other packages.  Users who install the Debian or RPM package
+for a catkin metapackage will also get all the packages directly or
+indirectly included in its group.  Metapackages may not install any
+code or other files, although ``package.xml`` does get installed
+automatically.  They can depend on other metapackages, if desired, but
+regular catkin packages cannot.
 
-Metapackages can be used to resolve stack dependencies declared by
-legacy rosbuild packages not yet converted to catkin.  Catkin packages
-must depend directly on the packages they use, not on any
-metapackages.
+Metapackages can be used to resolve dependencies declared by legacy
+rosbuild stacks not yet converted to catkin.  Catkin packages must
+depend directly on the packages they use, not on any metapackages.
 
 A good use for metapackages is to group the major components of your
 robot and then provide a comprehensive grouping for your whole system.
 
-The ``CMakeLists.txt`` file for a metapackage must contain these
-elements::
+Every metapackage must have a ``CMakeLists.txt`` containing these
+commands::
 
   cmake_minimum_required(VERSION 2.8.3)
   project(PACKAGE_NAME)
@@ -560,47 +558,48 @@ elements::
     <metapackage/>
   </export>
 
-Because the metapackage CMakeLists.txt contains a catkin macro, the
-``package.xml`` must declare a buildtool dependency on catkin::
+Because the metapackage ``CMakeLists.txt`` contains a catkin macro,
+its ``package.xml`` must declare a buildtool dependency on catkin::
 
   <buildtool_depend>catkin</buildtool_depend>
 
-Additional buildtool dependencies or build and test dependencies are
-not permitted.  Metapackages list the packages or other metapackages
-in the group using ``<run_depend>`` tags::
+Additional buildtool, build or test dependencies are not permitted.
+
+Metapackages all packages or other metapackages in their group using
+``<run_depend>`` tags::
 
   <run_depend>your_custom_msgs</run_depend>
   <run_depend>your_server_node</run_depend>
   <run_depend>your_utils</run_depend>
 
 
-Concerns
-========
+Compatibility
+=============
 
 Modification to previous specifications
 ---------------------------------------
 
  * Authors are now split into authors and maintainers.
 
-  * Multiple people and their emails are specified in separate tags
+  - Multiple people and their emails are specified in separate tags
     and attributes.
-  * Authors are now optional.
-  * Maintainers must provide an email address.
-  * At least one maintainer is now required.
+  - Authors are now optional.
+  - Maintainers must provide an email address.
+  - At least one maintainer is now required.
 
  * Multiple licenses can now be used, even though a single license per
    package is desired.
 
- * Multiple ``url`` tags can be specified with ``type`` attributes for
-   semantic meaning.
+ * Multiple ``url`` tags can be specified with ``type`` attributes
+   indicating their meanings.
 
  * The former ``depend`` and ``rosdep`` have been unified, but also
    split into various types of dependencies.
 
  * The ``export`` tag:
 
-  * The ``cpp`` tag has been dropped, it is handled by catkin.
-  * The ``roslang`` tag has been dropped, it is handled by catkin.
+  - The ``cpp`` tag has been dropped, it is handled by catkin.
+  - The ``roslang`` tag has been dropped, it is handled by catkin.
 
  * The ``copyright`` tag has been dropped.
  * The ``logo`` tag has been dropped.
@@ -608,20 +607,19 @@ Modification to previous specifications
    stored on the website of that package.
  * The ``versioncontrol`` tag has been dropped.
 
-Backwards Compatibility
------------------------
+Backward compatibility
+----------------------
 
-All tools currently utilizing ``stack.xml`` and ``manifest.xml`` are
-updated to work with ``package.xml`` files.
+All tools using ``stack.xml`` and ``manifest.xml`` are updated to work
+with ``package.xml`` files.
 
-The update of existing stacks and packages only affect catkin
-packages.  The existing dry packages remain the same.  Rosdep
-distinguishs between wet and dry and returns the appropriate system
-dependencies.
+Migration to the new format only affects packages being converted to
+catkin.  Existing rosbuild packages remain the same.  Rosdep
+distinguishes between catkin and rosbuild and returns the correct
+system dependencies.
 
-For backward compatibility with dry packages catkin will generate a
-| ``manifest.xml`` which exports compiler and linker flags needed by
-``rosbuild``.
+For backward compatibility, catkin generates a ``manifest.xml`` which
+exports the compiler and linker flags needed by rosbuild.
 
 Future enhancements
 -------------------
@@ -639,10 +637,10 @@ Specification
 
 A schema to validate a ``package.xml`` file against will be provided.
 
-.. todo:: Where is it?
+.. warning:: Where is it?
 
 Implementation
-==============
+--------------
 
 A reference implementation was released with ROS Groovy.
 
