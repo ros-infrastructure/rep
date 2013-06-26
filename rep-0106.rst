@@ -1,12 +1,17 @@
 REP: 106
 Title: Polled topics
 Author: Dirk Thomas
-Status: Accepted
+Status: Withdrawn
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 20-Dec-2010
 ROS-Version: 1.6
 Post-History: 20-Dec-2010
+
+Note (2013-06-26)
+=================
+
+The status of the REP has been updated to *Withdrawn* because the proposed functionality will not be implemented for the current ROS client libraries.
 
 Abstract
 ========
