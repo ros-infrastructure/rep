@@ -433,7 +433,7 @@ It can be installed via ``pip``::
     sudo pip install -U rosdep
 
 
-A mercurial repository is available at ``https://kforge.ros.org/rosrelease/rosdep``.
+A Git repository is available at ``https://github.com/ros-infrastructure/rosdep``.
 
 The reference implementation is not yet fully compatible with this
 specification.
@@ -449,7 +449,7 @@ References
 .. [3] REP 111: Multiple Package Manager Support for Rosdep
    (http://ros.org/reps/rep-0111.html)
 .. [4] rosdep YAML format
-   (http://ros.org/doc/api/rosdep2/html/rosdep_yaml_format.html)
+   (http://ros.org/doc/independent/api/rosdep/html/rosdep_yaml_format.html)
 .. [5] REP 122: FHS layout for ROS installation
    (http://ros.org/reps/rep-0122.html) 
 .. [6] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
