@@ -15,7 +15,6 @@ Outline
 #. Rationale_
 #. `Data representation`_
 #. Compatibility_
-#. Specification_
 #. References_
 #. Copyright_
 
@@ -64,17 +63,6 @@ information.  Several tools, like the buildfarm and the wiki, need to
 use that information.  They only need to fetch one file from each
 source package.
 
-Catkin-only specification
--------------------------
-
-The ``package.xml`` file only contains information needed for a ROS
-catkin system.  Any additional information necessary for backward
-compatibility with rosbuild is kept separate, in the ``manifest.xml``
-files.  This makes it easy to remove the legacy files in the future.
-Legacy files required for rosbuild interaction are fully generated
-from the new ``package.xml`` and the ``CMakeLists.txt``, and need not
-be maintained manually.
-
 Store normalized data
 ---------------------
 
@@ -88,7 +76,7 @@ Besides XML, which was used for ``stack.xml`` and ``manifest.xml``,
 other formats were considered.  YAML was investigated extensively
 during the Fuerte cycle, because it is easier for humans to read.
 Since benchmark results [6]_ showed YAML parsing in Python to be
-significantly slower (by a factor of 10), the XML format remains.
+ten times slower, the XML format remains.
 
 Tags versus attributes
 ----------------------
@@ -99,9 +87,44 @@ tags the later is preferred for readability reasons.
 Additional, mostly optional, information is stored in attributes of
 the related tag instead of grouping multiple tags inside a parent tag.
 
+XML syntax restrictions
+-----------------------
+
+The allowed ``package.xml`` elements are tightly restricted.  That
+way, tools can reliably detect errors and provide meaningful error
+messages should a user misspell any of the tags defined here.
+
+Within the ``<export>`` element, tools may define additional tags,
+free from those restrictions.
+
+If new top-level tags are needed, the ``format`` attribute of the
+``<package>`` tag provides a migration path.
+
+Package name restrictions
+-------------------------
+
+Package names are used in various contexts:
+
+ * namespaces
+ * variables
+ * part of a binary package name (i.e. Debian [4]_, Fedora [5]_)
+
+All ROS package names must be mapped to these conventions without
+generating collision.  Therefore only lower case letters (a-z),
+numbers (0-9) and one delimiting character (_) can be used.  The
+additional restriction that the first character be a letter is due to
+the requirements of some languages for naming packages or namespaces.
+
 
 Data representation
 ===================
+
+The package manifest is an XML file, with restricted syntax.
+
+The only top-level element allowed is ``<package>``.  Immediately
+subordinate to that are several required or optional elements, defined
+here.  No other tags are permitted directly under the ``<package>``
+element.
 
 <package>
 ---------
@@ -122,8 +145,7 @@ Attributes
 Required Tags
 -------------
 
-The required set of tags in a ``package.xml`` file provides basic
-meta-data about the package:
+The required tags in a ``package.xml`` file provide package meta-data:
 
  * `\<name\>`_
  * `\<version\>`_
@@ -137,16 +159,10 @@ Optional Tags
 Meta-information
 ''''''''''''''''
 
-We strongly recommend the ``<url>`` tag, pointing users to a website
-and a bug tracker where they can find more information and give
-feedback about the package.  The website is commonly a wiki page on
-``ros.org`` where users can find and update information about the
-package.
+Optional, but recommended, meta-data include the names of the original
+authors and links to support documentation.
 
  * `\<url\> (multiple)`_
-
-Furthermore, authors can be given credit:
-
  * `\<author\> (multiple)`_
 
 Dependencies
@@ -217,26 +233,10 @@ Example
 <name>
 ------
 
-The name of the package consisting only of lower case alphanumeric
-characters and underscores and must start with a letter [1]_.  The
-package name must be unique within the ROS ecosystem.  It may differ
-from the folder name where it is checked out, but using the same name
-for that folder is recommended.
-
-Reasons for naming convention
-'''''''''''''''''''''''''''''
-
-Package names are used in various contexts:
-
- * namespaces
- * variables
- * part of a binary package name (i.e. Debian [4]_, Fedora [5]_)
-
-All ROS package names must be mapped to these conventions without
-generating collision.  Therefore only lower case letters (a-z),
-numbers (0-9) and one delimiting character (_) can be used.  The
-additional restriction that the first character be a letter is due to
-the requirements of some languages for naming packages or namespaces.
+The package name must start with a letter and contain only lowercase
+alphabetic, numeric or underscore characters [1]_.  The package name
+should be unique within the ROS community.  It may differ from the
+folder name into which it is checked out, but that is *not* recommended.
 
 
 <version>
@@ -244,24 +244,6 @@ the requirements of some languages for naming packages or namespaces.
 
 The version number of the package in the format ``MAJOR.MINOR.PATCH``
 where each part is numeric only.
-
-Attributes
-''''''''''
-
-  ``abi="FORMAT-TBD"`` *(optional)*
-
-  Specifying an ABI version number.
-
-  The packages generated are version-locked against the exact ABI
-  version of packages it depends on (if not specified the normal
-  version number).  When increasing the version number while keeping
-  the same ABI version all dependent packages do not need to be
-  rebuilt.
-
-.. warning:: 
-
-  This abi attribute is not fully specified.  Is it even allowed?  Do
-  any current tools support it?
 
 
 <description>
@@ -327,7 +309,12 @@ Commonly used license strings:
 <url> (multiple)
 ----------------
 
-The URL to a website, a bug tracker or anything else for the package.
+A Uniform Resource Locator for the package's website, bug tracker or
+source repository.
+
+It is a good idea to include ``<url>`` tags pointing users to these
+resources.  The website is commonly a wiki page on ``ros.org`` where
+users can find and update information about the package.
 
 Attributes
 ''''''''''
@@ -554,9 +541,6 @@ commands::
   project(PACKAGE_NAME)
   find_package(catkin REQUIRED)
   catkin_metapackage()
-  <export>
-    <metapackage/>
-  </export>
 
 Because the metapackage ``CMakeLists.txt`` contains a catkin macro,
 its ``package.xml`` must declare a buildtool dependency on catkin::
@@ -565,8 +549,8 @@ its ``package.xml`` must declare a buildtool dependency on catkin::
 
 Additional buildtool, build or test dependencies are not permitted.
 
-Metapackages all packages or other metapackages in their group using
-``<run_depend>`` tags::
+Metapackages list all packages or other metapackages in their group
+using ``<run_depend>`` tags::
 
   <run_depend>your_custom_msgs</run_depend>
   <run_depend>your_server_node</run_depend>
@@ -618,32 +602,6 @@ catkin.  Existing rosbuild packages remain the same.  Rosdep
 distinguishes between catkin and rosbuild and returns the correct
 system dependencies.
 
-For backward compatibility, catkin generates a ``manifest.xml`` which
-exports the compiler and linker flags needed by rosbuild.
-
-Future enhancements
--------------------
-
-Additional meta-information can be added within the ``export`` tag, as
-needed.
-
-New features related to the infrastructure can be specified and
-integrated using additional tags and attributes by introducing a new
-``<package>`` format number.
-
-
-Specification
-=============
-
-A schema to validate a ``package.xml`` file against will be provided.
-
-.. warning:: Where is it?
-
-Implementation
---------------
-
-A reference implementation was released with ROS Groovy.
-
 Affected tools
 --------------
 
@@ -667,12 +625,22 @@ Several tools are affected by the transition from packaging packages
 instead of stacks and not really by the specification of the format
 for the package information.
 
+Future enhancements
+-------------------
+
+Additional meta-information can be added within the ``export`` tag, as
+needed.
+
+New features related to the infrastructure can be specified and
+integrated using additional tags and attributes, but this requires
+introducing a new ``<package>`` format number.
+
 
 References
 ==========
 
 .. [1] Naming conventions
-   (http://www.ros.org/wiki/Naming)
+   (http://www.ros.org/wiki/ROS/Patterns/Conventions#Naming_ROS_Resources)
 .. [2] Manifest
    (http://ros.org/wiki/Manifest)
 .. [3] Stack Manifest
