@@ -33,8 +33,8 @@ Motivation
 ==========
 
 The decision to remove the concept of stacks, leaving only packages
-[8]_, drove the decision to merge the information contained in both
-``stack.xml`` and ``manifest.xml``.
+[6]_, [7]_, drove the decision to merge the information contained in
+both ``stack.xml`` and ``manifest.xml``.
 
 The ``package.xml`` contains several kinds of information:
 
@@ -75,7 +75,7 @@ Data format
 Besides XML, which was used for ``stack.xml`` and ``manifest.xml``,
 other formats were considered.  YAML was investigated extensively
 during the Fuerte cycle, because it is easier for humans to read.
-Since benchmark results [6]_ showed YAML parsing in Python to be
+Since benchmark results [3]_ showed YAML parsing in Python to be
 ten times slower, the XML format remains.
 
 Tags versus attributes
@@ -140,7 +140,8 @@ Attributes
   Specifying the ``package.xml`` format being used.  If not set, the
   default ``format="1"`` is assumed.  That is the only format
   described here.  If you are using a different format, please refer
-  to the relevant specification.  REP-0140 will describe format two.
+  to the relevant specification.  REP-0140 [2]_ will describe format
+  two.
 
 Required Tags
 -------------
@@ -169,7 +170,7 @@ Dependencies
 ''''''''''''
 
 The dependencies and relations to other packages and system packages
-have been discussed in [8]_ and are described using:
+have been discussed in [7]_ and are described using:
 
  * `\<build_depend\> (multiple)`_
  * `\<buildtool_depend\> (multiple)`_
@@ -641,21 +642,18 @@ References
 
 .. [1] Naming conventions
    (http://www.ros.org/wiki/ROS/Patterns/Conventions#Naming_ROS_Resources)
-.. [2] Manifest
-   (http://ros.org/wiki/Manifest)
-.. [3] Stack Manifest
-   (http://www.ros.org/wiki/Stack%20Manifest)
+.. [2] REP-0140
+   (http://ros.org/reps/rep-0140)
+.. [3] Comparison between YAML and XML for manifests
+   (https://github.com/ros/catkin/issues/128)
 .. [4] Declaring relationships between packages (Debian Policy Manual)
    (http://www.debian.org/doc/debian-policy/ch-relationships.html)
 .. [5] Advances RPM Packaging (Fedora Documentation)
    (http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-advanced-packaging.html)
-.. [6] Comparison between YAML and XML for manifests
-   (https://github.com/ros/catkin/issues/128)
-.. [7] Discussion on the buildsystem mailing list
-   (https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_jRvhXFfsVk)
-.. [8] Discussion on the buildsystem mailing list (regarding
-   package dependencies and relationships)
-   (https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/fXGSZG0SC08)
+.. [6] Buildsystem mailing list discussion: `"Request for comment REP 127"
+   <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_jRvhXFfsVk>`_
+.. [7] Buildsystem mailing list discussion: `"Dependency tag types for REP 127"
+   <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/fXGSZG0SC08>`_
 
 Copyright
 =========
