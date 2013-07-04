@@ -165,7 +165,7 @@ doc files and their corresponding build files.
       source: groovy/source.yaml
       source_builds: [groovy/source-build.yaml]
       doc: groovy/doc.yaml
-      doc-build: [groovy/doc-build.yaml]
+      doc_builds: [groovy/doc-build.yaml]
     hydro:
       ...
   type: index
