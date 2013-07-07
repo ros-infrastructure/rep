@@ -218,8 +218,8 @@ Example
     <build_depend>catkin</build_depend>
     <build_depend version_gte="1.1" version_lt="2.0">genmsg</build_depend>
 
-    <build_depend>libboost-thread-dev</build_depend>
-    <run_depend>libboost-thread</run_depend>
+    <build_depend>libgstreamer0.10-dev</build_depend>
+    <run_depend>libgstreamer0.10-0</run_depend>
 
     <test_depend>gtest</test_depend>
 
