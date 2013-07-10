@@ -8,6 +8,11 @@ Created: 25-May-2011
 Post-History: 25-May-2011
 
 
+Note (2013-06-26)
+=================
+
+This REP describes information related to the legacy build system rosbuild.
+
 Abstract
 ========
 
