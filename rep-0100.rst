@@ -7,6 +7,10 @@ Content-Type: text/x-rst
 Created: 18-Sep-2010
 Post-History: 18-Sep-2010, 20-Oct-2010, 20-Nov-2010
 
+Note (2013-06-26)
+=================
+
+While most of this REP describes information in terms of the legacy build system rosbuild, several aspect like the separation of the monolithic ROS stack are still valid with the catkin build system.
 
 Abstract
 ========
