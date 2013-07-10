@@ -1,0 +1,680 @@
+REP: 140
+Title: Package manifest format two specification
+Author: Dirk Thomas, Jack O'Quin
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 26-Jun-2013
+
+Outline
+=======
+
+#. Abstract_
+#. Motivation_
+#. Rationale_
+#. `Data representation`_
+#. Compatibility_
+#. References_
+#. Copyright_
+
+
+Abstract
+========
+
+This REP specifies the second ``package.xml`` format, replacing the
+one specified in REP-0127 [1]_.  It is relevant for packages using the
+catkin build system.
+
+
+Motivation
+==========
+
+Overall, the intial package definition worked well.  Hundreds of
+packages were converted from rosbuild to catkin using that interface.
+But, experience has revealed some areas needing improvement.
+
+The biggest problem was user confusion due to the two meanings of the
+``<run_depend>`` tag.  Replacing it with ``<exec_depend>`` and
+``<devel_depend>`` makes the semantics of both types much clearer.
+
+A lesser issue was the need to declare most ROS package dependencies
+twice, using both ``<run_depend>`` and ``<build_depend>``.
+
+
+Rationale
+=========
+
+REP-0127 [1]_ provides the basic ``package.xml`` design rationale,
+which is not repeated here.
+
+Removing <run_depend>
+---------------------
+
+The ``<run_depend>`` tag generated considerable confusion within the
+ROS user and developer community [3]_.  Everyone understood that
+it was needed when a package required another to be available at
+run-time.  But, most people did not grasp the subtle transitive
+build-time dependency introduced when a header exported by a package
+included one from some other package.  In that case, the required
+``<run_depend>`` tag name was quite misleading.
+
+Creating specific tags for those two different meanings reduces
+confusion, and improves packaging efficiency because
+``<devel_depend>`` normally resolves to a development package, while
+``<exec_depend>`` generally refers to a run-time binary package [8]_.
+Although most existing ROS components are not divided into development
+and run-time packages, many system dependencies *are* separated in
+that way.  The new tags can take advantage of it immediately.
+
+With the new tags defined, ``<run_depend>`` was no longer needed.
+Removing it draws attention to the former confusion and helps resolve
+it correctly.  When each package is upgraded from format one to this
+new specification, ``<run_depend>`` must be converted to one or both
+of the new tags, as appropriate.
+
+Adding <depend>
+---------------
+
+Very few ROS packages have been split into separate development and
+run-time packages.  So, most ROS package dependencies must repeat the
+same name in several tags, typically ``<build_depend>`` and
+``<run_depend>``.  With ``<run_depend>`` now divided into
+``<devel_depend>`` and ``<exec_depend>``, that problem gets worse.
+
+The ``<depend>`` tag eliminates the repetition, combining all those
+dependencies into one [3]_.  While ``<depend>`` can be misused [6]_,
+it is good to have when appropriate.
+
+Disabling unit tests
+--------------------
+
+Formerly, catkin unit tests were not cleanly separated from the rest
+of the package.  There are sometimes reasons to build a package
+without its tests or their dependencies.  For generated Debian or RPM
+packages they would not run anyway, and should not be installed.  When
+building from source for small embedded systems, disabling the tests
+reduces the number of dependencies which must also be built and
+installed.
+
+The solution adopted introduces two CMake configuration variables:
+
+ * ``CATKIN_ENABLE_TESTING`` controls whether the tests will be built.
+   Packages should test this variable within their ``CMakeLists.txt``,
+   to ensure that no test artifacts are built.
+
+ * ``CATKIN_SKIP_TESTING`` can be used to build without tests even for
+   packages created before ``CATKIN_ENABLE_TESTING`` became available.
+   This option does not build as efficiently, and may display warning
+   messages during the build.  It is a migration aid, for use while
+   packages are being upgraded to explicitly enable and disable
+   testing themselves.
+
+
+Data representation
+===================
+
+The package manifest is an XML file, with restricted syntax.
+
+The only top-level element allowed is ``<package>``.  Immediately
+subordinate to that are several required or optional elements, defined
+here.  No other tags are permitted directly under the ``<package>``
+element.
+
+<package format="2">
+--------------------
+
+The ``<package>`` tag is the unique top-level tag in a ``package.xml``
+file.  All other tags are nested under it.
+
+Attributes
+''''''''''
+
+  ``format="NUMBER"`` *(optional)*
+
+  Specifying the ``package.xml`` format being used.  If not set,
+  ``format="1"`` would be assumed, which is *not* the format described
+  here.  For this interface, you *must* specify ``format="2"``.  If
+  you are using a different format, please refer to the relevant
+  specification.  REP-0127 [1]_ described format one.
+
+Required Tags
+-------------
+
+The required tags in a ``package.xml`` file provide package meta-data:
+
+ * `\<name\>`_
+ * `\<version\>`_
+ * `\<description\>`_
+ * `\<maintainer\> (multiple, but at least one)`_
+ * `\<license\> (multiple, but at least one)`_
+
+Optional Tags
+-------------
+
+Meta-information
+''''''''''''''''
+
+Optional, but recommended, meta-data include the names of the original
+authors and links to support documentation.
+
+ * `\<url\> (multiple)`_
+ * `\<author\> (multiple)`_
+
+Dependencies
+''''''''''''
+
+The dependencies and relations to other packages and system packages
+have been discussed in [7]_.  They are described using:
+
+ * `\<build_depend\> (multiple)`_
+ * `\<buildtool_depend\> (multiple)`_
+ * `\<depend\> (multiple)`_
+ * `\<devel_depend\> (multiple)`_
+ * `\<exec_depend\> (multiple)`_
+ * `\<test_depend\> (multiple)`_
+ * `\<conflict\> (multiple)`_
+ * `\<replace\> (multiple)`_
+
+These dependency tags are used with both system packages and ROS
+packages.  For system dependencies specify the rosdep key name, for
+ROS dependencies use the package name.
+
+The dependency graph must be acyclic.  No package may directly or
+indirectly depend on itself.
+
+Various
+'''''''
+
+There is a need for additional meta-data in the manifest for other
+tools that work with packages, like message generators and plugin
+discovery.  All of this *dynamic* information is stored in tags under
+a single tag:
+
+ * `\<export\>`_
+
+Tool providers are responsible for defining the tag structure their
+tool requires.
+
+Example
+-------
+
+::
+
+  <package format="2">
+    <name>my_package</name>
+    <version>1.2.3</version>
+    <description>
+      ROS communications-related packages, including core client
+      libraries (roscpp, rospy, roslisp) and graph introspection tools
+      (rostopic, rosnode, rosservice, rosparam).
+    </description>
+    <maintainer email="someone@example.com">Someone</maintainer>
+
+    <license>BSD</license>
+    <license>LGPL</license>
+
+    <url type="website">http://wiki.ros.org/my_package</url>
+    <url type="bugtracker">http://www.github.com/my_org/my_package/issues</url>
+    <author>Jane Doe</author>
+    <author email="jane.doe@example.com">Jane Doe</author>
+
+    <build_depend>catkin</build_depend>
+    <build_depend version_gte="1.1" version_lt="2.0">genmsg</build_depend>
+
+    <depend>roscpp</depend>
+
+    <build_depend>libgstreamer0.10-dev</build_depend>
+    <devel_depend>libgstreamer0.10-dev</devel_depend>
+    <exec_depend>libgstreamer0.10-0</exec_depend>
+
+    <test_depend>gtest</test_depend>
+
+    <conflict>my_old_package</conflict>
+
+    <export>
+      ...
+    </export>
+  </package>
+
+
+<name>
+------
+
+The package name must start with a letter and contain only lowercase
+alphabetic, numeric or underscore characters [2]_.  The package name
+should be unique within the ROS community.  It may differ from the
+folder name into which it is checked out, but that is *not* recommended.
+
+
+<version>
+---------
+
+The version number of the package in the format ``MAJOR.MINOR.PATCH``
+where each part is numeric only.
+
+
+<description>
+-------------
+
+The description of the package. It can consist of multiple lines and
+may contain XHTML.  But depending on where the description is used
+XML tags and multiple whitespaces might be stripped.
+
+
+<maintainer> (multiple, but at least one)
+-----------------------------------------
+
+The name of the person maintaining the package.  All packages require
+a maintainer.  For orphaned packages see below.
+
+Attributes
+''''''''''
+
+ ``email="name@domain.tld"`` *(required)*
+
+  Email address of the maintainer.
+
+An orphaned package is one with no current maintainer.  Orphaned
+packages should have their maintainer set to ``ROS Community
+<ros-release@code.ros.org>``.  These packages will be maintained by
+the ROS Community as a whole until a volunteer takes over maintenance.
+
+Example
+'''''''
+
+::
+
+  <maintainer email="ros-release@code.ros.org">ROS Community</maintainer>
+
+
+<license> (multiple, but at least one)
+--------------------------------------
+
+Name of license for this package, e.g. BSD, GPL, LGPL.  In order to
+assist machine readability, only include the license name in this tag.
+For multiple licenses multiple separate tags must be used.  A package
+will have multiple licenses if different source files have different
+licenses.  Every license occurring in the source files should have
+a corresponding ``<license>`` tag.  For any explanatory text about
+licensing caveats, please use the ``<description>`` tag.
+
+Most common open-source licenses are described on the
+`OSI website <http://www.opensource.org/licenses/alphabetical>`_.
+
+Commonly used license strings:
+
+ - Apache 2.0
+ - BSD
+ - Boost Software License
+ - GPLv2
+ - GPLv3
+ - LGPLv2.1
+ - LGPLv3
+ - MIT 
+ - Mozilla Public License Version 1.1
+
+<url> (multiple)
+----------------
+
+A Uniform Resource Locator for the package's website, bug tracker or
+source repository.
+
+It is a good idea to include ``<url>`` tags pointing users to these
+resources.  The website is commonly a wiki page on ``ros.org`` where
+users can find and update information about the package.
+
+Attributes
+''''''''''
+
+ ``type="TYPE"`` *(optional)*
+
+ The type should be one of the following identifiers: ``website``
+ (default), ``bugtracker`` or ``repository``.
+
+
+<author> (multiple)
+-------------------
+
+The name of a person who is an author of the package, as
+acknowledgement of their work and for questions.
+
+Attributes
+''''''''''
+
+ ``email="name@domain.tld"`` *(optional)*
+
+  Email address of author.
+
+
+<build_depend> (multiple)
+-------------------------
+
+Declares a rosdep key or ROS package name that this package requires
+at build-time.  For system packages, the rosdep key will normally
+specify the "development" package, which frequently ends in ``"-dev"``.
+
+The ``build`` and ``buildtool`` dependencies are used to determine
+the build order of multiple packages.
+
+Attributes
+''''''''''
+
+ All dependencies and relationships may restrict their applicability
+ to particular versions.  For each comparison operator an attribute
+ can be used.  Two of these attributes can be used together to
+ describe a version range.
+
+ ``version_lt="VERSION"`` *(optional)*
+
+ The dependency to the package is restricted to versions less than
+ the stated version number.
+
+ ``version_lte="VERSION"`` *(optional)*
+
+ The dependency to the package is restricted to versions less or
+ equal than the stated version number.
+
+ ``version_eq="VERSION"`` *(optional)*
+
+ The dependency to the package is restricted to a version equal than
+ the stated version number.
+
+ ``version_gte="VERSION"`` *(optional)*
+
+ The dependency to the package is restricted to versions greater or
+ equal than the stated version number.
+
+ ``version_gt="VERSION"`` *(optional)*
+
+ The dependency to the package is restricted to versions greater than
+ the stated version number.
+
+
+<buildtool_depend> (multiple)
+-----------------------------
+
+Declares a rosdep key or ROS package name for a tool that is executed
+during the build process.  For cross-compilation, one must distinguish
+these from normal build dependencies, which may be linked with your
+package and must be compiled for the target architecture, not the
+build system.  For system packages, the rosdep key will normally
+specify the "development" package, which frequently ends in
+``"-dev"``.
+
+
+Attributes 
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<depend> (multiple)
+-------------------
+
+Declares a rosdep key or ROS package name that this package needs for
+multiple reasons.  A ``<depend>`` tag is equivalent to specifying
+``<build_depend>``, ``<devel_depend>`` and ``<exec_depend>``, all on
+the same package.
+
+Attributes 
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<devel_depend> (multiple)
+-------------------------
+
+Declares a rosdep key or ROS package name that this package needs as
+part of some build interface it exports.  For system packages, the
+rosdep key will normally specify the "development" package, which
+frequently ends in ``"-dev"``.
+
+The ``<devel_depend>`` declares a transitive build dependency.  A
+common example is when one of your dependencies provides a header file
+included in some header exported by your package.  Even if your
+package does not use that header when building itself, other packages
+depending on your header *will* require those transitive dependencies
+when they are built.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+<exec_depend> (multiple)
+------------------------
+
+Declares a rosdep key or ROS package name that this package needs at
+execution-time.  For system packages, the rosdep key will normally
+*not* specify the "development" package, so it will generally lack the
+``"-dev"`` suffix.
+
+The ``<exec_depend>`` is needed for packages providing shared
+libraries, executable commands, Python modules, launch scripts or any
+other files required for running your package.  It is also used by
+metapackages for grouping packages.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<test_depend> (multiple)
+------------------------
+
+Declares a rosdep key or ROS package name that your package only needs
+for running its unit tests.  A ``<test_depend>`` may not reference any
+package also declared using a ``<build_depend>``,
+``<buildtool_depend>``, ``<devel_depend>`` or ``<exec_depend>``.
+
+All tests and their dependencies will be built if the CMake variables
+``CATKIN_ENABLE_TESTING=1`` and ``CATKIN_SKIP_TESTING=0``, the default
+settings. ``CMakeLists.txt`` should only define its test targets when
+``CATKIN_ENABLE_TESTING=1`` [9]_.
+
+When building with testing enabled, the ``<test_depend>`` packages are
+available for configuring and building the tests as well as running
+them.  Generated Debian packages are built without the unit tests or
+their dependencies.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<conflict> (multiple)
+---------------------
+
+Declares a rosdep key or ROS package name with which your package
+conflicts.  This package and the conflicting package cannot be
+installed at the same time.  This maps to ``conflicts`` for both
+``dpkg`` and ``rpms``.
+
+For a detailed explanation how these relationships are used see
+[4]_ and [5]_.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<replace> (multiple)
+--------------------
+
+Declares a rosdep key or ROS package name that your package replaces.
+This maps to ``Replaces`` for ``dpkg`` and ``Obsoletes`` for ``rpms``.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<export>
+--------
+
+This tag serves as a container for additional information various
+packages and subsystems need to embed.  To avoid potential collisions
+packages must use their package name as their tag name inside the
+export block.  The content of that tag is up to the package to define
+and use.
+
+Existing rosbuild export tags for tools using ``pluginlib`` remain
+unchanged.  For example, a package which implements an rviz plugin
+might include this::
+
+  <export>
+    <rviz plugin="${prefix}/plugin_description.xml"/>
+  </export>
+
+The following are some tags used within an ``<export>`` for various
+package and message generation tasks.
+
+<architecture_independent/>
+'''''''''''''''''''''''''''
+
+This empty tag indicates that your package contains no
+architecture-specific files.  That information is intended for
+possible future use, the current ROS packaging tools and build farm
+ignore it.
+
+Specifying ``<architecture_independent/>`` is recommended for
+metapackages and for packages defining only ROS messages and services.
+Python-only packages are reasonable candidates, too.  
+
+Be sure to remove this tag if some subsequent update adds
+architecture-dependent targets to a formerly independent package.
+
+<deprecated>
+''''''''''''
+
+This tag indicates that your package is deprecated, enabling tools to
+notify users about that fact.  The tag may be empty or may optionally
+contain an arbitrary text providing user more information about the
+deprecation::
+
+  <export>
+    <deprecated>
+      This package will be removed in ROS Indigo. Instead, use package
+      FOO, which provides similar features with a different API.
+    </deprecated>
+  </export>
+
+<message_generator>
+'''''''''''''''''''
+
+The content defines the *identifier* for the language bindings
+generated by this package, i.e. in ``gencpp`` this is set to ``cpp``::
+
+  <export>
+    <message_generator>cpp</message_generator>
+  </export>
+
+<metapackage/>
+''''''''''''''
+
+This empty tag declares a special kind of catkin package used for
+grouping other packages.  Metapackages only provide execution-time
+dependencies.  They cannot be used for catkin builds and compile
+nothing themselves.  Metapackages may not install any code or other
+files, although ``package.xml`` does get installed automatically.
+They can depend on other metapackages, but regular catkin packages
+cannot.
+
+A good use for metapackages is to group the major components of your
+robot and then provide a comprehensive grouping for your whole system.
+Package installation tools like ``apt-get`` or ``yum`` can
+automatically install all the packages on which a metapackage directly
+or indirectly depends.  Metapackages can also be used to resolve
+dependencies declared by legacy rosbuild stacks not yet converted to
+catkin.
+
+Every metapackage must have a ``CMakeLists.txt`` containing these
+commands::
+
+  cmake_minimum_required(VERSION 2.8.3)
+  project(PACKAGE_NAME)
+  find_package(catkin REQUIRED)
+  catkin_metapackage()
+
+Because the metapackage ``CMakeLists.txt`` contains a catkin macro,
+its ``package.xml`` must declare a buildtool dependency on catkin::
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+Additional buildtool, build or test dependencies are not permitted.
+
+Because metapackages only supply execution-time dependencies, they use
+``<exec_depend>`` to list the packages in their group::
+
+  <exec_depend>your_custom_msgs</exec_depend>
+  <exec_depend>your_server_node</exec_depend>
+  <exec_depend>your_utils</exec_depend>
+  <exec_depend>another_metapackage</exec_depend>
+
+
+Compatibility
+=============
+
+Modifications to REP-0127
+-------------------------
+
+ * ``<run_depend>`` was replaced by ``<devel_depend>`` and
+   ``<exec_depend>``.
+
+ * ``<depend>`` was added as a synonym for ``<build_depend>``,
+   ``<devel_depend>`` and ``<exec_depend>``.
+
+ * ``<test_depend>`` now fulfills configuration and build-time test
+   requirements in addition to the objects needed for running them.
+
+Backward compatibility
+----------------------
+
+Format one packages following REP-0127 [1]_ are not affected unless
+they are updated to declare ``<package format="2">``, at which time
+all ``<run_depend>`` elements must be removed and replaced with other
+appropriate dependencies.
+
+
+References
+==========
+
+.. [1] REP-0127
+   (http://ros.org/reps/rep-0127)
+.. [2] ROS naming conventions
+   (http://www.ros.org/wiki/ROS/Patterns/Conventions#Naming_ROS_Resources)
+.. [3] ros-infrastructure/catkin_pkg#43: `"add support for depend tag"
+   <https://github.com/ros-infrastructure/catkin_pkg/pull/43>`_
+.. [4] Declaring relationships between packages (Debian Policy Manual)
+   (http://www.debian.org/doc/debian-policy/ch-relationships.html)
+.. [5] Advanced RPM Packaging (Fedora Documentation)
+   (http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-advanced-packaging.html)
+.. [6] Buildsystem mailing list discussion: `"adding <depend> syntax to package.xml"
+   <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/j47jBnpEUnI>`_
+.. [7] Buildsystem mailing list discussion: `"Dependency tag types for REP 127"
+   <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/fXGSZG0SC08>`_
+.. [8] Buildsystem mailing list discussion: `"dev/non-dev packages and required meta information"
+   <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/HKgOrdu1OO0>`_
+.. [9] Buildsystem mailing list discussion: `"REP-0140: internal review"
+   <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_QVFLQi-6wk>`_
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
