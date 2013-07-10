@@ -29,6 +29,11 @@ This REP suggests a new elements to extend the functionality of
 .rosinstall files, "setup-file". "setup-file" would indicate 
 a path to a shell script to source in the setup.sh file.
 
+Note: the elements specified in this REP will only affect the tools
+used together with rosbuild packages: namely *rosinstall* and
+*rosws*. Newer tools like *wstool* intended to be used with catkin
+packages are not affected by these elements and will ignore them.
+
 .. _Background:
 
 Background
@@ -415,7 +420,7 @@ References
    (http://www.ros.org/reps/rep-0003.html)
 
 .. [4] Rosinstall source
-   https://kforge.ros.org/projects/vcstools/services/rosinstall/
+   (https://github.com/vcstools/rosinstall)
 
 Copyright
 =========
