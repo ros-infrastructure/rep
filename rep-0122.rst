@@ -391,20 +391,24 @@ necessary before developers could run their modified code.  This made
 it less convenient and increased the round-trip time during
 development substantially.
 
-In Groovy the build folder contains a subdirectory ``buildspace``
-which resembles the same structure than an installation.  The content
-of that folder also follows FHS conventions.  It enables to run any
-application from buildspace as well as if it would be installed.
+In Groovy the build folder contains a subdirectory or sibling folder
+``devel`` which resembles the same structure than an
+installation.  The content of that folder also follows FHS
+conventions.  It enables to run any application from devel space as
+well as if it would be installed.
 
 
 catkin tag in manifest
 ''''''''''''''''''''''
 
-Fuerte package manifests [3]_ had a ``<catkin/>`` tag to indicate that
-they are built using the catkin build system.  That tag was a
-performance optimization for tools like ``rosmake`` and the Python
-``roslib.load_manifest()`` API.  It was not required, but was strongly
+Fuerte package manifests [3]_ temporary had a ``<catkin/>`` tag to
+indicate that they are built using the catkin build system.  That tag
+was a performance optimization for tools like ``rosmake`` and the
+Python ``roslib.load_manifest()`` API.  It was not required, but was
 recommended.
+
+For compatibility with newer versions of rospkg (released for Groovy)
+the ``<catkin/>`` tag must be removed from Fuerte manifests.
 
 Catkin packages in Groovy replace the traditional ``manifest.xml``
 with a newly-defined ``package.xml``, defined in REP 127 [11]_.
@@ -436,9 +440,9 @@ References
 .. [1] Wikipedia: Filesystem Hiearchy Standard
    (http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
 .. [2] ROS filesystem environment variables
-   (http://ros.org/doc/api/rospkg/html/environment.html) 
+   (http://ros.org/doc/independent/api/rospkg/html/environment.html) 
 .. [3] ROS Manifest XML Tags Reference
-   (http://www.ros.org/doc/api/rospkg/html/manifest_xml.html)
+   (http://ros.org/doc/independent/api/rospkg/html/manifest_xml.html)
 .. [4] REP 109: Unary Stacks
    (http://ros.org/reps/rep-0109.html)
 .. [5] REP 102: ROS Install Target
