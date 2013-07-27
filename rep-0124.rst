@@ -71,54 +71,36 @@ discuss changes to Python library loading and a minor change to the
 ROS package manifest format.
 
 
-Locating package-relative executables in the install tree
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Locating package-relative executables with rosrun
+'''''''''''''''''''''''''''''''''''''''''''''''''
 
 Package-relative executables are files specified with
 ``(<ros-package-name>, <file-name>)``, where ``<file-name>`` denotes a
-file with executable permissions located anywhere in the directory
-root of ``<ros-package-name>``.
+file with executable permissions.
 
-Following the specification for ``share/``, package-relative
-executables are stored in ``share/ros-package-name/bin/executable``.
-In an install tree, ``ROS_PACKAGE_PATH`` includes the ``share/`` path.
-Thus, there are no updates to the package-relative executable
-specification for an install tree.
+The executable is looked up in the folder ``lib/ros-package-name``.
+Additionally ``rosrun`` will crawl the package directory (where the
+package manifest file is located) recursively for executables with the
+name ``file-name``.
+
+If multiple executables with the same name are found in different
+locations ``rosrun`` will query the user to select one of the
+executables.
 
 
-Locating package-relative executables in CATKIN_BINARY_DIR
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Locating package-relative executables with roslaunch
+''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-We amend the package-relative specification for the
-catkin-based binary builds, which builds out-of-source binaries
-outside of the ROS source package tree.
+Package-relative executables are files specified with
+``(<ros-package-name>, <relative-file-path>)``, where
+``<relative-file-path>`` denotes a file with executable permissions
+relative to root of the packages source directory.
 
-In order to find executables generated to a catkin-based build
-directory, tools must example the
-``$CATKIN_BINARY_DIR/etc/packages.list`` file for
-
-``packages.list`` is a text file, where each line is of the form::
-
-    <ros-package-name> <relative-file-path>
-
-For example::
-
-    rosconsole ros_comm/tools/rosconsole
-
-To locate a package-relative executable when the ``CATKIN_BINARY_DIR``
-environment variable is set, tools use the following precedence:
-
- 1. If an entry ``<ros-package-name> <relative-file-path>`` is in
-    ``packages.list``, look for binary in
-    ``$CATKIN_BINARY_DIR/<relative-file-path>``
- 2. If executable is not found yet, look for the executable in the ROS package directory.
-
-This implementation assumes that the underlying build system, catkin,
-properly separates executables into separate directories based on ROS
-package name to prevent collisions.
-
-This portion of the specification is potentially volatile, as it
-depends on a implementation that has not been reviewed yet.
+In an install tree the executable might have been installed into the
+FHS compliant location under ``lib/ros-package-name``. Therefore
+roslaunch checks first if an executable exist in this location with
+the filename specified in ``relative-file-path`` (without the path
+information).
 
 
 Motivation
@@ -167,17 +149,6 @@ considered undesireable as it would lengthen the development cycle for
 script executables, such as Python scripts, as a build would be
 required each time the script was modified in order to copy it back to
 the build space.
-
-There are even more alternatives, but the ``packages.list``
-specification ultimately is desireable for its simplicity.
-
-The particular implementation using ``CATKIN_BINARY_DIR`` creates a
-design coupling with the catkin build system.  It would be desireable
-to have a more general mechanism for preserving the semantics in an
-out-of-source build.  However, as the specification places
-requirements on the underlying build system as well, such as keeping
-executables for packages in separate directories.  Thus, this design
-coupling in unavoidable, so it is made explicit.
 
 
 env-loader optional
