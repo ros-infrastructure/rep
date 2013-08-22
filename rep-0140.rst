@@ -35,7 +35,7 @@ But, experience has revealed some areas needing improvement.
 
 The biggest problem was user confusion due to the two meanings of the
 ``<run_depend>`` tag.  Replacing it with ``<exec_depend>`` and
-``<devel_depend>`` makes the semantics of both types much clearer.
+``<build_export_depend>`` makes the semantics of both types much clearer.
 
 A lesser issue was the need to declare most ROS package dependencies
 twice, using both ``<run_depend>`` and ``<build_depend>``.
@@ -53,18 +53,18 @@ Removing <run_depend>
 The ``<run_depend>`` tag generated considerable confusion within the
 ROS user and developer community [3]_.  Everyone understood that
 it was needed when a package required another to be available at
-run-time.  But, most people did not grasp the subtle transitive
+execution-time.  But, most people did not grasp the subtle transitive
 build-time dependency introduced when a header exported by a package
 included one from some other package.  In that case, the required
 ``<run_depend>`` tag name was quite misleading.
 
 Creating specific tags for those two different meanings reduces
 confusion, and improves packaging efficiency because
-``<devel_depend>`` normally resolves to a development package, while
-``<exec_depend>`` generally refers to a run-time binary package [8]_.
+``<build_export_depend>`` normally resolves to a development package, while
+``<exec_depend>`` generally refers to an execution-time binary package [8]_.
 Although most existing ROS components are not divided into development
-and run-time packages, many system dependencies *are* separated in
-that way.  The new tags can take advantage of it immediately.
+and execution-time packages, many system dependencies *are* separated in
+that way.  The new tags can take advantage of that immediately.
 
 With the new tags defined, ``<run_depend>`` was no longer needed.
 Removing it draws attention to the former confusion and helps resolve
@@ -76,10 +76,10 @@ Adding <depend>
 ---------------
 
 Very few ROS packages have been split into separate development and
-run-time packages.  So, most ROS package dependencies must repeat the
+execution-time packages.  So, most ROS package dependencies must repeat the
 same name in several tags, typically ``<build_depend>`` and
 ``<run_depend>``.  With ``<run_depend>`` now divided into
-``<devel_depend>`` and ``<exec_depend>``, that problem gets worse.
+``<build_export_depend>`` and ``<exec_depend>``, that problem gets worse.
 
 The ``<depend>`` tag eliminates the repetition, combining all those
 dependencies into one [3]_.  While ``<depend>`` can be misused [6]_,
@@ -168,9 +168,9 @@ The dependencies and relations to other packages and system packages
 have been discussed in [7]_.  They are described using:
 
  * `\<build_depend\> (multiple)`_
+ * `\<build_export_depend\> (multiple)`_
  * `\<buildtool_depend\> (multiple)`_
  * `\<depend\> (multiple)`_
- * `\<devel_depend\> (multiple)`_
  * `\<exec_depend\> (multiple)`_
  * `\<test_depend\> (multiple)`_
  * `\<conflict\> (multiple)`_
@@ -225,7 +225,7 @@ Example
     <depend>roscpp</depend>
 
     <build_depend>libgstreamer0.10-dev</build_depend>
-    <devel_depend>libgstreamer0.10-dev</devel_depend>
+    <build_export_depend>libgstreamer0.10-dev</build_export_depend>
     <exec_depend>libgstreamer0.10-0</exec_depend>
 
     <test_depend>gtest</test_depend>
@@ -391,6 +391,27 @@ Attributes
  the stated version number.
 
 
+<build_export_depend> (multiple)
+-------------------------
+
+Declares a rosdep key or ROS package name that this package needs as
+part of some build interface it exports.  For system packages, the
+rosdep key will normally specify the "development" package, which
+frequently ends in ``"-dev"``.
+
+The ``<build_export_depend>`` declares a transitive build dependency.  A
+common example is when one of your dependencies provides a header file
+included in some header exported by your package.  Even if your
+package does not use that header when building itself, other packages
+depending on your header *will* require those transitive dependencies
+when they are built.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
 <buildtool_depend> (multiple)
 -----------------------------
 
@@ -414,34 +435,14 @@ Attributes
 
 Declares a rosdep key or ROS package name that this package needs for
 multiple reasons.  A ``<depend>`` tag is equivalent to specifying
-``<build_depend>``, ``<devel_depend>`` and ``<exec_depend>``, all on
-the same package.
+``<build_depend>``, ``<build_export_depend>`` and ``<exec_depend>``,
+all on the same package.
 
 Attributes 
 ''''''''''
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
-
-<devel_depend> (multiple)
--------------------------
-
-Declares a rosdep key or ROS package name that this package needs as
-part of some build interface it exports.  For system packages, the
-rosdep key will normally specify the "development" package, which
-frequently ends in ``"-dev"``.
-
-The ``<devel_depend>`` declares a transitive build dependency.  A
-common example is when one of your dependencies provides a header file
-included in some header exported by your package.  Even if your
-package does not use that header when building itself, other packages
-depending on your header *will* require those transitive dependencies
-when they are built.
-
-Attributes
-''''''''''
-
- The same attributes as for `\<build_depend\> (multiple)`_.
 
 <exec_depend> (multiple)
 ------------------------
@@ -468,8 +469,8 @@ Attributes
 Declares a rosdep key or ROS package name that your package only needs
 for running its unit tests.  A ``<test_depend>`` may not reference any
 package also declared using a ``<build_depend>``,
-``<buildtool_depend>``, ``<devel_depend>``, ``<exec_depend>`` or
-``<depend>`` tag.
+``<build_export_depend>``, ``<buildtool_depend>``, ``<depend>`` or
+``<exec_depend>`` tag.
 
 All tests and their dependencies will be built if the CMake variables
 ``CATKIN_ENABLE_TESTING=1`` and ``CATKIN_SKIP_TESTING=0``, the default
@@ -648,11 +649,11 @@ Compatibility
 Modifications to REP-0127
 -------------------------
 
- * ``<run_depend>`` was replaced by ``<devel_depend>`` and
+ * ``<run_depend>`` was replaced by ``<build_export_depend>`` and
    ``<exec_depend>``.
 
  * ``<depend>`` was added as a synonym for ``<build_depend>``,
-   ``<devel_depend>`` and ``<exec_depend>``.
+   ``<build_export_depend>`` and ``<exec_depend>``.
 
  * ``<test_depend>`` now fulfills configuration and build-time test
    requirements in addition to the objects needed for running them.
