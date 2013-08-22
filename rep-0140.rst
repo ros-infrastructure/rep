@@ -29,7 +29,7 @@ catkin build system.
 Motivation
 ==========
 
-Overall, the intial package definition worked well.  Hundreds of
+Overall, the initial package definition worked well.  Hundreds of
 packages were converted from rosbuild to catkin using that interface.
 But, experience has revealed some areas needing improvement.
 
@@ -100,7 +100,8 @@ The solution adopted introduces two CMake configuration variables:
 
  * ``CATKIN_ENABLE_TESTING`` controls whether the tests will be built.
    Packages should test this variable within their ``CMakeLists.txt``,
-   to ensure that no test artifacts are built.
+   to ensure that no test artifacts are configured or built, unless
+   enabled.
 
  * ``CATKIN_SKIP_TESTING`` can be used to build without tests even for
    packages created before ``CATKIN_ENABLE_TESTING`` became available.
@@ -129,7 +130,7 @@ file.  All other tags are nested under it.
 Attributes
 ''''''''''
 
-  ``format="NUMBER"`` *(optional)*
+  ``format="NUMBER"``
 
   Specifying the ``package.xml`` format being used.  If not set,
   ``format="1"`` would be assumed, which is *not* the format described
@@ -467,7 +468,8 @@ Attributes
 Declares a rosdep key or ROS package name that your package only needs
 for running its unit tests.  A ``<test_depend>`` may not reference any
 package also declared using a ``<build_depend>``,
-``<buildtool_depend>``, ``<devel_depend>`` or ``<exec_depend>``.
+``<buildtool_depend>``, ``<devel_depend>``, ``<exec_depend>`` or
+``<depend>`` tag.
 
 All tests and their dependencies will be built if the CMake variables
 ``CATKIN_ENABLE_TESTING=1`` and ``CATKIN_SKIP_TESTING=0``, the default
@@ -518,9 +520,9 @@ Attributes
 --------
 
 This tag serves as a container for additional information various
-packages and subsystems need to embed.  To avoid potential collisions
-packages must use their package name as their tag name inside the
-export block.  The content of that tag is up to the package to define
+packages and subsystems need to embed.  To avoid potential collisions,
+an export tag should have the same name as the package which is meant
+to process it.  The content of that tag is up to the package to define
 and use.
 
 Existing rosbuild export tags for tools using ``pluginlib`` remain
@@ -548,6 +550,29 @@ Python-only packages are reasonable candidates, too.
 
 Be sure to remove this tag if some subsequent update adds
 architecture-dependent targets to a formerly independent package.
+
+<build_type>
+''''''''''''
+
+Various tools use this tag to determine how to handle a package.  It
+was defined in REP-0134 [10]_, which currently specifies only two
+valid values::
+
+  <build_type>catkin</build_type>
+  <build_type>cmake</build_type>
+
+If no ``<build_type>`` is provided, ``catkin`` is assumed.
+
+When the build type is ``cmake``, the package is handled as a
+non-catkin CMake project.  It cannot be included in a normal catkin
+workspace, but can instead use ``catkin_make_isolated``, which
+configures and builds a different kind of workspace in which
+``cmake``, ``make``, and ``make install`` are invoked separately for
+each package.  See REP-0134 for details.
+
+Further build types may eventually be defined, such as: "make",
+"autotools", "rosbuild", or "custom".
+
 
 <deprecated>
 ''''''''''''
@@ -662,6 +687,8 @@ References
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/HKgOrdu1OO0>`_
 .. [9] Buildsystem mailing list discussion: `"REP-0140: internal review"
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_QVFLQi-6wk>`_
+.. [10] REP-0134
+   (http://ros.org/reps/rep-0134)
 
 Copyright
 =========
