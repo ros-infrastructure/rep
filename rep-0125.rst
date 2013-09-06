@@ -455,7 +455,7 @@ References
 .. [6] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
    (http://ros.org/reps/rep-0123.html) 
 .. [7] REP 3: Target Platforms
-   (http://ros.org/reps/rep-003.html) 
+   (http://ros.org/reps/rep-0003.html) 
 
 
 Copyright
