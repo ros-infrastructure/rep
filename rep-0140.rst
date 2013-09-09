@@ -392,7 +392,7 @@ Attributes
 
 
 <build_export_depend> (multiple)
--------------------------
+--------------------------------
 
 Declares a rosdep key or ROS package name that this package needs as
 part of some build interface it exports.  For system packages, the
