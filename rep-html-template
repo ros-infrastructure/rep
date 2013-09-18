@@ -11,7 +11,7 @@ DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
   <meta http-equiv="Content-Type" content="text/html; charset=%(encoding)s" />
   <meta name="generator" content="Docutils %(version)s: http://docutils.sourceforge.net/" />
 
-<script type="text/javascript" src="/_wiki/common/js/seesaw.js"></script> 
+<script type="text/javascript" src="/wiki/custom/js/seesaw.js"></script>
  
 <script type="text/javascript"> 
  
@@ -31,17 +31,17 @@ DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
 <meta name="robots" content="index,follow"> 
  
   <title>REP %(rep)s -- %(title)s (ROS.org)</title>
-<script type="text/javascript" src="/moin_static182/common/js/common.js"></script> 
+<script type="text/javascript" src="/wiki/moin_static197/common/js/common.js"></script>
  
-<link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="/moin_static182/rostheme/css/common.css"> 
-<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="/moin_static182/rostheme/css/screen.css"> 
-<link rel="stylesheet" type="text/css" charset="utf-8" media="print" href="/moin_static182/rostheme/css/print.css"> 
+<link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="/wiki/moin_static197/rostheme/css/common.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="/wiki/moin_static197/rostheme/css/screen.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" media="print" href="/wiki/moin_static197/rostheme/css/print.css">
 
  %(stylesheet)s
 
 <!-- css only for MSIE browsers --> 
 <!--[if IE]>
-   <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="/moin_static182/rostheme/css/msie.css">
+   <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="/wiki/moin_static197/rostheme/css/msie.css">
 <![endif]--> 
  
 </head> 
