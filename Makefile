@@ -27,4 +27,4 @@ clean:
 	-rm rep-0000.rst
 
 upload: all
-	rsync -r README.txt *.html rep.css style.css rep-0000.rst $(SUBDIRS) www.ros.org:/var/www/www.ros.org/html/reps
+	rsync -r README.txt *.html rep.css style.css rep-0000.rst $(SUBDIRS) rosbot@ros.osuosl.org:/var/www/www.ros.org/reps
