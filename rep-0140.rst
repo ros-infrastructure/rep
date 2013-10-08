@@ -110,6 +110,23 @@ The solution adopted introduces two CMake configuration variables:
    packages are being upgraded to explicitly enable and disable
    testing themselves.
 
+Making <test_depend> easier to use
+----------------------------------
+
+With format one, ``<test_depend>`` could not co-exist with other types
+of dependencies, nor could testing-only packages provide any build or
+configuration information.
+
+For example, rostest defines an ``add_rostest()`` CMake command.
+Using it required a ``<build_depend>rostest</build_depend>``, even
+though it was only needed when testing is enabled.  Even worse, also
+declaring ``<test_depend>rostest</test_depend>`` was considered an
+error.
+
+With format two, a ``<test_depend>`` for rostest works as expected, no
+separate ``<build_depend>`` is required in that case.  Moreover,
+packages needed for several reasons may now be declared using any
+desired combination of dependency types, including ``<test_depend>``.
 
 Data representation
 ===================
@@ -467,11 +484,9 @@ Attributes
 <test_depend> (multiple)
 ------------------------
 
-Declares a rosdep key or ROS package name that your package only needs
-for running its unit tests.  A ``<test_depend>`` may not reference any
-package also declared using a ``<build_depend>``,
-``<build_export_depend>``, ``<buildtool_depend>``, ``<depend>`` or
-``<exec_depend>`` tag.
+Declares a rosdep key or ROS package name that your package needs
+for running its unit tests.  A ``<test_depend>`` *may* reference a
+package also declared as some other type of dependency.
 
 All tests and their dependencies will be built if the CMake variables
 ``CATKIN_ENABLE_TESTING=1`` and ``CATKIN_SKIP_TESTING=0``, the default
