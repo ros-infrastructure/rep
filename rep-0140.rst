@@ -188,13 +188,14 @@ Various
 
 There is a need for additional meta-data in the manifest for other
 tools that work with packages, like message generators and plugin
-discovery.  All of this *dynamic* information is stored in tags under
-a single tag:
+discovery.  Tags for that kind of information are wrapped within this
+tag:
 
  * `\<export\>`_
 
-Tool providers are responsible for defining the tag structure their
-tool requires.
+Some ``<export>`` tags used by catkin are defined below.  Others are
+defined by various tools, which must specify their own specific tag
+structures.
 
 Example
 -------
