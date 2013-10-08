@@ -493,9 +493,9 @@ Attributes
 ---------------------
 
 Declares a rosdep key or ROS package name with which your package
-conflicts.  This package and the conflicting package cannot be
-installed at the same time.  This maps to ``conflicts`` for both
-``dpkg`` and ``rpms``.
+conflicts.  This package and the conflicting package should not be
+installed at the same time.  This has no effect on source builds, but
+maps to ``Conflicts`` when creating Debian or  RPM packages.
 
 For a detailed explanation how these relationships are used see
 [4]_ and [5]_.
@@ -510,7 +510,8 @@ Attributes
 --------------------
 
 Declares a rosdep key or ROS package name that your package replaces.
-This maps to ``Replaces`` for ``dpkg`` and ``Obsoletes`` for ``rpms``.
+This has no effect on source builds, but maps to ``Replaces`` when
+creating Debian packages and ``Obsoletes`` for RPM packages.
 
 Attributes
 ''''''''''
