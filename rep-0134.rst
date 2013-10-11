@@ -125,12 +125,15 @@ By default `catkin_make_isolated` will create a build folder for package `foo` a
 
   workspace/build_isolated/foo/
 
-whereas catkin_make only creates one build space for all packages at::
+For packages with a plain cmake build type subfolders are created under that
+folder called `devel` and `install` in order to cleanly separate them.
+
+catkin_make only creates one build space for all packages at::
 
   workspace/buildspace
 
 By default `catkin_make_isolated` will
-create a build folder for package foo at::
+create a devel folder for package `foo` at::
 
   workspace/devel_isolated/foo/
 
@@ -142,11 +145,11 @@ The devel space folder::
 
   workspace/devel_isolated
 
-will contain `setup.*sh` files to use to create a runtime environment.
+will contain `setup.*` files to use to create a runtime environment.
 
 For both standard as well as non-standard packages,
 catkin_make_isolated generates environment files (`env.sh`,
-´setup.sh´) in the packages devel space. The isolated build space of a
+`setup.*`) in the packages devel space. The isolated build space of a
 package can be used to (re-)build the package using the make command,
 provided the prerequisite packages are in the CMAKE_PREFIX_PATH. The
 `env.sh` file in the isolated devel space of the package can be used to
