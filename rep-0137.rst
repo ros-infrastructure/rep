@@ -179,7 +179,8 @@ Each release file contains the following information:
 * repositories: a list of GBP repositories which are identified by unique names
 
   * url: the URL of the release git repository
-    The URL should be writable (with the appropriate credentials).
+    The URL must be anonymously readable and (with the appropriate
+    credentials) writable.
   * version: version number for which packages are released. This
     can be a tag, branch or hash.
   * status: defines the status of the packages of the repository. Can be one of
@@ -355,8 +356,8 @@ Since the repository type is not limited to git each repository has to specify a
 * repositories: a list of repositories which are identified by unique names
 
   * type: the type of SCM in use. Typically 'git', 'svn'...
-  * url: the URL of the release git repository
-    The URL should be writable (with the appropriate credentials).
+  * url: the URL of the source repository
+    The URL must be anonymously readable.
   * version: For git and hg this is the tag, branch or hash to be checked out.
     For svn the version should not be set since the branch/tag is encoded in the url.
 
@@ -394,13 +395,13 @@ depends on.
 * repositories: a list of repositories which are identified by unique names
 
   * type: the type of SCM in use. Typically 'git', 'svn'...
-  * url: the URL of the release git repository
-    The URL should be writable (with the appropriate credentials).
+  * url: the URL of the source repository
+    The URL must be anonymously readable.
   * version: For git and hg this is the tag, branch or hash to be checked out.
     For svn the version should not be set since the branch/tag is encoded in the url.
   * depends: list of repository names. Other repositories to perform cross
     referencing in the documentation. This is only necessary if the packages
-    from the dependend repositories are not released. (default: [])
+    from the dependent repositories are not released. (default: [])
 
 * type: must be 'doc'
 * version: version number, this REP describes version 1
@@ -410,7 +411,7 @@ Documentation build file
 The documentation build file uses a specification similar to the source build file.
 
 * repository_whitelist: a list of repository names to build.
-  If this is omitted all repositories specified in the source file are build.
+  If this is omitted all repositories specified in the doc file are build.
 * repository_blacklist: a list of repository names excluded from build.
   If this is omitted no repositories are excluded.
   The blacklist overrides the whitelist.
