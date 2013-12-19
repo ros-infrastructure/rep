@@ -1,17 +1,18 @@
-REP: 137
+REP: 141
 Title: ROS distribution files
-Author: Tully Foote, Dirk Thomas, Paul Mathieu
-Status: Accepted
+Author: Dirk Thomas
+Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
-Created: 04-Feb-2013
-Post-History: 19-April-2013
+Created: 18-Dez-2013
+Post-History: 18-Dez-2013
 
 .. contents::
 
 Abstract
 ========
-This REP specifies a set of files which define ROS distributions and
+This REP is a revised version of REP 137 [6]_.
+It specifies a set of files which define ROS distributions and
 facilitate the building, packaging, testing and documenting process.
 The intention is to formalize the existing infrastructure and simplify hosting
 of (potentially customized) ROS buildfarms.
@@ -54,6 +55,8 @@ The information formalized in this REP is used in four separate processes:
 * building binary packages for a specific platform and architecture
 * running automated tests
 * running documentation jobs
+* checking out packages/repositories and their recursive dependencies from
+  release repositories as well as source repositories
 
 There should be a single configuration which contains (or references) all
 information required to run the above processes.
@@ -71,6 +74,9 @@ test suite). The build process can only work on released packages.
 Each configuration file must contain a label which identifies the semantics
 of the file as well as a version number to enable future format updates.
 
+It must be possible to unambiguously correlate source and release
+repositories of the same packages.
+
 Rationale
 =========
 A single configuration containing or referencing all required information
@@ -81,27 +87,38 @@ Specifying individual subsets of packages per platform and architecture is
 necessary since not all released packages can and should be build on all
 platforms and architectures.
 
-The information for the various processes should be separated from each other
-to ease customizing individual processes. This is especially necessary since
-different processes could be run by separate entities.
+The information for the various processes could be separated from each other
+to ease customizing individual processes. But then it would not be reliably
+possible to correlate entries from different processes. E.g. a released repo
+can not be unambiguously correlated to a source repository. Especially for
+tools like rosinstall_generator this would be valuable in order to enable
+certain features.
 
 Specification
 =============
 
 This REP gives a formal specification for the files that are used for that.
-Currently the information is stored in:
-* distribution files (groovy.yaml)
-* targets.yaml
-* individual rosinstall files for documentation, and depends files
+Currently the information about the repositories is stored in three
+different files:
+* release.yaml
+* source.yaml
+* doc.yaml
 
-The changes to the distribution file are minimal, such as restructuring and
-adding type and version fields.
-The content of the targets.yaml file will be split and merged into the
-release, source and doc files and their corresponding building files.
+In order correlate them realiably these information will be stored in a
+single distribution.yaml file. For each repository the content from the
+separate files is nested under a common repository entry in the new
+distribution file.
 
-The content of the individual rosinstall files is merged into a single file.
-The dependencies for documentation are replaced by referencing other
-repositories specified in the same file.
+The subfolder information for each package is being dropped. Since the
+location within the repository might be different for release/source/doc
+it would need to be maintained separately for each of them. Currently the
+package.xml is only fetched for released packages and then it is retrieved
+from the known location in the release repository.
+
+The status information is not specific to the release repository anymore
+but applies to the source and doc repository as well. This enables to
+annotate the status of repositories and packages even if they are not
+released.
 
 All current information can be converted into the new format using a script
 in the reference implementation.
@@ -116,8 +133,8 @@ As a good practice, the files should contain a header such as:
 ::
 
   %YAML 1.1
-  # ROS index|release|release-build|source|source-build|doc|doc-build file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # ROS index|distribution|release-build|source-build|doc-build file
+  # see REP 141: http://ros.org/reps/rep-0141.html
   ---
 
 Index file
@@ -133,18 +150,17 @@ The information stored in the index file is:
 
   For each distribution further information are referenced:
 
-  * release: reference to the release file
+  * repositories: reference to the distribution file
   * release_builds: list of references to the release-build files used to build the binary packages
   * release_cache: reference to a release cache. Whether this field is
     a dictionary, a list or a scalar is left as an implementation detail. The
     following examples will assume that the implementation necessitates an url.
-  * source: reference to the source file
   * source_builds: list of references to the source-build files used to run the tests
-  * doc: reference to the doc file
   * doc_builds: list of references to the doc-build files used to run the documentation
 
 * type: must be 'index'
-* version: version number, this REP describes version 1
+* version: version number, this REP describes version 2 (instead of version 1
+  described in REP 137 [6]_)
 
 Example
 -------
@@ -155,112 +171,173 @@ doc files and their corresponding build files.
 
   %YAML 1.1
   # ROS index file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # see REP 141: http://ros.org/reps/rep-0141.html
   ---
   distributions:
     groovy:
-      release: groovy/release.yaml
+      repositories: groovy/groovy.yaml
       release_builds: [groovy/release-build-ubuntu.yaml, releases/release-build-arm.yaml]
       release_cache: http://www.example.com/groovy-cache
-      source: groovy/source.yaml
       source_builds: [groovy/source-build.yaml]
-      doc: groovy/doc.yaml
       doc_builds: [groovy/doc-build.yaml]
     hydro:
       ...
   type: index
   version: 1
 
-Release file
-------------
-A release is identified by the code name of the ROS distribution in the index file.
-Each release file contains the following information:
+Distribution file
+-----------------
+A distribution is identified by the code name of the ROS distribution in the index file.
+Each distribution file contains the following information:
 
-* repositories: a list of GBP repositories which are identified by unique names
+* repositories: a list of repositories which are identified by unique names
 
-  * url: the URL of the release git repository
-    The URL should be writable (with the appropriate credentials).
-  * version: version number for which packages are released. This
-    can be a tag, branch or hash.
+  * release: all release repository related information are nested under this key
+
+    * url: the URL of the release git repository
+      The URL must be anonymously readable and (with the appropriate
+      credentials) writable.
+    * version: version number for which packages are released. This
+      can be a tag, branch or hash.
+    * packages: an optional list of package names.  If no package is specified,
+      one package with the name of the repository is assumed.
+    * tags: a dict of tags which can be used by tools like bloom and
+      the rosinstall generator, preventing the need for those tools to guess about tags in
+      release repositories, e.g. 'release/package/1.2.3' vs 'release/groovy/package/1.2.3-4'.
+      This provides a useful future proofing mechanism for tools which use tags in the
+      release repository, rather than guessing the format of the tags they can infer them
+      directly from the tag templates.
+
+      * *tag_name {release, debian, etc...}*: Format of tags are strings with {template_variables}
+        e.g. 'release/groovy/{package}/{version}' A non-exhaustive list of possible template tags:
+
+        * package - name of the package which this release tag corresponds
+        * version - full version of the package being released, e.g. 1.2.3-4
+        * upstream_version - upstream version of package being released, e.g. 1.2.3
+        * debian_distro - target debian distro codename
+        * debian_package_name - name of package, with any prefix and sanitized for debian
+
+        The only required tag_name is 'release', others like 'debian' are optional.
+
+  * source: all source repository related information are nested under this key
+
+    * type: the type of SCM in use. Typically 'git', 'svn'...
+    * url: the URL of the source repository
+      The URL must be anonymously readable.
+    * version: For git and hg this is the tag, branch or hash to be checked out.
+      For svn the version should not be set since the branch/tag is encoded in the url.
+
+  * doc: all doc repository related information are nested under this key
+
+    * type: the type of SCM in use. Typically 'git', 'svn'...
+    * url: the URL of the source repository
+      The URL must be anonymously readable.
+    * version: For git and hg this is the tag, branch or hash to be checked out.
+      For svn the version should not be set since the branch/tag is encoded in the url.
+    * blacklist_packages: an optional list of package names which should not
+      be documented. (default: [])
+    * depends: list of repository names. Other repositories to perform cross
+      referencing in the documentation. This is only necessary if the packages
+      from the dependent repositories are not released. (default: [])
+
   * status: defines the status of the packages of the repository. Can be one of
     the following: ``developed``, ``maintained``, ``unmaintained``,
     ``end-of-life``
   * status_description: an optional field describing in a short sentence the
     current status of the repository.  For example detailing the reason
     for EOL and the recommended upgrade path.
-  * packages: an optional list of package names.  If no package is specified,
-    one package with the name of the repository is assumed in the root of the repository.
-    For each package name a dictionary with the following optional keys is possible:
+  * status_per_package: an optional list of package names.  For each package
+    name a dictionary with the following optional keys allow to override the
+    status information:
 
-    * subfolder: the relative path to the package from the repository base
-      (default: *package name*)
     * status: overrides the repository-wide status
     * status_description: overrides the repository-wide status description
-  * tags: a dict of tags which can be used by tools like bloom and
-    the rosinstall generator, preventing the need for those tools to guess about tags in
-    release repositories, e.g. 'release/package/1.2.3' vs 'release/groovy/package/1.2.3-4'.
-    This provides a useful future proofing mechanism for tools which use tags in the
-    release repository, rather than guessing the format of the tags they can infer them
-    directly from the tag templates.
 
-    * *tag_name {release, debian, etc...}*: Format of tags are strings with {template_variables}
-      e.g. 'release/groovy/{package}/{version}' A non-exhaustive list of possible template tags:
-
-      * package - name of the package which this release tag corresponds
-      * version - full version of the package being released, e.g. 1.2.3-4
-      * upstream_version - upstream version of package being released, e.g. 1.2.3
-      * debian_distro - target debian distro codename
-      * debian_package_name - name of package, with any prefix and sanitized for debian
-
-      The only required tag_name is 'release', others like 'debian' are optional.
-
-* platforms: a dict of target platforms for which packages are released.
+* release_platforms: a dict of target platforms for which packages are released.
   Each key contains the OS name while the value is a list of OS code names.
   These OS names and OS code names are determined by *rospkg.os_detect* [4]_.
   Each target platform will result in a different bloom release.
 
-* type: must be 'release'
+* type: must be 'distribution'
 * version: version number, this REP describes version 1
 
-**Example**: A release file listing GBP repositories and packages and the
-target platforms.
+**Example**: A distribution file listing repositories and the release
+platforms. All changes to REP 137 are commented on inline.
 
 ::
 
   %YAML 1.1
-  # ROS release file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # ROS distribution file
+  # see REP 141: http://ros.org/reps/rep-0141.html
   ---
-  repositories:
-    actionlib:
-      url: https://github.com/ros-gbp/actionlib-release.git
-      version: 1.9.11-0
-      tags:
-        release: release/groovy/actionlib/{version}
-    ar_track_alvar:
-      url: https://github.com/ros-gbp/ar_track_alvar-release.git
-      version: 0.3.0-0
-      packages:
-        ar_track_alvar:
-          subfolder: artrackalvar
-      tags:
-        release: release/{package}/{upstream_version}
-    bond_core:
-      url: https://github.com/ros-gbp/bond_core-release.git
-      version: 1.7.10-0
-      packages:
-        bond:
-        bond_core:
-        bondcpp:
-        bondpy:
-        smclib:
-      tags:
-        release: release/groovy/{package}/{version}
-        debian: debian/{debian_package_name}_{version}_{debian_distro}
-  platforms:
-    ubuntu: [oneiric, precise, quantal]
+  # prefixed with 'release_' since these are the platforms we release for
+  release_platforms:
     debian: [wheezy]
-  type: release
+    ubuntu: [precise, quantal, raring]
+  repositories:
+    catkin:
+      # each repo contains the (optional) sections for 'doc', 'release' and 'source'
+      doc:
+        type: git
+        url: https://github.com/ros/catkin.git
+        version: groovy-devel
+      release:
+        tags:
+          release: release/hydro/{package}/{version}
+        url: https://github.com/ros-gbp/catkin-release.git
+        version: 0.5.77-0
+      source:
+        type: git
+        url: https://github.com/ros/catkin.git
+        version: groovy-devel
+    genmsg:
+      doc:
+        type: git
+        url: https://github.com/ros/genmsg.git
+        # specified separately from 'source' since it might use different version
+        version: 0.4.23
+      release:
+        tags:
+          release: release/hydro/{package}/{version}
+        url: https://github.com/ros-gbp/genmsg-release.git
+        version: 0.4.23-0
+      source:
+        type: git
+        url: https://github.com/ros/genmsg.git
+        version: hydro-devel
+    roscpp_core:
+      doc:
+        # optional blacklist packages to avoid documentation of these
+        blacklist_packages: [test_rostime]
+        depends: [genmsg]
+        type: git
+        url: https://github.com/ros/roscpp_core.git
+        version: hydro-devel
+      release:
+        # the packages are populated by bloom
+        # the subfolder is not stored anymore
+        packages: [cpp_common, roscpp_core, roscpp_serialization, roscpp_traits, rostime]
+        tags:
+          release: release/hydro/{package}/{version}
+        url: https://github.com/ros-gbp/roscpp_core-release.git
+        version: 0.3.16-0
+      source:
+        # blacklisting packages should be done with CATKIN_IGNORE files
+        # rather than in this file to also cover users checking out the repo
+        type: git
+        url: https://github.com/ros/roscpp_core.git
+        version: hydro-devel
+      # status also covers 'doc' and 'source' (not only release, e.g. if not even released)
+      status: maintained
+      status_description: 'Very actively maintained'
+      # status can be overridden per package
+      status_per_package:
+        roscpp_core:
+          status: end-of-life
+          status_description: 'Metapackage is not necessary anymore'
+        rostime:
+          status: unmaintained
+  type: distribution
   version: 1
 
 Release build file
@@ -269,7 +346,8 @@ A release build file contains the information necessary to build packages of
 the packages specified in the release file:
 
 * package_whitelist: a list of package names to build.
-  If this is omitted all packages specified in the release file are build.
+  If this is omitted all packages specified in the release part of the
+  distribution file are build.
   Any upstream packages are implicitly included.
 * package_blacklist: a list of package names excluded from build.
   If this is omitted no packages are excluded.
@@ -286,8 +364,8 @@ the packages specified in the release file:
   The first level key contains the OS name.
   The second level key contains the OS code name.
   The third level key contains the CPU architecture.
-  The OS names and OS code names specified must be listed as a platform in the
-  corresponding release or source file.
+  The OS names and OS code names specified must be listed as a release
+  platform in the corresponding distribution file.
   Each level can contain a key `_config` which can contain a dict with arbitrary data.
   These configurations can be used to specify target specific information
   (e.g. `apt_target_repository` or `yum_repository`).
@@ -305,14 +383,14 @@ the packages specified in the release file:
 * type: must be 'release-build'
 * version: version number, this REP describes version 1
 
-**Example**: A build file selecting a subset of packages from the release or source file
-and specifying the platforms and architectures.
+**Example**: A build file selecting a subset of packages from the release
+part of a distribution file and specifying the platforms and architectures.
 
 ::
 
   %YAML 1.1
   # ROS release-build file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # see REP 141: http://ros.org/reps/rep-0141.html
   ---
   package_whitelist: [ros_tutorials, common_tutorials]
   package_blacklist: [turtlesim]
@@ -344,25 +422,6 @@ Collection of all meta information of the ROS distribution, including all the in
 The cache must reference the release file and store a hash of the release file it was build from to be able to detect if the cache is invalid.
 The format of that cache is considered an implementation detail and is not specified in this REP.
 
-Source file
------------
-The source file uses a specification similar to the release file, but does not
-have a list of platforms or additional metainformation for each repository
-(status, status_description, packages
-and tags).
-Since the repository type is not limited to git each repository has to specify a type.
-
-* repositories: a list of repositories which are identified by unique names
-
-  * type: the type of SCM in use. Typically 'git', 'svn'...
-  * url: the URL of the release git repository
-    The URL should be writable (with the appropriate credentials).
-  * version: For git and hg this is the tag, branch or hash to be checked out.
-    For svn the version should not be set since the branch/tag is encoded in the url.
-
-* type: must be 'source'
-* version: version number, this REP describes version 1
-
 Source build file
 -----------------
 The source build file uses a specification similar to the release build file, but does not
@@ -371,7 +430,8 @@ Also the white- and blacklist is on a repository level and does not consider
 any kind of dependencies.
 
 * repository_whitelist: a list of repository names to build.
-  If this is omitted all repositories specified in the source file are build.
+  If this is omitted all repositories specified in the source part of the
+  distribution file are build.
 * repository_blacklist: a list of repository names excluded from build.
   If this is omitted no repositories are excluded.
   The blacklist overrides the whitelist.
@@ -385,32 +445,13 @@ any kind of dependencies.
 * type: must be 'source-build'
 * version: version number, this REP describes version 1
 
-Documentation file
-------------------
-The documentation file uses a specification similar to the source file.
-Additionally each repository can specify a list of other repositories it
-depends on.
-
-* repositories: a list of repositories which are identified by unique names
-
-  * type: the type of SCM in use. Typically 'git', 'svn'...
-  * url: the URL of the release git repository
-    The URL should be writable (with the appropriate credentials).
-  * version: For git and hg this is the tag, branch or hash to be checked out.
-    For svn the version should not be set since the branch/tag is encoded in the url.
-  * depends: list of repository names. Other repositories to perform cross
-    referencing in the documentation. This is only necessary if the packages
-    from the dependend repositories are not released. (default: [])
-
-* type: must be 'doc'
-* version: version number, this REP describes version 1
-
 Documentation build file
 ------------------------
 The documentation build file uses a specification similar to the source build file.
 
 * repository_whitelist: a list of repository names to build.
-  If this is omitted all repositories specified in the source file are build.
+  If this is omitted all repositories specified in the doc part of the
+  distribution file are build.
 * repository_blacklist: a list of repository names excluded from build.
   If this is omitted no repositories are excluded.
   The blacklist overrides the whitelist.
@@ -434,30 +475,43 @@ The documentation build file uses a specification similar to the source build fi
 
 Reference implementation
 ------------------------
-This REP is to be implemented in a Python module called *rosdistro*. This module
-will serve as a reference implementation for this REP. Any ROS tool requesting
-information defined in this REP should use this reference API implementation.
+This REP is to be implemented in version 0.3 of the Python module *rosdistro*.
+This module will serve as a reference implementation for this REP. Any ROS
+tool requesting information defined in this REP should use this reference API
+implementation.
 
 Compatibility issues
 ====================
 
-Since the new files are stored under a different URL (not in a releases
-subfolder in the rosdistro repository) the old tools will fail at some point
-when the information is not fetchable anymore form the old URL.
+To leverage the new file format additional API will be introduced (e.g.
+'rosdistro.get_distribution_file()'). The existing API to access the
+previously separated release/source/doc repositories will still be available
+and return the information from the new distribution file.
+
+Other tools not using the rosdistro API should fail gracefully since the
+version of index file has been leveled.
 
 Affected tools
 --------------
 
-* bloom [1]_: relies on rosdep to retrieve the list of targets. Changes to
-  bloom are thought to be minimal.
-* buildfarm: needs to know for which target/architecture it builds packages.
-* jenkins_scripts: provides the implementation of devel, doc and prerelease jobs
-* jenkins_tools: provides the devel and doc job generators
-* prerelease_website: needs a list of release and devel repositories
-* rosdep [2]_: rosdep also provides a list of targets (the old targets.yaml file),
-* rosinstall_gen: needs a list of release and devel repositories
-* roslocate [3]_: should be updated to use rosdistro
+For all tools it must be ensured that the used API of rosdistro (even if
+deprecated) is still working flawlessly:
 
+* bloom [1]_
+* buildfarm
+* jenkins_scripts
+* jenkins_tools
+* prerelease_website
+* rosdep [2]_
+* rosinstall_gen
+* rosinstall_generator
+* roslocate [3]_
+
+After this REP has been deployed 'rosinstall_generator' can be modified to
+enable not only checking out released packages but also source repositories.
+
+The other tools should be updated in the future to use the newly introduced
+rather then the deprecated API.
 
 Use case examples
 =================
@@ -472,6 +526,7 @@ References
 .. [3] roslocate: http://www.ros.org/reps/rep-0115.html
 .. [4] rospkg.os_detect: http://www.ros.org/reps/rep-0114.html
 .. [5] Example files specifying a ROS distro: https://github.com/ros-infrastructure/rosdistro/tree/master/test/files
+.. [6] REP 137: http://www.ros.org/reps/rep-0137.html
 
 Copyright
 =========
