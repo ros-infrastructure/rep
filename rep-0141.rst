@@ -11,11 +11,11 @@ Post-History: 18-Dez-2013
 
 Abstract
 ========
-This REP is a revised version of REP 137 [6]_.
-It specifies a set of files which define ROS distributions and
+This REP specifies a set of files which define ROS distributions and
 facilitate the building, packaging, testing and documenting process.
 The intention is to formalize the existing infrastructure and simplify hosting
 of (potentially customized) ROS buildfarms.
+This REP is a revised version of REP 137 [6]_.
 
 Motivation
 ==========
@@ -104,7 +104,7 @@ different files:
 * source.yaml
 * doc.yaml
 
-In order correlate them realiably these information will be stored in a
+In order to correlate them realiably this information will be stored in a
 single distribution.yaml file. For each repository the content from the
 separate files is nested under a common repository entry in the new
 distribution file.
@@ -116,9 +116,9 @@ package.xml is only fetched for released packages and then it is retrieved
 from the known location in the release repository.
 
 The status information is not specific to the release repository anymore
-but applies to the source and doc repository as well. This enables to
-annotate the status of repositories and packages even if they are not
-released.
+but applies to the source and doc repository as well. This allows for
+annotating annotate the status of repositories and packages even if they
+are not released.
 
 All current information can be converted into the new format using a script
 in the reference implementation.
@@ -183,7 +183,7 @@ doc files and their corresponding build files.
     hydro:
       ...
   type: index
-  version: 1
+  version: 2
 
 Distribution file
 -----------------
@@ -381,7 +381,8 @@ the packages specified in the release file:
     perform a sync. (default: [])
 
 * type: must be 'release-build'
-* version: version number, this REP describes version 1
+* version: version number, this REP describes version 1, since the
+  specification is the same as in REP 137
 
 **Example**: A build file selecting a subset of packages from the release
 part of a distribution file and specifying the platforms and architectures.
@@ -443,7 +444,8 @@ any kind of dependencies.
 * jenkins_job_timeout: the timeout in minutes for each job (optional).
 
 * type: must be 'source-build'
-* version: version number, this REP describes version 1
+* version: version number, this REP describes version 1, since the
+  specification is the same as in REP 137
 
 Documentation build file
 ------------------------
@@ -471,7 +473,8 @@ The documentation build file uses a specification similar to the source build fi
   * version: This is the branch to be checked out and committed to.
 
 * type: must be 'doc-build'
-* version: version number, this REP describes version 1
+* version: version number, this REP describes version 1, since the
+  specification is the same as in REP 137
 
 Reference implementation
 ------------------------
