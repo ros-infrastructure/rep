@@ -4,8 +4,8 @@ Author: Dirk Thomas
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
-Created: 18-Dez-2013
-Post-History: 18-Dez-2013
+Created: 18-Dec-2013
+Post-History: 18-Dec-2013
 
 .. contents::
 
@@ -150,7 +150,7 @@ The information stored in the index file is:
 
   For each distribution further information are referenced:
 
-  * repositories: reference to the distribution file
+  * distribution: reference to the distribution file
   * release_builds: list of references to the release-build files used to build the binary packages
   * release_cache: reference to a release cache. Whether this field is
     a dictionary, a list or a scalar is left as an implementation detail. The
@@ -175,7 +175,7 @@ doc files and their corresponding build files.
   ---
   distributions:
     groovy:
-      repositories: groovy/groovy.yaml
+      distribution: groovy/distribution.yaml
       release_builds: [groovy/release-build-ubuntu.yaml, releases/release-build-arm.yaml]
       release_cache: http://www.example.com/groovy-cache
       source_builds: [groovy/source-build.yaml]
