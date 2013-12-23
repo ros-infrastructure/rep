@@ -491,8 +491,14 @@ To leverage the new file format additional API will be introduced (e.g.
 previously separated release/source/doc repositories will still be available
 and return the information from the new distribution file.
 
-Other tools not using the rosdistro API should fail gracefully since the
-version of index file has been leveled.
+As soon as the new version of 'rosdistro' is released the 'ros/rosdistro'
+repository [7]_ is being updated to the new format (for Groovy and higher).
+Any client accessing trying to access the data with an old 'rosdistro'
+version will get an error message like this:
+
+::
+
+  Unable to handle 'index' format version '1', please update rosdistro
 
 Affected tools
 --------------
@@ -514,7 +520,8 @@ After this REP has been deployed 'rosinstall_generator' can be modified to
 enable not only checking out released packages but also source repositories.
 
 The other tools should be updated in the future to use the newly introduced
-rather then the deprecated API.
+rather then the deprecated API. After some migration period the deprecated
+API might be removed from 'rosdistro'.
 
 Use case examples
 =================
