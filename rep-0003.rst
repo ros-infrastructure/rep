@@ -106,7 +106,7 @@ Indigo Igloo (May 2014)
 - C++03
 - Boost 1.53
 - Lisp SBCL 1.0.x
-- Python 2.7 + 3.3
+- Python 2.7 (Additional testing against Python 3.3 recommended)
 - CMake 2.8.11
 
 Motivation
