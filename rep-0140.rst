@@ -194,9 +194,9 @@ have been discussed in [7]_.  They are described using:
  * `\<build_export_depend\> (multiple)`_
  * `\<buildtool_depend\> (multiple)`_
  * `\<buildtool_export_depend\> (multiple)`_
+ * `\<exec_depend\> (multiple)`_
  * `\<depend\> (multiple)`_
  * `\<doc_depend\> (multiple)`_
- * `\<exec_depend\> (multiple)`_
  * `\<test_depend\> (multiple)`_
  * `\<conflict\> (multiple)`_
  * `\<replace\> (multiple)`_
@@ -469,7 +469,26 @@ build dependencies, which may be linked with your package and must be
 compiled for the target architecture.
 
 
-Attributes 
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<exec_depend> (multiple)
+------------------------
+
+Declares a rosdep key or ROS package name that this package needs at
+execution-time.  For system packages, the rosdep key will normally
+*not* specify the "development" package, so it will generally lack the
+``"-dev"`` suffix.
+
+The ``<exec_depend>`` is needed for packages providing shared
+libraries, executable commands, Python modules, launch scripts or any
+other files required for running your package.  It is also used by
+metapackages for grouping packages.
+
+Attributes
 ''''''''''
 
  The same attributes as for `\<build_depend\> (multiple)`_.
@@ -501,25 +520,6 @@ Documentation and will be built with the CMake variable
 building documentation is enabled, the ``<doc_depend>`` packages are
 available for configuring and building it.  Generated Debian packages
 are built without documentation or its dependencies.
-
-Attributes
-''''''''''
-
- The same attributes as for `\<build_depend\> (multiple)`_.
-
-
-<exec_depend> (multiple)
-------------------------
-
-Declares a rosdep key or ROS package name that this package needs at
-execution-time.  For system packages, the rosdep key will normally
-*not* specify the "development" package, so it will generally lack the
-``"-dev"`` suffix.
-
-The ``<exec_depend>`` is needed for packages providing shared
-libraries, executable commands, Python modules, launch scripts or any
-other files required for running your package.  It is also used by
-metapackages for grouping packages.
 
 Attributes
 ''''''''''
