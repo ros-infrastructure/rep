@@ -331,7 +331,7 @@ Commonly used license strings:
  - GPLv3
  - LGPLv2.1
  - LGPLv3
- - MIT 
+ - MIT
  - Mozilla Public License Version 1.1
 
 <url> (multiple)
@@ -444,7 +444,7 @@ specify the "development" package, which frequently ends in
 ``"-dev"``.
 
 
-Attributes 
+Attributes
 ''''''''''
 
  The same attributes as for `\<build_depend\> (multiple)`_.
@@ -474,7 +474,7 @@ multiple reasons.  A ``<depend>`` tag is equivalent to specifying
 ``<build_depend>``, ``<build_export_depend>`` and ``<exec_depend>``,
 all on the same package.
 
-Attributes 
+Attributes
 ''''''''''
 
  The same attributes as for `\<build_depend\> (multiple)`_.
@@ -601,7 +601,7 @@ ignore it.
 
 Specifying ``<architecture_independent/>`` is recommended for
 metapackages and for packages defining only ROS messages and services.
-Python-only packages are reasonable candidates, too.  
+Python-only packages are reasonable candidates, too.
 
 Be sure to remove this tag if some subsequent update adds
 architecture-dependent targets to a formerly independent package.
@@ -751,7 +751,7 @@ Copyright
 This document has been placed in the public domain.
 
 
-
+
 ..
    Local Variables:
    mode: indented-text
