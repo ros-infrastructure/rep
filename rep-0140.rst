@@ -460,7 +460,7 @@ Attributes
 
 
 <buildtool_export_depend> (multiple)
------------------------------
+------------------------------------
 
 Declares a rosdep key or ROS package name that this package exports
 which must be compiled and run on the build system, not the target
@@ -509,7 +509,7 @@ Attributes
 
 
 <doc_depend> (multiple)
-------------------------
+-----------------------
 
 Declares a rosdep key or ROS package name that your package needs for
 building its documentation.  A ``<doc_depend>`` *may* reference a
