@@ -1,5 +1,5 @@
 REP: 140
-Title: Package manifest format two specification
+Title: Package Manifest Format Two Specification
 Author: Dirk Thomas, Jack O'Quin
 Status: Draft
 Type: Standards Track
@@ -12,7 +12,7 @@ Outline
 #. Abstract_
 #. Motivation_
 #. Rationale_
-#. `Data representation`_
+#. `Data Representation`_
 #. Compatibility_
 #. References_
 #. Copyright_
@@ -31,14 +31,20 @@ Motivation
 
 Overall, the initial package definition worked well.  Hundreds of
 packages were converted from rosbuild to catkin using that interface.
-But, experience has revealed some areas needing improvement.
+But, experience has revealed some areas which need to be improved.
 
 The biggest problem was user confusion due to the two meanings of the
 ``<run_depend>`` tag.  Replacing it with ``<exec_depend>`` and
 ``<build_export_depend>`` makes the semantics of both types much clearer.
 
 A lesser issue was the need to declare most ROS package dependencies
-twice, using both ``<run_depend>`` and ``<build_depend>``.
+twice, using both ``<run_depend>`` and ``<build_depend>``. To aleviate this
+redundancy the ``<depend>`` tag was introduced.
+
+Also, as use of the package format has matured, the need has arrisen for
+some additional dependency tag types, e.g. ``<doc_depend>``. Additionally,
+the ``<test_depend>`` tag's semantics is changed such that you do not have
+to additionally list it as a ``<build_depend>`` tag.
 
 
 Rationale
@@ -128,7 +134,7 @@ separate ``<build_depend>`` is required in that case.  Moreover,
 packages needed for several reasons may now be declared using any
 desired combination of dependency types, including ``<test_depend>``.
 
-Data representation
+Data Representation
 ===================
 
 The package manifest is an XML file, with restricted syntax.
@@ -188,9 +194,9 @@ have been discussed in [7]_.  They are described using:
  * `\<build_export_depend\> (multiple)`_
  * `\<buildtool_depend\> (multiple)`_
  * `\<buildtool_export_depend\> (multiple)`_
+ * `\<exec_depend\> (multiple)`_
  * `\<depend\> (multiple)`_
  * `\<doc_depend\> (multiple)`_
- * `\<exec_depend\> (multiple)`_
  * `\<test_depend\> (multiple)`_
  * `\<conflict\> (multiple)`_
  * `\<replace\> (multiple)`_
@@ -225,9 +231,7 @@ Example
     <name>my_package</name>
     <version>1.2.3</version>
     <description>
-      ROS communications-related packages, including core client
-      libraries (roscpp, rospy, roslisp) and graph introspection tools
-      (rostopic, rosnode, rosservice, rosparam).
+      This is my package's description.
     </description>
     <maintainer email="someone@example.com">Someone</maintainer>
 
@@ -235,11 +239,12 @@ Example
     <license>LGPL</license>
 
     <url type="website">http://wiki.ros.org/my_package</url>
+    <url type="repository">http://www.github.com/my_org/my_package</url>
     <url type="bugtracker">http://www.github.com/my_org/my_package/issues</url>
-    <author>Jane Doe</author>
+    <author>John Doe</author>
     <author email="jane.doe@example.com">Jane Doe</author>
 
-    <build_depend>catkin</build_depend>
+    <buildtool_depend>catkin</buildtool_depend>
     <build_depend version_gte="1.1" version_lt="2.0">genmsg</build_depend>
 
     <depend>roscpp</depend>
@@ -250,7 +255,11 @@ Example
 
     <test_depend>gtest</test_depend>
 
-    <conflict>my_old_package</conflict>
+    <doc_depend>doxygen</doc_depend>
+
+    <conflict>alternative_implementation</conflict>
+
+    <replace>my_old_package</replace>
 
     <export>
       ...
@@ -331,7 +340,7 @@ Commonly used license strings:
  - GPLv3
  - LGPLv2.1
  - LGPLv3
- - MIT 
+ - MIT
  - Mozilla Public License Version 1.1
 
 <url> (multiple)
@@ -444,7 +453,7 @@ specify the "development" package, which frequently ends in
 ``"-dev"``.
 
 
-Attributes 
+Attributes
 ''''''''''
 
  The same attributes as for `\<build_depend\> (multiple)`_.
@@ -459,39 +468,6 @@ system.  For cross-compilation, one must distinguish these from target
 build dependencies, which may be linked with your package and must be
 compiled for the target architecture.
 
-
-Attributes 
-''''''''''
-
- The same attributes as for `\<build_depend\> (multiple)`_.
-
-
-<depend> (multiple)
--------------------
-
-Declares a rosdep key or ROS package name that this package needs for
-multiple reasons.  A ``<depend>`` tag is equivalent to specifying
-``<build_depend>``, ``<build_export_depend>`` and ``<exec_depend>``,
-all on the same package.
-
-Attributes 
-''''''''''
-
- The same attributes as for `\<build_depend\> (multiple)`_.
-
-
-<doc_depend> (multiple)
-------------------------
-
-Declares a rosdep key or ROS package name that your package needs for
-building its documentation.  A ``<doc_depend>`` *may* reference a
-package also declared as some other type of dependency.
-
-Documentation and will be built with the CMake variable
-``CATKIN_ENABLE_DOC`` is set to ``1``, as it is by default.  When
-building documentation is enabled, the ``<doc_depend>`` packages are
-available for configuring and building it.  Generated Debian packages
-are built without documentation or its dependencies.
 
 Attributes
 ''''''''''
@@ -511,6 +487,39 @@ The ``<exec_depend>`` is needed for packages providing shared
 libraries, executable commands, Python modules, launch scripts or any
 other files required for running your package.  It is also used by
 metapackages for grouping packages.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<depend> (multiple)
+-------------------
+
+Declares a rosdep key or ROS package name that this package needs for
+multiple reasons.  A ``<depend>`` tag is equivalent to specifying
+``<build_depend>``, ``<build_export_depend>`` and ``<exec_depend>``,
+all on the same package.
+
+Attributes
+''''''''''
+
+ The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+<doc_depend> (multiple)
+------------------------
+
+Declares a rosdep key or ROS package name that your package needs for
+building its documentation.  A ``<doc_depend>`` *may* reference a
+package also declared as some other type of dependency.
+
+Documentation will be built if the CMake variable
+``CATKIN_ENABLE_DOC`` is set to ``1``, as it is by default.  When
+building documentation is enabled, the ``<doc_depend>`` packages are
+available for configuring and building it.  Generated Debian packages
+are built without documentation or its dependencies.
 
 Attributes
 ''''''''''
@@ -601,7 +610,7 @@ ignore it.
 
 Specifying ``<architecture_independent/>`` is recommended for
 metapackages and for packages defining only ROS messages and services.
-Python-only packages are reasonable candidates, too.  
+Python-only packages are reasonable candidates, too.
 
 Be sure to remove this tag if some subsequent update adds
 architecture-dependent targets to a formerly independent package.
@@ -751,7 +760,7 @@ Copyright
 This document has been placed in the public domain.
 
 
-
+
 ..
    Local Variables:
    mode: indented-text
