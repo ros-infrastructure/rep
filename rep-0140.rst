@@ -31,14 +31,20 @@ Motivation
 
 Overall, the initial package definition worked well.  Hundreds of
 packages were converted from rosbuild to catkin using that interface.
-But, experience has revealed some areas needing improvement.
+But, experience has revealed some areas which need to be improved.
 
 The biggest problem was user confusion due to the two meanings of the
 ``<run_depend>`` tag.  Replacing it with ``<exec_depend>`` and
 ``<build_export_depend>`` makes the semantics of both types much clearer.
 
 A lesser issue was the need to declare most ROS package dependencies
-twice, using both ``<run_depend>`` and ``<build_depend>``.
+twice, using both ``<run_depend>`` and ``<build_depend>``. To aleviate this
+redundancy the ``<depend>`` tag was introduced.
+
+Also, as use of the package format has matured, the need has arrisen for
+some additional dependency tag types, e.g. ``<doc_depend>``. Additionally,
+the ``<test_depend>`` tag's semantics is changed such that you do not have
+to additionally list it as a ``<build_depend>`` tag.
 
 
 Rationale
