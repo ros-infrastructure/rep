@@ -1,5 +1,5 @@
 REP: 140
-Title: Package manifest format two specification
+Title: Package Manifest Format Two Specification
 Author: Dirk Thomas, Jack O'Quin
 Status: Draft
 Type: Standards Track
@@ -12,7 +12,7 @@ Outline
 #. Abstract_
 #. Motivation_
 #. Rationale_
-#. `Data representation`_
+#. `Data Representation`_
 #. Compatibility_
 #. References_
 #. Copyright_
@@ -128,7 +128,7 @@ separate ``<build_depend>`` is required in that case.  Moreover,
 packages needed for several reasons may now be declared using any
 desired combination of dependency types, including ``<test_depend>``.
 
-Data representation
+Data Representation
 ===================
 
 The package manifest is an XML file, with restricted syntax.
