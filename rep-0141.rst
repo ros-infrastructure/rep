@@ -47,9 +47,9 @@ The use cases this REP is designed to address are:
 
 Design requirements
 ===================
-The information formalized in this REP is used in four separate processes:
+The information formalized in this REP is used in five separate processes:
 
-* releasing a package
+* releasing a package.
   This is the process of exporting upstream source and generating platform
   specific build files specific meta-information)
 * building binary packages for a specific platform and architecture
@@ -117,7 +117,7 @@ from the known location in the release repository.
 
 The status information is not specific to the release repository anymore
 but applies to the source and doc repository as well. This allows for
-annotating annotate the status of repositories and packages even if they
+annotating the status of repositories and packages even if they
 are not released.
 
 All current information can be converted into the new format using a script
@@ -247,7 +247,7 @@ Each distribution file contains the following information:
     current status of the repository.  For example detailing the reason
     for EOL and the recommended upgrade path.
   * status_per_package: an optional list of package names.  For each package
-    name a dictionary with the following optional keys allow to override the
+    name a dictionary with the following optional keys allows to override the
     status information:
 
     * status: overrides the repository-wide status
@@ -347,7 +347,7 @@ the packages specified in the release file:
 
 * package_whitelist: a list of package names to build.
   If this is omitted all packages specified in the release part of the
-  distribution file are build.
+  distribution file are built.
   Any upstream packages are implicitly included.
 * package_blacklist: a list of package names excluded from build.
   If this is omitted no packages are excluded.
@@ -360,7 +360,7 @@ the packages specified in the release file:
   * maintainers: a boolean flag used to enable email notification to listed maintainers. (default: false)
   * committers: a boolean flag used to enable email notification to committers. (default: false)
 
-* targets: a nested dict of targets for which packages are build.
+* targets: a nested dict of targets for which packages are built.
   The first level key contains the OS name.
   The second level key contains the OS code name.
   The third level key contains the CPU architecture.
@@ -432,7 +432,7 @@ any kind of dependencies.
 
 * repository_whitelist: a list of repository names to build.
   If this is omitted all repositories specified in the source part of the
-  distribution file are build.
+  distribution file are built.
 * repository_blacklist: a list of repository names excluded from build.
   If this is omitted no repositories are excluded.
   The blacklist overrides the whitelist.
@@ -453,7 +453,7 @@ The documentation build file uses a specification similar to the source build fi
 
 * repository_whitelist: a list of repository names to build.
   If this is omitted all repositories specified in the doc part of the
-  distribution file are build.
+  distribution file are built.
 * repository_blacklist: a list of repository names excluded from build.
   If this is omitted no repositories are excluded.
   The blacklist overrides the whitelist.
@@ -537,6 +537,7 @@ References
 .. [4] rospkg.os_detect: http://www.ros.org/reps/rep-0114.html
 .. [5] Example files specifying a ROS distro: https://github.com/ros-infrastructure/rosdistro/tree/master/test/files
 .. [6] REP 137: http://www.ros.org/reps/rep-0137.html
+-- [7] rosdistro repository: https://github.com/ros/rosdistro
 
 Copyright
 =========
