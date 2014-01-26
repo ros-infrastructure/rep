@@ -49,8 +49,8 @@ Design requirements
 ===================
 The information formalized in this REP is used in five separate processes:
 
-* releasing a package.
-  This is the process of exporting upstream source and generating platform
+* releasing a package
+  (This is the process of exporting upstream source and generating platform
   specific build files specific meta-information)
 * building binary packages for a specific platform and architecture
 * running automated tests
