@@ -537,7 +537,7 @@ References
 .. [4] rospkg.os_detect: http://www.ros.org/reps/rep-0114.html
 .. [5] Example files specifying a ROS distro: https://github.com/ros-infrastructure/rosdistro/tree/master/test/files
 .. [6] REP 137: http://www.ros.org/reps/rep-0137.html
--- [7] rosdistro repository: https://github.com/ros/rosdistro
+.. [7] rosdistro repository: https://github.com/ros/rosdistro
 
 Copyright
 =========
