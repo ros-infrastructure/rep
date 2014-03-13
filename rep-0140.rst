@@ -5,6 +5,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 26-Jun-2013
+Post-History: 12-Mar-2014
 
 Outline
 =======
@@ -97,7 +98,7 @@ Disabling unit tests
 --------------------
 
 Formerly, catkin unit tests were not cleanly separated from the rest
-of the package and where always configured (even if not being built
+of the package and were always configured (even if not being built
 later).  But there are sometimes reasons to build a package without its
 tests or their configure time dependencies.  For generated Debian or RPM
 packages they would not run anyway, and should not be installed.  When
@@ -133,7 +134,7 @@ declaring ``<test_depend>rostest</test_depend>`` was considered an
 error.
 
 With format two, a ``<test_depend>`` for rostest works as expected, no
-separate ``<build_depend>`` is required in that case.  That assumed that
+separate ``<build_depend>`` is required in that case.  That assumes that
 the configure step is done with the flag ``CATKIN_ENABLE_TESTING`` being
 set and that the package correctly uses the flag to disable all
 configuration of unit tests.  Moreover, packages needed for several
@@ -506,9 +507,9 @@ Attributes
 Declares a rosdep key or ROS package name that this package needs for
 multiple reasons.  A ``<depend>`` tag is equivalent to specifying
 ``<build_depend>``, ``<build_export_depend>`` and ``<exec_depend>``,
-all on the same package.  It is not allowed to use the ``<depend>``
-tag in combination with any of the three equivalent tags for the same
-package name.
+all on the same package or key.  The ``<depend>`` tag cannot be used
+in combination with any of the three equivalent tags for the same
+package or key name.
 
 Attributes
 ''''''''''
@@ -525,12 +526,12 @@ package also declared as some other type of dependency.
 
 The current version of the buildsystem does not provide any
 documentation specific functionality or targets but may do so in the
-future similar to how theunit tests are integrated into the configure
+future, similar to how the unit tests are integrated into the configure
 and make steps.  Other infrastructure (like the documentation jobs on
 the buildfarm) will utilize these additional doc dependencies.
 
-Generated Debian packages are built without the documentation or their
-dependencies.
+Generated Debian packages are built without the documentation or the
+documentation dependencies.
 
 Attributes
 ''''''''''
