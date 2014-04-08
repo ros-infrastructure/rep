@@ -43,9 +43,9 @@ End-user entry points
 
 We define the same three main entry points for ROS users as REP 108 [1]_.
 
- * desktop-full (recommended)
+ * desktop_full (recommended)
  * desktop
- * ros-base
+ * ros_base
 
 Metapackages
 ------------
@@ -53,13 +53,13 @@ Metapackages
 ROS Base
 ''''''''
 
-The `ros-base` metapackages composes the `ros_core` metapackage which contains core 
+The `ros_base` metapackages composes the `ros_core` metapackage which contains core 
 communication protocols with commonly used libraries. 
 It may not contain any GUI dependencies.
 
 ::
 
-  - ros-base:
+  - ros_base:
       extends: [ros_core]
       packages: [actionlib, bond_core, class_loader, common_tutorials, dynamic_reconfigure,
                  nodeliet_core, pluginlib] 
@@ -81,7 +81,7 @@ It may not contain any GUI dependencies.
 ::
 
   - robot:
-      extends: [ros-base]
+      extends: [ros_base]
       packages: [control_msgs, diagnostics, executive_smach, filters, 
                  geometry, robot_model, robot_state_publisher, xacro]
 
@@ -115,7 +115,7 @@ Desktop variants
 ''''''''''''''''
 
 The `desktop` variants are main entry points for users.  The
-`desktop-full` is a "batteries included" experience for users and
+`desktop_full` is a "batteries included" experience for users and
 attempts to collect stable, well-documented libraries.  These
 libraries may be specific to certain classes of robots, such as mobile
 robots, though they are not specific to a particular robot.  The
@@ -129,7 +129,7 @@ variants contain tutorials for the stacks they provide.
       extends: [robot, viz]
       packages: [geometry_tutorials, rqt_robot_plugins, urdf_tutorials,
                  visualization_tutorials]
-  - desktop-full:
+  - desktop_full:
       extends: [desktop, perception, simulators]
 
       
