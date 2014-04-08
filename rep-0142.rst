@@ -75,7 +75,8 @@ Robot metapackage
 '''''''''''''''''
 
 The `robot` metapackage is defined to be core, stable, ROS libraries for
-any robot hardware.  It is the "general robotics" libraries of ROS.
+any robot hardware.
+It is the "general robotics" libraries of ROS.
 It may not contain any GUI dependencies.
 
 ::
@@ -90,9 +91,10 @@ Capability variants
 '''''''''''''''''''
 
 The capability variants organize commonly used libraries that are
-specific to a class of use case.  We also define a `simulators` variant
-that provides an organizational role for higher-level variants.  We
-discourage GUI dependencies in these stacks, if possible.
+specific to a class of use case.
+We also define a `simulators` variant
+that provides an organizational role for higher-level variants.
+We discourage GUI dependencies in these stacks, if possible.
 
 ::
 
@@ -114,14 +116,14 @@ discourage GUI dependencies in these stacks, if possible.
 Desktop variants
 ''''''''''''''''
 
-The `desktop` variants are main entry points for users.  The
-`desktop_full` is a "batteries included" experience for users and
-attempts to collect stable, well-documented libraries.  These
-libraries may be specific to certain classes of robots, such as mobile
-robots, though they are not specific to a particular robot.  The
-`desktop` variant is more minimal and only provides the stacks in the
-`robot` variant, plus visualization and debugging tools.  Both of these
-variants contain tutorials for the stacks they provide.
+The `desktop` variants are main entry points for users.
+The `desktop_full` is a "batteries included" experience for users and
+attempts to collect stable, well-documented libraries.
+These libraries may be specific to certain classes of robots, such as mobile
+robots, though they are not specific to a particular robot.
+The `desktop` variant is more minimal and only provides the stacks in the
+`robot` variant, plus visualization and debugging tools.
+Both of these variants contain tutorials for the stacks they provide.
 
 ::
 
