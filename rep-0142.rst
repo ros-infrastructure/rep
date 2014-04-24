@@ -1,7 +1,7 @@
 REP: 142
 Title: ROS Indigo Metapackages
 Author: Tully Foote <tfoote@willowgarage.com>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 07-Apr-2014
