@@ -124,40 +124,7 @@ Rationale
 Target platforms for future releases are speculative and are based on
 consulting Ubuntu's release and end-of-life schedule [1]_. 
 
-The following rules are used for choosing the target platforms. They
-aim to limit the number of supported Ubuntu version for each ROS
-distribution to a small number (<= 3) as well as provide a reasonable
-upgrade path for users as well as maintainers of packages.
-
-* The latest Ubuntu version (released around the same time as the ROS
-  distribution).
-
-* The current Ubuntu LTS version.
-
-* The previous Ubuntu version.
-
-* At least one Ubuntu version which is common with the two previous
-  ROS distributions.
-
-Any "formula" requires making assumptions about future Ubuntu library
-choices and other crystal-ball projections. While we will do our best
-to follow the assumed target schedule, we reserve the right to change
-support targets based on Ubuntu library choices or other
-considerations. For example, the formula above assumes that a ROS
-distribution release can be made compatible with *future* Ubuntu
-releases. In the event that forward integration cannot be done without
-introducing destabilizing changes, preference will always be given to
-maintaining stability of the existing release.
-
-We generally expect to use the ROS Distribution release prior to an
-Ubuntu LTS release to transition to newer libraries and drop support
-for older platforms. Our past experience with Ubuntu releases is that
-the release prior to an LTS release (e.g. Karmic (9.10)) incorporates major
-jumps in library versions; also, this release is generally very
-similar to the LTS release. Requiring that all stacks be compatible
-across a wide spread of Ubuntu releases can be very difficult,
-especially for libraries like Boost that do not provide for backwards
-compatibility.
+These targets are based on the Distribution Timeline to meet minimum requirements. [3]_ 
 
 C++
 ---
@@ -237,6 +204,9 @@ References and Footnotes
    
 .. [2] REP 108, ROS Diamondback Variants
    (http://www.ros.org/reps/rep-0108.html)
+   
+.. [3] Distribution Timeline
+   (http://wiki.ros.org/Distributions/Timeline)
 
 Copyright
 =========
