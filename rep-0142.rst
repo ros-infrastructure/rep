@@ -50,11 +50,26 @@ We define the same three main entry points for ROS users as REP 108 [1]_.
 Metapackages
 ------------
 
+ROS Core
+''''''''
+
+The `ros_core` metapackage composes the core communication protocols.
+It may not contain any GUI dependencies.
+
+::
+
+ - ros_core: 
+      extends: [ros, ros_comm]
+      packages: [catkin, cmake_modules, common_msgs, console_bridge, gencpp,
+                 genlisp, genmsg, genpy, message_generation, message_runtime,
+                 ros_comm_msgs, ros_tutorials, rosbag_migration_rules, 
+                 rosconsole_bridge, roscpp_core, roslisp, rospack, std_msgs]
+
 ROS Base
 ''''''''
 
-The `ros_base` metapackages composes the `ros_core` metapackage which contains core 
-communication protocols with commonly used libraries. 
+The `ros_base` metapackage composes the `ros_core` metapackage with commonly
+used libraries.
 It may not contain any GUI dependencies.
 
 ::
@@ -63,13 +78,6 @@ It may not contain any GUI dependencies.
       extends: [ros_core]
       packages: [actionlib, bond_core, class_loader, common_tutorials, dynamic_reconfigure,
                  nodelet_core, pluginlib] 
-
- - ros_core: 
-      extends: [ros, ros_comm]
-      packages: [catkin, cmake_modules, common_msgs, console_bridge, gencpp,
-                 genlisp, genmsg, genpy, message_generation, message_runtime,
-                 ros_comm_msgs, ros_tutorials, rosbag_migration_rules, 
-                 rosconsole_bridge, roscpp_core, roslisp, rospack, std_msgs]
 
 Robot metapackage
 '''''''''''''''''
@@ -130,7 +138,7 @@ Both of these variants contain tutorials for the stacks they provide.
   - desktop:
       extends: [robot, viz]
       packages: [geometry_tutorials, rqt_robot_plugins, urdf_tutorials,
-                 visualization_tutorials]
+                 visualization_tutorials, roslint]
   - desktop_full:
       extends: [desktop, perception, simulators]
 
