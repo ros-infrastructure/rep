@@ -141,8 +141,8 @@ Both of these variants contain tutorials for the stacks they provide.
 
   - desktop:
       extends: [robot, viz]
-      packages: [geometry_tutorials, rqt_robot_plugins, urdf_tutorials,
-                 visualization_tutorials, roslint]
+      packages: [geometry_tutorials, roslint, rqt_robot_plugins,
+                 urdf_tutorials, visualization_tutorials]
   - desktop_full:
       extends: [desktop, perception, simulators]
 
