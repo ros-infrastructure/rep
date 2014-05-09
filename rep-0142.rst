@@ -81,7 +81,7 @@ It may not contain any GUI dependencies.
 
   - ros_base:
       extends: [ros_core]
-      packages: [actionlib, bond_core, class_loader,
+      packages: [actionlib, angles, bond_core, class_loader,
                  common_tutorials, dynamic_reconfigure, nodelet_core,
                  pluginlib]
 
