@@ -67,7 +67,7 @@ It may not contain any GUI dependencies.
       packages: [catkin, cmake_modules, common_msgs, console_bridge,
                  gencpp, genlisp, genmsg, genpy, message_generation,
                  message_runtime, ros_comm_msgs, ros_tutorials,
-                 rosbag_migration_rules, rosconsole_bridge,
+                 rosbag_migration_rule, rosconsole_bridge,
                  roscpp_core, roslisp, rospack, std_msgs]
 
 ROS Base
