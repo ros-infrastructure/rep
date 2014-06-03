@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 07-Apr-2014
-Post-History: 07-Apr-2014
+Post-History: 03-Jun-2014
 
 
 Abstract
@@ -120,11 +120,12 @@ We discourage GUI dependencies in these stacks, if possible.
 
   - simulators:
       extends: [robot]
-      packages: [gazebo_ros_pkgs, rqt_robot_plugins, stage_ros]
+      packages: [gazebo_ros_pkgs, rqt_common_plugins, rqt_robot_plugins,
+                 stage_ros]
 
   - viz:
       extends: [robot]
-      packages: [rqt_robot_plugins, rviz]
+      packages: [rqt_common_plugins, rqt_robot_plugins, rviz]
 
 Desktop variants
 ''''''''''''''''
@@ -142,8 +143,9 @@ Both of these variants contain tutorials for the stacks they provide.
 
   - desktop:
       extends: [robot, viz]
-      packages: [geometry_tutorials, roslint, rqt_robot_plugins,
-                 urdf_tutorials, visualization_tutorials]
+      packages: [geometry_tutorials, roslint, rqt_common_plugins,
+                 rqt_robot_plugins, urdf_tutorials,
+                 visualization_tutorials]
   - desktop_full:
       extends: [desktop, perception, simulators]
 
