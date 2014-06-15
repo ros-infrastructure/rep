@@ -77,6 +77,8 @@ Fuerte Turtle (Mar 2012)
 - Lisp SBCL 1.0.x
 - Python 2.6
 
+- a first version of catkin has been introduces but it is not recommended to be used by packages other then in the ROS core
+
 Groovy Galapagos (Oct 2012)
 ---------------------------
 - Ubuntu Oneiric (11.10)
@@ -87,6 +89,9 @@ Groovy Galapagos (Oct 2012)
 - Lisp SBCL 1.0.x
 - Python 2.7
 - CMake 2.8.3
+
+- catkin has been officially introduced
+- the ROS buildfarm supports releasing, documenting and continuous integration testing packages which are based on either catkin or rosbuild
 
 Hydro Medusa (Aug 2013)
 -----------------------
@@ -99,6 +104,12 @@ Hydro Medusa (Aug 2013)
 - Python 2.7
 - CMake 2.8.3
 
+- the ROS buildfarm supports:
+  - releasing only catkin-based packages
+  - documenting and continuous integration testing packages which are based on either catkin or rosbuild
+- rosbuild-based packages can still be built from source
+
+
 Indigo Igloo (May 2014)
 -----------------------
 - Ubuntu Saucy (13.10)
@@ -108,6 +119,10 @@ Indigo Igloo (May 2014)
 - Lisp SBCL 1.0.x
 - Python 2.7 (Additional testing against Python 3.3 recommended)
 - CMake 2.8.11
+
+- the ROS buildfarm supports:
+  - releasing, documenting and continuous integration testing only catkin-based packages
+- rosbuild-based packages can still be built from source
 
 Motivation
 ==========
@@ -165,6 +180,24 @@ The preferred migration strategy is to support both Python 2.7 and
 Python >= 3.2 in each source script. Supporting any version earlier
 than 2.6 makes that task harder. Python 3.0 and 3.1 will probably
 never be supported explicitly, although some things may work.
+
+catkin / rosbuild support
+=========================
+
+catkin was officially introduced in Groovy beside rosbuild.
+
+Since even half a year after the Hydro release not a single rosbuild-based
+package was released the support for building Debian packages of rosbuild-based
+packages has been discontinued in Hydro.
+
+As of Indigo the ROS buildfarm also only supports documenting and continuous
+integration testing of catkin-based packages.
+Since Indigo is a LTS release and aims to be supported for several years
+maintaining the legacy code for rosbuild-based packages seems to be
+impractical.
+
+rosbuild-based packages can still be built from source (which should also be
+supported in upcoming ROS distributions).
 
 Core Stacks
 ===========
