@@ -128,6 +128,13 @@ the system.  Usually this is installed from your package manager.  The
 default for this location is ``/opt/ros/ROSDISTRO`` where ROSDISTRO is
 the codename for the ROS distro being used.
 
+Result Space
+------------
+The term result space can be used for either a development space or an
+install space.
+In cases where either of those two specific terms would do, the
+generic term should be used instead.
+
 
 Overlays
 ========
