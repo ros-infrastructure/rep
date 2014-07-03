@@ -1,11 +1,11 @@
 REP: 128
 Title: Naming Conventions for Catkin Based Workspaces
-Author: Tully Foote
+Author: Tully Foote, Dirk Thomas
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 16-Oct-2012
-Post-History: 30-Aug-2002
+Post-History: 03-Jul-2014
 
 
 Abstract
@@ -110,6 +110,12 @@ artifacts from the associated source space.
 After the build step, inside this folder is expected everything needed
 to run nodes in packages which have been built.
 
+The development space can not be a folder which contains ROS packages
+in subfolders.
+E.g. it can not equal to the workspace root as this would make the
+source space a subfolder which would lead to packages being found
+multiple times.
+
 Install Space
 -------------
 
@@ -118,6 +124,11 @@ will target all installations.  Again creating an FHS style directory
 structure with a setup.(ba)sh in the root. This can be set to any
 directory using the ``-DCMAKE_INSTALL_PREFIX=/any/directory`` as an
 option to cmake.  The cmake default is ``/usr/local``.
+
+The same restriction as for development spaces applies to the install
+space.
+This also implies that install spaces and development spaces must not
+be nested within each other.
 
 System Install Space
 ''''''''''''''''''''
