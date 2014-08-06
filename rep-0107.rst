@@ -191,8 +191,8 @@ Improper Usage
 Appendices:
 ===========
 
-Diagnotic Tools
----------------
+Diagnostic Tools
+----------------
 
 While user-end tools are not needed to generate and capture the
 diagnostic information, they perform a critical role in making the
