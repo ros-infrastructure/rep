@@ -1,0 +1,158 @@
+REP: 140
+Title: Package Manifest Specification For External Packages
+Author: Jonathan Bohren
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 29-Sep-2014
+Post-History: 29-Sep-2014
+
+Outline
+=======
+
+#. Abstract_
+#. Motivation_
+#. Rationale_
+#. Compatibility_
+#. References_
+#. Copyright_
+
+
+Abstract
+========
+
+This REP specifies an extension to the validation of the ``package.xml`` format,
+specified in REP-0127 [1]_ and REP-0140 [2]_.  It is relevant for packages using
+the catkin buildtool, but not necessarily the catkin CMake macros.
+
+Motivation
+==========
+
+Since the development of tools like ``catkin_make_isolated`` [3]_ and ``catkin
+build`` [4]_, it has been possible to build non-catkin packages in a catkin
+workspace alongside catkin packages. This has greatly simplified the complexity
+of workspaces when external packages without binary distributions are needed.
+
+Unfortunately, this still requires augmenting the external packages with a
+``package.xml`` file. Since manual creation of this file is necessary, it
+adds additional complexity to checking out an entire workspace of repositories
+from version control and building them.
+
+If one or more users doesn't want to re-create these ``package.xml`` files each
+time they clone a given repository, it can lead to maintaining entire forks of
+repositories just to have a version which can be easily built in a catkin
+workspace. Alternatively, they may develop additional non-standard scripts that
+generate or download these files from somewhere on the web.
+
+If these files are proliferated, the values which should be described by the
+standard ``package.xml`` tags are poorly-defined. For example, should such a
+``package.xml`` file's ``<maintainer>`` tag describe the one who created the
+package.xml file, or the name of someone associated with the upstream package?
+What if the version number doesn't fit the catkin versioning guidelines? 
+
+The package ``<description>`` tag will also be redundant with whatever is in 
+the package's README (if it exists), and is often filled with a placeholder
+just to make it pass validaiton.
+
+Furthermore, if the package has a rosdep [5]_ key, it is unlikely that the
+package name will satisfy catkin naming conventions. 
+
+Rationale
+=========
+
+REP-0127 [1]_  and REP-0140 [2]_ provide the basic ``package.xml`` design
+rationale, which is not repeated here.
+
+We accept that in order for a package to be built in a catkin workspace,
+it should be augmented with a ``package.xml`` file. The requirements
+for building and dependency resolution, however, are fewer than the
+full requirements of a normal ``package.xml`` file.
+
+In order to facilitate either quick writing or auto-generation of
+``package.xml`` files for 3rd-party packages this REP formalizes an
+additional ``<export>`` convention for external packages.
+
+Addition of <external_package/> export convention
+-------------------------------------------------
+
+This empty tag will change the validation requirements on a given
+``package.xml`` file in order to enable it to be built in a catkin workspace.
+The tag would be given in the ``<export>`` section like so::
+
+    <export>
+      <external_package/>  
+      <build_type>cmake</build_type> 
+    </export>
+
+This is similar to the behavior of the ``<metapackage/>`` export tag described
+in REP-0140 [2]_ which prohibits ``<build_depend>`` or ``<test_depend>`` tags.
+
+This means that the following would be a valid ``package.xml`` for building an
+external package in a catkin workspace.::
+
+    <?xml version="1.0"?>
+    <package>
+      <name>liburdfdom-dev</name>
+      <export>
+        <external_package/>
+        <build_type>cmake</build_type>
+      </export>
+    </package>
+
+Compatibility
+=============
+
+Modifications to REP-0127 and REP-0140
+--------------------------------------
+
+ * The following tags are required if a ``package.xml`` file contains the
+   ``<external_package/>`` tag:
+   * ``<build_type>``
+
+ * The following tags are not reqiured if a ``package.xml`` file contains the
+   ``<external_package/>`` tag:
+   * ``<description>``
+   * ``<maintainer>``
+   * ``<license>``
+   * ``<version>``
+
+ * The following tags are not validated against catkin guidelines if a ``package.xml`` file contains the
+   ``<external_package/>`` tag:
+   * ``<name>``
+
+Backward compatibility
+----------------------
+
+Neither Format one or Format two packages following REP-0127 [1]_ or REP-0140
+[2]_, respectively, are affected. This only affects the validation of tags
+in ``package.xml`` files, and only relaxes constraints. Furthermore, these
+constraints are only relaxed if the ``<external_package/>`` tag is present.
+
+
+References
+==========
+
+.. [1] REP-0127
+   (http://ros.org/reps/rep-0140)
+.. [2] REP-0140
+   (http://ros.org/reps/rep-0140)
+.. [3] ``catkin_make_isolated``
+   (http://www.github.com/ros/catkin)
+.. [4] ``catkin build``
+   (http://www.github.com/catkin/catkin_tools)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
