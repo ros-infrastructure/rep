@@ -145,7 +145,13 @@ The term result space can be used for either a development space or an
 install space.
 In cases where either of those two specific terms would do, the
 generic term should be used instead.
+To visually distinguish the result space from spaces that have a direct 
+folder name correspondence (such as the folder ``install`` for the install 
+space) it is recommended to refer to the result space as ``RESULT-SPACE`` 
+in documention, for example:
+::
 
+    source RESULT-SPACE/setup.sh
 
 Overlays
 ========
