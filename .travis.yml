@@ -1,7 +1,7 @@
 language: python
 python:
   - "2.7"
-# This is not python 3 compatible yet   - "3.3"
+  - "3.3"
 # command to install dependencies
 install:
   - pip install docutils

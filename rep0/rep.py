@@ -89,8 +89,8 @@ class Author(object):
             if part[0].isupper():
                 break
         else:
-            raise ValueError("last name missing a capital letter: %r"
-	                                                       % name_parts)
+            raise ValueError(
+                "last name missing a capital letter: %r" % name_parts)
         base = u' '.join(name_parts[index:]).lower()
         return unicodedata.normalize('NFKD', base).encode('ASCII', 'ignore')
 
@@ -121,7 +121,7 @@ class Author(object):
 class REP(object):
 
     """Representation of REPs.
-    
+
     Attributes:
 
         + number : int
@@ -168,21 +168,20 @@ class REP(object):
         header_order = iter(self.headers)
         try:
             for header_name in metadata.keys():
-                current_header, required = header_order.next()
+                current_header, required = next(header_order)
                 while header_name != current_header and not required:
-                    current_header, required = header_order.next()
+                    current_header, required = next(header_order)
                 if header_name != current_header:
                     raise REPError("did not deal with "
                                    "%r before having to handle %r" %
                                    (header_name, current_header),
                                    rep_file.name)
         except StopIteration:
-            raise REPError("headers missing or out of order",
-                                rep_file.name)
+            raise REPError("headers missing or out of order", rep_file.name)
         required = False
         try:
             while not required:
-                current_header, required = header_order.next()
+                current_header, required = next(header_order)
             else:
                 raise REPError("REP is missing its %r" % (current_header,),
                                rep_file.name)
@@ -218,23 +217,23 @@ class REP(object):
         if len(authors_and_emails) < 1:
             raise REPError("no authors found", rep_file.name,
                            self.number)
-        self.authors = map(Author, authors_and_emails)
+        self.authors = [Author(x) for x in authors_and_emails]
 
     def _parse_author(self, data):
         """Return a list of author names and emails."""
         # XXX Consider using email.utils.parseaddr (doesn't work with names
         # lacking an email address.
-        angled = ur'(?P<author>.+?) <(?P<email>.+?)>'
-        paren = ur'(?P<email>.+?) \((?P<author>.+?)\)'
-        simple = ur'(?P<author>[^,]+)'
+        angled = r'(?P<author>.+?) <(?P<email>.+?)>'
+        paren = r'(?P<email>.+?) \((?P<author>.+?)\)'
+        simple = r'(?P<author>[^,]+)'
         author_list = []
         for regex in (angled, paren, simple):
             # Watch out for commas separating multiple names.
             regex += u'(,\s*)?'
             for match in re.finditer(regex, data):
-                # Watch out for suffixes like 'Jr.' when they are comma-separated
-                # from the name and thus cause issues when *all* names are only
-                # separated by commas.
+                # Watch out for suffixes like 'Jr.' when they are
+                # comma-separated from the name and thus cause issues when
+                # *all* names are only separated by commas.
                 match_dict = match.groupdict()
                 author = match_dict['author']
                 if not author.partition(' ')[1] and author.endswith('.'):
@@ -278,9 +277,13 @@ class REP(object):
         wrapped_title = textwrap.wrap(self.title, constants.title_length - 4)
         return wrapped_title[0] + u' ...'
 
-    def __unicode__(self):
+    def __str__(self):
         """Return the line entry for the REP."""
-        rep_info = {'type': self.type_abbr, 'number': str(self.number),
-                'title': self.title_abbr, 'status': self.status_abbr,
-                'authors': self.author_abbr}
+        rep_info = {
+            'type': self.type_abbr, 'number': str(self.number),
+            'title': self.title_abbr, 'status': self.status_abbr,
+            'authors': self.author_abbr}
         return constants.column_format % rep_info
+
+    def __unicode__(self):
+        return self.__str__()
