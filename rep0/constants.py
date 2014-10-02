@@ -7,7 +7,7 @@
 
 title_length = 55
 column_format = (u' %(type)1s%(status)1s %(number)4s  %(title)-' +
-                    unicode(title_length) + u's %(authors)-s')
+                 u'%d' % title_length + u's %(authors)-s')
 
 header = u"""REP: 0
 Title: Index of ROS Enhancement Proposals (REPs)

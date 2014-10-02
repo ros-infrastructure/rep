@@ -46,10 +46,10 @@ def main(argv):
                             raise REPError('REP number does not match file name',
                                            file_path, rep.number)
                         reps.append(rep)
-                    except REPError, e:
+                    except REPError as e:
                         errmsg = "Error processing REP %s (%s), excluding:" % \
                             (e.number, e.filename)
-                        print >>sys.stderr, errmsg, e
+                        print(errmsg, e, file=sys.stderr)
                         sys.exit(1)
         reps.sort(key=attrgetter('number'))
     elif os.path.isfile(path):
