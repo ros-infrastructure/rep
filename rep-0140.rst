@@ -1,7 +1,7 @@
 REP: 140
 Title: Package Manifest Format Two Specification
 Author: Dirk Thomas, Jack O'Quin
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 26-Jun-2013
