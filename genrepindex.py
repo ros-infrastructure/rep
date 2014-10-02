@@ -14,7 +14,9 @@ With the REP information collected, to create the index itself you must:
     3. Output the REP (both by category and numerical index).
 
 """
-from __future__ import absolute_import, with_statement
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import with_statement
 
 import sys
 import os
@@ -38,13 +40,16 @@ def main(argv):
             abs_file_path = os.path.join(path, file_path)
             if not os.path.isfile(abs_file_path):
                 continue
-            if file_path.startswith("rep-") and file_path.endswith(".rst") and not file_path == 'rep-0000.rst':
-                with codecs.open(abs_file_path, 'r', encoding='UTF-8') as rep_file:
+            if file_path.startswith("rep-") and \
+                    file_path.endswith(".rst") and \
+                    not file_path == 'rep-0000.rst':
+                with codecs.open(
+                        abs_file_path, 'r', encoding='UTF-8') as rep_file:
                     try:
                         rep = REP(rep_file)
                         if rep.number != int(file_path[4:-4]):
-                            raise REPError('REP number does not match file name',
-                                           file_path, rep.number)
+                            raise REPError('REP number does not match file ' +
+                                           'name', file_path, rep.number)
                         reps.append(rep)
                     except REPError as e:
                         errmsg = "Error processing REP %s (%s), excluding:" % \

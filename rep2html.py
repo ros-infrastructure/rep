@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Convert REPs to (X)HTML - courtesy of /F
+"""Convert REPs to (X)HTML - courtesy of /F.
 
 Usage: %(PROGRAM)s [options] [<reps> ...]
 
@@ -43,7 +43,6 @@ import cgi
 import glob
 import getopt
 import errno
-import random
 import time
 
 REQUIRES = {'python': '2.2',
@@ -51,11 +50,12 @@ REQUIRES = {'python': '2.2',
 PROGRAM = sys.argv[0]
 RFCURL = 'http://www.faqs.org/rfcs/rfc%d.html'
 REPURL = 'rep-%04d.html'
-REPGITURL = ('https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst')
+REPGITURL = (
+    'https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst')
 REPDIRRUL = 'http://www.ros.org/reps/'
 
 HOST = "wgs32.willowgarage.com"                    # host for update
-HDIR = "/var/www/www.ros.org/html/reps" # target host directory
+HDIR = "/var/www/www.ros.org/html/reps"  # target host directory
 LOCALVARS = "Local Variables:"
 
 COMMENT = """<!--
@@ -69,10 +69,11 @@ to templates.  DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
 DTD = ('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"\n'
        '                      "http://www.w3.org/TR/REC-html40/loose.dtd">')
 
-fixpat = re.compile("((https?|ftp):[-_a-zA-Z0-9/.+~:?#$=&,]+)|(rep-\d+(.rst)?)|"
-                    "(RFC[- ]?(?P<rfcnum>\d+))|"
-                    "(REP\s+(?P<repnum>\d+))|"
-                    ".")
+fixpat = re.compile(
+    "((https?|ftp):[-_a-zA-Z0-9/.+~:?#$=&,]+)|(rep-\d+(.rst)?)|"
+    "(RFC[- ]?(?P<rfcnum>\d+))|"
+    "(REP\s+(?P<repnum>\d+))|"
+    ".")
 
 EMPTYSTRING = ''
 SPACE = ' '
@@ -87,6 +88,7 @@ import docutils_readers_rep
 import docutils_writers_rep
 sys.modules['docutils.readers.rep'] = docutils_readers_rep
 sys.modules['docutils.writers.rep_html'] = docutils_writers_rep
+
 
 def usage(code, msg=''):
     """Print usage message and exit.  Uses stderr if code != 0."""
@@ -103,8 +105,8 @@ def usage(code, msg=''):
 def fixanchor(current, match):
     text = match.group(0)
     link = None
-    if (text.startswith('http:') or text.startswith('https:')
-        or text.startswith('ftp:')):
+    if (text.startswith('http:') or text.startswith('https:') or
+            text.startswith('ftp:')):
         # Strip off trailing punctuation.  Pattern taken from faqwiz.
         ltext = list(text)
         while ltext:
@@ -123,13 +125,14 @@ def fixanchor(current, match):
         link = RFCURL % rfcnum
     if link:
         return '<a href="%s">%s</a>' % (cgi.escape(link), cgi.escape(text))
-    return cgi.escape(match.group(0)) # really slow, but it works...
+    return cgi.escape(match.group(0))  # really slow, but it works...
 
 
 NON_MASKED_EMAILS = [
     'ros-users@code.ros.org',
     'ros-developers@code.ros.org',
     ]
+
 
 def fixemail(address, repno):
     if address.lower() in NON_MASKED_EMAILS:
@@ -146,6 +149,7 @@ def linkemail(address, repno):
     return ('<a href="mailto:%s&#64;%s?subject=REP%%20%s">'
             '%s&#32;&#97;t&#32;%s</a>'
             % (parts[0], parts[1], repno, parts[0], parts[1]))
+
 
 def fixfile(inpath, input_lines, outfile):
     from email.utils import parseaddr
@@ -187,16 +191,18 @@ def fixfile(inpath, input_lines, outfile):
     tmpl = f.read()
     f.close()
     if int(rep) == 0:
-        tmpl = tmpl.replace('[<b><a href="%(repindex)s">REP Index</a></b>]', '')
+        tmpl = tmpl.replace(
+            '[<b><a href="%(repindex)s">REP Index</a></b>]', '')
     tmpl_vars = {
         'repindex': 'rep-0000.html',
         'rep': title,
-        'repnum': "%04d"%int(rep),
+        'repnum': "%04d" % int(rep),
         'rephome': '/reps',
         'encoding': 'utf-8',
         'version': '',
         'title': 'REP '+rep+" -- "+title,
-        'stylesheet': '<link rel="stylesheet" href="rep.css" type="text/css" />',
+        'stylesheet': (
+            '<link rel="stylesheet" href="rep.css" type="text/css" />'),
         }
 
     if 0:
@@ -217,23 +223,24 @@ def fixfile(inpath, input_lines, outfile):
             print('[<b><a href=".">REP Index</a></b>]', file=outfile)
         if rep:
             try:
-                print('[<b><a href="rep-%04d.rst">REP Source</a>'
-                                   '</b>]' % int(rep), file=outfile)
+                print('[<b><a href="rep-%04d.rst">REP Source</a></b>]' %
+                      int(rep), file=outfile)
             except ValueError as error:
                 print('ValueError (invalid REP number): %s' % error,
                       file=sys.stderr)
         print('</td></tr></table>', file=outfile)
 
     real_outfile = outfile
-    
+
     try:
         from cStringIO import StringIO
     except ImportError:
         from io import StringIO
     outfile = StringIO()
-    print("""<div class="header">\n<table border="0" class="rfc2822 docutils field-list" frame="void" rules="none">
-<col class="field-name" /> 
-<col class="field-body" /> 
+    print("""<div class="header">
+<table border="0" class="rfc2822 docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
 <tbody valign="top">""", file=outfile)
     for k, v in header:
         if k.lower() in ('author', 'discussions-to'):
@@ -273,8 +280,9 @@ def fixfile(inpath, input_lines, outfile):
             v = '<a href="%s">%s</a> ' % (url, cgi.escape(rep_type))
         else:
             v = cgi.escape(v)
-        print('  <tr class="field"><th class="field-name">%s:&nbsp;</th><td class="field-body">%s</td></tr>' \
-              % (cgi.escape(k), v), file=outfile)
+        print(('  <tr class="field"><th class="field-name">%s:&nbsp;</th>' +
+               '<td class="field-body">%s</td></tr>') %
+              (cgi.escape(k), v), file=outfile)
     print('</table>', file=outfile)
     print('</div>', file=outfile)
     print('<hr />', file=outfile)
@@ -327,7 +335,7 @@ def fixfile(inpath, input_lines, outfile):
     print('</div>', file=outfile)
 
     tmpl_vars['body'] = outfile.getvalue()
-    real_outfile.write((tmpl%tmpl_vars).encode('utf'))
+    real_outfile.write((tmpl % tmpl_vars).encode('utf'))
     if 0:
         print('</body>', file=outfile)
         print('</html>', file=outfile)
@@ -335,6 +343,7 @@ def fixfile(inpath, input_lines, outfile):
 docutils_settings = None
 """Runtime settings object used by Docutils.  Can be set by the client
 application when this module is imported."""
+
 
 def fix_rst_rep(inpath, input_lines, outfile):
     from docutils import core
@@ -350,9 +359,11 @@ def fix_rst_rep(inpath, input_lines, outfile):
         settings_overrides={'traceback': 1})
     outfile.write(output)
 
+
 def get_rep_type(input_lines):
     """
     Return the Content-Type of the input.  "text/plain" is the default.
+
     Return ``None`` if the input is not a REP.
     """
     rep_type = None
@@ -369,24 +380,28 @@ def get_rep_type(input_lines):
             rep_type = 'text/plain'
     return rep_type
 
+
 def get_input_lines(inpath):
     try:
         infile = open(inpath)
     except IOError as e:
-        if e.errno != errno.ENOENT: raise
+        if e.errno != errno.ENOENT:
+            raise
         print('Error: Skipping missing REP file:', e.filename, file=sys.stderr)
         sys.stderr.flush()
         return None
-    lines = infile.read().splitlines(1) # handles x-platform line endings
+    lines = infile.read().splitlines(1)  # handles x-platform line endings
     infile.close()
     return lines
 
+
 def find_rep(rep_str):
-    """Find the .rst file indicated by a cmd line argument"""
+    """Find the .rst file indicated by a cmd line argument."""
     if os.path.exists(rep_str):
         return rep_str
     num = int(rep_str)
     return "rep-%04d.rst" % num
+
 
 def make_html(inpath, verbose=0):
     input_lines = get_input_lines(inpath)
@@ -402,7 +417,7 @@ def make_html(inpath, verbose=0):
               (inpath, rep_type), file=sys.stderr)
         sys.stdout.flush()
         return None
-    elif REP_TYPE_DISPATCH[rep_type] == None:
+    elif REP_TYPE_DISPATCH[rep_type] is None:
         rep_type_error(inpath, rep_type)
         return None
     outpath = os.path.splitext(inpath)[0] + ".html"
@@ -415,6 +430,7 @@ def make_html(inpath, verbose=0):
     os.chmod(outfile.name, 0o664)
     return outpath
 
+
 def push_rep(htmlfiles, rstfiles, username, verbose, local=0):
     quiet = ""
     if local:
@@ -422,7 +438,7 @@ def push_rep(htmlfiles, rstfiles, username, verbose, local=0):
             quiet = "-v"
         target = HDIR
         copy_cmd = "cp"
-        chmod_cmd = "chmod"
+        #chmod_cmd = "chmod"
     else:
         if not verbose:
             quiet = "-q"
@@ -430,7 +446,7 @@ def push_rep(htmlfiles, rstfiles, username, verbose, local=0):
             username = username + "@"
         target = username + HOST + ":" + HDIR
         copy_cmd = "scp"
-        chmod_cmd = "ssh %s%s chmod" % (username, HOST)
+        #chmod_cmd = "ssh %s%s chmod" % (username, HOST)
     files = htmlfiles[:]
     files.extend(rstfiles)
     files.append("style.css")
@@ -446,6 +462,7 @@ def push_rep(htmlfiles, rstfiles, username, verbose, local=0):
 REP_TYPE_DISPATCH = {'text/plain': fixfile,
                      'text/x-rst': fix_rst_rep}
 REP_TYPE_MESSAGES = {}
+
 
 def check_requirements():
     # Check Python:
@@ -476,9 +493,11 @@ def check_requirements():
                 '%s present.  See README.txt for installation.'
                 % (REQUIRES['docutils'], docutils.__version__))
 
+
 def rep_type_error(inpath, rep_type):
     print('Error: ' + REP_TYPE_MESSAGES[rep_type] % locals(), file=sys.stderr)
     sys.stdout.flush()
+
 
 def browse_file(rep):
     import webbrowser
@@ -489,6 +508,7 @@ def browse_file(rep):
     url = "file:" + file
     webbrowser.open(url)
 
+
 def browse_remote(rep):
     import webbrowser
     file = find_rep(rep)
@@ -496,6 +516,7 @@ def browse_remote(rep):
         file = file[:-3] + "html"
     url = REPDIRRUL + file
     webbrowser.open(url)
+
 
 def main(argv=None):
     # defaults

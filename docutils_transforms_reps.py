@@ -13,29 +13,27 @@ Transforms for REP processing.
 
 __docformat__ = 'reStructuredText'
 
-import sys
 import os
 import re
 import time
 from docutils import nodes, utils, languages
-from docutils import ApplicationError, DataError
-from docutils.transforms import Transform, TransformError
+from docutils import DataError
+from docutils.transforms import Transform
 from docutils.transforms import parts, references, misc
 
 
 class Headers(Transform):
 
-    """
-    Process fields in a REP's initial RFC-2822 header.
-    """
+    """Process fields in a REP's initial RFC-2822 header."""
 
     default_priority = 360
 
     rep_url = 'rep-%04d'
-    rep_git_url = 'https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst'
+    rep_git_url = \
+        'https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst'
     rcs_keyword_substitutions = (
-          (re.compile(r'\$' r'RCSfile: (.+),v \$$', re.IGNORECASE), r'\1'),
-          (re.compile(r'\$[a-zA-Z]+: (.+) \$$'), r'\1'),)
+        (re.compile(r'\$' r'RCSfile: (.+),v \$$', re.IGNORECASE), r'\1'),
+        (re.compile(r'\$[a-zA-Z]+: (.+) \$$'), r'\1'),)
 
     def apply(self):
         self.document.settings.rep_base_url = 'http://ros.org/reps/'
@@ -45,12 +43,12 @@ class Headers(Transform):
             raise DataError('Document tree is empty.')
         header = self.document[0]
         if not isinstance(header, nodes.field_list) or \
-              'rfc2822' not in header['classes']:
+                'rfc2822' not in header['classes']:
             raise DataError('Document does not begin with an RFC-2822 '
                             'header; it is not a REP.')
         rep = None
         for field in header:
-            if field[0].astext().lower() == 'rep': # should be the first field
+            if field[0].astext().lower() == 'rep':  # should be the first field
                 value = field[1].astext()
                 try:
                     rep = int(value)
@@ -94,8 +92,8 @@ class Headers(Transform):
                                     % field.pformat(level=1))
             elif name == 'last-modified':
                 date = time.strftime(
-                      '%d-%b-%Y',
-                      time.localtime(os.stat(self.document['source'])[8]))
+                    '%d-%b-%Y',
+                    time.localtime(os.stat(self.document['source'])[8]))
                 if repo_url:
                     body += nodes.paragraph(
                         '', '', nodes.reference('', date, refuri=repo_url))
@@ -121,7 +119,7 @@ class Headers(Transform):
                         refuri=(self.document.settings.rep_base_url
                                 + self.rep_url % repno)))
                     newbody.append(space)
-                para[:] = newbody[:-1] # drop trailing space
+                para[:] = newbody[:-1]  # drop trailing space
             elif name == 'last-modified':
                 utils.clean_rcs_keywords(para, self.rcs_keyword_substitutions)
                 if repo_url:
@@ -147,9 +145,11 @@ class Contents(Transform):
     def apply(self):
         try:
             #incompatible API change in docutils
-            language = languages.get_language(self.document.settings.language_code, None)
+            language = languages.get_language(
+                self.document.settings.language_code, None)
         except TypeError:
-            language = languages.get_language(self.document.settings.language_code )
+            language = languages.get_language(
+                self.document.settings.language_code)
         name = language.labels['contents']
         title = nodes.title('', name)
         topic = nodes.topic('', title, classes=['contents'])
@@ -215,11 +215,9 @@ class TargetNotes(Transform):
 
 class REPZero(Transform):
 
-    """
-    Special processing for REP 0.
-    """
+    """Special processing for REP 0."""
 
-    default_priority =760
+    default_priority = 760
 
     def apply(self):
         visitor = REPZeroSpecial(self.document)
@@ -264,7 +262,7 @@ class REPZeroSpecial(nodes.SparseNodeVisitor):
 
     def visit_entry(self, node):
         self.document.settings.rep_base_url = 'http://ros.org/reps/'
-        
+
         self.entry += 1
         if self.rep_table and self.entry == 2 and len(node) == 1:
             node['classes'].append('num')
@@ -283,6 +281,7 @@ class REPZeroSpecial(nodes.SparseNodeVisitor):
 non_masked_addresses = ('reps@python.org',
                         'ros-users@code.ros.org',
                         'ros-developers@code.ros.org')
+
 
 def mask_email(ref, repno=None):
     """

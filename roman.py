@@ -1,4 +1,4 @@
-"""Convert to and from Roman numerals"""
+"""Convert to and from Roman numerals."""
 
 __author__ = "Mark Pilgrim (f8dy@diveintopython.org)"
 __version__ = "1.4"
@@ -16,11 +16,21 @@ http://www.python.org/2.1.1/license.html
 
 import re
 
-#Define exceptions
-class RomanError(Exception): pass
-class OutOfRangeError(RomanError): pass
-class NotIntegerError(RomanError): pass
-class InvalidRomanNumeralError(RomanError): pass
+
+class RomanError(Exception):
+    pass
+
+
+class OutOfRangeError(RomanError):
+    pass
+
+
+class NotIntegerError(RomanError):
+    pass
+
+
+class InvalidRomanNumeralError(RomanError):
+    pass
 
 #Define digit mapping
 romanNumeralMap = (('M',  1000),
@@ -36,6 +46,7 @@ romanNumeralMap = (('M',  1000),
                    ('V',  5),
                    ('IV', 4),
                    ('I',  1))
+
 
 def toRoman(n):
     """convert integer to Roman numeral"""
@@ -62,10 +73,11 @@ romanNumeralPattern = re.compile("""
     (IX|IV|V?I{0,3})    # ones - 9 (IX), 4 (IV), 0-3 (0 to 3 I's),
                         #        or 5-8 (V, followed by 0 to 3 I's)
     $                   # end of string
-    """ ,re.VERBOSE)
+    """ , re.VERBOSE)
+
 
 def fromRoman(s):
-    """convert Roman numeral to integer"""
+    """convert Roman numeral to integer."""
     if not s:
         raise InvalidRomanNumeralError('Input can not be blank')
     if not romanNumeralPattern.search(s):
@@ -78,4 +90,3 @@ def fromRoman(s):
             result += integer
             index += len(numeral)
     return result
-

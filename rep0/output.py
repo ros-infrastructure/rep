@@ -14,10 +14,11 @@ from .rep import REP, REPError
 
 indent = u' '
 
+
 def write_column_headers(output):
     """Output the column headers for the REP indices."""
     column_headers = {'status': u'', 'type': u'', 'number': u'num',
-                        'title': u'title', 'authors': u'owner'}
+                      'title': u'title', 'authors': u'owner'}
     print(constants.column_format % column_headers, file=output)
     underline_headers = {}
     for key, value in column_headers.items():
@@ -26,8 +27,12 @@ def write_column_headers(output):
 
 
 def sort_reps(reps):
-    """Sort REPs into meta, informational, accepted, open, finished,
-    and essentially dead."""
+    """
+    Sort REPs into categories.
+
+    Current these categories include: meta, informational, accepted, open,
+    finished, and essentially dead.
+    """
     meta = []
     info = []
     accepted = []
@@ -41,8 +46,8 @@ def sort_reps(reps):
             meta.append(rep)
         elif rep.status == 'Draft':
             open_.append(rep)
-        elif rep.status in ('Rejected', 'Withdrawn', 'Deferred',
-                'Incomplete', 'Replaced'):
+        elif rep.status in [
+                'Rejected', 'Withdrawn', 'Deferred', 'Incomplete', 'Replaced']:
             dead.append(rep)
         elif rep.type_ == 'Informational':
             info.append(rep)
@@ -99,6 +104,7 @@ def sort_authors(authors_dict):
     authors_list.sort(key=attrgetter('sort_by'))
     return authors_list
 
+
 def normalized_last_first(name):
     return len(unicodedata.normalize('NFC', name.last_first))
 
@@ -125,7 +131,8 @@ def write_rep0(reps, output=sys.stdout):
     for rep in info:
         print(u'%s' % rep, file=output)
     print('', file=output)
-    print(u" Accepted REPs (accepted; may not be implemented yet)", file=output)
+    print(u" Accepted REPs (accepted; may not be implemented yet)",
+          file=output)
     print('', file=output)
     for rep in accepted:
         print(u'%s' % rep, file=output)
@@ -135,7 +142,8 @@ def write_rep0(reps, output=sys.stdout):
     for rep in open_:
         print(u'%s' % rep, file=output)
     print('', file=output)
-    print(u" Finished REPs (done, implemented in code repository)", file=output)
+    print(u" Finished REPs (done, implemented in code repository)",
+          file=output)
     print('', file=output)
     for rep in finished:
         print(u'%s' % rep, file=output)
@@ -172,15 +180,18 @@ def write_rep0(reps, output=sys.stdout):
     authors_dict = verify_email_addresses(reps)
     max_name = max(list(authors_dict.keys()), key=normalized_last_first)
     max_name_len = len(max_name.last_first)
-    print(u"    %s  %s" % ('name'.ljust(max_name_len), 'email address'), file=output)
-    print(u"    %s  %s" % ((len('name')*'-').ljust(max_name_len),
-                                    len('email address')*'-'), file=output)
+    print(u"    %s  %s" % ('name'.ljust(max_name_len), 'email address'),
+          file=output)
+    print(u"    %s  %s" %
+          ((len('name')*'-').ljust(max_name_len), len('email address')*'-'),
+          file=output)
     sorted_authors = sort_authors(authors_dict)
     for author in sorted_authors:
         # Use the email from authors_dict instead of the one from 'author' as
         # the author instance may have an empty email.
-        print((u"    %s  %s" %
-                (author.last_first.ljust(max_name_len), authors_dict[author])), file=output)
+        print(u"    %s  %s" %
+              (author.last_first.ljust(max_name_len), authors_dict[author]),
+              file=output)
     print('', file=output)
     print('', file=output)
     print(u"References", file=output)

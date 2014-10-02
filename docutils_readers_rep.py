@@ -2,15 +2,13 @@
 # Author: David Goodger <goodger@python.org>
 # Copyright: This module has been placed in the public domain.
 
-"""
-Python Enhancement Proposal (REP) Reader.
-"""
+"""Python Enhancement Proposal (REP) Reader."""
 
 __docformat__ = 'reStructuredText'
 
 
 from docutils.readers import standalone
-from docutils.transforms import references, misc, frontmatter
+from docutils.transforms import frontmatter
 import docutils_transforms_reps as reps
 from docutils.parsers import rst
 

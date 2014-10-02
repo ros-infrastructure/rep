@@ -89,8 +89,8 @@ class Author(object):
             if part[0].isupper():
                 break
         else:
-            raise ValueError("last name missing a capital letter: %r"
-	                                                       % name_parts)
+            raise ValueError(
+                "last name missing a capital letter: %r" % name_parts)
         base = u' '.join(name_parts[index:]).lower()
         return unicodedata.normalize('NFKD', base).encode('ASCII', 'ignore')
 
@@ -121,7 +121,7 @@ class Author(object):
 class REP(object):
 
     """Representation of REPs.
-    
+
     Attributes:
 
         + number : int
@@ -177,8 +177,7 @@ class REP(object):
                                    (header_name, current_header),
                                    rep_file.name)
         except StopIteration:
-            raise REPError("headers missing or out of order",
-                                rep_file.name)
+            raise REPError("headers missing or out of order", rep_file.name)
         required = False
         try:
             while not required:
@@ -232,9 +231,9 @@ class REP(object):
             # Watch out for commas separating multiple names.
             regex += u'(,\s*)?'
             for match in re.finditer(regex, data):
-                # Watch out for suffixes like 'Jr.' when they are comma-separated
-                # from the name and thus cause issues when *all* names are only
-                # separated by commas.
+                # Watch out for suffixes like 'Jr.' when they are
+                # comma-separated from the name and thus cause issues when
+                # *all* names are only separated by commas.
                 match_dict = match.groupdict()
                 author = match_dict['author']
                 if not author.partition(' ')[1] and author.endswith('.'):
@@ -280,9 +279,10 @@ class REP(object):
 
     def __str__(self):
         """Return the line entry for the REP."""
-        rep_info = {'type': self.type_abbr, 'number': str(self.number),
-                'title': self.title_abbr, 'status': self.status_abbr,
-                'authors': self.author_abbr}
+        rep_info = {
+            'type': self.type_abbr, 'number': str(self.number),
+            'title': self.title_abbr, 'status': self.status_abbr,
+            'authors': self.author_abbr}
         return constants.column_format % rep_info
 
     def __unicode__(self):
