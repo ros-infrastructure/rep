@@ -1,0 +1,92 @@
+REP: 143
+Title: ROS distribution files
+Author: Dirk Thomas <dthomas@osrfoundation.org>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 01-Sep-2014
+Post-History: 06-Nov-2013
+
+
+.. contents::
+
+Abstract
+========
+This REP updates the specification of the ROS distribution files facilitated in
+the building, packaging, testing and documenting process.
+The intention is to add further configuration options for hosting of
+(potentially customized) ROS buildfarms.
+This REP is a revised version of REP 141 [1]_.
+It currently does not repeat the content of REP 141 but only states the
+differences.
+
+
+Specification
+=============
+
+Index file
+----------
+
+* distributions
+
+  * distribution: list of reference to the distribution files
+    A single distribution file guarantees that there are no duplicate
+    repositories.
+    But when rnuning a custom buildfarm which only adds custom repositories it
+    is much smoother to maintain them in a separate file to avoid any kind of
+    conflicts.
+    It also allows to override specific repositories with either a fork variant
+    or a specific version number.
+
+  * release_builds / source_builds / doc_builds: dict of references to the
+    build files
+    The named key enables better tooling to e.g. generate the jobs of a
+    specific build file - rather then using the opaque list index.
+
+* version: version number, this REP describes version 3 (instead of version 2
+  described in REP 141 [1]_ and version 1 described in REP 137 [2]_)
+
+
+Distribution file
+-----------------
+
+* repositories
+
+  * source
+
+    * test_commits: a boolean flag used to enable CI jobs for each commit to
+      the branch specified under ``versions``. (default: false)
+    * test_pull_requests: a boolean flag used to enable CI jobs for each pull
+      request against the branch specified under ``versions``. (default: false)
+    * version: if ``test_pull_requests`` is enabled the version must specify a
+      branch.
+
+* version: version number, this REP describes version 2 (instead of version 1
+  described in REP 141 [1]_ and REP 137 [2]_)
+
+
+Release build file
+------------------
+* jenkins_job_priority: the priority number for the sourcedeb and binarydeb jobs (optional).
+
+* version: version number, this REP describes version 2 (instead of version 1
+  described in REP 141 [1]_ and REP 137 [2]_)
+
+
+Reference implementation
+------------------------
+This REP is to be implemented in version 0.4 of the Python package *rosdistro*.
+It will serve as a reference implementation for this REP.
+A draft implementation can be found in the forked repository
+[dirk-thomas/ros-infrastructure_rosdistro](https://github.com/dirk-thomas/ros-infrastructure_rosdistro).
+
+
+References
+==========
+.. [1] REP 141: http://www.ros.org/reps/rep-0141.html
+.. [2] REP 137: http://www.ros.org/reps/rep-0137.html
+
+
+Copyright
+=========
+This document has been placed in the public domain.
