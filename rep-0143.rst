@@ -67,6 +67,9 @@ Distribution file
 
 Release build file
 ------------------
+* abi_incompatibility_assumed: a boolean flag used to indicate that binary
+  do not guarantee ABI compatibility. (default: false)
+
 * jenkins_job_priority: the priority number for the sourcedeb and binarydeb jobs (optional).
 
 * version: version number, this REP describes version 2 (instead of version 1
