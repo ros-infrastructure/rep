@@ -73,6 +73,41 @@ A draft implementation can be found in the "rep143" branch of
 [ros-infrastructure/rosdistro](https://github.com/ros-infrastructure/rosdistro/tree/rep143).
 
 
+Compatibility issues
+====================
+
+The draft implementation of rosdistro is able to parse both index format
+version 2 as well as 3.
+
+To leverage the new ability to list multiple distribution files the following
+additional API will be introduced:
+
+* rosdistro.get_distribution_files()
+
+The existing API ('rosdistro.get_distribution_file()') will continue to provide
+the correct data by merging the information from all distribution files.
+
+All function related to the removed build files will simply return empty lists.
+
+As soon as the new version of 'rosdistro' is released the 'ros/rosdistro'
+repository [7]_ is being updated to the new format (for Hydro and higher).
+Any client accessing trying to access the data with an old 'rosdistro'
+version will get an error message like this:
+
+::
+
+  Unable to handle 'index' format version '2', please update rosdistro...
+
+Affected tools
+--------------
+
+The only tool beside the "old" buildfarm accessing the raw rosdistro data which
+needs to be updated is 'rosdep' [5]_.
+
+All other tools using the API of rosdistro (even if deprecated) will still work
+flawlessly.
+
+
 References
 ==========
 .. [1] Python module to for buildfarm configuration:
@@ -81,6 +116,8 @@ References
   https://github.com/ros-infrastructure/ros_buildfarm_config
 .. [3] REP 141: http://www.ros.org/reps/rep-0141.html
 .. [4] REP 137: http://www.ros.org/reps/rep-0137.html
+.. [5] Patch for rosdep:
+  https://github.com/ros-infrastructure/rosdep/compare/rep143
 
 
 Copyright
