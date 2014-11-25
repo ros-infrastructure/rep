@@ -5,7 +5,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 01-Sep-2014
-Post-History: 06-Nov-2013
+Post-History: 25-Nov-2014
 
 
 .. contents::
@@ -14,9 +14,11 @@ Abstract
 ========
 This REP updates the specification of the ROS distribution files facilitated in
 the building, packaging, testing and documenting process.
-The intention is to add further configuration options for hosting of
-(potentially customized) ROS buildfarms.
-This REP is a revised version of REP 141 [1]_.
+
+The intention is to separate the buildfarm related configuration options from
+the information describing the ROS packages and repositories [1]_ [2]_.
+
+This REP is a revised version of REP 141 [3]_.
 It currently does not repeat the content of REP 141 but only states the
 differences.
 
@@ -32,19 +34,17 @@ Index file
   * distribution: list of reference to the distribution files
     A single distribution file guarantees that there are no duplicate
     repositories.
-    But when rnuning a custom buildfarm which only adds custom repositories it
+    But when running a custom buildfarm which only adds custom repositories it
     is much smoother to maintain them in a separate file to avoid any kind of
     conflicts.
-    It also allows to override specific repositories with either a fork variant
-    or a specific version number.
+    It also allows to override specific repositories with either a forked
+    variant or a specific version number.
 
-  * release_builds / source_builds / doc_builds: dict of references to the
-    build files
-    The named key enables better tooling to e.g. generate the jobs of a
-    specific build file - rather then using the opaque list index.
+  * release_builds / source_builds / doc_builds: are being removed since they
+    only contain information relevant to the buildfarm
 
 * version: version number, this REP describes version 3 (instead of version 2
-  described in REP 141 [1]_ and version 1 described in REP 137 [2]_)
+  described in REP 141 [3]_ and version 1 described in REP 137 [4]_)
 
 
 Distribution file
@@ -62,32 +62,25 @@ Distribution file
       branch.
 
 * version: version number, this REP describes version 2 (instead of version 1
-  described in REP 141 [1]_ and REP 137 [2]_)
-
-
-Release build file
-------------------
-* abi_incompatibility_assumed: a boolean flag used to indicate that binary
-  do not guarantee ABI compatibility. (default: false)
-
-* jenkins_job_priority: the priority number for the sourcedeb and binarydeb jobs (optional).
-
-* version: version number, this REP describes version 2 (instead of version 1
-  described in REP 141 [1]_ and REP 137 [2]_)
+  described in REP 141 [3]_ and REP 137 [4]_)
 
 
 Reference implementation
 ------------------------
 This REP is to be implemented in version 0.4 of the Python package *rosdistro*.
 It will serve as a reference implementation for this REP.
-A draft implementation can be found in the forked repository
-[dirk-thomas/ros-infrastructure_rosdistro](https://github.com/dirk-thomas/ros-infrastructure_rosdistro).
+A draft implementation can be found in the "rep143" branch of
+[ros-infrastructure/rosdistro](https://github.com/ros-infrastructure/rosdistro/tree/rep143).
 
 
 References
 ==========
-.. [1] REP 141: http://www.ros.org/reps/rep-0141.html
-.. [2] REP 137: http://www.ros.org/reps/rep-0137.html
+.. [1] Python module to for buildfarm configuration:
+  https://github.com/ros-infrastructure/ros_buildfarm/tree/master/ros_buildfarm/config
+.. [2] Example buildfarm configuration:
+  https://github.com/ros-infrastructure/ros_buildfarm_config
+.. [3] REP 141: http://www.ros.org/reps/rep-0141.html
+.. [4] REP 137: http://www.ros.org/reps/rep-0137.html
 
 
 Copyright
