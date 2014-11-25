@@ -96,7 +96,7 @@ version will get an error message like this:
 
 ::
 
-  Unable to handle 'index' format version '2', please update rosdistro...
+  Unable to handle 'index' format version '3', please update rosdistro...
 
 Affected tools
 --------------
