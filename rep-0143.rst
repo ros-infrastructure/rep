@@ -107,6 +107,10 @@ needs to be updated is 'rosdep' [5]_.
 All other tools using the API of rosdistro (even if deprecated) will still work
 flawlessly.
 
+In order to allow releasing packages into rosdistro repositories with multiple
+distribution files 'bloom' will need to be updated.
+That might also require to change the internal format of the rosdistro cache
+files which is not explicitly specified in the REP.
 
 References
 ==========
