@@ -57,7 +57,7 @@ Distribution file
     * test_commits: a boolean flag used to enable CI jobs for each commit to
       the branch specified under ``versions``. (default: false)
     * test_pull_requests: a boolean flag used to enable CI jobs for each pull
-      request against the branch specified under ``versions``. (default: false)
+      request against the branch specified under ``version``. (default: false)
     * version: if ``test_pull_requests`` is enabled the version must specify a
       branch.
 
