@@ -33,11 +33,15 @@ Index file
 
   * distribution: list of reference to the distribution files
     A single distribution file guarantees that there are no duplicate
-    repositories.
+    repositories and is therefore preferred.
     But when running a custom buildfarm which only adds custom repositories it
     is much smoother to maintain them in a separate file to avoid any kind of
     conflicts.
-    It also allows to override specific repositories with either a forked
+
+    The files are read in the order they are listed and entries in later
+    distribution files are overwriting entries from previous distribution
+    files.
+    This can be used to override specific repositories with either a forked
     variant or a specific version number.
 
   * release_builds / source_builds / doc_builds: are being removed since they
