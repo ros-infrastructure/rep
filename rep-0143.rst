@@ -69,8 +69,7 @@ Reference implementation
 ------------------------
 This REP is to be implemented in version 0.4 of the Python package *rosdistro*.
 It will serve as a reference implementation for this REP.
-A draft implementation can be found in the "rep143" branch of
-[ros-infrastructure/rosdistro](https://github.com/ros-infrastructure/rosdistro/tree/rep143).
+A draft implementation can be found in [5]_.
 
 
 Compatibility issues
@@ -102,7 +101,7 @@ Affected tools
 --------------
 
 The only tool beside the "old" buildfarm accessing the raw rosdistro data which
-needs to be updated is 'rosdep' [5]_.
+needs to be updated is 'rosdep' [6]_.
 
 All other tools using the API of rosdistro (even if deprecated) will still work
 flawlessly.
@@ -120,8 +119,12 @@ References
   https://github.com/ros-infrastructure/ros_buildfarm_config
 .. [3] REP 141: http://www.ros.org/reps/rep-0141.html
 .. [4] REP 137: http://www.ros.org/reps/rep-0137.html
-.. [5] Patch for rosdep:
+.. [5] Patch to python-rosdistro:
+  https://github.com/ros-infrastructure/rosdistro/pull/45
+.. [6] Patch for rosdep:
   https://github.com/ros-infrastructure/rosdep/compare/rep143
+.. [7] ROS distro:
+  https://github.com/ros/rosdistro/
 
 
 Copyright
