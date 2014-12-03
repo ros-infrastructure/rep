@@ -140,6 +140,35 @@ There are many ways to represent rotations. The preferred order is listed below,
     conventions with different domains using different conventions by
     default.  
 
+
+Geography
+---------
+Systems representing global geographical locations may choose to do so
+using latitude and longitude, or using cartesian coordinates. An advantage
+of choosing cartesian representations is greater interoperability with
+software built around indoor systems, which are cartesian by default.
+
+Representations of cartesian geographical locations should be made using
+either absolute `UTM`_ coordinates, or coordinates offset from a local UTM
+origin, according to the `east north up`_ convention:
+
+* X east
+* Y north
+* Z up
+
+Orientations are expressed according to the right hand rule. Specifically,
+if a system is level and facing east, then its frame is aligned with the
+ENU frame, and therefore its orientation is zero. As the system rotates to
+point north, the yaw component of orientation increases to become pi/2.
+
+For systems which may use another convention internally (for example, NED
+on flight controllers), it is highly recommended to convert that standard to
+and from this one as part of the system's ROS API.
+
+.. _UTM: http://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system
+.. _east north up: http://en.wikipedia.org/wiki/Geodetic_datum#Local_east.2C_north.2C_up_.28ENU.29_coordinates
+
+
 Covariance Representation
 -------------------------
 Linear
