@@ -101,7 +101,7 @@ the correct data by merging the information from all distribution files.
 All function related to the removed build files will simply return empty lists.
 
 As soon as the new version of 'rosdistro' is released the 'ros/rosdistro'
-repository [7]_ is being updated to the new format (for Hydro and higher).
+repository [6]_ is being updated to the new format (for Hydro and higher).
 Any client accessing trying to access the data with an old 'rosdistro'
 version will get an error message like this:
 
@@ -113,15 +113,13 @@ Affected tools
 --------------
 
 The only tool beside the "old" buildfarm accessing the raw rosdistro data which
-needs to be updated is 'rosdep' [6]_.
+needs to be updated is 'rosdep' [7]_.
 
-All other tools using the API of rosdistro (even if deprecated) will still work
-flawlessly.
+All other tools using the API of rosdistro (even if deprecated) will continue
+to work.
 
 In order to allow releasing packages into rosdistro repositories with multiple
-distribution files 'bloom' will need to be updated.
-That might also require to change the internal format of the rosdistro cache
-files which is not explicitly specified in the REP.
+distribution files 'bloom' will need to be updated [8]_.
 
 References
 ==========
@@ -133,10 +131,9 @@ References
 .. [4] REP 137: http://www.ros.org/reps/rep-0137.html
 .. [5] Patch to python-rosdistro:
   https://github.com/ros-infrastructure/rosdistro/pull/45
-.. [6] Patch for rosdep:
-  https://github.com/ros-infrastructure/rosdep/compare/rep143
-.. [7] ROS distro:
-  https://github.com/ros/rosdistro/
+.. [6] ROS distro: https://github.com/ros/rosdistro/
+.. [7] Patch for rosdep: https://github.com/ros-infrastructure/rosdep/pull/365
+.. [8] Patch for bloom: https://github.com/ros-infrastructure/bloom/pull/330
 
 
 Copyright
