@@ -68,6 +68,11 @@ Distribution file
     * version: if ``test_pull_requests`` is enabled the version must specify a
       branch.
 
+* tags: list of tag names to identify the group of repositories specified by
+  the distribution file.
+  It allows build files to refer to sets of repositories / packages based on in
+  which distribution file they are defined.
+
 * version: version number, this REP describes version 2 (instead of version 1
   described in REP 141 [3]_ and REP 137 [4]_)
 
