@@ -43,6 +43,9 @@ Index file
     files.
     This can be used to override specific repositories with either a forked
     variant or a specific version number.
+    ``bloom`` will create pull requests against the last distribution file
+    since even when the repository is present in any of the other distribution
+    files the "overlaying" version should be stored in the last one.
 
   * release_builds / source_builds / doc_builds: are being removed since they
     only contain information relevant to the buildfarm
