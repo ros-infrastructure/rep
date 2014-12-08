@@ -1,0 +1,141 @@
+REP: 143
+Title: ROS distribution files
+Author: Dirk Thomas <dthomas@osrfoundation.org>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 01-Sep-2014
+Post-History: 25-Nov-2014
+
+
+.. contents::
+
+Abstract
+========
+This REP updates the specification of the ROS distribution files facilitated in
+the building, packaging, testing and documenting process.
+
+The intention is to separate the buildfarm related configuration options from
+the information describing the ROS packages and repositories [1]_ [2]_.
+
+This REP is a revised version of REP 141 [3]_.
+It currently does not repeat the content of REP 141 but only states the
+differences.
+
+
+Specification
+=============
+
+Index file
+----------
+
+* distributions
+
+  * distribution: list of reference to the distribution files
+    A single distribution file guarantees that there are no duplicate
+    repositories and is therefore preferred.
+    But when running a custom buildfarm which only adds custom repositories it
+    is much smoother to maintain them in a separate file to avoid any kind of
+    conflicts.
+
+    The files are read in the order they are listed and entries in later
+    distribution files are overwriting entries from previous distribution
+    files.
+    This can be used to override specific repositories with either a forked
+    variant or a specific version number.
+    ``bloom`` will create pull requests against the last distribution file
+    since even when the repository is present in any of the other distribution
+    files the "overlaying" version should be stored in the last one.
+
+  * release_builds / source_builds / doc_builds: are being removed since they
+    only contain information relevant to the buildfarm
+
+* version: version number, this REP describes version 3 (instead of version 2
+  described in REP 141 [3]_ and version 1 described in REP 137 [4]_)
+
+
+Distribution file
+-----------------
+
+* repositories
+
+  * source
+
+    * test_commits: a boolean flag used to enable CI jobs for each commit to
+      the branch specified under ``versions``. (default: false)
+    * test_pull_requests: a boolean flag used to enable CI jobs for each pull
+      request against the branch specified under ``version``. (default: false)
+    * version: if ``test_pull_requests`` is enabled the version must specify a
+      branch.
+
+* tags: list of tag names to identify the group of repositories specified by
+  the distribution file.
+  It allows build files to refer to sets of repositories / packages based on in
+  which distribution file they are defined.
+
+* version: version number, this REP describes version 2 (instead of version 1
+  described in REP 141 [3]_ and REP 137 [4]_)
+
+
+Reference implementation
+------------------------
+This REP is to be implemented in version 0.4 of the Python package *rosdistro*.
+It will serve as a reference implementation for this REP.
+A draft implementation can be found in [5]_.
+
+
+Compatibility issues
+====================
+
+The draft implementation of rosdistro is able to parse both index format
+version 2 as well as 3.
+
+To leverage the new ability to list multiple distribution files the following
+additional API will be introduced:
+
+* rosdistro.get_distribution_files()
+
+The existing API ('rosdistro.get_distribution_file()') will continue to provide
+the correct data by merging the information from all distribution files.
+
+All function related to the removed build files will simply return empty lists.
+
+As soon as the new version of 'rosdistro' is released the 'ros/rosdistro'
+repository [6]_ is being updated to the new format (for Hydro and higher).
+Any client accessing trying to access the data with an old 'rosdistro'
+version will get an error message like this:
+
+::
+
+  Unable to handle 'index' format version '3', please update rosdistro...
+
+Affected tools
+--------------
+
+The only tool beside the "old" buildfarm accessing the raw rosdistro data which
+needs to be updated is 'rosdep' [7]_.
+
+All other tools using the API of rosdistro (even if deprecated) will continue
+to work.
+
+In order to allow releasing packages into rosdistro repositories with multiple
+distribution files 'bloom' will need to be updated [8]_.
+
+References
+==========
+.. [1] Python module to for buildfarm configuration:
+  https://github.com/ros-infrastructure/ros_buildfarm/tree/master/ros_buildfarm/config
+.. [2] Example buildfarm configuration:
+  https://github.com/ros-infrastructure/ros_buildfarm_config
+.. [3] REP 141: http://www.ros.org/reps/rep-0141.html
+.. [4] REP 137: http://www.ros.org/reps/rep-0137.html
+.. [5] Patch to python-rosdistro:
+  https://github.com/ros-infrastructure/rosdistro/pull/45
+.. [6] ROS distro: https://github.com/ros/rosdistro/
+.. [7] Patch for rosdep: https://github.com/ros-infrastructure/rosdep/pull/365
+.. [8] Patch for bloom: https://github.com/ros-infrastructure/bloom/pull/330
+
+
+Copyright
+=========
+This document has been placed in the public domain.
