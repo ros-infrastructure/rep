@@ -149,23 +149,29 @@ of choosing cartesian representations is greater interoperability with
 software built around indoor systems, which are cartesian by default.
 
 Representations of cartesian geographical locations should be made using
-either absolute `UTM`_ coordinates, or coordinates offset from a local UTM
-origin, according to the `east north up`_ convention:
+the `east north up`_ (ENU) convention:
 
 * X east
 * Y north
 * Z up
+
+The selection of an appropriate projection and origin are left as
+system-specific implementation details. However, to avoid problems with 
+numerical precision in a float32 representation, you should choose an
+origin which is nearby to your system, such as its starting point.
 
 Orientations are expressed according to the right hand rule. Specifically,
 if a system is level and facing east, then its frame is aligned with the
 ENU frame, and therefore its orientation is zero. As the system rotates to
 point north, the yaw component of orientation increases to become pi/2.
 
-For systems which may use another convention internally (for example, NED
-on flight controllers), it is highly recommended to convert that standard to
-and from this one as part of the system's ROS API.
+Some systems may use another convention internally. For example,
+north-east-down (NED) is common on UAV hardware. In these cases, it
+is recommended to convert that standard to and from ENU as part of the
+system's ROS API. If you must work in NED, you may provide an appropriately
+transformed frame with the `_ned` suffix, to ensure interoperability.
 
-.. _UTM: http://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system
+
 .. _east north up: http://en.wikipedia.org/wiki/Geodetic_datum#Local_east.2C_north.2C_up_.28ENU.29_coordinates
 
 
