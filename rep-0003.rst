@@ -137,23 +137,23 @@ Rationale
 =========
 
 Target platforms for future releases are speculative and are based on
-consulting Ubuntu's release and end-of-life schedule [1]_. 
+consulting Ubuntu's release and end-of-life schedule [1]_.
 
-These targets are based on the Distribution Timeline to meet minimum requirements. [3]_ 
+These targets are based on the Distribution Timeline to meet minimum requirements. [3]_
 
 C++
 ---
 
-We use the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.  
+We use the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
 While we mainly develop with gcc, no use of compiler-specific features is allowed
 without proper use of macros to allow use on other platforms.
 
 Use of C++[0|1]x or tr1 features are only allowed if support for that feature is checked
 at compile time, and equivalent functionality exists without requiring C++[0|1]x
-code.  A wholesale jump to C++[0|1]x will not happen until all commonly used 
+code.  A wholesale jump to C++[0|1]x will not happen until all commonly used
 OS platforms fully support it.
 
-For a given release we allow use of Boost libraries that match the version provided in our 
+For a given release we allow use of Boost libraries that match the version provided in our
 low-water-mark Ubuntu version.
 
 Lisp
@@ -234,10 +234,10 @@ References and Footnotes
 
 .. [1] Ubuntu Releases with End-of-Life Dates
    (https://wiki.ubuntu.com/Releases)
-   
+
 .. [2] REP 108, ROS Diamondback Variants
    (http://www.ros.org/reps/rep-0108.html)
-   
+
 .. [3] Distribution Timeline
    (http://wiki.ros.org/Distributions/Timeline)
 
@@ -246,7 +246,6 @@ Copyright
 
 This document has been placed in the public domain.
 
-
 ..
    Local Variables:
    mode: indented-text
@@ -255,4 +254,3 @@ This document has been placed in the public domain.
    fill-column: 70
    coding: utf-8
    End:
-
