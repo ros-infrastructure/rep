@@ -141,40 +141,6 @@ There are many ways to represent rotations. The preferred order is listed below,
     default.  
 
 
-Geography
----------
-Systems representing global geographical locations may choose to do so
-using latitude and longitude, or using cartesian coordinates. An advantage
-of choosing cartesian representations is greater interoperability with
-software built around indoor systems, which are cartesian by default.
-
-Representations of cartesian geographical locations should be made using
-the `east north up`_ (ENU) convention:
-
-* X east
-* Y north
-* Z up
-
-The selection of an appropriate projection and origin are left as
-system-specific implementation details. However, to avoid problems with 
-numerical precision in a float32 representation, you should choose an
-origin which is nearby to your system, such as its starting point.
-
-Orientations are expressed according to the right hand rule. Specifically,
-if a system is level and facing east, then its frame is aligned with the
-ENU frame, and therefore its orientation is zero. As the system rotates to
-point north, the yaw component of orientation increases to become pi/2.
-
-Some systems may use another convention internally. For example,
-north-east-down (NED) is common on UAV hardware. In these cases, it
-is recommended to convert that standard to and from ENU as part of the
-system's ROS API. If you must work in NED, you may provide an appropriately
-transformed frame with the `_ned` suffix, to ensure interoperability.
-
-
-.. _east north up: http://en.wikipedia.org/wiki/Geodetic_datum#Local_east.2C_north.2C_up_.28ENU.29_coordinates
-
-
 Covariance Representation
 -------------------------
 Linear
@@ -199,6 +165,61 @@ Six Dimensional
     float64[36] covariance
 
 
+Geographical Frames
+===================
+
+Systems representing global geographical locations should do so using
+latitude and longitude, referencing the `WGS 84 ellipsoid`_, with
+altitude specified in meters above the ellipsoid.
+
+It may also be desirable to define a local cartesian frame,
+especially as this allows a GNSS- or compass-equipped system to
+interoperate with software built around cartesian indoor systems.
+
+.. _WGS 84 ellipsoid: http://en.wikipedia.org/wiki/World_Geodetic_System
+
+
+Axis Orientation
+----------------
+
+Representations of cartesian geographical locations should be made using
+the `east north up`_ (ENU) convention:
+
+* X east
+* Y north
+* Z up
+
+The selection of an appropriate projection and origin are left as
+system-specific implementation details. However, to avoid problems with
+numerical precision in a float32 representation, it is recommended to
+choose an origin which is nearby to your system, such as its initial
+position.
+
+.. _east north up: http://en.wikipedia.org/wiki/Geodetic_datum#Local_east.2C_north.2C_up_.28ENU.29_coordinates
+
+
+Rotation Representation
+-----------------------
+
+Geographical orientations are expressed according to the right hand rule,
+about the ENU axis.
+
+Specifically, if a system is level and facing east, then its frame is
+aligned with the ENU frame, and therefore its orientation is zero. As the
+system rotates to point north, the yaw component of orientation increases
+to become pi/2.
+
+
+Alternative Axis Frame
+----------------------
+
+Some systems may use another convention internally. For example,
+`north east down`_ (NED) is common in UAV hardware. In these cases, it
+is recommended to convert that standard to and from ENU as part of the
+system's ROS API. If you must work in NED, you may provide an appropriately
+transformed frame with the `_ned` suffix, to ensure interoperability.
+
+.. _north east down: http://en.wikipedia.org/wiki/North_east_down
 
 
 References
