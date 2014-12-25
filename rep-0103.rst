@@ -169,12 +169,12 @@ Geographical Frames
 ===================
 
 Systems representing global geographical locations should do so using
-latitude and longitude, referencing the `WGS 84 ellipsoid`_, with
-altitude specified in meters above the ellipsoid.
+latitude and longitude in float64 decimal degrees, referencing the
+`WGS 84 ellipsoid`_, with altitude specified in meters above the ellipsoid.
 
-It may also be desirable to define a local cartesian frame,
+It may also be desirable to define a local Cartesian frame,
 especially as this allows a GNSS- or compass-equipped system to
-interoperate with software built around cartesian indoor systems.
+interoperate with software built around Cartesian indoor systems.
 
 .. _WGS 84 ellipsoid: http://en.wikipedia.org/wiki/World_Geodetic_System
 
@@ -182,7 +182,7 @@ interoperate with software built around cartesian indoor systems.
 Axis Orientation
 ----------------
 
-Representations of cartesian geographical locations should be made using
+Representations of Cartesian geographical locations should be made using
 the `east north up`_ (ENU) convention:
 
 * X east
