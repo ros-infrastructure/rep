@@ -167,13 +167,12 @@ There are many ways to represent rotations. The preferred order is listed below,
     conventions with different domains using different conventions by
     default.  
 
-Note that by the right hand rule, the yaw component of orientation increases as
-the child frame rotates counter-clockwise, and for geographic poses, the zero yaw
-value is when pointed due east.
+By the right hand rule, the yaw component of orientation increases as the child frame
+rotates counter-clockwise, and for geographic poses, yaw is zero when pointing east.
 
-This requires special mention only because differs from a traditional compass bearing,
-which is zero when due north and incrementing clockwise. Hardware drivers should make
-the appropriate transformations.
+This requires special mention only because it differs from a traditional compass bearing,
+which is zero when pointing north and increments clockwise. Hardware drivers should make
+the appropriate transformations before publishing standard ROS messages.
 
 
 Covariance Representation
