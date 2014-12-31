@@ -79,6 +79,7 @@ force         newton
 power         watt
 voltage       volt
 temperature   celsius
+magnetism     tesla
 ===========   =======
 
 .. _SI derived units: http://en.wikipedia.org/wiki/SI_derived_units
@@ -100,11 +101,28 @@ All systems are right handed.  This means they comply with the `right hand rule`
 
 Axis Orientation
 ----------------
-In relation to a body the standard is :
+
+In relation to a body the standard is:
 
 * x forward
 * y left
 * z up
+
+For short-range Cartesian representations of geographic locations, use the
+`east north up`_ (ENU) convention:
+
+* X east
+* Y north
+* Z up
+
+To avoid precision problems with large float32 values, it is recommended to
+choose a nearby origin such as your system's starting position.
+
+.. _east north up: http://en.wikipedia.org/wiki/Geodetic_datum#Local_east.2C_north.2C_up_.28ENU.29_coordinates
+
+
+Suffix Frames
+-------------
 
 In the case of cameras, there is often a second frame defined with a
 "_optical" suffix. This uses a slightly different convention:
@@ -113,6 +131,15 @@ In the case of cameras, there is often a second frame defined with a
 * x right
 * y down
 
+For outdoor systems where it is desireable to work under the
+`north east down`_ (NED) convention, define an appropriately transformed
+secondary frame with the "_ned" suffix:
+
+* X north
+* Y east
+* Z down
+
+.. _north east down: http://en.wikipedia.org/wiki/North_east_down
 
 
 Rotation Representation
@@ -139,6 +166,14 @@ There are many ways to represent rotations. The preferred order is listed below,
   * Euler angles are generally discouraged due to having 24 'valid'
     conventions with different domains using different conventions by
     default.  
+
+By the right hand rule, the yaw component of orientation increases as the child frame
+rotates counter-clockwise, and for geographic poses, yaw is zero when pointing east.
+
+This requires special mention only because it differs from a traditional compass bearing,
+which is zero when pointing north and increments clockwise. Hardware drivers should make
+the appropriate transformations before publishing standard ROS messages.
+
 
 Covariance Representation
 -------------------------
