@@ -1,11 +1,11 @@
 REP: 103
 Title: Standard Units of Measure and Coordinate Conventions
-Author: Tully Foote
+Author: Tully Foote, Mike Purvis
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 07-Oct-2010
-Post-History: 30-Aug-2002
+Post-History: 31-Dec-2014
 
 
 Abstract
