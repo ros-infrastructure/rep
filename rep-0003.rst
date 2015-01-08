@@ -164,7 +164,7 @@ Rationale
 Target platforms for future releases are speculative and are based on
 consulting Ubuntu's release and end-of-life schedule [1]_.
 
-These targets are based on the Distribution Timeline to meet minimum requirements. [3]_
+These targets, including starting and ending support dates, are based on the Distribution Timeline to meet minimum requirements. [3]_
 
 C++
 ---
