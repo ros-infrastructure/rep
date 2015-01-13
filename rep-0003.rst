@@ -145,9 +145,9 @@ Exact or Series Requirements:
 - PCL 1.7.x
 - OpenCV 2.4.x
 
-- Buildsystem support:
- - catkin: build from source, release for binary packaging, wiki documentation, continuous integration
- - rosbuild: build from source
+Buildsystem support:
+- catkin: build from source, release for binary packaging, wiki documentation, continuous integration
+- rosbuild: build from source
 
 Motivation
 ==========
