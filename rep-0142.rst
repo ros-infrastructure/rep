@@ -11,7 +11,7 @@ Post-History: 03-Jun-2014
 Abstract
 ========
 
-This REP describes the metapackages for the ROS Indigo release.
+This REP describes the metapackages for the ROS Indigo release and for releases that follow until otherwise replaced by a similar update REP.
 This REP updates REP 131 [3]_ for changes in packages.
 
 
