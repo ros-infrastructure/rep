@@ -148,6 +148,9 @@ Required Support for:
 Minimum Requirements:
 
 - C++03
+
+  - C++11 features are not used, but code should compile when ``-std=c++11`` is used
+
 - Python 2.7
 
   - Python 3.3 not required, but testing against it is recommended
@@ -197,14 +200,12 @@ These targets, including starting and ending support dates, are based on the Dis
 C++
 ---
 
-We use the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
+As of January 2015 (Hydro, Indigo, and Jade), we use the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
 While we mainly develop with gcc, no use of compiler-specific features is allowed
 without proper use of macros to allow use on other platforms.
 
-Use of C++[0|1]x or tr1 features are only allowed if support for that feature is checked
-at compile time, and equivalent functionality exists without requiring C++[0|1]x
-code.  A wholesale jump to C++[0|1]x will not happen until all commonly used
-OS platforms fully support it.
+Use of C++11/C++14 features and filesystem/networking/etc... TS's (Technical Specifications) is allowed if they are checked for at configure time and equivalent functionality can be provided with the extra compiler features.
+While we will not use C++11 features to preserve the C++03 compatibility, the code should compile when C++11 features are turned on, i.e. when `-std=c++11` is used.
 
 For a given release we allow use of Boost libraries that match the version provided in our
 low-water-mark Ubuntu version.
