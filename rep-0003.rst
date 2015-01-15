@@ -91,7 +91,7 @@ Groovy Galapagos (Oct 2012)
 - CMake 2.8.3
 
 - catkin has been officially introduced
-- the ROS buildfarm supports releasing, documenting and continuous integration testing packages which are based on either catkin or rosbuild
+- the ROS build farm supports releasing, documenting and continuous integration testing packages which are based on either catkin or rosbuild
 
 Hydro Medusa (Aug 2013)
 -----------------------
@@ -243,7 +243,7 @@ Since even half a year after the Hydro release not a single rosbuild-based
 package was released the support for building Debian packages of rosbuild-based
 packages has been discontinued in Hydro.
 
-As of Indigo the ROS buildfarm also only supports documenting and continuous
+As of Indigo the ROS build farm also only supports documenting and continuous
 integration testing of catkin-based packages.
 Since Indigo is a LTS release and aims to be supported for several years
 maintaining the legacy code for rosbuild-based packages seems to be
