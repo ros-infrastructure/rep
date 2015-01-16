@@ -200,7 +200,7 @@ These targets, including starting and ending support dates, are based on the Dis
 C++
 ---
 
-As of January 2015 (Hydro, Indigo, and Jade), we use the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
+As of ROS Jade, we are still using the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
 While we mainly develop with gcc, no use of compiler-specific features is allowed
 without proper use of macros to allow use on other platforms.
 
