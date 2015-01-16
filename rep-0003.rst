@@ -91,7 +91,7 @@ Groovy Galapagos (Oct 2012)
 - CMake 2.8.3
 
 - catkin has been officially introduced
-- the ROS buildfarm supports releasing, documenting and continuous integration testing packages which are based on either catkin or rosbuild
+- the ROS build farm supports releasing, documenting and continuous integration testing packages which are based on either catkin or rosbuild
 
 Hydro Medusa (Aug 2013)
 -----------------------
@@ -104,10 +104,16 @@ Hydro Medusa (Aug 2013)
 - Python 2.7
 - CMake 2.8.3
 
-- the ROS buildfarm supports:
-  - releasing only catkin-based packages
-  - documenting and continuous integration testing packages which are based on either catkin or rosbuild
-- rosbuild-based packages can still be built from source
+- For only catkin packages the the ROS build farm supports:
+
+  - releasing
+
+- For both catkin and rosbuild packages the ROS build farm supports:
+
+  - documenting
+  - continuous integration testing
+
+- For rosbuild based packages can still be built from source.
 
 
 Indigo Igloo (May 2014)
@@ -117,28 +123,44 @@ Indigo Igloo (May 2014)
 - C++03
 - Boost 1.53
 - Lisp SBCL 1.0.x
-- Python 2.7 (Additional testing against Python 3.3 recommended)
+- Python 2.7
+
+  - Additional testing against Python 3.3 recommended
+
 - CMake 2.8.11
 
-- the ROS buildfarm supports:
-  - releasing, documenting and continuous integration testing only catkin-based packages
-- rosbuild-based packages can still be built from source
+- For catkin packages the ROS build farm supports:
+
+  - releasing
+  - documenting
+  - continuous integration testing
+
+- For rosbuild based packages can still be built from source.
 
 Jade Turtle (May 2015 - May 2017)
 ---------------------------------
 Required Support for:
+
 - Ubuntu Trusty (14.04)
 - Ubuntu Utopic (14.10)
 - Ubuntu Vivid (15.04)
 
 Minimum Requirements:
+
 - C++03
-- Python 2.7 (Python 3.3 not required, but testing against it is recommended)
+
+  - C++11 features are not used, but code should compile when ``-std=c++11`` is used
+
+- Python 2.7
+
+  - Python 3.3 not required, but testing against it is recommended
+
 - Lisp SBCL 1.1.14
 - CMake 2.8.12
 - Boost 1.54
 
 Exact or Series Requirements:
+
 - Ogre3D 1.8.x (Trusty)
 - Ogre3D 1.9.x (Other Systems)
 - Gazebo 5
@@ -146,8 +168,17 @@ Exact or Series Requirements:
 - OpenCV 2.4.x
 
 Buildsystem support:
-- catkin: build from source, release for binary packaging, wiki documentation, continuous integration
-- rosbuild: build from source
+
+- catkin:
+
+  - build from source
+  - release for binary packaging
+  - wiki documentation
+  - continuous integration
+
+- rosbuild:
+
+  - build from source
 
 Motivation
 ==========
@@ -169,14 +200,12 @@ These targets, including starting and ending support dates, are based on the Dis
 C++
 ---
 
-We use the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
+As of ROS Jade, we are still using the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
 While we mainly develop with gcc, no use of compiler-specific features is allowed
 without proper use of macros to allow use on other platforms.
 
-Use of C++[0|1]x or tr1 features are only allowed if support for that feature is checked
-at compile time, and equivalent functionality exists without requiring C++[0|1]x
-code.  A wholesale jump to C++[0|1]x will not happen until all commonly used
-OS platforms fully support it.
+Use of C++11/C++14 features and filesystem/networking/etc... TS's (Technical Specifications) is allowed if they are checked for at configure time and equivalent functionality can be provided with the extra compiler features.
+While we will not use C++11 features to preserve the C++03 compatibility, the code should compile when C++11 features are turned on, i.e. when `-std=c++11` is used.
 
 For a given release we allow use of Boost libraries that match the version provided in our
 low-water-mark Ubuntu version.
@@ -215,7 +244,7 @@ Since even half a year after the Hydro release not a single rosbuild-based
 package was released the support for building Debian packages of rosbuild-based
 packages has been discontinued in Hydro.
 
-As of Indigo the ROS buildfarm also only supports documenting and continuous
+As of Indigo the ROS build farm also only supports documenting and continuous
 integration testing of catkin-based packages.
 Since Indigo is a LTS release and aims to be supported for several years
 maintaining the legacy code for rosbuild-based packages seems to be
