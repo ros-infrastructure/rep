@@ -1,0 +1,129 @@
+REP: 144
+Title: ROS Package Naming and Versioning
+Author: Vincent Rabaud <vincent.rabaud@gmail.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 28-Jan-2015
+Post-History:
+
+
+Abstract
+========
+
+This REP gives advice on how a ROS package should be named and versioned. It
+formalizes and extends conventions that were formerly described in [1]_.
+
+Motivation
+==========
+
+As the number of ROS packages increases, it is hard to quickly find a package
+and guess its functionality based on its name. Over time, the lack of naming 
+conventions created problems like use of unexplained acronyms or
+packages with the same functionality but different names.
+
+This REP proposes rules to name a ROS package properly. Those 
+rules are not mandatory, merely informative.
+
+
+Package Naming
+==============
+
+Global Rules
+------------
+
+* ``alphanumerics`` are ``A-Za-z0-9`` only
+* a package name is defined more strictly than with Debian at [2]_. It must only consist
+  of lower case letters ``a-z``, digits ``0-9`` and ``_`` separators. They must be at
+  least two characters long and must start with an alphanumeric character
+* package names should be specific enough to identify what the package does. For example,
+  a motion planner should not called ``planner``. If it implements the wavefront propagation
+  algorithm, it might be called ``wavefront_planner``. There's obviously tension between
+  making a name specific and keeping it from becoming overly verbose
+* using catchall names such as ``utils`` should be avoided as they do not scope what goes
+  into the package or what should be outside the package
+* a package name should not contain ``ros`` as it is redundant. Exceptions include 
+  core packages and ROS bindings of an upstream library (e.g. ``moveit_ros``)
+* one of ROS's goals is to develop a canonical set of tools for making robots do
+  interesting things. The package name should describe what the package does, not where
+  it came from
+* to check whether a name is taken, consult [3]_. If you'd like your
+  repository included in that list, see the tutorial at [4]_
+
+Naming Rules
+------------
+
+The following rules define the different parts of the package name. The overall 
+idea is to prepend a name with words that distinguish it from similar 
+functional implementation (e.g.: ``lab``, ``robot``) but in order of importance 
+(e.g.: ``python_robot_lab``). Similarly, words that specialize this 
+functionality are appended (e.g. ``msgs``, ``config`` ...).
+
+The rules to add those words should be followed in order. For prefixes:
+
+* if a package is specialized by an entity (lab, company, ...), prepend the 
+  name of the entity
+* if a package is specialized for a software project, prepend its name
+* if a package is specialized for a hardware piece, prepend its name
+* if a package is specialized for a robot, prepend its name
+
+For suffixes:
+
+* if a package is a driver, append ``driver``
+* if a package contains any of a ROS message/service/action, append ``msgs``
+* if a package is a plugin for a library, append ``library-name_plugins``, e.g. 
+  ``pr2_gazebo_plugins``
+* if a package is meant for test only, append ``test``
+
+Special Suffixes:
+
+* a development only package, containing anything used to compile against 
+  (headers, CMake files ...) should have its name end in ``dev``
+* a package built in debug mode should have its name end in ``dbg``
+* a meta package for a robot should be named ``name-of-the-robot_robot``, e.g. 
+  ``pr2_robot``
+* a package containing the URDF and meshes of a robot should be named 
+  ``name-of-the-robot_description``, e.g ``pr2_willow_garage_description``
+
+Special Cases
+-------------
+
+* a Python package should have its name starting with ``python`` to follow the 
+  Debian usage
+* a package containing only a set of launch files should end with ``launch``
+* a package containing one or more tutorials only should end with ``tutorials``
+* a package containing one or more demos only should end with ``demos``
+* a package containing one or more tests only should end with ``tests``
+* third party libraries that are patched / integrated into ROS should not be named
+  like their rosdep key as it creates a conflict across Ubuntu versions. If it is
+  not specialized, name it generically ``name-of-library_ros``
+
+Package Version
+===============
+
+The versioning should follow the Debian convention as detailed in [5]_ : it may
+contain only alphanumerics and the characters ``. + - : ~``
+(full stop, plus, hyphen, colon, tilde) and should start with a digit.
+
+References
+==========
+
+.. [1] ROS Pattern Conventions
+   (http://wiki.ros.org/ROS/Patterns/Conventions#Packages)
+
+.. [2] Debian package naming convention
+   (https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Source)
+
+.. [3] Browsing ROS Packages
+   (http://www.ros.org/browse)
+
+.. [4] Indexing Your ROS Repository for Documentation Generation
+   (http://wiki.ros.org/rosdistro/Tutorials/Indexing%20Your%20ROS%20Repository%20for%20Documentation%20Generation)
+
+.. [5] Debian package upstream_version convention
+   (https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
