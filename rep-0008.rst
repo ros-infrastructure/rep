@@ -93,7 +93,7 @@ Note that the ``packages`` parameter points to all Python packages which should 
 Also note the ``package_dir`` parameter indicates that all aforementioned packages are located in the ``src`` folder by using the empty string as a key.
 This standard boiler plate configuration for Python packages allows you to place your Python code anywhere you like within your package and follows the Python ``setuptools`` conventions.
 
-If your package contains messages or services then they will generate code into a Python package called ``msgs`` or ``srvs`` in the root Python package, e.g. ``my_package/src/my_package/msgs`` or ``my_package/src/my_package/srvs``.
+If your package contains messages or services then they will generate code into a Python package called ``msgs`` or ``srvs`` in the root of your package's "Python package", e.g. ``my_package/msgs`` or ``my_package/srvs``.
 Though this generated code does not go into your package's source code, it does get merged with your package's Python source when getting installed.
 This is a new mechanism introduced with ``catkin`` because ``catkin`` installs into a FHS [5]_ layout, whereas ``rosbuild`` did not have an install step.
 
