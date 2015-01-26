@@ -62,6 +62,7 @@ In this case a "Python package" is a folder which contains a ``__init__.py`` fil
 Here is the recommended layout of an example ``catkin`` package called ``my_package`` which contains Python code::
 
     my_package
+    ├── CMakeLists.txt
     ├── package.xml
     ├── setup.py
     └── src
@@ -102,7 +103,23 @@ Your package shares a global ``PYTHONPATH`` namespace with other packages, so be
 Installing Scripts with catkin
 ''''''''''''''''''''''''''''''
 
-Python scripts, which can either be general scripts or "nodes", may be installed in one of two ways.
+We distinguish between "nodes" and "scripts" for clarity to users.
+Nodes are executable Python files that conform to the ROS node API.
+Scripts are executable Python files that do not conform to the ROS node API.
+
+Here is an example of a package with a node and a script:
+
+    my_package
+    ├── CMakeLists.txt
+    ├── nodes
+    │   └── my_node
+    ├── package.xml
+    ├── scripts
+    │   └── my_script
+    └── setup.py
+    ...
+
+Executable Python files, which can either be general scripts or "nodes", may be installed in one of two ways.
 
 ----
 
@@ -115,10 +132,10 @@ For example:
 
 .. code-block:: cmake
 
-  catkin_install_python(PROGRAMS scripts/my_script
+  catkin_install_python(PROGRAMS nodes/my_node
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-In this case the ``scripts/my_script`` is the location of the script you want to install relative to the location of the ``CMakeLists.txt`` file which contains these lines.
+In this case the ``nodes/my_node`` is the location of the node you want to install relative to the location of the ``CMakeLists.txt`` file which contains these lines.
 This ``CMakeLists.txt`` file is usually in the root of the package's source, but can be in other folders in some situations.
 
 ----
