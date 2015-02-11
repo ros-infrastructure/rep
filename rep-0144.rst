@@ -1,5 +1,5 @@
 REP: 144
-Title: ROS Package Naming and Versioning
+Title: ROS Package Naming
 Author: Vincent Rabaud <vincent.rabaud@gmail.com>
 Status: Draft
 Type: Informational
@@ -10,7 +10,7 @@ Post-History:
 Abstract
 ========
 
-This REP gives advice on how a ROS package should be named and versioned.
+This REP gives advice on how a ROS package should be named.
 It formalizes and extends conventions that were formerly described in [1]_.
 
 Motivation
@@ -118,13 +118,6 @@ Special Cases
   like their rosdep key as it creates a conflict across Ubuntu versions.
   If it is not specialized, name it generically ``<name_of_library>_ros``
 
-Package Version
-===============
-
-The versioning should follow the Debian convention as detailed in [5]_ : it may
-contain only alphanumerics and the characters ``. + - : ~``
-(full stop, plus, hyphen, colon, tilde) and should start with a digit.
-
 References
 ==========
 
@@ -139,9 +132,6 @@ References
 
 .. [4] Indexing Your ROS Repository for Documentation Generation
    (http://wiki.ros.org/rosdistro/Tutorials/Indexing%20Your%20ROS%20Repository%20for%20Documentation%20Generation)
-
-.. [5] Debian package upstream_version convention
-   (https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version)
 
 Copyright
 =========
