@@ -21,7 +21,7 @@ and guess its functionality based on its name.
 Over time, the lack of naming conventions created problems like use of
 unexplained acronyms or packages with the same functionality but different names.
 
-FOr now, ROS package names translate directly to packages in supported Operating
+For now, ROS package names translate directly to packages in supported Operating
 Systems: therefore, there is a flat global namerspace in which rules have to
 be followed.
 
@@ -34,7 +34,8 @@ Package Naming
 Mandatory Rules
 ---------------
 
-A package name is defined more strictly than with Debian at [2]_.
+By habit, a package name is often used as a namespace (in C++ or any other language).
+Thus, the naming rules have to be strict.
 
 * ``alphanumerics`` are ``a-z0-9`` only
 * ``alphabetics`` are ``a-z`` only
@@ -65,8 +66,8 @@ Global Rules
   by an entity (lab, company, ...), prepend the name of the entity``.
   But once the package is commonly used, owned and maintained, that name can be dropped
   as the package becomes the reference
-* to check whether a name is taken, consult [3]_. If you'd like your
-  repository included in that list, see the tutorial at [4]_
+* to check whether a name is taken, consult [2]_. If you'd like your
+  repository included in that list, see the tutorial at [3]_
 
 Naming Rules
 ------------
@@ -113,7 +114,6 @@ Special Cases
   If it is a set of tutorials for another package, it should contain that other
   package name: e.g. ``navigation`` and ``navigation_tutorials``
 * a package containing one or more demos only should end with ``demos``
-* a package containing one or more tests only should end with ``tests``
 * third party libraries that are patched / integrated into ROS should not be named
   like their rosdep key as it creates a conflict across Ubuntu versions.
   If it is not specialized, name it generically ``<name_of_library>_ros``
@@ -124,13 +124,10 @@ References
 .. [1] ROS Pattern Conventions
    (http://wiki.ros.org/ROS/Patterns/Conventions#Packages)
 
-.. [2] Debian package naming convention
-   (https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Source)
-
-.. [3] Browsing ROS Packages
+.. [2] Browsing ROS Packages
    (http://www.ros.org/browse)
 
-.. [4] Indexing Your ROS Repository for Documentation Generation
+.. [3] Indexing Your ROS Repository for Documentation Generation
    (http://wiki.ros.org/rosdistro/Tutorials/Indexing%20Your%20ROS%20Repository%20for%20Documentation%20Generation)
 
 Copyright
