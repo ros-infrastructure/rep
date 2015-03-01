@@ -1,7 +1,7 @@
 REP: 144
 Title: ROS Package Naming
 Author: Vincent Rabaud <vincent.rabaud@gmail.com>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 28-Jan-2015
