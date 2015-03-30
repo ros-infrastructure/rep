@@ -54,6 +54,8 @@ The ``map`` frame is useful as a long-term global reference, but
 discrete jumps make it a poor reference frame for local sensing and
 acting.
 
+It is recommended to align the map with east and north for easier viewing,
+but is not required.
 
 odom
 ''''
@@ -81,8 +83,30 @@ The coordinate frame called ``base_link`` is rigidly attached to the
 mobile robot base. The ``base_link`` can be attached to the base in
 any arbitrary position or orientation; for every hardware platform
 there will be a different place on the base that provides an obvious
-point of reference. Note that REP 103 [1] specifies a preferred
+point of reference. Note that REP 103 [1]_ specifies a preferred
 orientation for frames.
+
+earth
+'''''
+
+The coordinate frame called ``earth`` is the origin of ECEF.
+
+This frame is designed to allow the interaction of multiple robots in different map frames.
+If the application only needs one map the ``earth`` coordinate frame is not expected to be present.
+In the case of running with multiple maps simultaneously the ``map`` and ``odom`` and ``base_link`` frames will need to be customized for each robot.
+If running multiple robots and bridging data between them, the transform frame_ids can remain standard on each robot if the other robots_frame_ids are rewritten.
+
+If the ``map`` frame is globally referenced the publisher from ``earth`` to ``map`` can be a static transform publisher.
+Otherwise the ``earth`` to ``map`` transform will usually need to be computed by taking the estimate of the current global position and subtracting the current estimated pose in the map to get the estimated pose of the origin of the map.
+
+In case the ``map`` frame's absolute positon is unknown at the time of startup, it can remain detached until such time that the global position estimation can be adaquately evaluated.
+This will operate in the same way that a robot can operate in the ``odom`` frame before localization in the ``map`` frame is innitialized.
+
+.. figure:: rep-0105/ECEF_ENU_Longitude_Latitude_relationships.svg
+   :width: 640px
+   :alt: Earth Centered Earth Fixed diagram
+   
+   A visualization of Earth Centered Earth Fixed with a tangential ``map`` frame.
 
 
 
@@ -94,12 +118,47 @@ in a robot system to each other. Therefore each coordinate frame has
 one parent coordinate frame, and any number of child coordinate
 frames. The frames described in this REP are attached as follows:
 
-``map`` --> ``odom`` --> ``base_link``
+.. raw:: html
+
+  <div class="mermaid" style="font-family:'Lucida Console', monospace">
+  %% Example diagram
+  graph LR
+      O(odom) --> B(base_link)
+      M(map) --> O
+      E(earth) --> M
+
+  </div>
+
 
 The ``map`` frame is the parent of ``odom``, and ``odom`` is the
 parent of ``base_link``.  Although intuition would say that both
 ``map`` and ``odom`` should be attached to ``base_link``, this is not
 allowed because each frame can only have one parent.
+
+
+Example of multi-robot tf graph using ECEF
+------------------------------------------
+
+
+.. raw:: html
+
+  <div class="mermaid" style="font-family:'Lucida Console', monospace">
+  %% Example diagram
+  graph TB
+      odom_1(odom_1) --> base_link1(base_link1)
+      map_1(map_1) --> odom_1
+      earth(earth) --> map_1
+      odom_2(odom_2) --> base_link2(base_link2)
+      map_2(map_2) --> odom_2
+      earth --> map_2
+  </div>
+
+This is an example of a tf tree with two robots using different maps for localization and having a common frame ``earth``.
+
+The diagram above uses different frame ids for clarity.
+However for maximum reusability it is recommended to use the canonical frame ids on each robot and use a script to forward information off of the robot.
+When the information is forwarded the frame ids should be remapped to disambiguate which robot they are coming from and referencing.
+
 
 
 Frame Authorities
@@ -114,6 +173,12 @@ broadcast the transform from ``map`` to ``base_link``. Instead, it
 first receives the transform from ``odom`` to ``base_link``, and uses
 this information to broadcast the transform from ``map`` to ``odom``.
 
+The transform from ``earth`` to ``map`` is statically published and
+configured by the choice of map frame. If not specifically configured
+a fallback position is to use the initial position of the vehicle as
+the origin of the map frame.
+If the map is not georeferenced so as to support a simple static transform the localization module can follow the same procedure as for publishing the estimated offset from the ``map` to the ``odom`` frame to publish the transform from ``earth`` to ``map`` frame.
+
 
 Exceptions
 ----------
@@ -122,18 +187,18 @@ The scope of potential robotics software is too broad to require all
 ROS software to follow the guidelines of this REP.  However, choosing
 different conventions should be well justified and well documented.
 
-
-
 Compliance
 ==========
 
-This REP depends on and is compliant with REP 103 [1].
+This REP depends on and is compliant with REP 103 [1]_.
 
 References
 ==========
 
 .. [1] REP 103, Standard Units of Measure and Coordinate Conventions
    (http://www.ros.org/reps/rep-0103.html)
+
+.. [2] Earth Centered, Earth Fixed Wikipedia article (https://en.wikipedia.org/wiki/ECEF)
 
 Copyright
 =========
