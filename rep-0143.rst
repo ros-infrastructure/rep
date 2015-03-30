@@ -1,7 +1,7 @@
 REP: 143
 Title: ROS distribution files
 Author: Dirk Thomas <dthomas@osrfoundation.org>
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 01-Sep-2014
