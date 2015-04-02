@@ -79,7 +79,7 @@ base_link
 
 The coordinate frame called ``base_link`` is rigidly attached to the
 mobile robot base. The ``base_link`` can be attached to the base in
-any arbitrary position or orienation; for every hardware platform
+any arbitrary position or orientation; for every hardware platform
 there will be a different place on the base that provides an obvious
 point of reference. Note that REP 103 [1] specifies a preferred
 orientation for frames.
