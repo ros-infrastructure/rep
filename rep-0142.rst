@@ -66,7 +66,7 @@ It may not contain any GUI dependencies.
       extends: [ros, ros_comm]
       packages: [catkin, cmake_modules, common_msgs, console_bridge,
                  gencpp, genlisp, genmsg, genpy, message_generation,
-                 message_runtime, ros_tutorials,
+                 message_runtime,
                  rosbag_migration_rule, rosconsole_bridge,
                  roscpp_core, rosgraph_msgs, roslisp, rospack,
                  std_msgs, std_srvs]
@@ -83,7 +83,7 @@ It may not contain any GUI dependencies.
   - ros_base:
       extends: [ros_core]
       packages: [actionlib, angles, bond_core, class_loader,
-                 common_tutorials, dynamic_reconfigure, nodelet_core,
+                 dynamic_reconfigure, nodelet_core,
                  pluginlib]
 
 Robot metapackage
@@ -143,7 +143,8 @@ Both of these variants contain tutorials for the stacks they provide.
 
   - desktop:
       extends: [robot, viz]
-      packages: [geometry_tutorials, roslint, rqt_common_plugins,
+      packages: [common_tutorials, geometry_tutorials, ros_tutorials,
+                 roslint, rqt_common_plugins,
                  rqt_robot_plugins, urdf_tutorials,
                  visualization_tutorials]
   - desktop_full:
