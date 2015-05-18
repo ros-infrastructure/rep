@@ -104,7 +104,7 @@ different files:
 * source.yaml
 * doc.yaml
 
-In order to correlate them realiably this information will be stored in a
+In order to correlate them reliably this information will be stored in a
 single distribution.yaml file. For each repository the content from the
 separate files is nested under a common repository entry in the new
 distribution file.
