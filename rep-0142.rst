@@ -1,5 +1,5 @@
 REP: 142
-Title: ROS Indigo Metapackages
+Title: ROS Indigo and Newer Metapackages
 Author: Tully Foote <tfoote@willowgarage.com>
 Status: Active
 Type: Informational
@@ -59,13 +59,14 @@ ROS Core
 
 The `ros_core` metapackage composes the core communication protocols.
 It may not contain any GUI dependencies.
+In ROS Jade `ros_core` is extended to include `geneus`.
 
 ::
 
  - ros_core:
       extends: [ros, ros_comm]
       packages: [catkin, cmake_modules, common_msgs, console_bridge,
-                 gencpp, genlisp, genmsg, genpy, message_generation,
+                 gencpp, geneus(Jade and newer), genlisp, genmsg, genpy, message_generation,
                  message_runtime,
                  rosbag_migration_rule, rosconsole_bridge,
                  roscpp_core, rosgraph_msgs, roslisp, rospack,
