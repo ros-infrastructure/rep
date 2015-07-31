@@ -1,0 +1,62 @@
+REP: 146
+Title: ROS Robot Parameter Naming Convention
+Author: Kei Okada <k-okada@jsk.t.u-tokyo.ac.jp>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 31-Jly-2015
+Post-History:
+
+Abstract
+========
+
+This REP aims to define the best practices for robot related parameter
+name space for making robot-agnostic packages.
+
+
+Motivation
+==========
+
+As the number of ROS-supported robot increases, we will write
+robot-agnostic packages, but still they need robot-specific
+information as calibration parameters.
+
+A `robot_description` parameter is widely shared naming convention
+among ROS community and this REP proposes such conventions for robot specific information on
+parameter, so application program can build their program on top of that.
+
+
+Specifications
+==============
+
+Parameters
+----------
+
+robot_description
+'''''''''''''''''
+
+`robot_description` stores robot kinematics / geometry information using
+URDF format.
+
+
+robot/type
+''''''''''
+
+`robot/type` stores robot type, for example 'pr2' in PR2 robot case [1]
+
+
+robot/name
+''''''''''
+
+`robot/name` stores robot name, default pr2 name is 'robot' [1]
+
+References
+==========
+
+.. [1] PR2 robot.yaml
+   (https://github.com/pr2-debs/pr2-core/blob/master/root/etc/ros/robot.yaml)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
