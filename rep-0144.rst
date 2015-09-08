@@ -82,12 +82,12 @@ Similarly, words that specialize this functionality are appended
 The rules to add those words should be followed in order.
 For prefixes:
 
-* if a package is specialized by an entity (lab, company, ...), prepend the 
-  name of the entity.
-  Once the package is commonly used, owned and maintained, that name can be dropped
 * if a package is specialized for a software project, prepend its name
 * if a package is specialized for a hardware piece, prepend its name
 * if a package is specialized for a robot, prepend its name
+* if a package is specialized by an entity (lab, company, ...), prepend the 
+  name of the entity.
+  Once the package is commonly used, owned and maintained, that name can be dropped
 
 For suffixes:
 
@@ -102,7 +102,7 @@ Special Suffixes:
   ``pr2_robot``
 * a package containing the URDF and meshes of a robot should be named 
   ``<name_of_the_robot>_description``, e.g ``pr2_description``
-* if a package is meant for test only, prepend ``test``
+* if a package is meant for test only, append ``tests``
 
 Special Cases
 -------------
@@ -117,6 +117,22 @@ Special Cases
 * third party libraries that are patched / integrated into ROS should not be named
   like their rosdep key as it creates a conflict across Ubuntu versions.
   If it is not specialized, name it generically ``<name_of_library>_ros``
+
+Examples
+--------
+
+The following is a list of examples following the above rules:
+
+* A set of launch files for a wavefront planner, made for the PR2 by
+  Willow Garage would have the following names when specializing the package more and more:
+
+  * ``planner_launch``
+  * ``wavefront_planner_launch``
+  * ``pr2_wavefront_planner_launch``
+  * ``willow_garage_pr2_wavefront_planner_launch``
+
+* OpenCV 3 package, packaged for ROS: ```opencv3_ros```
+* a set of launch files for navigation tests: ```navigation_launch_tests```
 
 References
 ==========
