@@ -22,7 +22,7 @@ Over time, the lack of naming conventions created problems like use of
 unexplained acronyms or packages with the same functionality but different names.
 
 For now, ROS package names translate directly to packages in supported Operating
-Systems: therefore, there is a flat global namerspace in which rules have to
+Systems: therefore, there is a flat global namespace in which rules have to
 be followed.
 
 This REP proposes rules to name a ROS package properly.
@@ -41,7 +41,7 @@ Thus, the naming rules have to be strict.
 * ``alphabetics`` are ``a-z`` only
 * it must only consist of alphanumerics and ``_`` separators.
   Other symbols might not be supported by some OSes (e.g. unicode characters) or would
-  make it hard to follow OSes conventions/
+  make it hard to follow OSes conventions.
 * they must be at least two characters long and must start with an alphabetic character.
   This rule is simply to force the name of the package to be more human understandable.
 
