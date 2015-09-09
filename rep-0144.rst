@@ -42,6 +42,8 @@ Thus, the naming rules have to be strict.
 * it must only consist of alphanumerics and ``_`` separators.
   Other symbols might not be supported by some OSes (e.g. unicode characters) or would
   make it hard to follow OSes conventions.
+  Do not use multiple ``_`` separators consecutively. 
+  This allows generated symbols to be guarenteed not to collide with package names.
 * they must be at least two characters long and must start with an alphabetic character.
   This rule is simply to force the name of the package to be more human understandable.
 
