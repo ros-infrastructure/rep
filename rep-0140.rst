@@ -615,14 +615,14 @@ package and message generation tasks.
 <architecture_independent/>
 '''''''''''''''''''''''''''
 
-This empty tag indicates that your package contains no
-architecture-specific files.  That information is intended for
-possible future use, the current ROS packaging tools and build farm
-ignore it.
+This empty tag indicates that your package produces no
+architecture-specific files once built.
+That information is intended for allowing optimization of packaging.
 
 Specifying ``<architecture_independent/>`` is recommended for
 metapackages and for packages defining only ROS messages and services.
 Python-only packages are reasonable candidates, too.
+It is not appropriate for any package which compiles C or C++ code.
 
 Be sure to remove this tag if some subsequent update adds
 architecture-dependent targets to a formerly independent package.
