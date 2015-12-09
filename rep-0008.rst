@@ -31,7 +31,7 @@ With ``catkin``
 The loader method of accessing Python code in ROS is obsolete if you are using
 ``catkin``.
 When using ``catkin``, the Python code for all packages will be on the
-``PYTHONPATH`` after sourcing the `setup.bash` file for your workspace.
+``PYTHONPATH`` after sourcing the ``setup`` file for your workspace.
 
 With ``rosbuild``
 -----------------
@@ -98,7 +98,7 @@ If your package contains messages or services then they will generate code into 
 Though this generated code does not go into your package's source code, it does get merged with your package's Python source when getting installed.
 This is a new mechanism introduced with ``catkin`` because ``catkin`` installs into a FHS [5]_ layout, whereas ``rosbuild`` did not have an install step.
 
-Your package shares a global ``PYTHONPATH`` namespace with other packages, so be considerate when creating Python packages at the root of your package's ``src`` folder as they can collide with others.
+Your package shares a global ``PYTHONPATH`` namespace with other packages (system Python packages as well as ROS packages with Python code), so be considerate when creating Python packages at the root of your package's ``src`` folder as they can collide with others.
 
 Installing Scripts with catkin
 ''''''''''''''''''''''''''''''
@@ -232,7 +232,7 @@ The target version of Python changes based on the requirements for each distribu
 See REP-0003 [2]_ for the target Python version for each ROS distribution.
 
 Currently, as of 2015, the target is Python 2.7+, but we wish to encourage
-code that is easily transitioned to Python 3 [3]_.
+code that is easily transitioned to Python 3 [3]_ [6]_.
 
 This means you should follow the recommended guidelines on the ROS wiki:
 
@@ -255,6 +255,9 @@ References
 
 .. [5] Wikipedia: Filesystem Hiearchy Standard
    http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
+
+.. [6] ROS Python 2/3 Compatibility Guidelines
+   http://wiki.ros.org/python_2_and_3_compatible_code
 
 Copyright
 =========
