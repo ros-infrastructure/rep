@@ -14,6 +14,9 @@ Abstract
 This document gives coding conventions for the Python code comprising
 the standard library in the main ROS distribution.
 
+Since originally being published, this REP has been updated to include
+``catkin`` and ``rosbuild`` specific sections where appropriate.
+
 Coding Style
 ============
 
@@ -22,27 +25,148 @@ Please follow Python's PEP 8 [1]_ for guidelines on formatting, naming, etc...
 The Loader
 ==========
 
-roslib is the only ROS Python package you can automatically assume to
+With ``catkin``
+---------------
+
+The loader method of accessing Python code in ROS is obsolete if you are using
+``catkin``.
+When using ``catkin``, the Python code for all packages will be on the
+``PYTHONPATH`` after sourcing the ``setup`` file for your workspace.
+
+With ``rosbuild``
+-----------------
+
+``roslib`` is the only ROS Python package you can automatically assume to
 be importable other than your local files. If your Python package has
 dependencies, you must include the following header at the top::
 
     import roslib
     roslib.load_manifest('your_package_name')
 
-roslib.load_manifest looks at your manifest.xml and places your
-dependencies on your Python path. DO NOT use multiple load_manifest
+``roslib.load_manifest`` looks at your ``manifest.xml`` and places your
+dependencies on your Python path. DO NOT use multiple ``load_manifest``
 calls. If you need multiple calls, it's probably because you're
 missing the correct dependencies in your manifest.
 
 
-Package/Module Names (__init__.py files)
-========================================
+Package/Module Names (``__init__.py`` files)
+============================================
+
+With ``catkin``
+---------------
+
+When using ``catkin`` you can organize your Python code in any way that you like, but you must inform Python's ``setuptools`` where your code is located by creating a ``setup.py`` file.
+The recommended layout is to put all of your package's importable Python code in the ``src`` folder of your package and in a "Python package" with the same name as your package.
+In this case a "Python package" is a folder which contains a ``__init__.py`` file, indicating that the folder contains additional Python packages and modules.
+
+Here is the recommended layout of an example ``catkin`` package called ``my_package`` which contains Python code::
+
+    my_package
+    ├── CMakeLists.txt
+    ├── package.xml
+    ├── setup.py
+    └── src
+        └── my_package
+            ├── __init__.py
+            ├── a_nested_python_package
+            │   └── __init__.py
+            └── a_python_module.py
+
+In this example there is a root Python package in the ``src`` folder called ``my_package``, which follows the recommendation.
+This root Python package then contains a Python module called ``a_python_module`` and a nested Python package called ``a_nested_python_package``.
+
+In this example the ``setup.py`` will use the convenience function ``generate_distutils_setup``, which is provided by ``catkin``, in order to extract information like the version and description from the
+package's manifest file, i.e. the ``package.xml``:
+
+.. code-block:: python
+
+    from distutils.core import setup
+    from catkin_pkg.python_setup import generate_distutils_setup
+
+    d = generate_distutils_setup(
+        packages=['my_package', 'my_package.a_nested_python_package'],
+        package_dir={'': 'src'},
+    )
+
+    setup(**d)
+
+Note that the ``packages`` parameter points to all Python packages which should be installed, even the nested one.
+Also note the ``package_dir`` parameter indicates that all aforementioned packages are located in the ``src`` folder by using the empty string as a key.
+This standard boiler plate configuration for Python packages allows you to place your Python code anywhere you like within your package and follows the Python ``setuptools`` conventions.
+
+If your package contains messages or services then they will generate code into a Python package called ``msgs`` or ``srvs`` in the root of your package's "Python package", e.g. ``my_package/msgs`` or ``my_package/srvs``.
+Though this generated code does not go into your package's source code, it does get merged with your package's Python source when getting installed.
+This is a new mechanism introduced with ``catkin`` because ``catkin`` installs into a FHS [5]_ layout, whereas ``rosbuild`` did not have an install step.
+
+Your package shares a global ``PYTHONPATH`` namespace with other packages (system Python packages as well as ROS packages with Python code), so be considerate when creating Python packages at the root of your package's ``src`` folder as they can collide with others.
+
+Installing Scripts with catkin
+''''''''''''''''''''''''''''''
+
+We distinguish between "nodes" and "scripts" for clarity to users.
+Nodes are executable Python files that conform to the ROS node API.
+Scripts are executable Python files that do not conform to the ROS node API.
+
+Here is an example of a package with a node and a script:
+
+    my_package
+    ├── CMakeLists.txt
+    ├── nodes
+    │   └── my_node
+    ├── package.xml
+    ├── scripts
+    │   └── my_script
+    └── setup.py
+    ...
+
+Executable Python files, which can either be general scripts or "nodes", may be installed in one of two ways.
+
+----
+
+One way is to use the ``catkin_install_python`` CMake macro.
+This macro will take a Python script and install it to the given destination, rewriting the shebang (``#!/usr/bin/env python``) line if necessary.
+This mimics the behavior of how Python's ``setuptools`` installs scripts.
+The recommendation is to install these types of scripts to the "bin destination" folder (a.k.a. ``libexec``), which makes the scripts accessible from ``rosrun`` but does not expose them on the global system ``PATH``.
+These scripts are isolated by package, so there is no chance of colliding with another package's script of the same name.
+For example:
+
+.. code-block:: cmake
+
+  catkin_install_python(PROGRAMS nodes/my_node
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+In this case the ``nodes/my_node`` is the location of the node you want to install relative to the location of the ``CMakeLists.txt`` file which contains these lines.
+This ``CMakeLists.txt`` file is usually in the root of the package's source, but can be in other folders in some situations.
+
+----
+
+The other option is to use the ``setup.py`` to install Python scripts to the ``bin`` folder which is on the system ``PATH``.
+This means that these scripts are not found by ``rosrun``, but they are runnable from the shell directly.
+This is not the recommended way to install you scripts because it increases the chance of a collision with another package's scripts.
+Use with caution, but here is an example of how to add a script to your ``setup.py``:
+
+.. code-block:: python
+
+    from distutils.core import setup
+    from catkin_pkg.python_setup import generate_distutils_setup
+
+    d = generate_distutils_setup(
+        scripts=['scripts/my_script'],
+        ...
+    )
+
+    setup(**d)
+
+In this example, ``scripts/my_script`` is the location of the script you want to install relative to the location of this ``setup.py`` file, which should be in the root of your package source.
+
+With ``rosbuild``
+-----------------
 
 All python code must be placed within a module namespace. ROS exports
 your Python source directory to be on the path of any of your
-dependencies, so it is important not to accidentally clobber someone
-else's import. We strongly recommend that this module name be the same
-as your ROS package name.
+dependents (packages which depend on you), so it is important not to
+accidentally clobber someone else's import. We strongly recommend that this
+module name be the same as your ROS package name.
 
 There are two recommended code layouts:
 
@@ -67,12 +191,12 @@ Module with msgs/srvs::
           |- yourfiles.py
      |- scripts/
         |- non-exported python files
-    
+
 We distinguish between "nodes" and "scripts" for clarity to
 users. Nodes are executable Python files that conform to the ROS node
 API. Scripts are executable Python files that do not conform to the
 ROS node API.
-           
+
 If you don't know what an __init__.py file is, we recommend that you
 read `What is init py used for?
 <http://effbot.org/pyfaq/what-is-init-py-used-for.htm>`_?
@@ -104,29 +228,15 @@ src/packagename helps encourage this.
 Python Features and Version
 ===========================
 
-The current target platform is Python 2.5 [2]_, though we wish to make
-code that is easily transitioned to Python 2.6, 2.7, and, more
-importantly, Python 3000 [3]_.
+The target version of Python changes based on the requirements for each distribution.
+See REP-0003 [2]_ for the target Python version for each ROS distribution.
 
-This means:
+Currently, as of 2015, the target is Python 2.7+, but we wish to encourage
+code that is easily transitioned to Python 3 [3]_ [6]_.
 
-- Use new-style classes 
-- No ``reduce()``. ``sum()`` works in most cases and ``for`` loops are often as fast or faster
-- Try to avoid ``map()`` or ``filter()`` as they are on Guido's hit list. Use list comprehensions.
-- Use ``raise Exception("msg")`` instead of ``raise Exception, msg``
-- No backticks as a shortcut for ``repr``
-- No ``<>``, use ``!=``
-- Use ``from __future__ import division`` so that you're using true division, not floor division [4]_
-- Use ``subprocess`` instead of ``popen2``, ``os.popen``
-- Avoid ``dict.has_key()``, use ``key in dict`` instead.
-- Try to avoid using the results of ``zip()``, ``range()``, ``map()``, or ``filter()`` as a list as these will return iterators in the future
+This means you should follow the recommended guidelines on the ROS wiki:
 
-All the above are on this list either because:
-
-- They are not compatible with Python 2.5
-- They will potentially be eliminated in Python 3000. 
-
-Also, be careful not to introduce Python 2.6 features, such as ``Exception as ex``.
+http://wiki.ros.org/python_2_and_3_compatible_code
 
 References
 ==========
@@ -143,13 +253,17 @@ References
 .. [4] PEP 238, Changing the Division Operator, Zadka
    http://www.python.org/dev/peps/pep-0238
 
+.. [5] Wikipedia: Filesystem Hiearchy Standard
+   http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
+
+.. [6] ROS Python 2/3 Compatibility Guidelines
+   http://wiki.ros.org/python_2_and_3_compatible_code
+
 Copyright
 =========
 
 This document has been placed in the public domain.
 
-
-
 ..
    Local Variables:
    mode: indented-text
