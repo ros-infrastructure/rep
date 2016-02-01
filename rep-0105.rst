@@ -71,7 +71,7 @@ source, such as wheel odometry, visual odometry or an inertia
 measurement unit.
 
 The ``odom`` frame is useful as an accurate, short-term local
-reference, but drift makes is a poor frame for long-term reference.
+reference, but drift makes it a poor frame for long-term reference.
 
 
 base_link
