@@ -69,7 +69,7 @@ REP Work Flow
 =============
 
 The REP editors assign REP numbers and change their status.  Please send
-all REP-related email to <ros-users@code.ros.org> (no cross-posting please).
+all REP-related email to <ros-users@lists.ros.org> (no cross-posting please).
 Also see `REP Editor Responsibilities & Workflow`_ below.
 
 The REP process begins with a new idea for ROS.  It is highly
@@ -385,7 +385,7 @@ REP Editor Responsibilities & Workflow
 ======================================
 
 All REP-related correspondence should be sent (or CC'd) to
-<ros-users@code.ros.org>.
+<ros-users@lists.ros.org>.
 
 For each new REP that comes in an editor does the following:
 
@@ -419,7 +419,7 @@ Once the REP is ready for the repository, the REP editor will:
 * Send email back to the REP author with next steps (post to
   ros-users).
 
-Updates to existing REPs also come in to ros-users@code.ros.org.  Many
+Updates to existing REPs also come in to ros-users@lists.ros.org.  Many
 REP authors are not GIT committers yet, so we do the commits for them.
 
 Many REPs are written and maintained by developers with write access
