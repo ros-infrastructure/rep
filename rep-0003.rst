@@ -211,6 +211,8 @@ Exact or Series Requirements:
 - Gazebo 7
 - PCL 1.7.x
 - OpenCV 3.1.x
+- Qt 5.3.x
+- PyQt5
 
 Buildsystem support:
 
