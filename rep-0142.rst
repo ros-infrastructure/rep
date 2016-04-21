@@ -60,14 +60,15 @@ ROS Core
 The `ros_core` metapackage composes the core communication protocols.
 It may not contain any GUI dependencies.
 In ROS Jade `ros_core` is extended to include `geneus`.
+In ROS Kinetic `ros_core` is extended to include `genjs`.
 
 ::
 
  - ros_core:
       extends: [ros, ros_comm]
       packages: [catkin, cmake_modules, common_msgs, console_bridge,
-                 gencpp, geneus(Jade and newer), genlisp, genmsg, genpy, message_generation,
-                 message_runtime,
+                 gencpp, geneus(Jade and newer), genjs(Kinetic and newer),
+                 genlisp, genmsg, genpy, message_generation, message_runtime,
                  rosbag_migration_rule, rosconsole_bridge,
                  roscpp_core, rosgraph_msgs, roslisp, rospack,
                  std_msgs, std_srvs]
