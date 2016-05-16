@@ -10,8 +10,6 @@ DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
   <meta name="google-site-verification" content="CjkdY6BqKWAVmQ78_iSq6J7ZZ9AoL7-CjFVBYGg9FU4" /> 
   <meta http-equiv="Content-Type" content="text/html; charset=%(encoding)s" />
   <meta name="generator" content="Docutils %(version)s: http://docutils.sourceforge.net/" />
-
-<script type="text/javascript" src="http://wiki.ros.org/custom/js/seesaw.js"></script>
  
 <script type="text/javascript"> 
  
