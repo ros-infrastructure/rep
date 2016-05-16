@@ -532,6 +532,30 @@ text form, you should consider including a description or ASCII art
 alternative, using a comment (below).
 
 
+Graphs
+------
+
+ROS REPs support `mermaid diagrams`_
+
+
+.. _mermaid diagrams: https://knsv.github.io/mermaid/ 
+
+You can create flow charts: 
+  
+  
+.. raw:: html
+  
+  <div class="mermaid">
+  %% Example diagram
+  graph LR
+      A[Square Rect] -- Link text --> B((Circle))
+      A --> C(Round Rect)
+      B --> D{Rhombus}
+      C --> D
+  </div>
+
+Gantt charts and sequences should also be possible but do not appear to be working.
+
 Comments
 --------
 
