@@ -113,7 +113,7 @@ Hydro Medusa (Aug 2013)
   - documenting
   - continuous integration testing
 
-- For rosbuild based packages can still be built from source.
+- Rosbuild based packages can still be built from source.
 
 Indigo Igloo (May 2014)
 -----------------------
@@ -134,7 +134,7 @@ Indigo Igloo (May 2014)
   - documenting
   - continuous integration testing
 
-- For rosbuild based packages can still be built from source.
+- Rosbuild based packages can still be built from source.
 
 Jade Turtle (May 2015 - May 2017)
 ---------------------------------
