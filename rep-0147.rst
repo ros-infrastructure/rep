@@ -1,0 +1,365 @@
+REP: 147
+Title: A Standard interface for Aerial Vehicles
+Author: Tully Foote
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 16-May-2016
+Post-History: 30-Aug-2002
+
+
+Abstract
+========
+
+This REP is written to provide a common interface for aerial vehicles.
+This interface is designed to promote interoperability and reusability of core functionality between diverse aerial vehicles.
+By leveraging the interfaces defined in this REP we both tools and libraries can be designed to be reusable between different frameworks and vehicles.
+It is expected that aerial vehicles can and will implement additional interfaces in addition to these core interfaces.
+When choosing an interface these should be considered the default and only change away from them for a good reason.
+
+These interfaces are designed to be relevant for all types of aerial vehicles whether multi-copter, fixed-wing, hybrid, transitional or other.
+Like ground robots, the core abstraction is the same for all vehicles regardless of their method of motivation.
+
+Rationale
+=========
+
+There are a lot of developers around the world using ROS on aerial vehicles.
+As such there are also many different implementations which are similiar but not exactly compatible.
+A short list of existing known bridges and implementations follows: 
+
+ - astec_mav_framework [#astec]_
+ - autopilot_bridge [#autopilot_bridge]_
+ - CRATES [#crates]_
+ - dji_sdk_dji2ros [#djisdk]_
+ - hector_quadrotor [#hector]_
+ - mav_tools [#mav_tools]_
+ - mavlink2ros [#mavlink2ros]_
+ - mavros [#mavros]_
+ - roscopter [#roscopter]_
+ - rospilot [#rospilot]_
+
+Due to a lack of common interfaces the majority of the above packages cannot be used together.
+By implementing common interfaces elements of each package can be used in conjunction with elements of a different package.
+This will allow much better collaboration between projects and allow a reduction in duplicate efforts to implement the same functionality.
+
+There are also a lot of interfaces already well developed from other domains which can be brought into the aerial vehicle domain.
+This REP seeks to also integrate as many of those reusable interfaces as well to provide the greatest compatibilty with those other domains.
+
+Other interface defintions
+==========================
+
+There are a lot of messages already defined.
+These messages definitions were used to help define this set. 
+
+ - DroneKit [#dronekit]_
+ - mav_msgs [#mav_msgs]_
+ - mavlink [#mavlink]_
+ - mavlink2 [#mavlink2]_
+ - mavros_msgs [#mavros]_
+ - nav_msgs [#nav_msgs]_
+ - trajectory_msgs [#trajectory_msgs]_
+
+
+
+Reference Abstractions
+======================
+
+For this document we will use the following abstractions of the architecture.
+These abstractions are used to define the interfaces, however it is not required that a given system implement all the interfaces.
+A given system may implement subsets of these interfaces.
+
+
+Control Abstractions
+--------------------
+
+For controlling an aerial vehicle we will use the following terms for the interfaces.
+
+.. raw:: html
+  
+  <div class="mermaid">
+  graph LR
+    na[ ]
+    tc[Trajectory Controller]
+    ac[Attitude Controller]
+    rc[Rate Controller]
+    va[Vehicle Abstraction]
+    na ==>|Trajectory|tc
+    tc ==>|Pose|ac
+    ac ==>|Rate|rc
+    rc ==>|Acceleration|va
+    
+    va -.-> am[Allocation Matrix]
+    va -.-> mixer
+    
+    am -.-> Actuators
+    mixer -.-> Actuators 
+  </div>
+
+High Level Architecture
+-----------------------
+
+A higher level view of the system uses the following abstraction.
+
+.. raw:: html
+  
+  <div class="mermaid">
+  graph LR
+    GCS[Ground Control Station]
+    CS[Collision Sensors]
+    OS[Odometry Sensors]
+    C[Controller]
+    L[ ]
+    style L fill:#fff,stroke:#ff0,stroke-width:0px;
+    L --> CS
+    L --> GCS
+    L --> OS
+    subgraph Generic Planning Framework
+    CM[Collision Mapping]
+    MSC[Minimum Snap Controller]
+    CM ---|Shared State|MSC
+    end
+    CS -->|Obstacle Observations|CM
+    OS -->|Odometry|MSC
+    OS -->|Odometry|CM
+    OS -->|Odometry|C
+    GCS -->|Goals|MSC
+    MSC -->|Trajectory|C
+    %% Links to L 
+    linkStyle 0 fill:#fff,stroke:#ff0,stroke-width:0px;
+    linkStyle 1 fill:#fff,stroke:#ff0,stroke-width:0px;
+    linkStyle 2 fill:#fff,stroke:#ff0,stroke-width:0px;
+  </div>
+
+
+Coordinate Frames
+=================
+
+It is expected that users of this interface will also follow the coordinate frame conventions layed out in REP 105 [#rep105]_.
+
+Proposed Interfaces
+===================
+
+Control Interfaces
+------------------
+
+Trajectory Control Interface
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+For sending trajectories in 3D space there already exists a message used for free space planning.
+This message used is ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_ and is actively used by planning frameworks already.
+
+This message is not the most straight forward to parse as it has a lot of optional fields which increases the complexity and requires consistent labelling and filling.
+The complexity of the message parsing is traded off against supporting a relatively compact representations.
+
+* Datatype: ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_ 
+* Topic: ``command_trajectory``
+
+Pose Interface
+,,,,,,,,,,,,,,
+
+The message to send a goal pose is ``geometry_msgs/PoseStamped`` [#posestamped]_.
+This is a very highly used standard message and contains precisely the information needed.
+
+* Datatype: ``geometry_msgs/PoseStamped`` [#posestamped]_
+* Topic: ``command_pose``
+
+
+Rate Interface
+,,,,,,,,,,,,,,
+
+The Rate interface can be implemented by two messages.
+
+The messages are ``mav_msgs/AttitudeThrust`` [#attitudethrust]_ and ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_.
+These are both well established messages which have evolved from usage.
+They are well established and have several existing implementations.
+The ``mav_msgs/RollPitchYawrateThrust`` is a convenience message to support low level controllers that are not aware of the absolute yaw.
+
+They diverge from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
+A ``Twist`` based inteface could be provided for backwards compatability as well.
+It was chosen do diverge here since this is a much more natural interface for aerial vehicles.
+
+* Datatype: ``mav_msgs/AttitudeThrust`` [#attitudethrust]_
+* Topic: ``command_velocity``
+* Datatype: ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_
+* Topic: ``command_velocity_rpy``
+
+Implementations of this interface should accept messages on either topic/datatype.
+Publishers are expected to choose only one.
+
+Acceleration Interface
+,,,,,,,,,,,,,,,,,,,,,,
+
+The acceleartion interface is implemented using the established ``mav_msgs/RateThrust`` [#ratethrust]_ message.
+This message is very similar to the standard ``Twist`` message however it removes some of the ambiguities of the reference frame by explicitly referencing the body frame.
+
+* Datatype: ``mav_msgs/RateThrust``  [#ratethrust]_
+* Topic: ``command_acceleration``
+
+High Level Interfaces
+---------------------
+
+Odometry Interface
+,,,,,,,,,,,,,,,,,,
+
+To communicate odometry information the ``nav_msgs/Odometry`` message will be used. [#odometry]_
+This is the standard message used throughout ROS systems already, many modules already take advantage of it.
+However there are many use cases for aerial vehicles when the estimation of the acceleration is important.
+So an additional message will be defined which provides acceleration in addition to position and velocity already defined.
+This additional message will be published in parallel.
+For backwards compatibility all systems will publish both.
+
+* Datatype: ``nav_msgs/Odometry`` [#odometry]_
+* Topic: ``odom``
+
+* Datatype: ``nav_msgs/OdometryWithAcceleration`` `[proposed]`
+* Topic: ``odometry``
+
+
+Goal Interface
+,,,,,,,,,,,,,,
+
+It is expected that there will be several high level ways to communicate goals which are application specific.
+
+TODO(tfoote): Maybe add a standard GPS waypoint list here? Things already in mavlink?
+
+Currently Unspecified
+---------------------
+
+Obstacle Observations
+,,,,,,,,,,,,,,,,,,,,,
+
+The obstacle observations are expected to use common sensor messages.
+However since there are a large variety of potential sensors, this interface will not be defined in this REP.
+It is recommended to use the common messages such as ``LaserScan``, ``DepthImage``, and ``PointCloud2`` from ``sensor_msgs`` whenever possible. [#sensormsgs]_
+
+Shared State
+,,,,,,,,,,,,
+
+The shared state between the collision mapping and motion planning controller is expected to be very specific to the implementation.
+As such it is not proposed to be standardized.
+
+Other Interfaces
+================
+
+Battery State
+-------------
+Aerial vehicles should use the ``sensor_msgs/BatteryState`` message for reporting their battery status. [#batterystate]_
+This is a recently standardized message which is much more broadly applicable than aerial vehicles and has already been standardized.
+
+* Datatype: ``sensor_msgs/BatteryState`` [#batterystate]_
+* Topic: ``battery_state``
+
+
+Summary
+=======
+
+Existing interfaces
+-------------------
+
+ - Battery State via ``sensor_msgs/BatteryState`` [#batterystate]_
+ - Trajectory via ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_
+ - Rates via ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_ or ``mav_msgs/AttitudeThrust`` [#attitudethrust]_
+ - Accelerations via ``mav_msgs/RateThrust``  [#ratethrust]_
+ - Obstacle information from common ``sensor_msgs`` [#sensormsgs]_
+ - Odometry via``nav_msgs/Odometry`` [#odometry]_
+
+Proposed New Interfaces
+
+ - Extended Odometry via proposed ``nav_msgs/OdometryWithAcceleration`` [propoised]
+
+References
+==========
+
+.. [#astec] astec_mav_framework
+   (http://wiki.ros.org/asctec_mav_framework)
+
+.. [#mavlink2ros] mavlink2ros
+   (https://github.com/posilva/mav2rosgenerator)
+
+.. [#mavros] mavros
+   (http://wiki.ros.org/mavros)
+
+.. [#roscopter] roscopter
+   (https://code.google.com/p/roscopter/)
+
+.. [#crates] CRATES
+   (https://bitbucket.org/asymingt/crates)
+
+.. [#rospilot] rospilot
+   (http://wiki.ros.org/rospilot)
+
+.. [#hector] hector_quadrotor
+   (http://wiki.ros.org/hector_quadrotor)
+
+.. [#autopilot_bridge] autopilot_bridge
+   (https://github.com/mikeclement/autopilot_bridge)
+
+.. [#mav_tools] mav_tools
+   (http://wiki.ros.org/mav_tools)
+
+.. [#djisdk] dji_sdk_dji2ros
+   (http://www.ros.org/browse/details.php?distro=indigo&name=dji_sdk_dji2mav)
+
+.. [#batterystate] sensor_msgs/BatteryState
+   (http://docs.ros.org/api/sensor_msgs/html/msg/BatteryState.html)
+
+.. [#multidoftraj]
+   (http://docs.ros.org/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html)
+
+.. [#posestamped]
+   (http://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html)
+
+.. [#sensormsgs]
+   (http://wiki.ros.org/sensor_msgs)
+
+.. [#nav_msgs] nav_msgs
+   (http://wiki.ros.org/nav_msgs)
+
+.. [#trajectory_msgs] trajectory_msgs
+   (http://wiki.ros.org/trajectory_msgs)
+
+.. [#dronekit] DroneKit
+   (http://dronekit.io/)
+
+.. [#mav_msgs] mav_msgs
+   (http://wiki.ros.org/mav_msgs)
+
+.. [#mavlink] Mavlink
+   (http://qgroundcontrol.org/mavlink/start)
+
+.. [#mavlink2] Mavlink2
+   (https://github.com/diydrones/mavlink/blob/mavlink2-wip/doc/MAVLink2.md)
+
+.. [#odometry] odometry
+   (http://www.ros.org/doc/api/nav_msgs/html/msg/Odometry.html)
+
+.. [#ratethrust] mav_msgs/RateThrust
+   (http://docs.ros.org/jade/api/mav_msgs/html/msg/RateThrust.html)
+
+.. [#attitudethrust] mav_msgs/AttitudeThrust
+   (http://docs.ros.org/api/mav_msgs/html/msg/AttitudeThrust.html)
+
+.. [#rpythrust] mav_msgs/RollPitchYawrateThrust
+   (http://docs.ros.org/indigo/api/mav_msgs/html/msg/RollPitchYawrateThrust.html)
+
+.. [#twist] geometry_msgs/Twist
+   (http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html)
+
+.. [#rep105] REP 105: Coordinate Frames for Mobile Platforms
+   (http://www.ros.org/reps/rep-0105.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
