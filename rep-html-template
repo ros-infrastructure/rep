@@ -10,7 +10,6 @@ DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
   <meta name="google-site-verification" content="CjkdY6BqKWAVmQ78_iSq6J7ZZ9AoL7-CjFVBYGg9FU4" /> 
   <meta http-equiv="Content-Type" content="text/html; charset=%(encoding)s" />
   <meta name="generator" content="Docutils %(version)s: http://docutils.sourceforge.net/" />
- 
 <script type="text/javascript"> 
  
   var _gaq = _gaq || [];
@@ -42,6 +41,11 @@ DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
    <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="http://wiki.ros.org/moin_static197/rostheme/css/msie.css">
 <![endif]--> 
  
+
+<link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="mermaid.css">
+<script src="mermaid.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
+
 </head> 
  
 <body  lang="en" dir="ltr"> 
