@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="VersionType">
+    <xs:annotation>
+      <xs:documentation>
+        The version number must have the form "X.Y.Z" where X, Y, and Z
+        are non-negative integers, and must not contain leading zeroes.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="(0|[1-9][0-9]*)(.(0|[1-9][0-9]*)){2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="DescriptionType" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        The description allows any content but should be limit to XHTML.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="EmailType">
+    <xs:annotation>
+      <xs:documentation>
+        A valid email address must follow several complex rules
+        (see https://en.wikipedia.org/wiki/Email_address).
+        For ROS packages only a few are enforced and not the full character set
+        is supported.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[-a-zA-Z0-9_%+]+(\.[-a-zA-Z0-9_%+]+)*@[-a-zA-Z0-9%]+(\.[-a-zA-Z0-9%]+)*\.[a-zA-Z]{2,}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="PersonWithEmailType">
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute name="email" type="EmailType" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="PersonWithOptionalEmailType">
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute name="email" type="EmailType" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="UrlTypeEnum">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="website"/>
+      <xs:enumeration value="bugtracker"/>
+      <xs:enumeration value="repository"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="UrlType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:attribute name="type" type="UrlTypeEnum" use="optional" default="website"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="VersionLimitType">
+    <xs:annotation>
+      <xs:documentation>
+        The version limit must have the form "X.Y.Z", "X.Y", or "X".
+        See documentation for VersionType for further details.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="(0|[1-9][0-9]*)(.(0|[1-9][0-9]*)){0,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="DependencyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <!-- The dependency must have a version less then the specified limit. -->
+        <xs:attribute name="version_lt" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version less then or equal to the specified limit. -->
+        <xs:attribute name="version_lte" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version equal to the specified limit. -->
+        <xs:attribute name="version_eq" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version greater then or equal to the specified limit. -->
+        <xs:attribute name="version_gte" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version greater then the specified limit. -->
+        <xs:attribute name="version_gt" type="VersionLimitType" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="ExportType">
+    <xs:sequence>
+      <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
