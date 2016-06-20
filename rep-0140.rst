@@ -15,6 +15,7 @@ Outline
 #. Rationale_
 #. `Data Representation`_
 #. Compatibility_
+#. Schema_
 #. References_
 #. Copyright_
 
@@ -748,6 +749,19 @@ all ``<run_depend>`` elements must be removed and replaced with other
 appropriate dependencies.
 
 
+Schema
+======
+
+A schema defining the structure specified in this document is available
+at [11]_.
+To specify the schema within a manifest you can reference a self
+contained schema file like this:
+
+  <?xml version="1.0"?>
+  <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+  <package format="2">
+
+
 References
 ==========
 
@@ -771,6 +785,9 @@ References
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_QVFLQi-6wk>`_
 .. [10] REP-0134
    (http://ros.org/reps/rep-0134)
+.. [11] Schema file
+   (https://github.com/ros-infrastructure/rep/blob/master/xsd/package_format2.xsd)
+
 
 Copyright
 =========

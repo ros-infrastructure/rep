@@ -16,6 +16,7 @@ Outline
 #. `Data representation`_
 #. Compatibility_
 #. References_
+#. Schema_
 #. Copyright_
 
 
@@ -637,6 +638,19 @@ integrated using additional tags and attributes, but this requires
 introducing a new ``<package>`` format number.
 
 
+Schema
+======
+
+A schema defining the structure specified in this document is available
+at [8]_.
+To specify the schema within a manifest you can reference a self
+contained schema file like this:
+
+  <?xml version="1.0"?>
+  <?xml-model href="http://download.ros.org/schema/package_format1.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+  <package>
+
+
 References
 ==========
 
@@ -654,6 +668,8 @@ References
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_jRvhXFfsVk>`_
 .. [7] Buildsystem mailing list discussion: `"Dependency tag types for REP 127"
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/fXGSZG0SC08>`_
+.. [8] Schema file
+   (https://github.com/ros-infrastructure/rep/blob/master/xsd/package_format1.xsd)
 
 Copyright
 =========
