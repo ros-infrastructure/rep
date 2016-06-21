@@ -54,8 +54,9 @@ The ``map`` frame is useful as a long-term global reference, but
 discrete jumps make it a poor reference frame for local sensing and
 acting.
 
-It is recommended to align the map with east and north for easier viewing,
-but is not required.
+It is recommended to align the map with east, north, up (ENU) as a default for consisent viewing, but is not required.
+Reasons to choose other orientations might include local geographic feature alignment, or consistency with a prior map, or other application specific requirements.
+If the map is being constructed dynamically (SLAM) and absolute heading is unknown it is recommended to take a best estimate of NEU with at least up being as accurately aligned as possible.
 
 odom
 ''''
