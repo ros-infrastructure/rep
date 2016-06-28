@@ -56,7 +56,7 @@ acting.
 
 It is recommended to align the map with east, north, up (ENU) as a default for consisent viewing, but is not required.
 Reasons to choose other orientations might include local geographic feature alignment, or consistency with a prior map, or other application specific requirements.
-If the map is being constructed dynamically (SLAM) and absolute heading is unknown it is recommended to take a best estimate of NEU with at least up being as accurately aligned as possible.
+If the map is being constructed dynamically (SLAM) and absolute heading is unknown it is recommended to take a best estimate of ENU with at least up being as accurately aligned as possible.
 
 odom
 ''''
