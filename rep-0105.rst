@@ -218,6 +218,26 @@ a fallback position is to use the initial position of the vehicle as
 the origin of the map frame.
 If the map is not georeferenced so as to support a simple static transform the localization module can follow the same procedure as for publishing the estimated offset from the ``map` to the ``odom`` frame to publish the transform from ``earth`` to ``map`` frame.
 
+Transitions Between Maps
+------------------------
+
+When a robot travels a long distance it is expected that it will need to transition between maps.
+In an outdoor context map coordinate frame is a euclidian approximation of a vacinity however the euclidian approximation breaks down at longer distances due to the curvature of the earth.
+In an indoor context this can be transitioning between two buildings where each has a prior map in which you are navigating or the robot is on a new floor of a building.
+
+It is the responsibility of the localization frame authority to reparent the ``odom`` frame appropriately when moving between maps.
+The common implementation of computing the ``map`` to ``odom`` frame as the results of subtracting the ``odom`` to ``base_link`` from the localization fix ``map`` to ``base_link`` will take care of this implicitly when the choice of which ``map`` frame changes.
+
+**``odom`` consistency**
+
+When transitioning between maps the odometric frame should not be effected.
+Data retention policies for data collected in the odom frame should be tuned such that old or distant data is discarded before the integrated position error accumulates enough to make the data invalid.
+Depending on the quality of the robot's odometry these policies may be vastly different a wheeled vehicle with multiple redundant high resolution encoders will have a much lower rate of drift and will be able to keep data for a much longer time and or distance than a skid steer robot which only has open loop feedback on turning.
+
+There are other contexts which will also effect appropriate retention policy such as the robot being moved by external motivators or assumptions of a static environment.
+An example is a robot in an elevator where the environment has changed outside the elevator door between when it entered and exits the elevator.
+Most of these problems come from the assumption of a static environment where observations are in the same inertial frame as the robot.
+In these cases semantic information about the environment and objects in required to persist data correctly, but the inertial ``odom`` frame should remain continuous.
 
 Exceptions
 ----------
