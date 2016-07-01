@@ -154,6 +154,19 @@ The complexity of the message parsing is traded off against supporting a relativ
 * Datatype: ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_ 
 * Topic: ``command_trajectory``
 
+::
+
+  # The header is used to specify the coordinate frame and the reference time for the trajectory durations
+  Header header
+
+  # A representation of a multi-dof joint trajectory (each point is a transformation)
+  # Each point along the trajectory will include an array of positions/velocities/accelerations
+  # that has the same length as the array of joint names, and has the same order of joints as
+  # the joint names array.
+
+  string[] joint_names
+  MultiDOFJointTrajectoryPoint[] points
+
 Pose Interface
 ,,,,,,,,,,,,,,
 
@@ -163,6 +176,11 @@ This is a very highly used standard message and contains precisely the informati
 * Datatype: ``geometry_msgs/PoseStamped`` [#posestamped]_
 * Topic: ``command_pose``
 
+::
+
+  # A Pose with reference coordinate frame and timestamp
+  Header header
+  Pose pose
 
 Rate Interface
 ,,,,,,,,,,,,,,
@@ -180,8 +198,46 @@ It was chosen do diverge here since this is a much more natural interface for ae
 
 * Datatype: ``mav_msgs/AttitudeThrust`` [#attitudethrust]_
 * Topic: ``command_velocity``
+
+::
+
+  Header header
+
+  geometry_msgs/Quaternion attitude    # Attitude expressed in the header/frame_id frame.
+  geometry_msgs/Vector3 thrust         # Thrust [N] expressed in the body frame.
+                                      # For a fixed-wing, usually the x-component is used.
+                                      # For a multi-rotor, usually the z-component is used.
+                                      # Set all un-used components to 0.
+
 * Datatype: ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_
 * Topic: ``command_velocity_rpy``
+
+::
+
+  Header header
+
+  # We use the coordinate frames with the following convention:
+  #   x: forward
+  #   y: left
+  #   z: up
+
+  # rotation convention (z-y'-x''):
+  # yaw rotates around fixed frame's z axis
+  # pitch rotates around new y-axis (y')
+  # roll rotates around new x-axis (x'')
+
+  # This is a convenience-message to support that low-level (microcontroller-based) state
+  # estimators may not have knowledge about the absolute yaw.
+  # Roll- and pitch-angle should be specified in the header/frame_id frame
+  float64 roll                   # Roll angle [rad]
+  float64 pitch                  # Pitch angle  [rad]
+  float64 yaw_rate               # Yaw rate around z-axis [rad/s]
+
+  geometry_msgs/Vector3 thrust   # Thrust [N] expressed in the body frame.
+                                 # For a fixed-wing, usually the x-component is used.
+                                 # For a multi-rotor, usually the z-component is used.
+                                 # Set all un-used components to 0.
+
 
 Implementations of this interface should accept messages on either topic/datatype.
 Publishers are expected to choose only one.
@@ -194,6 +250,21 @@ This message is very similar to the standard ``Twist`` message however it remove
 
 * Datatype: ``mav_msgs/RateThrust``  [#ratethrust]_
 * Topic: ``command_acceleration``
+
+::
+
+  Header header
+
+  # We use the coordinate frames with the following convention:
+  #   x: forward
+  #   y: left
+  #   z: up
+
+  geometry_msgs/Vector3 angular_rates  # Roll-, pitch-, yaw-rate around body axes [rad/s]
+  geometry_msgs/Vector3 thrust         # Thrust [N] expressed in the body frame.
+                                       # For a fixed-wing, usually the x-component is used.
+                                       # For a multi-rotor, usually the z-component is used.
+                                       # Set all un-used components to 0.
 
 High Level Interfaces
 ---------------------
@@ -211,8 +282,29 @@ For backwards compatibility all systems will publish both.
 * Datatype: ``nav_msgs/Odometry`` [#odometry]_
 * Topic: ``odom``
 
+::
+
+  # This represents an estimate of a position and velocity in free space.
+  # The pose in this message should be specified in the coordinate frame given by header.frame_id.
+  # The twist in this message should be specified in the coordinate frame given by the child_frame_id
+  Header header
+  string child_frame_id
+  geometry_msgs/PoseWithCovariance pose
+  geometry_msgs/TwistWithCovariance twist
+
 * Datatype: ``nav_msgs/OdometryWithAcceleration`` `[proposed]`
 * Topic: ``odometry``
+
+::
+
+  # This represents an estimate of a position, velocity, and acceleration in free space.
+  # The pose in this message should be specified in the coordinate frame given by header.frame_id.
+  # The twist and acceleration in this message should be specified in the coordinate frame given by the child_frame_id
+  Header header
+  string child_frame_id
+  geometry_msgs/PoseWithCovariance pose
+  geometry_msgs/TwistWithCovariance twist
+  geometry_msgs/TwistWithCovariance acceleration
 
 
 Goal Interface
