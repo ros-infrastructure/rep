@@ -337,7 +337,7 @@ References
    (http://docs.ros.org/jade/api/mav_msgs/html/msg/RateThrust.html)
 
 .. [#attitudethrust] mav_msgs/AttitudeThrust
-   (http://docs.ros.org/api/mav_msgs/html/msg/AttitudeThrust.html)
+   (http://docs.ros.org/jade/api/mav_msgs/html/msg/AttitudeThrust.html)
 
 .. [#rpythrust] mav_msgs/RollPitchYawrateThrust
    (http://docs.ros.org/indigo/api/mav_msgs/html/msg/RollPitchYawrateThrust.html)
