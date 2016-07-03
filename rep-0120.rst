@@ -1,5 +1,5 @@
 REP: 120
-Title: Coordinate Frames for Humanoids Robots
+Title: Coordinate Frames for Humanoid Robots
 Author: Thomas Moulard <thomas.moulard@gmail.com>
 Status: Active
 Type: Informational
@@ -12,12 +12,12 @@ Abstract
 ========
 
 This REP specifies naming conventions and semantic meaning for
-coordinate frames of humanoids robots used within ROS.
+coordinate frames of humanoid robots used within ROS.
 
 Motivation
 ==========
 
-Developers of packages aimed at humanoids robots need a shared
+Developers of packages aimed at humanoid robots need a shared
 convention for coordinate frames in order to better integrate and
 re-use software components.
 
@@ -55,7 +55,7 @@ should be the barycenter of the feet projections on the floor. With respect
 to the ``odom`` frame, the roll and pitch angles should be zero and the
 yaw angle should correspond to the ``base_link`` yaw angle.
 
-Rationale: `base_footprint`` provides a fairly stable 2D planar representation
+Rationale: ``base_footprint`` provides a fairly stable 2D planar representation
 of the humanoid even while walking and swaying with the ``base_link``.
 
 
