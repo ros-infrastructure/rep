@@ -58,7 +58,7 @@ of a mobile platform in the ``odom`` frame always evolves in a smooth
 way, without discrete jumps.
 
 In a typical setup the ``odom`` frame is computed based on an odometry
-source, such as wheel odometry, visual odometry or an inertia
+source, such as wheel odometry, visual odometry or an inertial
 measurement unit.
 
 The ``odom`` frame is useful as an accurate, short-term local
