@@ -36,6 +36,34 @@ Specification
 Coordinate Frames
 -----------------
 
+base_link
+'''''''''
+
+The coordinate frame called ``base_link`` is rigidly attached to the
+mobile robot base. The ``base_link`` can be attached to the base in
+any arbitrary position or orientation; for every hardware platform
+there will be a different place on the base that provides an obvious
+point of reference. Note that REP 103 [1]_ specifies a preferred
+orientation for frames.
+
+odom
+''''
+
+The coordinate frame called ``odom`` is a world-fixed frame. The pose
+of a mobile platform in the ``odom`` frame can drift over time,
+without any bounds. This drift makes the ``odom`` frame useless as a
+long-term global reference. However, the pose of a robot in the
+``odom`` frame is guaranteed to be continuous, meaning that the pose
+of a mobile platform in the ``odom`` frame always evolves in a smooth
+way, without discrete jumps.
+
+In a typical setup the ``odom`` frame is computed based on an odometry
+source, such as wheel odometry, visual odometry or an inertia
+measurement unit.
+
+The ``odom`` frame is useful as an accurate, short-term local
+reference, but drift makes it a poor frame for long-term reference.
+
 map
 '''
 
@@ -58,9 +86,9 @@ acting.
 
 Map coordinate frames can either be referenced globally or to an application specific position.
 
-When defining coordinate frames with respect to a global reference like the earth.
-The default should be to align the x-axis east, y-axis north, and the z-axis up at the origin of the coordinate frame.
-Also the position of the z-axis should default to be zero at Mean Sea Level [#MSL]_ such that the z position in the map frame is equivalent to meters above sea level.
+When defining coordinate frames with respect to a global reference like the earth:
+ * The default should be to align the x-axis east, y-axis north, and the z-axis up at the origin of the coordinate frame.
+ * The default position of the z-axis should be zero at Mean Sea Level [#MSL]_ such that the z position in the map frame is equivalent to meters above sea level.
 
 In the case that there are application specific requirements for which the above cannot be satistfied as many as possible should still be met.
 
@@ -78,39 +106,10 @@ In unstructured environments the above should strongly be the defaults.
 In structured environments aligning the map with the environment may be more useful.
 An example structured environment such as an office building interior, which is commonly rectilinear and have limited global localization methods, aligning the map with building is recommended especially if the building layout is known apriori.
 Similarly in an indoor environment it is recommended to align the map at floor level.
-In the case that you are operating on multiple floors it may make sense to have multiple coordinate frames for each floor.
+In the case that you are operating on multiple floors it may make sense to have multiple coordinate frames, one for each floor.
 
 If there is ambiguity fall back to the conventions for unstructured environments above.
 Or if there is limited prior knowledge of the environment the unstructured conventions can still be used in structured environments.
-
-odom
-''''
-
-The coordinate frame called ``odom`` is a world-fixed frame. The pose
-of a mobile platform in the ``odom`` frame can drift over time,
-without any bounds. This drift makes the ``odom`` frame useless as a
-long-term global reference. However, the pose of a robot in the
-``odom`` frame is guaranteed to be continuous, meaning that the pose
-of a mobile platform in the ``odom`` frame always evolves in a smooth
-way, without discrete jumps.
-
-In a typical setup the ``odom`` frame is computed based on an odometry
-source, such as wheel odometry, visual odometry or an inertia
-measurement unit.
-
-The ``odom`` frame is useful as an accurate, short-term local
-reference, but drift makes it a poor frame for long-term reference.
-
-
-base_link
-'''''''''
-
-The coordinate frame called ``base_link`` is rigidly attached to the
-mobile robot base. The ``base_link`` can be attached to the base in
-any arbitrary position or orientation; for every hardware platform
-there will be a different place on the base that provides an obvious
-point of reference. Note that REP 103 [1]_ specifies a preferred
-orientation for frames.
 
 earth
 '''''
@@ -120,7 +119,7 @@ The coordinate frame called ``earth`` is the origin of ECEF. [2]_
 This frame is designed to allow the interaction of multiple robots in different map frames.
 If the application only needs one map the ``earth`` coordinate frame is not expected to be present.
 In the case of running with multiple maps simultaneously the ``map`` and ``odom`` and ``base_link`` frames will need to be customized for each robot.
-If running multiple robots and bridging data between them, the transform frame_ids can remain standard on each robot if the other robots_frame_ids are rewritten.
+If running multiple robots and bridging data between them, the transform frame_ids can remain standard on each robot if the other robots' frame_ids are rewritten.
 
 If the ``map`` frame is globally referenced the publisher from ``earth`` to ``map`` can be a static transform publisher.
 Otherwise the ``earth`` to ``map`` transform will usually need to be computed by taking the estimate of the current global position and subtracting the current estimated pose in the map to get the estimated pose of the origin of the map.
@@ -222,7 +221,7 @@ Transitions Between Maps
 ------------------------
 
 When a robot travels a long distance it is expected that it will need to transition between maps.
-In an outdoor context map coordinate frame is a euclidian approximation of a vacinity however the euclidian approximation breaks down at longer distances due to the curvature of the earth.
+In an outdoor context map coordinate frame is a euclidian approximation of a vicinity however the euclidian approximation breaks down at longer distances due to the curvature of the earth.
 In an indoor context this can be transitioning between two buildings where each has a prior map in which you are navigating or the robot is on a new floor of a building.
 
 It is the responsibility of the localization frame authority to reparent the ``odom`` frame appropriately when moving between maps.
@@ -234,10 +233,16 @@ When transitioning between maps the odometric frame should not be effected.
 Data retention policies for data collected in the odom frame should be tuned such that old or distant data is discarded before the integrated position error accumulates enough to make the data invalid.
 Depending on the quality of the robot's odometry these policies may be vastly different a wheeled vehicle with multiple redundant high resolution encoders will have a much lower rate of drift and will be able to keep data for a much longer time and or distance than a skid steer robot which only has open loop feedback on turning.
 
-There are other contexts which will also effect appropriate retention policy such as the robot being moved by external motivators or assumptions of a static environment.
+There are other contexts which will also affect appropriate retention policy such as the robot being moved by external motivators or assumptions of a static environment.
 An example is a robot in an elevator where the environment has changed outside the elevator door between when it entered and exits the elevator.
 Most of these problems come from the assumption of a static environment where observations are in the same inertial frame as the robot.
 In these cases semantic information about the environment and objects in required to persist data correctly, but the inertial ``odom`` frame should remain continuous.
+
+If the vehicle travels a long enough distance that the distance from the ``odom`` frame's origin to the vehicle approaches the maximum floating point precision degraded performance may be observed for float based data persisted in the ``odom`` frame.
+If distances on this order are encountered a systematic reset of the ``odom`` frame origin may be required.
+If centimeter level accuracy is required the maximum distance to the ``odom`` frame is approximately 83km. [#floating_point]_
+There is not a standard solution to this, systems with this issue will need to work around it.
+Potential solutions include additional coordinate frames in which to persist obstacle data or storing data with higher precision.
 
 Exceptions
 ----------
@@ -262,6 +267,8 @@ References
 .. [#MSL] Mean Sea Level (https://en.wikipedia.org/wiki/Sea_level)
 
 .. [#pressure_altitude] Pressure Altitude (https://en.wikipedia.org/wiki/Pressure_altitude)
+
+.. [#floating_point] Floating Point Precision (https://en.wikipedia.org/wiki/Single-precision_floating-point_format)
 
 Copyright
 =========
