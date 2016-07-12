@@ -189,6 +189,7 @@ Rate Interface
 
 The messge to send a velocity command is ``geometry_msgs/Twist`` [#twist]_.
 This is the standard way to command ROS vehicles.
+The datatype is not timestamped or externall referenced as it is not intended to be used in an open loop control system.
 
 * Datatype: ``geometry_msgs/Twist`` [#twist]_
 * Topic: ``cmd_vel``
@@ -275,6 +276,7 @@ Acceleration Interface
 
 
 The messge to send a velocity command is ``geometry_msgs/Twist`` [#twist]_.
+The datatype is not timestamped or externall referenced as it is not intended to be used in an open loop control system.
 
 * Datatype: ``geometry_msgs/Twist`` [#twist]_
 * Topic: ``command_acceleration``
