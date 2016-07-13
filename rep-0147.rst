@@ -187,15 +187,20 @@ The reference position is the origin of the ``base_link`` as defined in [#REP105
 Rate Interface
 ,,,,,,,,,,,,,,
 
-The messge to send a velocity command is ``geometry_msgs/Twist`` [#twist]_.
+The messge to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
 This is the standard way to command ROS vehicles.
 The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
 
-* Datatype: ``geometry_msgs/Twist`` [#twist]_
-* Topic: ``cmd_vel``
+* Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
+* Topic: ``command_velocity``
 
 ::
 
+    std_msgs/Header header
+    uint32 seq
+    time stamp
+    string frame_id
+    geometry_msgs/Twist twist
     geometry_msgs/Vector3 linear
       float64 x
       float64 y
@@ -205,13 +210,10 @@ The datatype is not timestamped or externally referenced as it is not intended t
       float64 y
       float64 z
 
-
-
-The command is a body relative set of velocities in linear and angular space.
-The reference position is the origin of the ``base_link`` as defined in [#REP105]_
-
-
-
+The command is a body relative set of accelerations in linear and angular space.
+This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
+A pure ``Twist`` based inteface could be provided for backwards compatability as well.
+It was chosen do diverge here since this is a much more powerful inteface for the vehicles and does not require all commands to be reverse calculated for the instantaneous attitude of the vehicle.
 
 .. TODO remove after review
 .. The Rate interface can be implemented by two messages.
@@ -221,7 +223,7 @@ The reference position is the origin of the ``base_link`` as defined in [#REP105
 .. They are well established and have several existing implementations.
 .. The ``mav_msgs/RollPitchYawrateThrust`` is a convenience message to support low level controllers that are not aware of the absolute yaw.
 ..
-.. They diverge from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
+.. They diverge from the common ``geometry_msgs/Twist`` [#twiststamped]_ used by ground robots.
 .. A ``Twist`` based inteface could be provided for backwards compatability as well.
 .. It was chosen do diverge here since this is a much more natural interface for aerial vehicles.
 ..
@@ -275,14 +277,19 @@ Acceleration Interface
 ,,,,,,,,,,,,,,,,,,,,,,
 
 
-The messge to send a velocity command is ``geometry_msgs/Twist`` [#twist]_.
+The messge to send a velocity command is ``geometry_msgs/Twist`` [#twiststamped]_.
 The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
 
-* Datatype: ``geometry_msgs/Twist`` [#twist]_
+* Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
 * Topic: ``command_acceleration``
 
 ::
 
+    std_msgs/Header header
+    uint32 seq
+    time stamp
+    string frame_id
+    geometry_msgs/Twist twist
     geometry_msgs/Vector3 linear
       float64 x
       float64 y
@@ -491,6 +498,9 @@ References
 
 .. [#twist] geometry_msgs/Twist
    (http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html)
+
+.. [#twiststamped] geometry_msgs/TwistStamped
+  (http://docs.ros.org/api/geometry_msgs/html/msg/TwistStamped.html)
 
 .. [#rep105] REP 105: Coordinate Frames for Mobile Platforms
    (http://www.ros.org/reps/rep-0105.html)
