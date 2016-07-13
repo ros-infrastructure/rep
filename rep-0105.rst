@@ -88,7 +88,7 @@ Map coordinate frames can either be referenced globally or to an application spe
 
 When defining coordinate frames with respect to a global reference like the earth:
  * The default should be to align the x-axis east, y-axis north, and the z-axis up at the origin of the coordinate frame.
- * The default position of the z-axis should be zero at Mean Sea Level [#MSL]_ such that the z position in the map frame is equivalent to meters above sea level.
+ * The default position of the z-axis should be zero at Mean Sea Level [#MSL]_ according to EGM1996 [#EGM96]_ such that the z position in the map frame is equivalent to meters above sea level.
 
 In the case that there are application specific requirements for which the above cannot be satistfied as many as possible should still be met.
 
@@ -265,6 +265,8 @@ References
 .. [2] Earth Centered, Earth Fixed Wikipedia article (https://en.wikipedia.org/wiki/ECEF)
 
 .. [#MSL] Mean Sea Level (https://en.wikipedia.org/wiki/Sea_level)
+
+.. [#EGM96] EGM1996 (http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/egm96.html)
 
 .. [#pressure_altitude] Pressure Altitude (https://en.wikipedia.org/wiki/Pressure_altitude)
 
