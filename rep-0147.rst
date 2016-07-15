@@ -197,23 +197,23 @@ The datatype is not timestamped or externally referenced as it is not intended t
 ::
 
     std_msgs/Header header
-    uint32 seq
-    time stamp
-    string frame_id
+      uint32 seq
+      time stamp
+      string frame_id
     geometry_msgs/Twist twist
-    geometry_msgs/Vector3 linear
-      float64 x
-      float64 y
-      float64 z
-    geometry_msgs/Vector3 angular
-      float64 x
-      float64 y
-      float64 z
+      geometry_msgs/Vector3 linear
+        float64 x
+        float64 y
+        float64 z
+      geometry_msgs/Vector3 angular
+        float64 x
+        float64 y
+        float64 z
 
 The command is a body relative set of accelerations in linear and angular space.
 This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
 A pure ``Twist`` based inteface could be provided for backwards compatability as well.
-It was chosen do diverge here since this is a much more powerful inteface for the vehicles and does not require all commands to be reverse calculated for the instantaneous attitude of the vehicle.
+It was chosen to diverge here since this is a much more powerful inteface for the vehicles and does not require all commands to be reverse calculated for the instantaneous attitude of the vehicle.
 
 .. TODO remove after review
 .. The Rate interface can be implemented by two messages.
@@ -286,18 +286,18 @@ The datatype is not timestamped or externally referenced as it is not intended t
 ::
 
     std_msgs/Header header
-    uint32 seq
-    time stamp
-    string frame_id
+      uint32 seq
+      time stamp
+      string frame_id
     geometry_msgs/Twist twist
-    geometry_msgs/Vector3 linear
-      float64 x
-      float64 y
-      float64 z
-    geometry_msgs/Vector3 angular
-      float64 x
-      float64 y
-      float64 z
+      geometry_msgs/Vector3 linear
+        float64 x
+        float64 y
+        float64 z
+      geometry_msgs/Vector3 angular
+        float64 x
+        float64 y
+        float64 z
 
 
 
