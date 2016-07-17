@@ -215,7 +215,7 @@ The transform from ``earth`` to ``map`` is statically published and
 configured by the choice of map frame. If not specifically configured
 a fallback position is to use the initial position of the vehicle as
 the origin of the map frame.
-If the map is not georeferenced so as to support a simple static transform the localization module can follow the same procedure as for publishing the estimated offset from the ``map` to the ``odom`` frame to publish the transform from ``earth`` to ``map`` frame.
+If the map is not georeferenced so as to support a simple static transform the localization module can follow the same procedure as for publishing the estimated offset from the ``map`` to the ``odom`` frame to publish the transform from ``earth`` to ``map`` frame.
 
 Transitions Between Maps
 ------------------------
