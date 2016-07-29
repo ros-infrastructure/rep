@@ -85,10 +85,12 @@ acting.
 **Map Conventions**
 
 Map coordinate frames can either be referenced globally or to an application specific position.
+A example of an application specific positioning might be Mean Sea Level [#MSL]_ according to EGM1996 [#EGM96]_ such that the z position in the map frame is equivalent to meters above sea level.
+Whatever the choice is the most important part is that the choice of reference position is clearly documented for users to avoid confusion.
 
 When defining coordinate frames with respect to a global reference like the earth:
  * The default should be to align the x-axis east, y-axis north, and the z-axis up at the origin of the coordinate frame.
- * The default position of the z-axis should be zero at Mean Sea Level [#MSL]_ according to EGM1996 [#EGM96]_ such that the z position in the map frame is equivalent to meters above sea level.
+ * If there is no other reference the default position of the z-axis should be zero at the height of the WGS84 ellipsoid.
 
 In the case that there are application specific requirements for which the above cannot be satistfied as many as possible should still be met.
 
