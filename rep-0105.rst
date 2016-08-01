@@ -95,7 +95,7 @@ When defining coordinate frames with respect to a global reference like the eart
 In the case that there are application specific requirements for which the above cannot be satistfied as many as possible should still be met.
 
 An example of an application which cannot meet the above requirements is a robot starting up without an external reference device such as a GPS, compass, nor altimeter.
-But if the robot still has an accelerometer it can intialize the map at it's current location with the z axis upward.
+But if the robot still has an accelerometer it can intialize the map at its current location with the z axis upward.
 
 If the robot has a compass heading as startup it can then also initialize x east, y north.
 
