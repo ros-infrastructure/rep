@@ -1,0 +1,392 @@
+REP: 129
+Title: Node API for SLAM Packages
+Author: Stéphane Magnenat <stephane at magnenat dot net>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 16-Oct-2012
+Post-History: 
+
+
+Abstract
+========
+
+This REP standardizes 2D and 3D mapping node API, to allow easy
+interoperability between different Simultaneous Localization and
+Mappping (SLAM) implementations.
+This document defines names and types for topics, services and parameters.
+Moreover, it partially defines the semantics of message content,
+for instance in the case of point clouds.
+To ease the compliance curve, this REP defines several compliance profiles.
+
+
+Motivation
+==========
+
+Localization and mapping is a cornerstone of modern robotic applications.
+While the SLAM problem has been solved in research papers for a variety of
+situations, on the practical side it is still not trivial to deploy a robust
+SLAM on real applications.
+For this reason, and because every solution has its own strong and weak
+points, there are different SLAM implementations available on ROS, most
+of them do 2D, but there are several that do 3D.
+Unfortunately, these implementations do not share the same node API,
+which hinders their comparison and puts unnecessary burden on the user,
+who typically want to test different approaches and use the one working
+the best for her application.
+The aim of this REP is to specify a node API for 2D and 3D SLAM nodes.
+This specification builds on the de-facto partial standard in 2D SLAMs on ROS,
+and extends it to 3D.
+
+
+Specification
+=============
+
+General Architecture
+--------------------
+
+The node API for mapping should minimize the necessary work for the
+node developers, while at the same time provide a rich set of features
+to users.
+For this reason, we propose to split the functionality into two entities,
+each having its own REP, a SLAM node and a map dispatcher node::
+
+    ---->   +---------------+ ---->         +----------------+ <--->
+    scans,  |               | poses (tf)    |                | ROI sub maps
+    point   |   SLAM node   |               | map_dispatcher |
+    clouds  |   this REP    | ------------> |    REP 130     | 
+            |               | map           |                | <--->
+            +---------------+               +----------------+ projected maps
+
+SLAM node
+    This node is responsible for localizing the robot and providing a simple
+    map, optionally with progressive updates. This part covered by this REP.
+
+map_dispatcher
+    This node receives the map from the SLAM node, and provides sub maps
+    based on regions of interest (ROI) and projected 2D maps from 3D data.
+    This is covered by REP 130 [#REP130]_.
+
+This strategy also keeps a low entry barrier to write a new compliant
+SLAM node, ensuring the largent compliance possible.
+
+
+Compliance Profiles
+-------------------
+
+A profile defines a set of features that make sense to bundle together.
+A node should provide all features defined in the profile to comply with
+the profile.
+In that case, the node is said to *implement* the profile.
+The following profiles are defined:
+
+2D
+    The minimal features to perform 2D SLAM on a robot.
+    The node shall provide an ``OccupancyGrid`` map.
+
+3D
+    The minimal features to perform 3D SLAM on a robot.
+    The node shall provide a ``PointCloud2`` map, consisting of points
+    at the boundary between free space and obstacles.
+    The point cloud must at least provide channels ``x``, ``y``, and ``z``.
+
+3DO
+    In 3D, the ability to send volumetric occupancy maps in addition to point maps.
+    The node shall provide a ``PointCloud2`` map, consisting of points
+    at the centers of obstacle cuboids (voxels), with one field ``size`` being the
+    length of each voxel.
+        
+P2D
+    Progressive 2D map, the ability to update parts of the map without sending
+    the whole map.
+    The node shall send ``OccupancyGridUpdate`` updates, that will replace
+    parts of the target map.
+    
+P3D
+    Progressive 3D map, the ability to update parts of the point map without
+    sending the whole map.
+    The node shall send ``PointCloud2Update`` updates, that will either add
+    or delete information to the target map.
+
+P3DO
+    Progressive occupancy  map, the ability to update parts of the 3D occupancy 
+    map without sending the whole map.
+    The node shall send ``PointCloud2Update`` updates, that will either add
+    or delete information to the target map.
+
+A 2D node shall implement at least the complete 2D profile.
+If so, the node is said to be "REP-129: 2D" compliant.
+A 3D node shall implement at least the complete 3D profile.
+A node implementing 3D and occupancy maps, including progressive updates,
+is said to be "REP-129: 3D, P3D, 3DO, P3DO" compliant.
+
+
+Message Types
+-------------
+
+The following types of messages are implemented in the supporting map_msgs_
+unary stack:
+
+
+map_msgs/OccupancyGridUpdate.msg
+''''''''''''''''''''''''''''''''
+
+This message contains an update to an occupancy-grid map.
+Its data field has a similar semantics to the one in ``OccupancyGrid.msg``.
+This field shall have ``width`` x ``height`` elements.
+The resolution is similar to the existing map, and the update replaces
+values in the Axis-Aligned Bounding-Box (AABB) starting at (``x``, ``y``)
+and of size (``width``, ``height``).
+If the target node does not have a map yet, or if any message was missed
+since sequence number (``header.seq``) was 0, this message is to be
+discarded::
+
+    Header header
+    int32 x
+    int32 y
+    uint32 width
+    uint32 height
+    int8[] data
+
+
+map_msgs/PointCloud2Update.msg
+''''''''''''''''''''''''''''''
+
+This message contains an update to a point-cloud map.
+If the update is an addition, the given points shall be added to the existing
+cloud.
+If the channels content do not match, missing channels shall be filled with the
+default-constructed corresponding value, and excessive channels shall be dropped.
+The point cloud must at least provide channels ``x``, ``y``, and ``z``.
+If the target node does not have a point-cloud map yet, or if any message
+was missed since sequence number (``header.seq``) was 0, this message is to be
+discarded::
+
+    uint32 ADD=0
+    uint32 DELETE=1
+    Header header
+    uint32 type          # type of update, one of ADD or DELETE
+    sensor_msgs/PointCloud2 points
+
+ 
+Common SLAM Node API
+--------------------
+
+This section lists features that are common to nodes performing mapping in
+2D or 3D.
+
+
+Parameters
+''''''''''
+
+``~base_frame`` (string, default: "base_link", profile: 2D, 3D)
+    the name of the base frame of the robot. This is the frame used for
+    localization and for transformation of laser scan data or point clouds.
+``~map_frame`` (string, default: "map", profile: 2D, 3D)
+    the name of the map frame
+``~odom_frame`` (string, default: "odom", profile: 2D, 3D)
+    the name of the odom frame
+``~enable_tf_publishing`` (bool, default: true, profile: 2D, 3D)
+    if true, publish base_frame -> odom_frame transforms on tf
+``~enable_pose_publishing`` (bool, default: false, profile: 2D, 3D)
+    if true, publish base_frame -> map_frame transforms as
+    ``geometry_msgs/PoseWithCovarianceStamped`` messages on
+    the ``pose`` topic.
+
+The default values for frames are set according to REP 105 [#REP105]_.
+For nodes supporting both 2D and 3D, one or more node-specific parameters
+shall allow to specify the mode or the topics to subscribe to.
+
+
+Subscribed Topics
+'''''''''''''''''
+
+SLAM nodes subscribe to the tf topic, through the tf API.
+
+
+Published Topics
+''''''''''''''''
+
+If ``~enable_pose_publishing`` is true:
+
+``pose`` (geometry_msgs/PoseWithCovarianceStamped, latched, profile: 2D, 3D)
+     base_frame -> map_frame transforms with covariance
+
+In addition, SLAM nodes publish on the tf topic if ``~enable_tf_publishing``
+is true.
+
+
+Required tf Transforms
+''''''''''''''''''''''
+
+According to REP 105 [#REP105]_, the following transformations shall be
+available to SLAM nodes.
+The nodes might not use all of them, for instance,
+ethzasl_mapping_ does not require base_frame.
+
+<the frame attached to incoming scans/clouds> -> base_frame (profile: 2D, 3D)
+    usually a fixed value, broadcast periodically by a robot_state_publisher,
+    or a tf static_transform_publisher. 
+base_frame -> odom_frame (profile: 2D, 3D)
+    usually provided by the odometry system (e.g., the driver for the
+    mobile base) 
+    
+
+Provided tf Transforms
+''''''''''''''''''''''
+
+According to REP 105 [#REP105]_, the SLAM nodes must provide at least 
+this transform, this REP adds a flag to disable publishing on tf, for
+instance in cases where poses with covariance are fused from different
+sources.
+
+map_frame -> odom_frame (profile: 2D, 3D)
+    the current estimate of the robot's pose within the map frame
+
+
+Services
+''''''''
+
+``~reset`` (std_msgs/Empty, profile: 2D, 3D)
+    Clear the map and set the position to the origin.
+    
+
+2D Node API
+-----------
+
+The 2D node API is very similar to the one of existing packages such as
+gmapping_ or hector_slam_.
+See the `Backwards Compatibility`_ section for information about changes.
+
+
+Subscribed Topics
+'''''''''''''''''
+
+``scan`` (sensor_msgs/LaserScan, profile: 2D)
+    laser scans to create the map from
+
+The node is allowed to subscribe to other sources of information in 2D.
+For instance, `ethzasl_mapping`_ subscribes to ``cloud_in`` and accepts
+2D point clouds.
+
+
+Published Topics
+''''''''''''''''
+
+``map`` (nav_msgs/OccupancyGrid, latched, profile: 2D)
+    generated map
+``map_update`` (map_msgs/OccupancyGridUpdate, profile: P2D)
+    updates of the map
+
+If the node implements P2D, it can provide map updates between full maps.
+The node shall still provide full maps at regular intervals.
+
+
+3D Node API
+-----------
+
+Nodes providing 3D mapping on point clouds have to provide a point-cloud map as output.
+Point-cloud maps must provide at least channels ``x``, ``y``, ``z`` and are
+allowed to provide additional channels such as normals and colors as well.
+In the case of a SLAM algorithm based on point clouds, the clouds themselves,
+possibly after filtering, shall be returned.
+For algorithms working with occupancy maps, the centers of the occupied voxels shall be returned, along with the size
+of their side, on the topic ``occupancy_map``.
+
+
+Subscribed Topics
+'''''''''''''''''
+
+``point_cloud`` (sensor_msgs/PointCloud2, profile: 3D)
+    incoming 3D point cloud for scan integration.
+
+
+Published Topics
+''''''''''''''''
+
+``point_map`` (sensor_msgs/PointCloud2, latched, profile: 3D)
+    generated map in point-cloud format
+``occupancy_map`` (sensor_msgs/PointCloud2, latched, profile: 3DO)
+    generated occupancy map, as point-cloud of the center voxels.
+``point_map_update`` (map_msgs/PointCloud2Update, profile: P3D)
+    updates of the point-cloud map
+``occupancy_map_update`` (map_msgs/PointCloud2Update, profile: P3DO)
+    updates of the occupancy map
+
+If the node implements P3D or P3DO, it can provide map updates between
+full maps.
+The node shall still provide full maps at regular intervals.
+
+
+Open Questions
+==============
+
+* Do we need the occupancy profiles? I think that the question boils
+  down to whether there are any SLAM system that directly work on
+  voxels rather than on point clouds for registration.
+  I think that 3DTK_ but I am unsure whether its authors have any
+  plan of integrating it into ROS.
+* Fields within a PointCloud2 message should be formally specified
+  somewhere, more officially than in the overview page of `ROS-PCL`_.
+* It would be nice to have viewpoint information in the resulting map.
+  We could either have something like 'camera' of size 3 or a triplet 
+  'camera_x', 'camera_y', 'camera_z' that is the position of the camera
+  in the final map from which this point would have been observed
+  (after corrections).
+  During registration, points can hold a relative vector to the camera
+  position that can be transformed into an absolute position before sending
+  the cloud.
+  Or we can keep the relative vector if we prefer.
+  The question is whether we want to enforce this, as this might require some
+  additional processing time for a feature that is useful, but might not be
+  required for all applications.
+  My feeling is that the benefit outweighs the drawbacks, so I would be ok
+  enforcing it, or at least having a parameter for enforcing it.
+  If we have it, should ``map_dispatcher`` being able of providing a voxel map
+  out of a point-cloud map?
+  Should it be part of a ``voxel_map_dispatcher`` node?
+
+
+Backwards Compatibility
+=======================
+
+The changes to existing 2D SLAM nodes are the following:
+
+* Renamed service ``dynamic_map`` to ``get_map`` for the sake of clarity.
+
+
+Reference Implementation
+========================
+
+The map_msgs_ unary stack implements the messages and services specified
+in this document.
+
+Currently, only ethzasl_mapping_ explicitely aims at implementing the node
+API defined in this REP.
+We expect common ROS mapping stacks such as gmapping_, hector_slam_ and 
+octomap_mapping_ to comply as well, once this REP is accepted.
+
+
+References
+==========
+
+.. _map_msgs: http://www.ros.org/wiki/map_msgs
+.. _ethzasl_mapping: http://www.ros.org/wiki/ethzasl_mapping
+.. _gmapping: http://www.ros.org/wiki/gmapping
+.. _hector_slam: http://www.ros.org/wiki/hector_slam
+.. _octomap_mapping: http://www.ros.org/wiki/octomap_mapping
+.. _3DTK: http://slam6d.sourceforge.net/
+.. _ROS-PCL: http://www.ros.org/wiki/pcl/Overview
+.. [#REP105] REP 105, Coordinate Frames for Mobile Platforms
+   (http://www.ros.org/reps/rep-0105.html)
+.. [#REP130] REP 130, Node API for Map Dispatching
+   (http://www.ros.org/reps/rep-0130.html)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+Note: some text snippets were copied from ROS Wiki (CC-BY 3.0),
+I think these are too small for being considered for copyright.
