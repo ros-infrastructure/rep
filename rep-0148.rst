@@ -1,0 +1,69 @@
+REP: 148
+Title: Secure ROS (SROS)
+Author: Ruffin White, Morgan Quigley
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 4-Aug-2016
+Post-History: ?
+
+
+Abstract
+========
+
+This REP is defines the specifications for Secure ROS (SROS).
+This specification is designed to promote secure communications, information assurance, and access control of core functionality between Secure ROS implementations.
+By leveraging the specifications defined in this REP, both tools and client libraries can be designed to be reusable between secured frameworks and platforms.
+When choosing a security practicals and policies definitions, these should be considered the default and only change away from them for a good reason.
+
+These interfaces are designed to be relevant for all ROS middleware level communication, including all master/slave API calls as well as all topic, service and parameter transport.
+Like ground robots, the core abstraction is the same for all vehicles regardless of their method of motivation.
+
+
+Rationale
+=========
+
+Cyber security is quickly becoming a pervasive issue for robotics, especially so as robots become more ubiquitous within society.
+With the advent of industrial automation, autonomous vehicles, commercial surveillance platforms, home service robots, and many more robotics domains, security of these subsystems should be considered vital, as they all provide a vector for cyber threats to manifest into real-world risks.
+Even without the hazards associated with industrial-strength robot arms or high-speed driverless semi trucks, personal robots promising to integrate with the internet of things could become targets for breaches in privacy and sources of identity theft, similar to smartphones and PCs.
+
+To counteract these issues while using ROS, this REP will propose upstreaming security features to the core of ROS’s codebase, such as native TLS support for all socket transport within ROS, the use of x.509 certificates permitting chains of trust, definable namespace globbing for ROS node restrictions and permitted roles, as well as covenant user-space tooling to auto generate node key pairs, audit ROS networks, and construct/train access control policies.
+
+Other interface defintions
+==========================
+
+
+
+Reference Abstractions
+======================
+
+
+Proposed Interfaces
+===================
+
+
+Summary
+=======
+
+
+References
+==========
+
+.. [#astec] astec_mav_framework
+   (http://wiki.ros.org/asctec_mav_framework)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
