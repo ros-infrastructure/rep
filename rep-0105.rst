@@ -101,7 +101,7 @@ If the robot has a compass heading as startup it can then also initialize x east
 
 And if the robot has an altimeter estimate at startup it can initialize the height at MSL.
 
-In unstructured environments the above should strongly be the defaults.
+The conventions above are strongly recommended for unstructured environments.
 
 **Map Conventions in Structured Environments**
 
@@ -127,7 +127,7 @@ If the ``map`` frame is globally referenced the publisher from ``earth`` to ``ma
 Otherwise the ``earth`` to ``map`` transform will usually need to be computed by taking the estimate of the current global position and subtracting the current estimated pose in the map to get the estimated pose of the origin of the map.
 
 In case the ``map`` frame's absolute positon is unknown at the time of startup, it can remain detached until such time that the global position estimation can be adaquately evaluated.
-This will operate in the same way that a robot can operate in the ``odom`` frame before localization in the ``map`` frame is innitialized.
+This will operate in the same way that a robot can operate in the ``odom`` frame before localization in the ``map`` frame is initialized.
 
 .. figure:: rep-0105/ECEF_ENU_Longitude_Latitude_relationships.svg
    :width: 640px
@@ -165,7 +165,7 @@ allowed because each frame can only have one parent.
 **Extra Intermediate Frames**
 
 This graph shows the minimal representation of this graph.
-The basic topology should stay the same, however it is find to insert additional links in the graph which may provide additional functionality.
+The basic topology should stay the same, however it is fine to insert additional links in the graph which may provide additional functionality.
 
 **Pressure Altitude**
 
@@ -229,22 +229,24 @@ In an indoor context this can be transitioning between two buildings where each 
 It is the responsibility of the localization frame authority to reparent the ``odom`` frame appropriately when moving between maps.
 The common implementation of computing the ``map`` to ``odom`` frame as the results of subtracting the ``odom`` to ``base_link`` from the localization fix ``map`` to ``base_link`` will take care of this implicitly when the choice of which ``map`` frame changes.
 
-**``odom`` consistency**
+**odom Frame Consistency**
 
-When transitioning between maps the odometric frame should not be effected.
+When transitioning between maps the odometric frame should not be affected.
 Data retention policies for data collected in the odom frame should be tuned such that old or distant data is discarded before the integrated position error accumulates enough to make the data invalid.
-Depending on the quality of the robot's odometry these policies may be vastly different a wheeled vehicle with multiple redundant high resolution encoders will have a much lower rate of drift and will be able to keep data for a much longer time and or distance than a skid steer robot which only has open loop feedback on turning.
+Depending on the quality of the robot's odometry these policies may be vastly different. A wheeled vehicle with multiple redundant high resolution encoders will have a much lower rate of drift and will be able to keep data for a much longer time or distance than a skid steer robot which only has open loop feedback on turning.
 
-There are other contexts which will also affect appropriate retention policy such as the robot being moved by external motivators or assumptions of a static environment.
-An example is a robot in an elevator where the environment has changed outside the elevator door between when it entered and exits the elevator.
+There are other contexts which will also affect appropriate retention policy, such as the robot being moved by external motivators, or assumptions of a static environment.
+An example is a robot in an elevator, where the environment outside has changed between entering and exiting it.
 Most of these problems come from the assumption of a static environment where observations are in the same inertial frame as the robot.
-In these cases semantic information about the environment and objects in required to persist data correctly, but the inertial ``odom`` frame should remain continuous.
+In these cases semantic information about the environment and its objects is required to manage persistent data correctly.
+Regardless, the inertial odom frame should always remain continuous.
 
-If the vehicle travels a long enough distance that the distance from the ``odom`` frame's origin to the vehicle approaches the maximum floating point precision degraded performance may be observed for float based data persisted in the ``odom`` frame.
+If the vehicle travels a long enough distance that the distance from the ``odom`` frame's origin to the vehicle approaches the maximum floating point precision, degraded performance may be observed for float-based data persisted in the ``odom`` frame.
+This is especially true of 32-bit floating point data used in things like pointclouds.
 If distances on this order are encountered a systematic reset of the ``odom`` frame origin may be required.
 If centimeter level accuracy is required the maximum distance to the ``odom`` frame is approximately 83km. [#floating_point]_
 There is not a standard solution to this, systems with this issue will need to work around it.
-Potential solutions include additional coordinate frames in which to persist obstacle data or storing data with higher precision.
+Potential solutions include additional coordinate frames in which to persist obstacle data or to store obstacle data, or using higher precision.
 
 Exceptions
 ----------
