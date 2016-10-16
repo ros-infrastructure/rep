@@ -186,6 +186,12 @@ Required Support for:
 - Ubuntu Wily (15.10)
 - Ubuntu Xenial (16.04)
 
+Recommended Support for: 
+
+- Debian Jessie
+- Fedora 23
+- Fedora 24
+
 Minimum Requirements:
 
 - C++11
