@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 21-Sep-2010
-Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015
+Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017
 
 
 Abstract
@@ -128,13 +128,18 @@ Indigo Igloo (May 2014)
 
 - CMake 2.8.11
 
-- For catkin packages the ROS build farm supports:
+Build System Support:
 
-  - releasing
-  - documenting
-  - continuous integration testing
+- catkin:
 
-- Rosbuild based packages can still be built from source.
+  - build from source
+  - release for binary packaging
+  - wiki documentation
+  - continuous integration
+
+- rosbuild:
+
+  - build from source
 
 Jade Turtle (May 2015 - May 2017)
 ---------------------------------
@@ -166,18 +171,9 @@ Exact or Series Requirements:
 - PCL 1.7.x
 - OpenCV 2.4.x
 
-Buildsystem support:
+Build System Support:
 
-- catkin:
-
-  - build from source
-  - release for binary packaging
-  - wiki documentation
-  - continuous integration
-
-- rosbuild:
-
-  - build from source
+- Same as Indigo
 
 Kinetic Kame (May 2016 - May 2021)
 ----------------------------------
@@ -186,7 +182,7 @@ Required Support for:
 - Ubuntu Wily (15.10)
 - Ubuntu Xenial (16.04)
 
-Recommended Support for: 
+Recommended Support for:
 
 - Debian Jessie
 - Fedora 23
@@ -220,18 +216,64 @@ Exact or Series Requirements:
 - Qt 5.3.x
 - PyQt5
 
-Buildsystem support:
+Build System Support:
 
-- catkin:
+- Same as Indigo
 
-  - build from source
-  - release for binary packaging
-  - wiki documentation
-  - continuous integration
+Lunar Loggerhead (May 2017 - May 2019)
+--------------------------------------
+Required Support for:
 
-- rosbuild:
+- Ubuntu Xenial (16.04)
+- Ubuntu Yakkety (16.10)
+- Ubuntu Zesty (17.04)
 
-  - build from source
+Recommended Support for:
+
+- Debian Stretch
+- Fedora 26
+
+Architectures Supported:
+
+- amd64
+- arm32
+- arm64
+
+Minimum Requirements:
+
+ Most of the following requirements are the same as Kinetic's to avoid maintainers
+ branching out before the next LTS release
+
+- C++11
+- Python 2.7
+
+  - Python 3.5 not required, but testing against it is recommended
+
+- Lisp SBCL 1.2.4
+- CMake 3.0.2
+- Boost 1.55
+
+Exact or Series Requirements:
+
+- Ogre3D 1.9.x
+- Gazebo 8 (packaged by OSRF)
+
+  - ROS won't use upstream Gazebo for the upcoming few releases because of a mismatch
+    between upstream versions on targeted Ubuntu distributions
+  - In the case of Lunar:
+
+    - Zesty ships with Gazebo 8
+    - Yakkety and Xenial ship with Gazebo 7
+
+- PCL 1.7.x (Xenial)
+- PCL 1.8.x (Other Systems)
+- OpenCV 3.2.x
+- Qt 5.3.x
+- PyQt5
+
+Build System Support:
+
+- Same as Indigo
 
 Motivation
 ==========
@@ -249,6 +291,13 @@ Target platforms for future releases are speculative and are based on
 consulting Ubuntu's release and end-of-life schedule [1]_.
 
 These targets, including starting and ending support dates, are based on the Distribution Timeline to meet minimum requirements. [3]_
+
+Architectures
+-------------
+
+As of ROS Lunar, we do not build packages for i386 architectures. Released code is still expected to build on i386.
+Ubuntu switched its default to 64bits and we noticed a significant decrease of
+ROS package downloads for this architecture.
 
 C++
 ---
@@ -327,7 +376,7 @@ This REP applies to stacks in the `desktop-extras` variant [2]_ for Diamondback.
 Non-core Stacks
 ===============
 
-    And thirdly, the code is more what you'd call "guidelines" than actual rules...
+And thirdly, the code is more what you'd call "guidelines" than actual rules...
 
 We hope that ROS stack maintainers will make every effort to comply
 with the target platforms within this REP, but we recognize that ROS
@@ -346,7 +395,7 @@ References and Footnotes
    (http://www.ros.org/reps/rep-0108.html)
 
 .. [3] Distribution Timeline
-   (http://wiki.ros.org/Distributions/Timeline)
+   (http://wiki.ros.org/Distributions)
 
 Copyright
 =========
