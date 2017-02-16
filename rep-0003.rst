@@ -273,18 +273,9 @@ Requirements:
 | PyQt    |     5.5.1     |     5.7        |    5.7       |    5.7         |   5.7     |
 +---------+---------------+----------------+--------------+----------------+-----------+
 
-`*` means that this is not the upstream version but a package distributed by OSRF or the community
+" * " means that this is not the upstream version but a package distributed by OSRF or the community
 
 Maintainers can chose to support even lower versions to also cover older ROS distributions and thus avoid branching out
-
-- Gazebo 8
-
-  - ROS won't use upstream Gazebo for the upcoming few releases because of a mismatch
-    between upstream versions on targeted Ubuntu distributions
-  - In the case of Lunar:
-
-    - Zesty ships with Gazebo 8
-    - Yakkety and Xenial ship with Gazebo 7
 
 Build System Support:
 
@@ -351,6 +342,11 @@ The preferred migration strategy is to support both Python 2.7 and
 Python >= 3.2 in each source script. Supporting any version earlier
 than 2.6 makes that task harder. Python 3.0 and 3.1 will probably
 never be supported explicitly, although some things may work.
+
+Gazebo
+------
+As of ROS Lunar, we are using the gazebo packages released by OSRF rather than the upstream version.
+This is due to a discrepency between upstream versions on targeted Ubuntu distributions
 
 catkin / rosbuild support
 =========================
