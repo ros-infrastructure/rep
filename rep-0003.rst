@@ -250,9 +250,12 @@ Targeted languages:
 
 Requirements:
 
+
 +---------+---------------+----------------+--------------+----------------+-----------+
 | Package | Ubuntu Xenial | Ubuntu Yakkety | Ubuntu Zesty | Debian Stretch | Fedora 26 |
 +=========+===============+================+==============+================+===========+
+|         |                  Required Support             |    Recommended support     |
++---------+---------------+----------------+--------------+----------------+-----------+
 | Boost   |     1.58      |     1.61       |    1.62      |    1.62        |   1.63    |
 +---------+---------------+----------------+--------------+----------------+-----------+
 | CMake   |     3.5.1     |     3.5.2      |    3.7.2     |    3.7.2       |   3.7.2   |
@@ -271,6 +274,8 @@ Requirements:
 +---------+---------------+----------------+--------------+----------------+-----------+
 
 `*` means that this is not the upstream version but a package distributed by OSRF or the community
+
+Maintainers can chose to support even lower versions to also cover older ROS distributions and thus avoid branching out
 
 - Gazebo 8
 
