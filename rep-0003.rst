@@ -239,7 +239,7 @@ Architectures Supported:
 - arm32
 - arm64
 
-Targeted languages:
+Targeted Languages:
 
 - C++11
 - Python 2.7
