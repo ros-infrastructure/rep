@@ -346,7 +346,7 @@ never be supported explicitly, although some things may work.
 Gazebo
 ------
 As of ROS Lunar, we are using the gazebo packages released by OSRF rather than the upstream version.
-This is due to a discrepency between upstream versions on targeted Ubuntu distributions
+This is due to a discrepancy between upstream versions on targeted Ubuntu distributions
 
 catkin / rosbuild support
 =========================
