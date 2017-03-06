@@ -273,9 +273,9 @@ Requirements:
 | PyQt    |     5.5.1     |     5.7        |    5.7       |    5.7         |   5.7     |
 +---------+---------------+----------------+--------------+----------------+-----------+
 
-" * " means that this is not the upstream version but a package distributed by OSRF or the community
+" * " means that this is not the upstream version but a package distributed by OSRF or the community.
 
-Maintainers can chose to support even lower versions to also cover older ROS distributions and thus avoid branching out
+Maintainers can choose to support even lower versions to also cover older ROS distributions and thus avoid branching out.
 
 Build System Support:
 
