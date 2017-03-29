@@ -1,0 +1,266 @@
+REP: 130
+Title: Node API for Map Dispatching
+Author: Stéphane Magnenat <stephane at magnenat dot net>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 16-Oct-2012
+Post-History: 
+
+
+Abstract
+========
+
+This REP standardizes a node API to provide interaction with 2D and 3D
+maps, including getting and saving the map, getting regions of interest
+from the map, and projecting 3D maps onto 2D regions.
+
+
+Motivation
+==========
+
+While REP 129 [#REP129]_ defines a lightweight node API for SLAM packages,
+with the explicit aims of making easy to write these, this API falls short
+of providing the rich features for interacting with the map that one would
+expect in practical use.
+Therefore, this REP completes REP 129 and define these features, such as
+regions of interest and 2D projections of 3D maps.
+
+
+Specification
+=============
+
+General Architecture
+--------------------
+
+The overall mapping node API is split into two entities, each
+defined in its own REP, the SLAM node and the map dispatcher node::
+
+    ---->   +---------------+ ---->         +----------------+ <--->
+    scans,  |               | poses (tf)    |                | ROI sub maps
+    point   |   SLAM node   |               | map_dispatcher |
+    clouds  |    REP 129    | ------------> |    this REP    | 
+            |               | map           |                | <--->
+            +---------------+               +----------------+ projected maps
+
+SLAM node
+    This node is responsible of localizing the robot and providing a simple
+    map, optionally with progressive updates.
+    This is covered by REP 129 [#REP129]_.
+
+map_dispatcher
+    This node receives the map from the SLAM node, and provides sub maps
+    based on regions of interest (ROI) and projected 2D maps from 3D data.
+    This part covered by this REP.
+
+
+Message Types
+-------------
+
+The following types of messages are implemented in the supporting map_msgs_
+unary stack:
+
+
+map_msgs/ProjectedMap.msg
+'''''''''''''''''''''''''
+
+This message contains the projection of a slice of a 3D point-cloud map
+onto a 2D occupancy grid.
+The map was projected along the z-axis in the ``map.header.frame_id`` frame,
+in the range of ``min_z`` to ``max_z``::
+
+    nav_msgs/OccupancyGrid map
+    float64 min_z
+    float64 max_z
+
+
+map_msgs/ProjectedMapInfo.msg
+'''''''''''''''''''''''''''''
+
+This message contains all information to set a projection from a slice of a
+3D point-cloud map onto a 2D occupancy grid.
+The map will be projected along the z-axis using points in the range of
+``min_z`` to ``max_z`` in the frame ``map.header.frame_id``, from the area
+defined by the AABB starting at (``x``, ``y``) and of
+size (``width``, ``height``)::
+
+    string frame_id
+    float64 x
+    float64 y
+    float64 width
+    float64 height
+    float64 min_z
+    float64 max_z
+
+    
+Service Types
+-------------
+
+map_msgs/SaveMap.srv
+''''''''''''''''''''
+
+This service allows to save a map. The type of the map is defined by the
+extension of filename, and is allowed to be specific to the SLAM node::
+
+    std_msgs/String filename
+
+
+map_msgs/GetPointMap.srv
+''''''''''''''''''''''''
+
+This service returns the map as a point cloud::
+
+    ---
+    sensor_msgs/PointCloud2 map
+
+
+map_msgs/SetMapProjections.srv
+''''''''''''''''''''''''''''''
+
+This service sets the different map projections::
+
+    ---
+    map_msgs/ProjectedMapInfo[] projected_maps_info
+
+
+map_msg/GetMapROI.srv
+'''''''''''''''''''''
+
+This service retrieves a region of interest (ROI) from a 2D map.
+The ``x``, ``y`` values are the center of the rectangular region of
+lengths ``l_x``, ``l_y``.
+The values are given relatively to the map frame::
+
+    float64 x
+    float64 y
+    float64 l_x
+    float64 l_y
+    ---
+    nav_msgs/OccupancyGrid sub_map
+    
+    
+map_msg/GetPointMapROI.srv
+''''''''''''''''''''''''''
+
+This service retrieves a region of interest (ROI) from a 3D map.
+The ``x``, ``y``, ``z`` values are the center of the region.
+If the ``r`` value is strictly positive, the ROI is a sphere,
+and if ``r`` is 0, the region is an axis-aligned bounding-box of
+length ``l_x``, ``l_y``, ``l_z``.
+The values are given relatively to the map frame::
+
+    float64 x
+    float64 y
+    float64 z
+    float64 r    # if r > 0, spherical ROI of radius r
+    float64 l_x  # if r == 0, length of AABB on x
+    float64 l_y  # if r == 0, length of AABB on y
+    float64 l_z  # if r == 0, length of AABB on z
+    ---
+    sensor_msgs/PointCloud2 sub_map
+
+
+Common map_dispatcher API
+-------------------------
+
+Services
+''''''''
+
+``~save_map`` (map_msgs/SaveMap)
+    Save the map to the filesystem, file type depends on extension in
+    filename.
+    
+
+2D map_dispatcher API
+---------------------
+
+This node stores incoming occupancy-grid maps and allows third-party nodes
+to retrieve parts of the map.
+
+
+Services
+''''''''
+
+``get_map`` (nav_msgs/GetMap)
+    Get the map.
+``get_sub_map`` (map_msg/GetMapROI)
+    Get part of the map.
+
+
+3D map_dispatcher API
+---------------------
+
+This node stores incoming point-cloud maps and allows third-party nodes
+to retrieve parts of the map and to set projections that will be
+updated in real time while the underlying map changes.
+
+
+Published Topics
+''''''''''''''''
+
+``projected_map_0 : projected_map_n-1`` (map_msgs/ProjectedMap, latched)
+    projected 2D maps
+
+
+Services
+''''''''
+
+``get_point_map`` (nav_msgs/GetPointMap)
+    Get the point-cloud map.
+``get_occupancy_map`` (nav_msgs/GetPointMap)
+    Get the occupancy map.
+``get_sub_point_map`` (map_msg/GetPointMapROI)
+    Get part of the point-cloud map.
+``get_sub_occupancy_map`` (map_msg/GetPointMapROI)
+    Get part of the 3D occupancy map, in occupancy point-cloud format.
+``set_map_projections`` (map_msgs/SetMapProjections)
+    Select the projections of the point-cloud map.
+
+
+Open Questions
+==============
+
+* Do we want a service, in addition to the topics, to get projected maps?
+* Should we add services to only partially set the projections?
+* How do we plan to handle multiple robots? (multi-sensors inputs)?
+  I currently think that a good solution would be to use a name
+  like *local_map_N* for ``map_frame``, letting a third-party tool
+  to fuse different maps together and provide transformations between
+  a global world *map* to the different *local_map_N*.
+  This scheme could also be useful when a robot has to register its
+  position with respect to a pre-existing map.
+  The question is then whether this REP should specify the interface
+  of the mult-map fusion; I am in favor of doing so.
+
+
+Reference Implementation
+========================
+
+The map_msgs_ unary stack implements the messages and services specified
+in this document.
+
+A reference implementation of ``map_dispatcher``, both in 2D and 3D,
+shall be available upon this REP acceptance.
+
+
+References
+==========
+
+.. _map_msgs: http://www.ros.org/wiki/map_msgs
+.. _ethzasl_mapping: http://www.ros.org/wiki/ethzasl_mapping
+.. _gmapping: http://www.ros.org/wiki/gmapping
+.. _hector_slam: http://www.ros.org/wiki/hector_slam
+.. _octomap_mapping: http://www.ros.org/wiki/octomap_mapping
+.. [#REP105] REP 105, Coordinate Frames for Mobile Platforms
+   (http://www.ros.org/reps/rep-0105.html)
+.. [#REP129] REP 129, Node API for SLAM Packages
+   (http://www.ros.org/reps/rep-0129.html)
+   
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+Note: some text snippets were copied from ROS Wiki (CC-BY 3.0),
+I think these are too small for being considered for copyright.
