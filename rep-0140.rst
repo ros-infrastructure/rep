@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 26-Jun-2013
-Post-History: 12-Mar-2014
+Post-History: 12-Mar-2014, 16-May-2017
 
 Outline
 =======
@@ -282,6 +282,17 @@ The package name must start with a letter and contain only lowercase
 alphabetic, numeric or underscore characters [2]_.  The package name
 should be unique within the ROS community.  It may differ from the
 folder name into which it is checked out, but that is *not* recommended.
+
+The following recommended exemptions apply, which are optional for
+implementations:
+
+- Dashes may be permitted in package names. This is to support
+  maintaining a consistent dependency name when transitioning back
+  and forth between a system dependency and in-workspace package,
+  since many rosdep keys contain dashes (inherited from the
+  Debian/Ubuntu name).
+- In support of some legacy packages, capital letters may also be
+  accepted in the package name, with a validation warning.
 
 
 <version>
