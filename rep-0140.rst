@@ -312,17 +312,16 @@ Attributes
 
   Email address of the maintainer.
 
-An orphaned package is one with no current maintainer.  Orphaned
-packages should have their maintainer set to ``ROS Community
-<ros-release@code.ros.org>``.  These packages will be maintained by
-the ROS Community as a whole until a volunteer takes over maintenance.
+An orphaned package is one with no current maintainer.
+Orphaned packages should use the following maintainer information to
+guide volunteers how they can claim maintainership:
 
 Example
 '''''''
 
 ::
 
-  <maintainer email="ros-release@code.ros.org">ROS Community</maintainer>
+  <maintainer email="ros-orphaned-packages@googlegroups.com">Unmaintained see http://wiki.ros.org/MaintenanceGuide#Claiming_Maintainership</maintainer>
 
 
 <license> (multiple, but at least one)
