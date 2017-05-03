@@ -1,0 +1,337 @@
+REP: XXX
+Title: Node API for Mapping Packages
+Author: Stéphane Magnenat <stephane at magnenat dot net>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 16-Oct-2012
+Post-History: 
+
+
+Abstract
+========
+
+This REP standardizes 2D and 3D mapping node API, to allow easy
+interoperability between mapping and SLAM implementations.
+This document defines names and types for topics, services and parameters.
+Moreover, it partially defines the semantics of message content,
+for instance in the case of point clouds.
+To ease the compliance curve, this REP defines several compliance profiles.
+
+
+Motivation
+==========
+
+Localization and mapping is a cornerstone of modern robotic applications.
+While the SLAM problem has been solved in research papers for a variety of
+situations, on the practical side it is still not trivial to deploy a robust
+SLAM on real applications.
+For this reason, and because every solution has its own strong and weak
+points, there are different SLAM implementations available on ROS, most
+of them in 2D, but several of them do 3D.
+Unfortunately, these implementations do not share the same node API,
+which hinders their comparison and puts unnecessary burden on the user,
+who typically want to test different approaches and use the one working
+the best for her application.
+The aim of this REP is to specify a node API for 2D and 3D SLAM nodes.
+This specification builds on the de-facto partial standard in 2D SLAMs on ROS,
+and extends it to 3D.
+
+
+Specification
+=============
+
+Compliance Profiles
+-------------------
+
+A profile defines a set of features that a node should provide to comply with
+the profile.
+Currently, profiles *baseline* (BP) and *main* (MP) are defined:
+
+BP
+    The minimal features to perform SLAM on a robot.
+    
+MP
+    All features of BP plus the ability to query sub-maps and 2D projections
+    in case of 3D mapping.
+
+In the rest of this document, every element of the API that are not available
+in BP will state the minimal profile in which they are available.
+
+
+Message Types
+-------------
+
+The following types of messages are implemented in the supporting map_msgs_
+unary stack:
+
+map_msgs/ProjectedMapInfo.msg
+'''''''''''''''''''''''''''''
+
+This message conveys information on z-values to consider when projecting 3D
+maps into 2D::
+
+    float64 min_z
+    float64 max_z
+    
+    
+Service Types
+-------------
+
+map_msgs/GetPointMap.srv
+''''''''''''''''''''''''
+
+This service returns the map as a point cloud::
+
+    ---
+    sensor_msgs/PointCloud2 map
+
+
+map_msgs/ProjectedMapsInfo.srv
+''''''''''''''''''''''''''''''
+
+This service retrieves how 2D maps are created from the 3D map::
+
+    ---
+    map_msgs/ProjectedMapInfo[] projected_maps_info
+
+
+map_msgs/SaveMap.srv
+''''''''''''''''''''
+
+This service allows to save a map. The type of the map is defined by the
+extension of filename, and is allowed to be specific to the mapping node::
+
+    std_msgs/String filename
+
+
+map_msg/GetMapROI
+'''''''''''''''''
+
+This service retrieves a region of interest (ROI) from a 2D map. The
+``x``, ``y`` values are the center of the rectangular region of
+lengths ``l_x``, ``l_y``::
+
+    float64 x
+    float64 y
+    float64 l_x  # if r == 0, length of AABB on x
+    float64 l_y  # if r == 0, length of AABB on y
+    ---
+    nav_msgs/OccupancyGrid sub_map
+    
+    
+map_msg/GetPointMapROI
+''''''''''''''''''''''
+
+This service retrieves a region of interest (ROI) from a 3D map. The
+``x``, ``y``, ``z`` values are the center of the region. If the ``r`` value
+is strictly positive, the ROI is a sphere, and if ``r`` is 0, the region
+is an axis-aligned bounding-box of length ``l_x``, ``l_y``, ``l_z``::
+
+    float64 x
+    float64 y
+    float64 z
+    float64 r    # if != 0, circular ROI of radius r
+    float64 l_x  # if r == 0, length of AABB on x
+    float64 l_y  # if r == 0, length of AABB on y
+    float64 l_z  # if r == 0, length of AABB on z
+    ---
+    sensor_msgs/PointCloud2 sub_map
+
+Common Node API
+---------------
+
+This section lists features that are common to nodes performing mapping in
+2D and 3D.
+
+
+Parameters
+''''''''''
+
+``~base_frame`` (string, default: "base_link")
+    the name of the base frame of the robot. This is the frame used for
+    localization and for transformation of laser scan data or point clouds.
+``~map_frame`` (string, default: "map")
+    the name of the map frame
+``~odom_frame`` (string, default: "odom")
+    the name of the odom frame
+
+For nodes supporting both 2D and 3D, one or more node-specific parameters
+shall allow to specify the mode or the topics to subscribe to.
+
+
+Topics
+''''''
+
+SLAM nodes both subscribe to and publish on the tf topic, through the tf API.
+
+
+Required tf Transforms
+''''''''''''''''''''''
+
+The following transformations shall be available to SLAM nodes.
+The nodes might not use all of them, for instance,
+ethzasl_mapping_ does not require base_frame.
+
+<the frame attached to incoming scans/clouds> -> base_frame
+    usually a fixed value, broadcast periodically by a robot_state_publisher,
+    or a tf static_transform_publisher. 
+base_frame -> odom_frame
+    usually provided by the odometry system (e.g., the driver for the
+    mobile base) 
+    
+
+Provided tf Transforms
+''''''''''''''''''''''
+
+The SLAM nodes must provide at least this transform.
+They are allowed to provide more, but they shall provide a setting
+to disable additional published transforms.
+
+map_frame -> odom_frame
+    the current estimate of the robot's pose within the map frame
+
+
+Services
+''''''''
+
+``~save_map`` (map_msgs/SaveMap)
+    Save the map to the filesystem, file type depends on extension in
+    filename.
+``~reset`` (std_msgs/Empty)
+    Clear the map and set the position.
+    
+
+2D Node API
+-----------
+
+The 2D node API is very similar to the one of existing packages such as
+gmapping_ or hector_slam_.
+See the `Backwards Compatibility`_ section for information about changes.
+
+
+Subscribed Topics
+'''''''''''''''''
+
+``scan`` (sensor_msgs/LaserScan)
+    laser scans to create the map from
+
+The node is allowed to subscribe for other source of information in 2D.
+For instance, `ethzasl_mapping`_ subscribes to ``cloud_in`` and accepts
+2D point clouds.
+
+
+Published Topics
+''''''''''''''''
+
+``map`` (nav_msgs/OccupancyGrid, latched)
+    generated map
+
+
+Services
+''''''''
+
+``get_map`` (nav_msgs/GetMap)
+    Get the map.
+``get_sub_map`` (map_msg/GetMapROI, MP)
+    Get part of the map.
+
+
+3D Node API
+-----------
+
+Nodes providing 3D mapping have to provide a point-cloud map as output, and
+optionally a set of projected maps as well (MP).
+Point-cloud maps must provide at least channels ``x``, ``y``, ``z`` and are
+allowed to provide additional channels such as normals and colors as well.
+In the case of a SLAM algorithm based on point clouds, the clouds themselves,
+possibly after filtering, shall be returned.
+For algorithms working with octrees, one point for every faces on the surface
+of the cuboids shall be returned.
+In addition, the center of the cuboids shall be returned, along with the size
+of their side, on the topic ``octree_map``.
+
+
+Subscribed Topics
+'''''''''''''''''
+
+``cloud_in`` (sensor_msgs/PointCloud2)
+    incoming 3D point cloud for scan integration.
+    The point cloud must at least provide channels ``x``, ``y``, and ``z``.
+
+
+Published Topics
+''''''''''''''''
+
+``point_map`` (sensor_msgs/PointCloud2, latched)
+    generated map in point-cloud format
+``octree_map`` (sensor_msgs/PointCloud2, latched)
+    only for octree-based SLAM. Generated map in point-cloud format where
+    each point is the center of a cuboid and the field ``size`` is the length
+    of its side.
+``projected_map_0 : projected_map_n-1`` (nav_msgs/OccupancyGrid, latched, MP)
+    projected 2D maps
+
+
+Services
+''''''''
+
+``get_point_map`` (nav_msgs/GetPointMap)
+    Get the point-cloud map.
+``get_sub_point_map`` (map_msg/GetPointMapROI, MP)
+    Get part of the point-cloud map.
+``get_sub_octree_map`` (map_msg/GetPointMapROI, MP)
+    only for octree-based SLAM. Get part of the octree map
+    (same interpretation of the PointCloud2 message).
+``projected_maps_info`` (map_msgs/ProjectedMapsInfo, MP)
+    Get the description of projected maps.
+
+
+Open Questions
+==============
+
+* Should the setting of ``ProjectedMapInfo`` be standardized as well?
+* Map messages in 2D are currently in ``nav_msgs``, which is a bit strange. 
+  As 3D map messages are in ``map_msgs``, this is a bit inconsistent.
+  However, this simplest from a practical point of view is to live with this.
+* Should we standardize additional fields for point clouds like normals, etc.?
+  As far as I know there is no specification in ROS for fields within
+  PointCloud2, although the usage in PCL might have set a de-facto standard.
+  
+
+Backwards Compatibility
+=======================
+
+The changes to existing 2D SLAM nodes are the following:
+
+* Renamed service ``dynamic_map`` to ``get_map`` for the sake of clarity.
+
+
+Reference Implementation
+========================
+
+The map_msgs_ unary stack implements the messages and services specified
+in this document.
+
+Currently, only ethzasl_mapping_ implements the node API defined in this REP.
+We expect common ROS mapping stacks such as gmapping_, hector_slam_ and 
+octomap_mapping_ to comply as well, once this REP is accepted.
+
+
+References
+==========
+
+.. _map_msgs: http://www.ros.org/wiki/map_msgs
+.. _ethzasl_mapping: http://www.ros.org/wiki/ethzasl_mapping
+.. _gmapping: http://www.ros.org/wiki/gmapping
+.. _hector_slam: http://www.ros.org/wiki/hector_slam
+.. _octomap_mapping: http://www.ros.org/wiki/octomap_mapping
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+Note: some text snippets were copied from ROS Wiki (CC-BY 3.0),
+I think these are too small for being considered for copyright.
