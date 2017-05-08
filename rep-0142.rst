@@ -140,15 +140,16 @@ mobile robots, though they are not specific to a particular robot.
 The `desktop` variant is more minimal and only provides the stacks in
 the `robot` variant, plus visualization and debugging tools.
 Both of these variants contain tutorials for the stacks they provide.
+`urdf_tutorials` are only in `desktop_full` because they depend on the simulator.
 
 ::
 
   - desktop:
       extends: [robot, viz]
       packages: [common_tutorials, geometry_tutorials, ros_tutorials,
-                 roslint, urdf_tutorials, visualization_tutorials]
+                 roslint, visualization_tutorials]
   - desktop_full:
-      extends: [desktop, perception, simulators]
+      extends: [desktop, perception, simulators, urdf_tutorials]
 
 Institution-specific and robot-specific
 '''''''''''''''''''''''''''''''''''''''
