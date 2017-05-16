@@ -260,7 +260,7 @@ Requirements:
 +---------+---------------+----------------+--------------+----------------+-----------+
 | CMake   |     3.5.1     |     3.5.2      |    3.7.2     |    3.7.2       |   3.7.2   |
 +---------+---------------+----------------+--------------+----------------+-----------+
-| Gazebo  |     8.0*      |     8.0*       |    8.0       |    8.0*        |   8.0*    |
+| Gazebo  |     7.0       |     7.3.1      |    7.5       |    7.3.1       |   7.x     |
 +---------+---------------+----------------+--------------+----------------+-----------+
 | Ogre    |     1.9       |     1.9        |    1.9       |    1.9         |   1.9     |
 +---------+---------------+----------------+--------------+----------------+-----------+
@@ -342,11 +342,6 @@ The preferred migration strategy is to support both Python 2.7 and
 Python >= 3.2 in each source script. Supporting any version earlier
 than 2.6 makes that task harder. Python 3.0 and 3.1 will probably
 never be supported explicitly, although some things may work.
-
-Gazebo
-------
-As of ROS Lunar, we are using the gazebo packages released by OSRF rather than the upstream version.
-This is due to a discrepancy between upstream versions on targeted Ubuntu distributions
 
 catkin / rosbuild support
 =========================
