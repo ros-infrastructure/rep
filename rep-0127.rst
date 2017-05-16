@@ -5,7 +5,7 @@ Status: Accepted
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 12-Sep-2012
-Post-History: 22-Sep-2012
+Post-History: 22-Sep-2012, 16-May-2017
 
 Outline
 =======
@@ -239,6 +239,17 @@ The package name must start with a letter and contain only lowercase
 alphabetic, numeric or underscore characters [1]_.  The package name
 should be unique within the ROS community.  It may differ from the
 folder name into which it is checked out, but that is *not* recommended.
+
+The following recommended exemptions apply, which are optional for
+implementations:
+
+- Dashes may be permitted in package names. This is to support
+  maintaining a consistent dependency name when transitioning back
+  and forth between a system dependency and in-workspace package,
+  since many rosdep keys contain dashes (inherited from the
+  Debian/Ubuntu name).
+- In support of some legacy packages, capital letters may also be
+  accepted in the package name, with a validation warning.
 
 
 <version>
@@ -491,6 +502,15 @@ package and message generation tasks.
 
 This empty tag indicates that your package contains no
 architecture-specific files.
+
+<build_type>
+''''''''''''
+
+This tag indicates the package's build type. If unspecified, the
+default is ``catkin``. Typical value is ``cmake`` to denote a plain
+CMake package, but any string is allowed.
+
+The ``<build_type>`` tag may only be specified once.
 
 <deprecated>
 ''''''''''''
