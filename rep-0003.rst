@@ -273,7 +273,7 @@ Requirements:
 | Qt5     |     5.5.1     |     5.6.1      |    5.7.1     |    5.7.1       |   5.7.1   |
 +---------+---------------+----------------+--------------+----------------+-----------+
 
-" * " means that this is not the upstream version but a package distributed by OSRF or the community.
+" * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
 Maintainers can choose to support even lower versions to also cover older ROS distributions and thus avoid branching out.
 
