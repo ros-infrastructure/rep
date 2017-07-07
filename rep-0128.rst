@@ -20,7 +20,7 @@ Rationale
 
 This REP has been written to make reading and writing documentation
 easier and more consistent and to remove ambiguities when
-communicating about the code layout of a specific installation.  
+communicating about the code layout of a specific installation.
 
 Recommended Layout
 ==================
@@ -31,12 +31,13 @@ This is the recommended layout for development is as follows:
 
     workspace_folder/        --WORKSPACE
       src/                   --SOURCE SPACE
-        CMakeLists.txt/      --This is symlinked to catkin/cmake/toplevel.cmake 
+        CMakeLists.txt/      --This is symlinked to catkin/cmake/toplevel.cmake
         package_1/
           CMakeLists.txt
           package.xml
         ...
         package_n/
+          CATKIN_IGNORE      --Optionally place this empty marker file to exclude package_n from being processed
           CMakeLists.txt
           package.xml
       build/                 --BUILD SPACE(this is where build system is invoked, not necessarily within workspace)
@@ -67,7 +68,7 @@ This is the recommended layout for development is as follows:
 Elements of the Workspace
 =========================
 
-When talking about a workspace used in development there are several names 
+When talking about a workspace used in development there are several names
 
 Workspace
 ---------
@@ -93,11 +94,11 @@ Build Space
 The build space is the folder in which cmake is invoked and generates
 artifacts such as the CMakeCache
 
-A typical invocation of cmake will look like this when following the recommended layout.  
+A typical invocation of cmake will look like this when following the recommended layout.
 
 ::
 
-    cmake ../src 
+    cmake ../src
 
 Development Space
 -----------------
@@ -145,9 +146,9 @@ The term result space can be used for either a development space or an
 install space.
 In cases where either of those two specific terms would do, the
 generic term should be used instead.
-To visually distinguish the result space from spaces that have a direct 
-folder name correspondence (such as the folder ``install`` for the install 
-space) it is recommended to refer to the result space as ``RESULT-SPACE`` 
+To visually distinguish the result space from spaces that have a direct
+folder name correspondence (such as the folder ``install`` for the install
+space) it is recommended to refer to the result space as ``RESULT-SPACE``
 in documention, for example:
 ::
 
@@ -189,11 +190,11 @@ Let us say we have several catkin workspaces in our home folder (~/).
      /src
      /build
      /devel
- ~/workspace3/ 
+ ~/workspace3/
      /src
      /build
      /devel
- 
+
 Example 1: Installing workspace1 to system
 ::
 
@@ -226,20 +227,20 @@ Example 3: Overlaying workspace 2 on top of workspace1's devel space on top of s
   cd ~/workspace2/build
   cmake ../src
   make
-  
+
 Example 4: Overlaying workspace 3 on top of local workspace2 install space on top of workspace1 devel space on top of system install
 ::
 
   cd ~/workspace2/build
-  cmake -DCMAKE_INSTALL_PREFIX=~/ws2_installed ../src 
+  cmake -DCMAKE_INSTALL_PREFIX=~/ws2_installed ../src
   make
   make install
-  
+
   source ~/ws2_installed/setup.bash
-  
+
   cd ~/workspace3/build
   cmake ../src
-  make  
+  make
 
 Mixing catkin And rosbuild Workspaces
 =====================================
