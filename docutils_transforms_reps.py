@@ -29,7 +29,7 @@ class Headers(Transform):
     default_priority = 360
 
     rep_rst_nr = 12
-    rep_url = 'rep-%04d'
+    rep_url = 'rep-%04d.html'
     rep_git_url = \
         'https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst'
     rcs_keyword_substitutions = (
