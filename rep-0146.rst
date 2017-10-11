@@ -50,6 +50,24 @@ robot/name
 
 `robot/name` stores robot name, default pr2 name is 'robot' [1]
 
+robot/info
+''''''''''
+
+`robot/info` stores any other characteristics of the robot, including type, serial number, owner name / email address, timezone, language it uses ...
+
+Examples
+========
+
+
+Example behaviors::
+
+    $ rosparam get robot/name
+    olive
+    $ rosparam get robot/type
+    pepper
+    $ rosparam get robot/info
+    {serial number: 00000000, owner name : Kei Okada, language: Japanese,....}
+
 References
 ==========
 
