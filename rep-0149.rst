@@ -72,12 +72,12 @@ ABI version on the package level
 When building binary packages on the ROS buildfarm there is no assumption
 about ABI compatibility.
 When a new Debian package has been built all downstream packages are being
-rebuild too in order to ensure they still work together.
+rebuilt too in order to ensure they still work together.
 This makes e.g. releasing a core package like `catkin` or `roscpp`
 particularly costly.
 Due to that overhead changes which should be released rather sooner than
-later, e.g. a documentation fix, simple bugfix in a `.cpp` file, are being
-hold back to group them with other changes to make the rebuild effort
+later, e.g. a documentation fix or simple bugfix in a `.cpp` file, are being
+held back to group them with other changes to make the rebuild effort
 worthwhile.
 
 In order to allow package releases without enforcing a rebuild of all
@@ -141,7 +141,7 @@ The reverse dependency can then be specified in two parts:
 
 During a from source build the build tool can use the information from all
 package manifests in the workspace to identify group dependencies.
-It can use these information to process group members before the packages
+It can use this information to process group members before the packages
 declaring the group dependency as if the dependency was declared explicitly
 using the existing `depend` tags.
 
@@ -171,7 +171,7 @@ Since then the number of packages in a ROS distributions has increased
 ROS provides binary packages for.
 Therefore the need to avoid unnecessary rebuilds has increased.
 It is also desired to be able to encourage more frequent releases if they
-don't require downstream packages to be rebuild.
+don't require downstream packages to be rebuilt.
 
 Dependencies across ROS 1 and ROS 2
 -----------------------------------
@@ -389,7 +389,7 @@ Attributes
   without the need to be recompiled.
   This includes but is not limited to ABI compatibility.
   Changes in other parts of a package (CMake, Python, etc.) could also
-  require downstream packages to be rebuild and therefore not qualify as
+  require downstream packages to be rebuilt and therefore not qualify as
   "compatible".
 
   .. raw:: html
