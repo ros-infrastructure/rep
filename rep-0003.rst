@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 21-Sep-2010
-Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017
+Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017, 23-Oct-2017
 
 
 Abstract
@@ -274,6 +274,68 @@ Requirements:
 +---------+---------------+----------------+--------------+----------------+-----------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
+
+Maintainers can choose to support even lower versions to also cover older ROS distributions and thus avoid branching out.
+
+Build System Support:
+
+- Same as Indigo
+
+Melodic Morenia (May 2018 - May 2023)
+--------------------------------------
+Required Support for:
+
+- Ubuntu Artful (17.10)
+- Ubuntu B (18.04)
+
+Recommended Support for:
+
+- Debian Stretch
+- Fedora 28
+
+Architectures Supported:
+
+- amd64
+- arm32
+- arm64
+
+Targeted Languages:
+
+- C++11
+- Python 2.7
+
+  - Python 3.6 not required, but testing against it is recommended
+
+- Lisp SBCL 1.3.14
+
+Requirements:
+
+
++---------+---------------+----------------+----------------+-----------+
+| Package | Ubuntu Artful | Ubuntu B       | Debian Stretch | Fedora 28 |
++=========+===============+================+================+===========+
+|         |       Required Support         |    Recommended support     |
++---------+---------------+----------------+----------------+-----------+
+| Boost   |     1.62      |     1.62!      |    1.62        |   1.64!   |
++---------+---------------+----------------+----------------+-----------+
+| CMake   |     3.9.1     |     3.9.1!     |    3.7.2       |   3.9.3!  |
++---------+---------------+----------------+----------------+-----------+
+| Gazebo  |     7.5.0     |     7.5.0!     |    7.3.1       |   8.1.1!  |
++---------+---------------+----------------+----------------+-----------+
+| Ogre    |     1.9       |     1.9!       |    1.9         |   1.9!    |
++---------+---------------+----------------+----------------+-----------+
+| OpenCV  |     3.3*      |     3.3*       |    3.3*        |   3.3*    |
++---------+---------------+----------------+----------------+-----------+
+| PCL     |     1.8.1     |     1.8.1!     |    1.8.0       |   1.8.0!  |
++---------+---------------+----------------+----------------+-----------+
+| PyQt    |     5.7       |     5.7!       |    5.7         |   5.9!    |
++---------+---------------+----------------+----------------+-----------+
+| Qt5     |     5.9.1     |     5.9.1!     |    5.7.1       |   5.9.2!  |
++---------+---------------+----------------+----------------+-----------+
+
+" * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
+
+" ! " means that this package will be at least this version (since these distributions have not yet been released); this may change as those releases get closer.
 
 Maintainers can choose to support even lower versions to also cover older ROS distributions and thus avoid branching out.
 
