@@ -119,25 +119,26 @@ for format one and two, which is not repeated here.
 Group dependencies
 ------------------
 
-While "normal" dependencies are specified in the package which expresses a
-dependency on another package this is not adequate for the targeted goal.
-Instead packages need to be able to declare that they are a dependency of
-another package.
+Packages can already express direct dependencies on other individual packages,
+but this is not sufficient for cases where a package needs to be built after
+all instances of a particular kind of package.
+Instead packages need to be able to declare a dependency on packages without
+using their name directly.
 
-For that kind of "reverse" dependency a package could use the name of the other
-package.
-But that approach would fail if the other package gets forked under a different
-name since the reverse dependency would still reference the original package
-name.
+One alternative is to "reverse" the dependency declaration so that a package
+states that it "wants" to be a dependency of another package.
+But that approach does not work in the case where the other package gets forked
+under a different name since the "reverse" dependency would still only
+reference the original package name.
 
-Therefore a reverse dependency is not using the package name but rather a
-separate identify which will be called "group dependency name".
-The reverse dependency can then be specified in two parts:
+Therefore the dependency declaration is being decoupled into two parts:
 
  * *(A)* packages declaring a dependency on a "group dependency name", e.g.
-   "message_packages"
+   `ros1_bridge` can depend on the group "message_packages"
 
- * *(B)* packages declaring to be part of a group dependency identified by its name
+ * *(B)* packages declaring to be part of a group dependency identified by its
+   name, e.g. `sensor_msgs` can declare itself part of the "message_packages"
+   group
 
 During a from source build the build tool can use the information from all
 package manifests in the workspace to identify group dependencies.
@@ -149,10 +150,6 @@ The group dependency (A) is declared with a `group_depend` tag.
 The content of the group dependency tag is the name of the group.
 Leading and trailing whitespace is being ignore from the name and for
 consistency it is recommended to following the naming rules for packages.
-
-In order to avoid confusion with the existing `depend` tags (which are also
-being used during the release process) the group dependency information is
-stored in new tags within the `export` section.
 
 The membership of a group (B) is declared with a `member_of_group` tag.
 
@@ -386,7 +383,7 @@ Attributes
 
   "Compatibility" in this context guarantees that downstream packages built
   against the older version will continue to work with a newer version
-  without the need to be recompiled.
+  without the need to be rebuilt.
   This includes but is not limited to ABI compatibility.
   Changes in other parts of a package (CMake, Python, etc.) could also
   require downstream packages to be rebuilt and therefore not qualify as
@@ -711,13 +708,13 @@ Group dependency tags
 <group_depend> (multiple)
 '''''''''''''''''''''''''
 
-The content identifies the name of the dependency group.
+The content is the name of a dependency group on which the package depends.
 The group name should follow the same rules as the `\<name\>`_ tag.
 
 <member_of_group> (multiple)
 ''''''''''''''''''''''''''''
 
-The content identifies the name of the dependency group.
+The content is the name of a dependency group of which the package is a member.
 
 .. raw:: html
 
