@@ -286,7 +286,7 @@ Melodic Morenia (May 2018 - May 2023)
 Required Support for:
 
 - Ubuntu Artful (17.10)
-- Ubuntu B (18.04)
+- Ubuntu Bionic (18.04)
 
 Recommended Support for:
 
@@ -312,7 +312,7 @@ Requirements:
 
 
 +---------+---------------+----------------+----------------+-----------+
-| Package | Ubuntu Artful | Ubuntu B       | Debian Stretch | Fedora 28 |
+| Package | Ubuntu Artful | Ubuntu Bionic  | Debian Stretch | Fedora 28 |
 +=========+===============+================+================+===========+
 |         |       Required Support         |    Recommended support     |
 +---------+---------------+----------------+----------------+-----------+
