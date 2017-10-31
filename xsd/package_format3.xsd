@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:include schemaLocation="package_common.xsd"/>
+
+  <xs:complexType name="VersionWithOptionalCompatibilityType">
+    <xs:simpleContent>
+      <xs:extension base="VersionType">
+        <xs:attribute name="compatibility" type="VersionLimitType" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
   <xs:element name="package">
     <xs:annotation>
       <xs:documentation>
-        Specified in REP 140 (see http://www.ros.org/reps/rep-0140.html).
+        Specified in REP 149 (see http://www.ros.org/reps/rep-0149.html).
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -47,9 +56,12 @@
           <xs:element type="DependencyType" name="replace"/>
         </xs:choice>
 
+        <xs:element name="group_depend" type="xs:token" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="member_of_group" type="xs:token" minOccurs="0" maxOccurs="unbounded"/>
+
         <xs:element name="export" type="ExportType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="format" fixed="2" use="required"/>
+      <xs:attribute name="format" fixed="3" use="required"/>
     </xs:complexType>
   </xs:element>
 </xs:schema>
