@@ -1,0 +1,212 @@
+REP: 150
+Title: ROS Melodic and Newer Metapackages
+Author: Chris Lalancette <clalancette@openrobotics.org>
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 03-Nov-2017
+Post-History:
+
+
+Abstract
+========
+
+This REP describes the metapackages for the ROS Melodic release and for releases that follow until otherwise replaced by a similar update REP.
+This REP updates REP 131 [3]_ and REP 142 [5]_ for changes in packages.
+
+
+Motivation
+==========
+
+For a discussion on the general motivation and role of variants,
+please see REP 108 [1]_.
+
+As of ROS Hydro we have completed the transition to using
+metapackages instead of variants.
+For more information on metapackages see REP 127 [2]_.
+
+This document covers the common metapackages used for recommended
+installations.
+It is expressed in the ros/metapackages repository on github.com
+[4]_.
+
+This REP proposes the same entrypoints as REP 108 and merely updates
+the variant definitions to reflect the organizational changes in ROS
+stacks.
+
+The definitions in this REP are more focused and concise for clearer
+purpose, and do not list all transitive dependencies explicitly.
+
+
+Specification
+=============
+
+End-user entry points
+---------------------
+
+We define the same three main entry points for ROS users as REP 108
+[1]_.
+
+ * desktop_full (recommended)
+ * desktop
+ * ros_base
+
+Metapackages
+------------
+
+ROS Core
+''''''''
+
+The `ros_core` metapackage composes the core communication protocols.
+It may not contain any GUI dependencies.
+In ROS Jade `ros_core` is extended to include `geneus`.
+In ROS Kinetic `ros_core` is extended to include `gennodejs`.
+
+::
+
+ - ros_core:
+      extends: [ros, ros_comm]
+      packages: [catkin, cmake_modules, common_msgs, console_bridge,
+                 gencpp, geneus(Jade and newer), gennodejs(Kinetic and newer),
+                 genlisp, genmsg, genpy, message_generation, message_runtime,
+                 rosbag_migration_rule, rosconsole_bridge,
+                 roscpp_core, rosgraph_msgs, roslisp, rospack,
+                 std_msgs, std_srvs]
+
+ROS Base
+''''''''
+
+The `ros_base` metapackage composes the `ros_core` metapackage with
+commonly used libraries.
+It may not contain any GUI dependencies.
+
+::
+
+  - ros_base:
+      extends: [ros_core]
+      packages: [actionlib, angles, bond_core, class_loader,
+                 dynamic_reconfigure, nodelet_core,
+                 pluginlib]
+
+Robot metapackage
+'''''''''''''''''
+
+The `robot` metapackage is defined to be core, stable, ROS libraries
+for any robot hardware.
+It is the "general robotics" libraries of ROS.
+It may not contain any GUI dependencies.
+In ROS Melodic `robot` is contracted to remove `robot_model` and instead
+explicitly list the necessary packages.
+
+::
+
+  - robot:
+      extends: [ros_base]
+      packages: [collada_parser, collada_urdf, control_msgs, diagnostics,
+                 executive_smach, filters, geometry, joint_state_publisher,
+                 kdl_parser, kdl_parser_py, robot_state_publisher, urdf,
+                 urdf_parser_plugin, xacro]
+
+Capability variants
+'''''''''''''''''''
+
+The capability variants organize commonly used libraries that are
+specific to a class of use case.
+We also define a `simulators` variant that provides an organizational
+role for higher-level variants.
+We discourage GUI dependencies in these stacks, if possible.
+
+::
+
+  - perception:
+      extends: [ros_base]
+      packages: [image_common, image_pipeline,
+                 image_transport_plugins, laser_pipeline,
+                 perception_pcl, vision_opencv]
+
+  - simulators:
+      extends: [robot]
+      packages: [gazebo_ros_pkgs, rqt_common_plugins, rqt_robot_plugins,
+                 stage_ros]
+
+  - viz:
+      extends: [robot]
+      packages: [rqt_common_plugins, rqt_robot_plugins, rviz]
+
+Desktop variants
+''''''''''''''''
+
+The `desktop` variants are main entry points for users.
+The `desktop_full` is a "batteries included" experience for users and
+attempts to collect stable, well-documented libraries.
+These libraries may be specific to certain classes of robots, such as
+mobile robots, though they are not specific to a particular robot.
+The `desktop` variant is more minimal and only provides the stacks in
+the `robot` variant, plus visualization and debugging tools.
+Both of these variants contain tutorials for the stacks they provide.
+`urdf_tutorials` are only in `desktop_full` because they depend on the simulator.
+
+::
+
+  - desktop:
+      extends: [robot, viz]
+      packages: [common_tutorials, geometry_tutorials, ros_tutorials,
+                 roslint, visualization_tutorials]
+  - desktop_full:
+      extends: [desktop, perception, simulators, urdf_tutorials]
+
+Institution-specific and robot-specific
+'''''''''''''''''''''''''''''''''''''''
+
+Please see REP 108 [1]_ for discussion of institution-specific
+metapackages.
+
+When creating robot or institution specific metapackages consider
+using the \*_robot and \*_desktop and \*_base form where * is the
+institution or robot name.
+
+An institution is not required to provide a metapackage, they are
+mainly provided for convenience and identity.
+
+
+Backwards Compatibility
+=======================
+
+The metapackages in this REP provide the same semantic top level
+entry points while simplifying the definitions.
+
+
+References
+==========
+
+.. [1] REP 108: Diamondback Variants
+   (http://www.ros.org/reps/rep-0108.html)
+
+.. [2] REP 127: Specification of package manifest format
+   (http://ros.org/reps/rep-0127.html)
+
+.. [3] REP 131: Groovy Variants
+   (http://www.ros.org/reps/rep-0131.html)
+
+.. [4] ROS Metapackages Repository
+   (https://github.com/ros/metapackages)
+
+.. [5] REP 142: Indigo Variants
+   (http://www.ros.org/reps/rep-0142.html)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
