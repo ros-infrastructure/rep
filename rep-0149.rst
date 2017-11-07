@@ -932,6 +932,34 @@ Because metapackages only supply execution-time dependencies, they use
   <exec_depend>another_metapackage</exec_depend>
 
 
+Related Changes
+===============
+
+Environment variables
+---------------------
+
+In order to identify the ROS distribution ROS 1 already defines an environment
+variable `ROS_DISTRO` ([17]_).
+ROS 2 should expose the same environment variable.
+The package exporting the necessary environment should be a dependency of
+almost all ROS 2 packages to ensure that the information is available even when
+only some packages are installed.
+The package `rcl` seems to be a good place for this.
+
+Additionally for the condition expressions to allow distinguishing ROS 1 and
+ROS 2 an environment variable identifying the major version is necessary.
+Therefore the environment variable `ROS_VERSION` is used with the value being
+either `1` or `2`.
+This new environment variable can be defined beside the `ROS_DISTRO` one.
+
+Once a specific ROS environment has been sourced all tools can determine the
+ROS major version as well as the distribution name and therefore evaluate
+conditions which use those to limit the scope of dependencies.
+
+If now environment has been source some tools might require that the necessary
+information is being specified explicitly when being invoked.
+
+
 Compatibility
 =============
 
@@ -1038,6 +1066,8 @@ References
    (https://groups.google.com/forum/#!topic/ros-sig-buildsystem/jTB9r3zu580)
 .. [16] REP-0143
    (http://ros.org/reps/rep-0143)
+.. [17] ROS_DISTRO environment variable
+  (https://github.com/ros/ros/blob/b202645dc6bea6d4b9ca408dc703c8c7cc8204d9/core/roslib/env-hooks/10.ros.sh.em#L16)
 
 
 Copyright
