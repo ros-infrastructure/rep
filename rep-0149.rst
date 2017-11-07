@@ -976,6 +976,10 @@ If they are not checking that the format is two or lower they will
 simply ignore the format three specific information when processing a
 package with a format three manifest.
 
+In order to enable packages to declare different dependencies for ROS 1 and ROS
+2 in a single manifest the tools in ROS 1 (`catkin_pkg`, `rosdep`, `bloom`,
+etc.) should be updated to support format 3.
+
 catkin_prepare_release
 ''''''''''''''''''''''
 
