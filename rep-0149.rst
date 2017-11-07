@@ -588,6 +588,24 @@ Attributes
  The dependency to the package is restricted to versions greater than
  the stated version number.
 
+ ``condition="CONDITION_EXPRESSION"``
+
+ Every dependency can be conditional on a condition expression.
+ If the condition expression evaluate to "true" the dependency is being used
+ and considered as if it doesn't have a condition attribute.
+ If the condition expression evaluate to "false" the dependency is being
+ ignored and considered as if it doesn't exist.
+
+ The condition expression can consist of:
+
+  * parenthesis (which must be balanced)
+  * logical operators `and` and `or`
+  * comparison operators `==` and `!=`
+  * variable names which start with a `$` sign and are followed by
+    alphanumerics and underscores
+  * literals which can only contain alphanumerics, undercsores and dashes
+  * arbitrary whitespaces between these tokens
+
 
 <build_export_depend> (multiple)
 ''''''''''''''''''''''''''''''''
@@ -768,10 +786,20 @@ Group dependency tags
 The content is the name of a dependency group on which the package depends.
 The group name should follow the same rules as the `\<name\>`_ tag.
 
+Attributes
+..........
+
+ The `condition` attribute as defined for `\<build_depend\> (multiple)`_.
+
 <member_of_group> (multiple)
 ''''''''''''''''''''''''''''
 
 The content is the name of a dependency group of which the package is a member.
+
+Attributes
+..........
+
+ The `condition` attribute as defined for `\<build_depend\> (multiple)`_.
 
 .. raw:: html
 
