@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="package_common.xsd"/>
+
+  <xs:complexType name="VersionWithOptionalCompatibilityType">
+    <xs:simpleContent>
+      <xs:extension base="VersionType">
+        <xs:attribute name="compatibility" type="VersionLimitType" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="package">
+    <xs:annotation>
+      <xs:documentation>
+        Specified in REP 149 (see http://www.ros.org/reps/rep-0149.html).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" minOccurs="1" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>
+              The package name should be unique within the ROS community.
+              It may differ from the folder name into which it is checked out,
+              but that is not recommended.
+              It must start with a lower-case letter and consist of only
+              lower-case letters, numbers and underscores.
+              It must not have two consecutive underscores.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:pattern value="[a-z](_?[a-z0-9]+)*"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="version" type="VersionType" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="description" type="DescriptionType" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="maintainer" type="PersonWithEmailType" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element name="license" type="xs:token" minOccurs="1" maxOccurs="unbounded"/>
+
+        <xs:element name="url" type="UrlType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="author" type="PersonWithOptionalEmailType" minOccurs="0" maxOccurs="unbounded"/>
+
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element type="DependencyType" name="build_depend"/>
+          <xs:element type="DependencyType" name="build_export_depend"/>
+          <xs:element type="DependencyType" name="buildtool_depend"/>
+          <xs:element type="DependencyType" name="buildtool_export_depend"/>
+          <xs:element type="DependencyType" name="exec_depend"/>
+          <xs:element type="DependencyType" name="depend"/>
+          <xs:element type="DependencyType" name="doc_depend"/>
+          <xs:element type="DependencyType" name="test_depend"/>
+          <xs:element type="DependencyType" name="conflict"/>
+          <xs:element type="DependencyType" name="replace"/>
+        </xs:choice>
+
+        <xs:element name="group_depend" type="xs:token" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="member_of_group" type="xs:token" minOccurs="0" maxOccurs="unbounded"/>
+
+        <xs:element name="export" type="ExportType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="format" fixed="3" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
