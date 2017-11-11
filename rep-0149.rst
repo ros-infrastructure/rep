@@ -22,7 +22,7 @@ Outline
 
   The current draft highlights significant changes compared to REP-0140 [2]_
   in <font color="red">red</font>.
-  Trivial changes appear in <font color="green">green</font>.
+  Trivial changes appear in <font color="blue">blue</font>.
 
 
 Abstract
@@ -30,11 +30,10 @@ Abstract
 
 .. raw:: html
 
-  <font color="green">
+  <font color="blue">
 
-This REP specifies the third ``package.xml`` format, replacing the ones
-specified in REP-0127 [1]_ and REP-0140 [2]_.
-It is relevant for packages using the catkin as well as the ament build system.
+This REP specifies the third ``package.xml`` format, which is an update to the
+previous versions specified in REP-0127 [1]_ and REP-0140 [2]_.
 
 .. raw:: html
 
@@ -109,7 +108,7 @@ Rationale
 
 .. raw:: html
 
-  <font color="green">
+  <font color="blue">
 
 REP-0127 [1]_ and REP-0140 [1]_ provide the ``package.xml`` design rationale
 for format one and two, which is not repeated here.
@@ -155,7 +154,7 @@ using the existing `depend` tags.
 The group dependency (A) is declared with a `group_depend` tag.
 The content of the group dependency tag is the name of the group.
 Leading and trailing whitespace is being ignore from the name and for
-consistency it is recommended to following the naming rules for packages.
+consistency it is required to follow the naming rules for packages.
 
 The membership of a group (B) is declared with a `member_of_group` tag.
 
@@ -250,7 +249,7 @@ element.
 
 .. raw:: html
 
-  <font color="green">
+  <font color="blue">
 
 <package format="3">
 --------------------
@@ -1019,7 +1018,7 @@ Schema
 
 .. raw:: html
 
-  <font color="green">
+  <font color="blue">
 
 A schema defining the structure specified in this document is available
 at [11]_.
