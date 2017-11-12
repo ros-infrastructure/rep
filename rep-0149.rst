@@ -967,7 +967,7 @@ Once a specific ROS environment has been sourced all tools can determine the
 ROS major version as well as the distribution name and therefore evaluate
 conditions which use those to limit the scope of dependencies.
 
-If now environment has been source some tools might require that the necessary
+If no environment has been sourced some tools might require that the necessary
 information is being specified explicitly when being invoked.
 
 
