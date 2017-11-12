@@ -587,6 +587,10 @@ Attributes
  The dependency to the package is restricted to versions greater than
  the stated version number.
 
+ .. raw:: html
+
+   <font color="red">
+
  ``condition="CONDITION_EXPRESSION"``
 
  Every dependency can be conditional on a condition expression.
@@ -604,6 +608,10 @@ Attributes
     alphanumerics and underscores
   * literals which can only contain alphanumerics, undercsores and dashes
   * arbitrary whitespaces between these tokens
+
+ .. raw:: html
+
+   </font>
 
 
 <build_export_depend> (multiple)
@@ -931,6 +939,10 @@ Because metapackages only supply execution-time dependencies, they use
   <exec_depend>another_metapackage</exec_depend>
 
 
+.. raw:: html
+
+  <font color="red">
+
 Related Changes
 ===============
 
@@ -961,10 +973,6 @@ information is being specified explicitly when being invoked.
 
 Compatibility
 =============
-
-.. raw:: html
-
-  <font color="red">
 
 Support for format three
 ------------------------
