@@ -61,7 +61,7 @@ But when building from source they need to be updated to add custom message
 generators or rmw implementations.
 
 The goal is to allow specifying this kind of group dependency in a way that a
-from source build can process the custom packages accordingly to make them
+from-source build can process the custom packages accordingly to make them
 available to the package even though the package doesn't list an explicit
 dependency on the custom package.
 
@@ -145,7 +145,7 @@ Therefore the dependency declaration is being decoupled into two parts:
    name, e.g. `sensor_msgs` can declare itself part of the "message_packages"
    group
 
-During a from source build the build tool can use the information from all
+During a from-source build the build tool can use the information from all
 package manifests in the workspace to identify group dependencies.
 It can use this information to process group members before the packages
 declaring the group dependency as if the dependency was declared explicitly
@@ -153,7 +153,7 @@ using the existing `depend` tags.
 
 The group dependency (A) is declared with a `group_depend` tag.
 The content of the group dependency tag is the name of the group.
-Leading and trailing whitespace is being ignore from the name and for
+Leading and trailing whitespace is being ignored from the name and for
 consistency it is required to follow the naming rules for packages.
 
 The membership of a group (B) is declared with a `member_of_group` tag.
@@ -332,7 +332,7 @@ Group dependencies and memberships
    * `\<member_of_group\> (multiple)`_
 
   These group dependencies are only applied in from-source builds and are being
-  ignore in the release process.
+  ignored in the release process.
 
   The dependency graph must be acyclic even when considering group dependencies.
 
