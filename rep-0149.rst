@@ -612,6 +612,9 @@ Attributes
   * literals which can only contain alphanumerics, undercsores and dashes
   * arbitrary whitespaces between these tokens
 
+ Tools may populate the values for the variables starting with a `$` sign in
+ different ways, but typically they are evaluated as environment variables.
+
  .. raw:: html
 
    </font>
