@@ -161,12 +161,14 @@ The membership of a group (B) is declared with a `member_of_group` tag.
 ABI version attribute
 ---------------------
 
-The early draft of REP 127 proposed an attribute (`abi_version`) to identify
-the package version which is considered "compatible".
+The early draft of REP 127 ("package.xml format 1") proposed an attribute
+(`abi_version`) to identify the package version which is considered
+"compatible".
 
-Since no consensus could be reached about specifying ABI compatibility
-in general (for packages as well as libraries) the proposed attribute was
-removed from the draft (see related discussions [13]_, [14]_, [15]_).
+Since at the time no consensus could be reached about specifying ABI
+compatibility in general (for packages as well as libraries) the proposed
+attribute was removed from the draft (see related discussions [13]_, [14]_,
+[15]_).
 
 Since then the number of packages in a ROS distributions has increased
 (e.g. Indigo has more than 2500 packages) as well as the number of platforms
@@ -434,7 +436,8 @@ Attributes
 
   ``compatibility="MAJOR.MINOR.PATCH"``
 
-  Specifying the version the package is compatible with.
+  Specifying the version up to which the package is compatible with, i.e.
+  always pick the oldest compatible version.
   If not set, the same value as specified in the ``version`` tag is assumed.
 
   "Compatibility" in this context guarantees that downstream packages built
