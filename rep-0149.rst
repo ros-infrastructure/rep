@@ -612,8 +612,22 @@ Attributes
   * literals which can only contain alphanumerics, undercsores and dashes
   * arbitrary whitespaces between these tokens
 
+ An expression syntactically correct by the previous definition will be
+ evaluated as follows:
+
+  * All variables are substituted by their values and treated as strings.
+  * All literals are also treated as strings.
+  * The resulting expression is evaluated as a Python interpreter would
+    evaluate it.
+
  Tools may populate the values for the variables starting with a `$` sign in
  different ways, but typically they are evaluated as environment variables.
+
+ As an example, a dependency might only be needed in a ROS 1 environment.
+ Such dependency could be described as follows where the value of
+ `$ROS_VERSION` is coming from an environment variable:
+
+ ``<depend condition="$ROS_VERSION == 1">roscpp</depend>``
 
  .. raw:: html
 
