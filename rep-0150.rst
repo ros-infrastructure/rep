@@ -141,7 +141,7 @@ mobile robots, though they are not specific to a particular robot.
 The `desktop` variant is more minimal and only provides the stacks in
 the `robot` variant, plus visualization and debugging tools.
 Both of these variants contain tutorials for the stacks they provide.
-`urdf_tutorials` are only in `desktop_full` because they depend on the simulator.
+The urdf tutorials are only in `desktop_full` because they depend on the simulator.
 
 ::
 
