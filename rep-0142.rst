@@ -21,9 +21,9 @@ Motivation
 For a discussion on the general motivation and role of variants,
 please see REP 108 [1]_.
 
-As of ROS Hydro we have completed the transitioned to using
+As of ROS Hydro we have completed the transition to using
 metapackages instead of variants.
-For more information on metapackges see REP 127 [2]_.
+For more information on metapackages see REP 127 [2]_.
 
 This document covers the common metapackages used for recommended
 installations.
