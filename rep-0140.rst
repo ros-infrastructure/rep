@@ -40,10 +40,10 @@ The biggest problem was user confusion due to the two meanings of the
 ``<build_export_depend>`` makes the semantics of both types much clearer.
 
 A lesser issue was the need to declare most ROS package dependencies
-twice, using both ``<run_depend>`` and ``<build_depend>``. To aleviate this
+twice, using both ``<run_depend>`` and ``<build_depend>``. To alleviate this
 redundancy the ``<depend>`` tag was introduced.
 
-Also, as use of the package format has matured, the need has arrisen for
+Also, as use of the package format has matured, the need has arisen for
 some additional dependency tag types, e.g. ``<doc_depend>``. Additionally,
 the ``<test_depend>`` tag's semantics is changed such that it covers
 configure as well as run time dependencies related to testing. Before it
