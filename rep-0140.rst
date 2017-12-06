@@ -794,7 +794,7 @@ References
 .. [9] Buildsystem mailing list discussion: `"REP-0140: internal review"
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_QVFLQi-6wk>`_
 .. [10] REP-0134
-   (http://ros.org/reps/rep-0134)
+   (http://ros.org/reps/rep-0134.html)
 .. [11] Schema file
    (https://github.com/ros-infrastructure/rep/blob/master/xsd/package_format2.xsd)
 
