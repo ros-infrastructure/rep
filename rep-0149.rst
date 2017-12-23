@@ -619,7 +619,7 @@ Attributes
   * All literals are also treated as strings.
   * The resulting expression is evaluated as a Python interpreter would
     evaluate it.
-    Please not that the comparison operators only do a *string* comparison and
+    Please note that the comparison operators only do a *string* comparison and
     don't attempt to interpret the string as a numerical value.
 
  Tools may populate the values for the variables starting with a `$` sign in
