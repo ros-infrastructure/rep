@@ -1,0 +1,223 @@
+REP: 151
+Title: Python 3 Support
+Author: Dirk Thomas
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 23-Dec-2017
+
+Outline
+=======
+
+#. Abstract_
+#. Motivation_
+#. Rationale_
+#. Proposal_
+#. Requirements_
+#. References_
+#. Copyright_
+
+Abstract
+========
+
+This REP describes the path for switching from Python 2 to Python 3 in ROS 1.
+
+Motivation
+==========
+
+As described in the Python release schedule [1]_ Python 2.7 will only receive
+bugfix releases until 2020.
+As a consequence Ubuntu is trying to demote Python 2.7 into the `universe`
+repository for 18.04 since they don't want to guarantee support for 5 years.
+While it is unlikely that Python 2.7 will be removed from the archives entirely
+it should not be relied on past its EOL date.
+Therefore ROS 1 needs to begin moving to Python 3 in order to make the
+transition as smooth as possible.
+
+Rationale
+=========
+
+The goal for a future ROS 1 distribution to support Python 3 should be achieved
+no later than for ROS O-turtle (May 2020).
+Since O-turtle is a LTS release it is strongly desired to already support
+Python 3 in the non-LTS release N-turtle to allow enough "soak" time.
+
+In general a single Python version must be used since different versions can't
+be mixed within a single ROS distribution.
+E.g. a package `A` using Python 3 can't use the Python modules from package `B`
+if that was built with/for Python 2.
+
+In order to support Python 3 it is mandatory that the testing infrastructure
+(namely `devel` and `PR` jobs) can run the build and tests with Python 3.
+Since each of these jobs require Debian packages of the dependencies to be
+present being able to test for a specific Python version requires Debian
+packages for this Python version to be present.
+The alternative of building all dependencies from-source in these jobs doesn't
+scale and is therefore not feasible since the time necessary for a single build
+gets increasingly high the further up in the stack the package is.
+
+Updating all ROS packages which contain Python code to support Python 2
+as well as 3 is a significant effort.
+Therefore it is expected that this will take a while and will require the ROS
+community to share the necessary workload.
+
+Proposals
+=========
+
+Neither of the proposals specifies a specific minimum minor version for Python
+3 support but focuses on the general effort to transition to Python 3.
+The minimum version is being defined in REP 3 [2]_ together with all other
+versions.
+
+A) Transition over multiple releases with dual Python version support inbetween
+-------------------------------------------------------------------------------
+
+The goals of this proposal are to provide early feedback for Python 3 related
+problems by providing parallel testing capabilities.
+The following timeline describes a transition over multiple ROS releases:
+
+ * ROS O-turtle (May 2020, LTS):
+
+   * The only Debian packages provided are using Python 3.
+   * From-source builds are using Python 3 by default.
+   * All ROS packages should support Python 3.
+   * Python 2 support is not required anymore.
+
+ * ROS N-turtle (May 2019):
+
+   * The set of recommended Debian packages is using Python 3.
+   * There is an alternative set of Debian packages which is using Python 2,
+     this can be used in case some packages don't support Python 3 yet.
+     These two sets of Debian packages should be side-by-side installable in
+     order to ease testing.
+   * From-source builds are using Python 3 by default, optionally choosing
+     Python 2 should be possible for all packages.
+   * All ROS packages should support Python 2 as well as Python 3.
+
+ * ROS Melodic (May 2018, LTS):
+
+   * The set of recommended Debian packages is using Python 2.
+   * There is an alternative set of Debian packages which is using Python 3,
+     this can be used by the CI infrastructure as well as users choosing to use
+     Python 3.
+   * From-source builds are using Python 2 by default, optionally choosing
+     Python 3 should be possible.
+   * All ROS packages should support Python 2 while support for Python 3 is
+     recommended (as it has been for the past ROS distributions).
+
+Requirements
+''''''''''''
+
+To support the proposal `A)` a few capabilities have to be developed:
+
+ * `catkin` / `catkin_tools` need to support choosing the Python version.
+
+ * `rosdep`: choose between Python 2 and Python 3 dependencies.
+   Multiple different options can be considered for this:
+
+   * Beside the `python.yaml` file create a `python3.yaml` file and let
+     `rosdep` choose between them.
+   * Use different installers for Python 2 and Python 3 packages, e.g. `xenial`
+     and `xenial_python3`, and let `rosdep` choose between them.
+   * Create explicit rosdep keys with a `python2` and `python3` prefix and use
+     them in the package manifest files with conditional dependencies as
+     specified in REP 149 [3]_.
+
+ * `bloom` needs to generate releases for both Python versions in parallel.
+   The user should only need to release each package once.
+
+ * `ros_buildfarm` needs to provide jobs for both Python versions in parallel.
+
+ * Across all ROS packages which contain Python code it needs to be ensured
+   that they support both major Python versions.
+   In the majority of the cases this can be easily achieved, some examples how
+   to convert Python 2-only code to work for both major versions can be found
+   in the ROS wiki [4]_.
+
+B) Transition from one release to the next
+------------------------------------------
+
+This proposal minimizes the effort necessary on the infrastructure and tooling
+side.
+Instead of supporting both Python versions in parallel the only supported
+Python version changes from one release to the next:
+
+ * ROS O-turtle (May 2020, LTS):
+
+   * The Debian packages as well as the infrastructure and tools only support
+     Python 3.
+
+ * ROS N-turtle (May 2019):
+
+   * The Debian packages as well as the infrastructure and tools only support
+     Python 3.
+   * To maximize the testing time the buildfarm should be provided as early as
+     possible (around November 2018 once the first Ubuntu 19.04 packages are
+     available).
+   * The downside of this is that N-turtle will target the same Ubuntu LTS
+     18.04 which makes it more difficult to choose the "right" `rosdep`
+     mapping.
+     The effort is not higher than for proposal `A)` though.
+     An alternative would be to keep using Python 2 in N-turtle and only switch
+     to Python 3 in O-turtle but that would imply a drastic change in an LTS
+     release which doesn't seem to be a good idea.
+
+ * ROS Melodic (May 2018, LTS):
+
+   * The Debian packages as well as the infrastructure and tools only support
+     Python 2.
+   * It should be made possible to do a from-source build with Python 3 for
+     early testing.
+   * It is encouraged to make the code base work with both Python version in
+     order to ease the upcoming transition.
+
+Requirements
+''''''''''''
+
+To support the proposal `B)` less effort is necessary compared to proposal
+`A)`:
+
+ * `rosdep`: choose between Python 2 and Python 3 dependencies.
+
+ * `bloom` needs to generate releases for both Python versions in parallel.
+   The user should only need to release each package once.
+
+ * `ros_buildfarm` needs to provide jobs for both Python versions in parallel.
+
+ * ROS packages don't have to support both Python versions in parallel but they
+   all have to switch to Python 3 for the same release.
+   While the effort is slightly lower than to support both Python versions
+   simultaneously the transition window is rather short.
+
+Conclusion
+==========
+
+While proposal `A)` provides a smoother transition it requires a significantly
+higher development effort.
+Due to the sparse resource available proposal `B)` is being chosen.
+
+References
+==========
+
+.. [1] PEP 373 Python 2.7 Release Schedule
+   (https://www.python.org/dev/peps/pep-0373/)
+.. [2] REP-0003 Target Platforms
+   (http://ros.org/reps/rep-0003)
+.. [3] REP-0149 Package Manifest Format Three Specification
+   (http://ros.org/reps/rep-0149)
+.. [4] ROS Wiki - Python 2 and 3 compatible code
+   (http://wiki.ros.org/python_2_and_3_compatible_code)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
