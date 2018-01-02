@@ -409,6 +409,17 @@ Our intent with Python is to track the minimum version provided in the
 supported Ubuntu platforms, as well as survey other commonly used OS
 platforms that support ROS to determine a reasonable minimum target.
 
+Melodic
+~~~~~~~
+Ubuntu will most likely stop supporting Python 2 in release 20.04.  To make
+sure ROS will be able to support that version of Ubuntu, ROS Python packages
+starting with Melodic Morenia are highly encouraged to support both Python 2.7
+and Python 3.5.  During the development of Melodic there will be work undertaken
+to support rosdep keys for both Python 2 and Python 3 so ROS package developers
+can more easily test with either version of Python.
+
+Lunar and earlier
+~~~~~~~~~~~~~~~~~
 Ubuntu has announced plans to release 14.04 in April 2014 with Python
 3 as its default interpreter. Some ROS infrastructure and core scripts
 already work with Python 3 since Groovy. But, it remains difficult to
