@@ -5,6 +5,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Oct-2017
+Post-History: 02-Jan-2018
 
 Outline
 =======
@@ -992,6 +993,18 @@ conditions which use those to limit the scope of dependencies.
 If no environment has been sourced some tools might require that the necessary
 information is being specified explicitly when being invoked.
 
+New ROS package
+'''''''''''''''
+
+In ROS 1 the environment variable `ROS_DISTRO` is being set in the `roslib`
+package which also defines other environment variables like `ROS_PACKAGE_PATH`.
+In ROS 2 the environment variable `ROS_DISTRO` doesn't exist at the moment.
+Also neither ROS version has an environment variable `ROS_VERSION` at the
+moment.
+
+A new ROS package named `ros_environment` which has minimal dependencies will
+be available in both ROS versions and providing the new environment variables
+as well as some of the existing environment variables.
 
 Compatibility
 =============
