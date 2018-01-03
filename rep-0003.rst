@@ -413,9 +413,9 @@ Melodic
 Ubuntu will most likely stop supporting Python 2 in release 20.04.  To make
 sure ROS will be able to support that version of Ubuntu, ROS Python packages
 starting with Melodic Morenia are highly encouraged to support both Python 2.7
-and Python 3.5.  During the development of Melodic there will be work undertaken
-to support rosdep keys for both Python 2 and Python 3 so ROS package developers
-can more easily test with either version of Python.
+and Python 3.5 or later.  During the development of Melodic there will be work
+undertaken to support both Python 2 and Python 3 (including rosdep keys) so ROS
+package developers can more easily test with either version of Python.
 
 Lunar and earlier
 ~~~~~~~~~~~~~~~~~
