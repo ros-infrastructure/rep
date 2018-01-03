@@ -370,6 +370,10 @@ ROS package downloads for this architecture.
 C++
 ---
 
+The C++ code in ROS is meant to be compiler-agnostic.  While we mainly develop
+with gcc, no use of compiler-specific features is allowed without proper use
+of macros to allow use on other platforms or with other compilers.
+
 Melodic
 ~~~~~~~
 As of ROS Melodic, we are using the C++14 (ISO/IEC 14882:2014) standard.  All
@@ -380,14 +384,9 @@ consumers of the API.  If at all possible, maintainers should use a "tick-tock"
 model where the new APIs are introduced alongside the old (deprecated) APIs, and
 then remove the old APIs in a subsequent release.
 
-ROS Melodic is also compiler-agnostic, so no use of compiler-specific features is allowed
-without proper use of macros to allow use on other platforms.
-
 Lunar and earlier
 ~~~~~~~~~~~~~~~~~
-As of ROS Jade, we are still using the C++03 (ISO/IEC 14882:2003) standard, and are compiler-agnostic.
-While we mainly develop with gcc, no use of compiler-specific features is allowed
-without proper use of macros to allow use on other platforms.
+As of ROS Jade, we are still using the C++03 (ISO/IEC 14882:2003) standard.
 
 Use of C++11/C++14 features and filesystem/networking/etc... TS's (Technical Specifications) is allowed if they are checked for at configure time and equivalent functionality can be provided with the extra compiler features.
 Support for C++11 is now a compiler requirement, but the API of the packages included in desktop-full will not use any C++11-specific feature. External packages are encouraged to follow this guideline.
