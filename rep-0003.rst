@@ -312,7 +312,7 @@ As of ROS Jade, we are still using the C++03 (ISO/IEC 14882:2003) standard, and 
 While we mainly develop with gcc, no use of compiler-specific features is allowed
 without proper use of macros to allow use on other platforms.
 
-Use of C++11/C++14 features and filesystem/networking/etc... TS's (Technical Specifications) is allowed if they are checked for at configure time and equivalent functionality can be provided with the extra compiler features.
+Use of C++11/C++14 features and filesystem/networking/etc... TS's (Technical Specifications) is allowed if they are checked for at configure time and equivalent functionality can be provided without the extra compiler features.
 Support for C++11 is now a compiler requirement, but the API of the packages included in desktop-full will not use any C++11-specific feature. External packages are encouraged to follow this guideline.
 
 For a given release we allow use of Boost libraries that match the version provided in our
