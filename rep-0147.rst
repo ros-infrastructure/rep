@@ -1,11 +1,11 @@
 REP: 147
 Title: A Standard interface for Aerial Vehicles
 Author: Tully Foote
-Status: Draft
+Status: Accepted
 Type: Informational
 Content-Type: text/x-rst
 Created: 16-May-2016
-Post-History: 30-Aug-2002
+Post-History: 18-Jan-2018
 
 
 Abstract
