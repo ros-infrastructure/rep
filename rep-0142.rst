@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 07-Apr-2014
-Post-History: 03-Jun-2014
+Post-History: 03-Jun-2014 08-May-2017
 
 
 Abstract
@@ -21,9 +21,9 @@ Motivation
 For a discussion on the general motivation and role of variants,
 please see REP 108 [1]_.
 
-As of ROS Hydro we have completed the transitioned to using
+As of ROS Hydro we have completed the transition to using
 metapackages instead of variants.
-For more information on metapackges see REP 127 [2]_.
+For more information on metapackages see REP 127 [2]_.
 
 This document covers the common metapackages used for recommended
 installations.
@@ -140,15 +140,16 @@ mobile robots, though they are not specific to a particular robot.
 The `desktop` variant is more minimal and only provides the stacks in
 the `robot` variant, plus visualization and debugging tools.
 Both of these variants contain tutorials for the stacks they provide.
+`urdf_tutorials` are only in `desktop_full` because they depend on the simulator.
 
 ::
 
   - desktop:
       extends: [robot, viz]
       packages: [common_tutorials, geometry_tutorials, ros_tutorials,
-                 roslint, urdf_tutorials, visualization_tutorials]
+                 roslint, visualization_tutorials]
   - desktop_full:
-      extends: [desktop, perception, simulators]
+      extends: [desktop, perception, simulators, urdf_tutorials]
 
 Institution-specific and robot-specific
 '''''''''''''''''''''''''''''''''''''''

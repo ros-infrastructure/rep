@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 21-Sep-2010
-Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015
+Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017
 
 
 Abstract
@@ -128,13 +128,18 @@ Indigo Igloo (May 2014)
 
 - CMake 2.8.11
 
-- For catkin packages the ROS build farm supports:
+Build System Support:
 
-  - releasing
-  - documenting
-  - continuous integration testing
+- catkin:
 
-- Rosbuild based packages can still be built from source.
+  - build from source
+  - release for binary packaging
+  - wiki documentation
+  - continuous integration
+
+- rosbuild:
+
+  - build from source
 
 Jade Turtle (May 2015 - May 2017)
 ---------------------------------
@@ -166,18 +171,9 @@ Exact or Series Requirements:
 - PCL 1.7.x
 - OpenCV 2.4.x
 
-Buildsystem support:
+Build System Support:
 
-- catkin:
-
-  - build from source
-  - release for binary packaging
-  - wiki documentation
-  - continuous integration
-
-- rosbuild:
-
-  - build from source
+- Same as Indigo
 
 Kinetic Kame (May 2016 - May 2021)
 ----------------------------------
@@ -185,6 +181,12 @@ Required Support for:
 
 - Ubuntu Wily (15.10)
 - Ubuntu Xenial (16.04)
+
+Recommended Support for:
+
+- Debian Jessie
+- Fedora 23
+- Fedora 24
 
 Minimum Requirements:
 
@@ -210,22 +212,74 @@ Exact or Series Requirements:
 - Ogre3D 1.9.x
 - Gazebo 7
 - PCL 1.7.x
-- OpenCV 3.1.x
+- OpenCV 3.x
 - Qt 5.3.x
 - PyQt5
 
-Buildsystem support:
+Build System Support:
 
-- catkin:
+- Same as Indigo
 
-  - build from source
-  - release for binary packaging
-  - wiki documentation
-  - continuous integration
+Lunar Loggerhead (May 2017 - May 2019)
+--------------------------------------
+Required Support for:
 
-- rosbuild:
+- Ubuntu Xenial (16.04)
+- Ubuntu Yakkety (16.10)
+- Ubuntu Zesty (17.04)
 
-  - build from source
+Recommended Support for:
+
+- Debian Stretch
+- Fedora 26
+
+Architectures Supported:
+
+- amd64
+- arm32
+- arm64
+
+Targeted Languages:
+
+- C++11
+- Python 2.7
+
+  - Python 3.5 not required, but testing against it is recommended
+
+- Lisp SBCL 1.2.4
+
+Requirements:
+
+
++---------+---------------+----------------+--------------+----------------+-----------+
+| Package | Ubuntu Xenial | Ubuntu Yakkety | Ubuntu Zesty | Debian Stretch | Fedora 26 |
++=========+===============+================+==============+================+===========+
+|         |                  Required Support             |    Recommended support     |
++---------+---------------+----------------+--------------+----------------+-----------+
+| Boost   |     1.58      |     1.61       |    1.62      |    1.62        |   1.63    |
++---------+---------------+----------------+--------------+----------------+-----------+
+| CMake   |     3.5.1     |     3.5.2      |    3.7.2     |    3.7.2       |   3.7.2   |
++---------+---------------+----------------+--------------+----------------+-----------+
+| Gazebo  |     7.0       |     7.3.1      |    7.5       |    7.3.1       |   7.x     |
++---------+---------------+----------------+--------------+----------------+-----------+
+| Ogre    |     1.9       |     1.9        |    1.9       |    1.9         |   1.9     |
++---------+---------------+----------------+--------------+----------------+-----------+
+| OpenCV  |     3.x*      |     3.x*       |    3.x*      |    3.x*        |   3.x*    |
++---------+---------------+----------------+--------------+----------------+-----------+
+| PCL     |     1.7.2     |     1.8.0      |    1.8.0     |    1.8.0       |   1.8.0   |
++---------+---------------+----------------+--------------+----------------+-----------+
+| PyQt    |     5.5.1     |     5.7        |    5.7       |    5.7         |   5.7     |
++---------+---------------+----------------+--------------+----------------+-----------+
+| Qt5     |     5.5.1     |     5.6.1      |    5.7.1     |    5.7.1       |   5.7.1   |
++---------+---------------+----------------+--------------+----------------+-----------+
+
+" * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
+
+Maintainers can choose to support even lower versions to also cover older ROS distributions and thus avoid branching out.
+
+Build System Support:
+
+- Same as Indigo
 
 Motivation
 ==========
@@ -244,6 +298,13 @@ consulting Ubuntu's release and end-of-life schedule [1]_.
 
 These targets, including starting and ending support dates, are based on the Distribution Timeline to meet minimum requirements. [3]_
 
+Architectures
+-------------
+
+As of ROS Lunar, we do not build packages for i386 architectures. Released code is still expected to build on i386.
+Ubuntu switched its default to 64bits and we noticed a significant decrease of
+ROS package downloads for this architecture.
+
 C++
 ---
 
@@ -251,7 +312,7 @@ As of ROS Jade, we are still using the C++03 (ISO/IEC 14882:2003) standard, and 
 While we mainly develop with gcc, no use of compiler-specific features is allowed
 without proper use of macros to allow use on other platforms.
 
-Use of C++11/C++14 features and filesystem/networking/etc... TS's (Technical Specifications) is allowed if they are checked for at configure time and equivalent functionality can be provided with the extra compiler features.
+Use of C++11/C++14 features and filesystem/networking/etc... TS's (Technical Specifications) is allowed if they are checked for at configure time and equivalent functionality can be provided without the extra compiler features.
 Support for C++11 is now a compiler requirement, but the API of the packages included in desktop-full will not use any C++11-specific feature. External packages are encouraged to follow this guideline.
 
 For a given release we allow use of Boost libraries that match the version provided in our
@@ -321,7 +382,7 @@ This REP applies to stacks in the `desktop-extras` variant [2]_ for Diamondback.
 Non-core Stacks
 ===============
 
-    And thirdly, the code is more what you'd call "guidelines" than actual rules...
+And thirdly, the code is more what you'd call "guidelines" than actual rules...
 
 We hope that ROS stack maintainers will make every effort to comply
 with the target platforms within this REP, but we recognize that ROS
@@ -340,7 +401,7 @@ References and Footnotes
    (http://www.ros.org/reps/rep-0108.html)
 
 .. [3] Distribution Timeline
-   (http://wiki.ros.org/Distributions/Timeline)
+   (http://wiki.ros.org/Distributions)
 
 Copyright
 =========

@@ -1,11 +1,11 @@
-REP: 140
-Title: Package Manifest Format Two Specification
-Author: Dirk Thomas, Jack O'Quin
-Status: Final
+REP: 149
+Title: Package Manifest Format Three Specification
+Author: Dirk Thomas
+Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
-Created: 26-Jun-2013
-Post-History: 12-Mar-2014, 16-May-2017
+Created: 11-Oct-2017
+Post-History: 02-Jan-2018
 
 Outline
 =======
@@ -19,128 +19,226 @@ Outline
 #. References_
 #. Copyright_
 
+.. raw:: html
+
+  The current draft highlights significant changes compared to REP-0140 [2]_
+  in <font color="red">red</font>.
+  Trivial changes appear in <font color="blue">blue</font>.
+
 
 Abstract
 ========
 
-This REP specifies the second ``package.xml`` format, replacing the
-one specified in REP-0127 [1]_.  It is relevant for packages using the
-catkin build system.
+.. raw:: html
+
+  <font color="blue">
+
+This REP specifies the third ``package.xml`` format, which is an update to the
+previous versions specified in REP-0127 [1]_ and REP-0140 [2]_.
+
+.. raw:: html
+
+  </font>
 
 
 Motivation
 ==========
 
-Overall, the initial package definition worked well.  Hundreds of
-packages were converted from rosbuild to catkin using that interface.
-But, experience has revealed some areas which need to be improved.
+.. raw:: html
 
-The biggest problem was user confusion due to the two meanings of the
-``<run_depend>`` tag.  Replacing it with ``<exec_depend>`` and
-``<build_export_depend>`` makes the semantics of both types much clearer.
+  <font color="red">
 
-A lesser issue was the need to declare most ROS package dependencies
-twice, using both ``<run_depend>`` and ``<build_depend>``. To alleviate this
-redundancy the ``<depend>`` tag was introduced.
+This REP covers three separate topics which are described in the following
+subsections.
 
-Also, as use of the package format has matured, the need has arisen for
-some additional dependency tag types, e.g. ``<doc_depend>``. Additionally,
-the ``<test_depend>`` tag's semantics is changed such that it covers
-configure as well as run time dependencies related to testing. Before it
-only covered run dependencies and configure time test dependencies needed
-to be listed with the ``<build_depend>`` tag.
+Dependency groups
+-----------------
+
+Several ROS packages aggregate dependencies of a specific type, e.g.
+`message_generation` in ROS 1 or `rmw_implementation` in ROS 2.
+They explicitly list the dependencies which are being used during the release
+process.
+But when building from source they need to be updated to add custom message
+generators or rmw implementations.
+
+The goal is to allow specifying this kind of group dependency in a way that a
+from-source build can process the custom packages accordingly to make them
+available to the package even though the package doesn't list an explicit
+dependency on the custom package.
+
+ABI version on the package level
+--------------------------------
+
+When building binary packages on the ROS buildfarm there is no assumption
+about ABI compatibility.
+When a new Debian package has been built all downstream packages are being
+rebuilt too in order to ensure they still work together.
+This makes e.g. releasing a core package like `catkin` or `roscpp`
+particularly costly.
+Due to that overhead changes which should be released rather sooner than
+later, e.g. a documentation fix or simple bugfix in a `.cpp` file, are being
+held back to group them with other changes to make the rebuild effort
+worthwhile.
+
+In order to allow package releases without enforcing a rebuild of all
+downstream packages a package should be able to declare if such a rebuild
+is necessary or not.
+
+Dependencies across ROS 1 and ROS 2
+-----------------------------------
+
+In order for a ROS package to work with ROS 1 and ROS 2 from a single source
+the dependencies listed in the package manifest are a problem.
+E.g. in ROS 1 a package needs to depend on `roscpp` where as in ROS 2 it needs
+to depend on `rclcpp`.
+Currently the manifest doesn't support this use case and requires two different
+code bases (usually two separate branches).
+
+The necessary part outside of the manifest to make a package compatible with
+ROS 1 as well as ROS 2 is explicitly not part of this document.
+In general it is possible to conditionally handle those cases in programming
+languages like CMake, C++, Python, etc.
+
+.. raw:: html
+
+  </font>
 
 
 Rationale
 =========
 
-REP-0127 [1]_ provides the basic ``package.xml`` design rationale,
-which is not repeated here.
+.. raw:: html
 
-Removing <run_depend>
+  <font color="blue">
+
+REP-0127 [1]_ and REP-0140 [1]_ provide the ``package.xml`` design rationale
+for format one and two, which is not repeated here.
+
+.. raw:: html
+
+  </font>
+
+.. raw:: html
+
+  <font color="red">
+
+Group dependencies
+------------------
+
+Packages can already express direct dependencies on other individual packages,
+but this is not sufficient for cases where a package needs to be built after
+all instances of a particular kind of package.
+Instead packages need to be able to declare a dependency on packages without
+using their name directly.
+
+One alternative is to "reverse" the dependency declaration so that a package
+states that it "wants" to be a dependency of another package.
+But that approach does not work in the case where the other package gets forked
+under a different name since the "reverse" dependency would still only
+reference the original package name.
+
+Therefore the dependency declaration is being decoupled into two parts:
+
+ * *(A)* packages declaring a dependency on a "group dependency name", e.g.
+   `ros1_bridge` can depend on the group "message_packages"
+
+ * *(B)* packages declaring to be part of a group dependency identified by its
+   name, e.g. `sensor_msgs` can declare itself part of the "message_packages"
+   group
+
+During a from-source build the build tool can use the information from all
+package manifests in the workspace to identify group dependencies.
+It can use this information to process group members before the packages
+declaring the group dependency as if the dependency was declared explicitly
+using the existing `depend` tags.
+
+The group dependency (A) is declared with a `group_depend` tag.
+The content of the group dependency tag is the name of the group.
+Leading and trailing whitespace is being ignored from the name and for
+consistency it is required to follow the naming rules for packages.
+
+The membership of a group (B) is declared with a `member_of_group` tag.
+
+ABI version attribute
 ---------------------
 
-The ``<run_depend>`` tag generated considerable confusion within the
-ROS user and developer community [3]_.  Everyone understood that
-it was needed when a package required another to be available at
-execution-time.  But, most people did not grasp the subtle transitive
-build-time dependency introduced when a header exported by a package
-included one from some other package.  In that case, the required
-``<run_depend>`` tag name was quite misleading.
+The early draft of REP 127 ("package.xml format 1") proposed an attribute
+(`abi_version`) to identify the package version which is considered
+"compatible".
 
-Creating specific tags for those two different meanings reduces
-confusion, and improves packaging efficiency because
-``<build_export_depend>`` normally resolves to a development package, while
-``<exec_depend>`` generally refers to an execution-time binary package [8]_.
-Although most existing ROS components are not divided into development
-and execution-time packages, many system dependencies *are* separated in
-that way.  The new tags can take advantage of that immediately.
+Since at the time no consensus could be reached about specifying ABI
+compatibility in general (for packages as well as libraries) the proposed
+attribute was removed from the draft (see related discussions [13]_, [14]_,
+[15]_).
 
-With the new tags defined, ``<run_depend>`` was no longer needed.
-Removing it draws attention to the former confusion and helps resolve
-it correctly.  When each package is upgraded from format one to this
-new specification, ``<run_depend>`` must be converted to one or both
-of the new tags, as appropriate.
+Since then the number of packages in a ROS distributions has increased
+(e.g. Indigo has more than 2500 packages) as well as the number of platforms
+ROS provides binary packages for.
+Therefore the need to avoid unnecessary rebuilds has increased.
+It is also desired to be able to encourage more frequent releases if they
+don't require downstream packages to be rebuilt.
 
-Adding <depend>
----------------
+Dependencies across ROS 1 and ROS 2
+-----------------------------------
 
-Very few ROS packages have been split into separate development and
-execution-time packages.  So, most ROS package dependencies must repeat the
-same name in several tags, typically ``<build_depend>`` and
-``<run_depend>``.  With ``<run_depend>`` now divided into
-``<build_export_depend>`` and ``<exec_depend>``, that problem gets worse.
+The differences in dependencies in ROS 1 and ROS 2 could be handled in various
+ways.
 
-The ``<depend>`` tag eliminates the repetition, combining all those
-dependencies into one [3]_.  While ``<depend>`` can be misused [6]_,
-it is good to have when appropriate.
+Use the same package names
+''''''''''''''''''''''''''
 
-Disabling unit tests
---------------------
+One option (A) would be to not allow different dependencies depending on the
+ROS version.
+That would imply that for the previously described example of `roscpp` and
+`rclcpp` a "dummy" package could be provided to provide the same package names.
+This could be either a ROS 1 package named `rclcpp` which simply depends on
+`roscpp` or a ROS 2 package named `roscpp` which depends on `rclcpp`.
+That would allow all downstream packages to use a single name as their
+dependency.
+While that would be possible it would require dummy packages for every naming
+difference between ROS 1 and ROS 2.
 
-Formerly, catkin unit tests were not cleanly separated from the rest
-of the package and were always configured (even if not being built
-later).  But there are sometimes reasons to build a package without its
-tests or their configure time dependencies.  For generated Debian or RPM
-packages they would not run anyway, and should not be installed.  When
-building from source for small embedded systems, disabling the tests
-reduces the number of dependencies which must also be built and
-installed.
+But option (A) would become even more cumbersome if a package needs to declare
+a dependency only in one of the ROS versions.
+It would require a dummy package in both ROS version where as in one of them
+the dummy would be empty and in the other it would declare a dependency.
 
-The solution adopted introduces two CMake configuration variables:
+Annotate dependencies
+'''''''''''''''''''''
 
- * ``CATKIN_ENABLE_TESTING`` controls whether the tests will be built.
-   Packages should test this variable within their ``CMakeLists.txt``,
-   to ensure that no test artifacts are configured or built, unless
-   enabled.
+Another option (B) is to annotate the dependencies in the manifest if they are
+specific to a ROS version.
+The annotation could happen in various ways in the markup.
+One way is an optional attribute for each dependency tag.
+Another way would be a new conditional tag under which one or multiple
+dependency tags would be grouped.
+In case a dependency doesn't have such an annotation it is being used
+unconditionally.
 
- * ``CATKIN_SKIP_TESTING`` can be used to build without tests even for
-   packages created before ``CATKIN_ENABLE_TESTING`` became available.
-   This option does not build as efficiently, and may display warning
-   messages during the build.  It is a migration aid, for use while
-   packages are being upgraded to explicitly enable and disable
-   testing themselves.
+In this case various tools will need to be aware of the condition choosing
+which dependencies should be used:
 
-Making <test_depend> easier to use
-----------------------------------
+ * `bloom`
+ * `rosdep`
+ * `rosinstall_generator`
+ * the build tool
 
-With format one, ``<test_depend>`` could not co-exist with other types
-of dependencies, nor could testing-only packages provide any build or
-configuration information.
+The first three tools are all operating on a specific ROS distribution.
+Assume that a ROS distribution "knows" which ROS version it represents (which
+would require adding a new field to the distribution file specified in REP 143
+[16]_) the necessary information should be available to decide the condition.
 
-For example, rostest defines an ``add_rostest()`` CMake command.
-Using it required a ``<build_depend>rostest</build_depend>``, even
-though it was only needed when testing is enabled.  Even worse, also
-declaring ``<test_depend>rostest</test_depend>`` was considered an
-error.
+The build tool does not have access to the ROS distribution metadata.
+It could either use information provided by an environment variable or fall
+back to consider *all* dependencies (independent of their annotation) and work
+on the assumption that the workspace contains a set of consistent packages and
+additional dependencies from other ROS versions are not available in the
+workspace.
 
-With format two, a ``<test_depend>`` for rostest works as expected, no
-separate ``<build_depend>`` is required in that case.  That assumes that
-the configure step is done with the flag ``CATKIN_ENABLE_TESTING`` being
-set and that the package correctly uses the flag to disable all
-configuration of unit tests.  Moreover, packages needed for several
-reasons may now be declared using any desired combination of dependency
-types, including ``<test_depend>``.
+.. raw:: html
+
+  </font>
+
 
 Data Representation
 ===================
@@ -152,11 +250,19 @@ subordinate to that are several required or optional elements, defined
 here.  No other tags are permitted directly under the ``<package>``
 element.
 
-<package format="2">
+.. raw:: html
+
+  <font color="blue">
+
+<package format="3">
 --------------------
 
 The ``<package>`` tag is the unique top-level tag in a ``package.xml``
 file.  All other tags are nested under it.
+
+.. raw:: html
+
+  </font>
 
 Attributes
 ''''''''''
@@ -165,9 +271,9 @@ Attributes
 
   Specifying the ``package.xml`` format being used.  If not set,
   ``format="1"`` would be assumed, which is *not* the format described
-  here.  For this interface, you *must* specify ``format="2"``.  If
+  here.  For this interface, you *must* specify ``format="3"``.  If
   you are using a different format, please refer to the relevant
-  specification.  REP-0127 [1]_ described format one.
+  specification.  REP-0127 [1]_ described format one, REP-0140 [12]_ format two.
 
 Required Tags
 -------------
@@ -215,6 +321,27 @@ ROS dependencies use the package name.
 
 The dependency graph must be acyclic.  No package may directly or
 indirectly depend on itself.
+
+Group dependencies and memberships
+''''''''''''''''''''''''''''''''''
+
+  .. raw:: html
+
+    <font color="red">
+
+  The group dependencies and membership of groups are described using:
+
+   * `\<group_depend\> (multiple)`_
+   * `\<member_of_group\> (multiple)`_
+
+  These group dependencies are only applied in from-source builds and are being
+  ignored in the release process.
+
+  The dependency graph must be acyclic even when considering group dependencies.
+
+  .. raw:: html
+
+    </font>
 
 Various
 '''''''
@@ -301,6 +428,30 @@ implementations:
 The version number of the package in the format ``MAJOR.MINOR.PATCH``
 where each part is numeric only.
 
+Attributes
+''''''''''
+
+  .. raw:: html
+
+    <font color="red">
+
+  ``compatibility="MAJOR.MINOR.PATCH"``
+
+  Specifying the version up to which the package is compatible with, i.e.
+  always pick the oldest compatible version.
+  If not set, the same value as specified in the ``version`` tag is assumed.
+
+  "Compatibility" in this context guarantees that downstream packages built
+  against the older version will continue to work with a newer version
+  without the need to be rebuilt.
+  This includes but is not limited to ABI compatibility.
+  Changes in other parts of a package (CMake, Python, etc.) could also
+  require downstream packages to be rebuilt and therefore not qualify as
+  "compatible".
+
+  .. raw:: html
+
+    </font>
 
 <description>
 -------------
@@ -394,8 +545,11 @@ Attributes
   Email address of author.
 
 
+Dependency tags
+---------------
+
 <build_depend> (multiple)
--------------------------
+'''''''''''''''''''''''''
 
 Declares a rosdep key or ROS package name that this package requires
 at build-time.  For system packages, the rosdep key will normally
@@ -405,7 +559,7 @@ The ``build`` and ``buildtool`` dependencies are used to determine
 the build order of multiple packages.
 
 Attributes
-''''''''''
+..........
 
  All dependencies and relationships may restrict their applicability
  to particular versions.  For each comparison operator an attribute
@@ -437,9 +591,54 @@ Attributes
  The dependency to the package is restricted to versions greater than
  the stated version number.
 
+ .. raw:: html
+
+   <font color="red">
+
+ ``condition="CONDITION_EXPRESSION"``
+
+ Every dependency can be conditional on a condition expression.
+ If the condition expression evaluate to "true" the dependency is being used
+ and considered as if it doesn't have a condition attribute.
+ If the condition expression evaluate to "false" the dependency is being
+ ignored and considered as if it doesn't exist.
+
+ The condition expression can consist of:
+
+  * parenthesis (which must be balanced)
+  * logical operators `and` and `or`
+  * comparison operators: `==`, `!=`, `<`, `<=`, `>`, `>=`
+  * variable names which start with a `$` sign and are followed by
+    alphanumerics and underscores
+  * literals which can only contain alphanumerics, undercsores and dashes
+  * arbitrary whitespaces between these tokens
+
+ An expression syntactically correct by the previous definition will be
+ evaluated as follows:
+
+  * All variables are substituted by their values and treated as strings.
+  * All literals are also treated as strings.
+  * The resulting expression is evaluated as a Python interpreter would
+    evaluate it.
+    Please note that the comparison operators only do a *string* comparison and
+    don't attempt to interpret the string as a numerical value.
+
+ Tools may populate the values for the variables starting with a `$` sign in
+ different ways, but typically they are evaluated as environment variables.
+
+ As an example, a dependency might only be needed in a ROS 1 environment.
+ Such dependency could be described as follows where the value of
+ `$ROS_VERSION` is coming from an environment variable:
+
+ ``<depend condition="$ROS_VERSION == 1">roscpp</depend>``
+
+ .. raw:: html
+
+   </font>
+
 
 <build_export_depend> (multiple)
---------------------------------
+''''''''''''''''''''''''''''''''
 
 Declares a rosdep key or ROS package name that this package needs as
 part of some build interface it exports.  For system packages, the
@@ -454,13 +653,13 @@ depending on your header *will* require those transitive dependencies
 when they are built.
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <buildtool_depend> (multiple)
------------------------------
+'''''''''''''''''''''''''''''
 
 Declares a rosdep key or ROS package name for a tool that is executed
 during the build process.  For cross-compilation, one must distinguish
@@ -472,13 +671,13 @@ specify the "development" package, which frequently ends in
 
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <buildtool_export_depend> (multiple)
-------------------------------------
+''''''''''''''''''''''''''''''''''''
 
 Declares a rosdep key or ROS package name that this package exports
 which must be compiled and run on the build system, not the target
@@ -488,13 +687,13 @@ compiled for the target architecture.
 
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <exec_depend> (multiple)
-------------------------
+''''''''''''''''''''''''
 
 Declares a rosdep key or ROS package name that this package needs at
 execution-time.  For system packages, the rosdep key will normally
@@ -507,13 +706,13 @@ other files required for running your package.  It is also used by
 metapackages for grouping packages.
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <depend> (multiple)
--------------------
+'''''''''''''''''''
 
 Declares a rosdep key or ROS package name that this package needs for
 multiple reasons.  A ``<depend>`` tag is equivalent to specifying
@@ -523,13 +722,13 @@ in combination with any of the three equivalent tags for the same
 package or key name.
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <doc_depend> (multiple)
------------------------
+'''''''''''''''''''''''
 
 Declares a rosdep key or ROS package name that your package needs for
 building its documentation.  A ``<doc_depend>`` *may* reference a
@@ -545,13 +744,13 @@ Generated Debian packages are built without the documentation or the
 documentation dependencies.
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <test_depend> (multiple)
-------------------------
+''''''''''''''''''''''''
 
 Declares a rosdep key or ROS package name that your package needs
 for running its unit tests.  A ``<test_depend>`` *may* reference a
@@ -568,13 +767,13 @@ them.  Generated Debian packages are built without the unit tests or
 their dependencies.
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <conflict> (multiple)
----------------------
+'''''''''''''''''''''
 
 Declares a rosdep key or ROS package name with which your package
 conflicts.  This package and the conflicting package should not be
@@ -585,22 +784,56 @@ For a detailed explanation how these relationships are used see
 [4]_ and [5]_.
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
 
 
 <replace> (multiple)
---------------------
+''''''''''''''''''''
 
 Declares a rosdep key or ROS package name that your package replaces.
 This has no effect on source builds, but maps to ``Replaces`` when
 creating Debian packages and ``Obsoletes`` for RPM packages.
 
 Attributes
-''''''''''
+..........
 
  The same attributes as for `\<build_depend\> (multiple)`_.
+
+
+.. raw:: html
+
+  <font color="red">
+
+
+Group dependency tags
+---------------------
+
+<group_depend> (multiple)
+'''''''''''''''''''''''''
+
+The content is the name of a dependency group on which the package depends.
+The group name should follow the same rules as the `\<name\>`_ tag.
+
+Attributes
+..........
+
+ The `condition` attribute as defined for `\<build_depend\> (multiple)`_.
+
+<member_of_group> (multiple)
+''''''''''''''''''''''''''''
+
+The content is the name of a dependency group of which the package is a member.
+
+Attributes
+..........
+
+ The `condition` attribute as defined for `\<build_depend\> (multiple)`_.
+
+.. raw:: html
+
+  </font>
 
 
 <export>
@@ -729,38 +962,106 @@ Because metapackages only supply execution-time dependencies, they use
   <exec_depend>another_metapackage</exec_depend>
 
 
+.. raw:: html
+
+  <font color="red">
+
+Related Changes
+===============
+
+Environment variables
+---------------------
+
+In order to identify the ROS distribution ROS 1 already defines an environment
+variable `ROS_DISTRO` ([17]_).
+ROS 2 should expose the same environment variable.
+The package exporting the necessary environment should be a dependency of
+almost all ROS 2 packages to ensure that the information is available even when
+only some packages are installed.
+The package `rcl` seems to be a good place for this.
+
+Additionally for the condition expressions to allow distinguishing ROS 1 and
+ROS 2 an environment variable identifying the major version is necessary.
+Therefore the environment variable `ROS_VERSION` is used with the value being
+either `1` or `2`.
+This new environment variable can be defined beside the `ROS_DISTRO` one.
+
+Once a specific ROS environment has been sourced all tools can determine the
+ROS major version as well as the distribution name and therefore evaluate
+conditions which use those to limit the scope of dependencies.
+
+If no environment has been sourced some tools might require that the necessary
+information is being specified explicitly when being invoked.
+
+New ROS package
+'''''''''''''''
+
+In ROS 1 the environment variable `ROS_DISTRO` is being set in the `roslib`
+package which also defines other environment variables like `ROS_PACKAGE_PATH`.
+In ROS 2 the environment variable `ROS_DISTRO` doesn't exist at the moment.
+Also neither ROS version has an environment variable `ROS_VERSION` at the
+moment.
+
+A new ROS package named `ros_environment` which has minimal dependencies will
+be available in both ROS versions and providing the new environment variables
+as well as some of the existing environment variables.
+
 Compatibility
 =============
 
-Modifications to REP-0127
--------------------------
+Support for format three
+------------------------
 
- * ``<run_depend>`` was replaced by ``<build_export_depend>`` and
-   ``<exec_depend>``.
+Existing tools supporting up to format two will need to be updated to
+honor the new information provided by format three.
+If they are not checking that the format is two or lower they will
+simply ignore the format three specific information when processing a
+package with a format three manifest.
 
- * ``<depend>`` was added as a synonym for ``<build_depend>``,
-   ``<build_export_depend>`` and ``<exec_depend>``.
+In order to enable packages to declare different dependencies for ROS 1 and ROS
+2 in a single manifest the tools in ROS 1 (`catkin_pkg`, `rosdep`, `bloom`,
+etc.) should be updated to support format 3.
 
- * ``<test_depend>`` now fulfills configuration and build-time test
-   requirements in addition to the objects needed for running them.
+catkin_prepare_release
+''''''''''''''''''''''
 
- * ``<doc_depend>`` was added for documentation specific dependencies.
+As long as a manifest doesn't specify a `compatibility` version the tools
+doesn't need to change.
+For packages which do specify a `compatibility` version the tool should
+probably by default remove the attribute and only after confirmation from
+the user offer to keep it.
 
- * ``<buildtool_export_depend>`` was added to enable the same
-   cross-compilation semantic for ``<build_export_depend>`` as it is already
-   available with ``<buildtool_depend>`` for ``<build_depend>``.
+ros_buildfarm
+'''''''''''''
+
+The dependencies between packages is directly mapped to upstream /
+downstream jobs in Jenkins.
+In order to consider the `compatibility` attribute the downstream job
+dependencies must be changed to be conditional which are only triggered
+when the new package version is not compatible to the previous version.
+
 
 Backward compatibility
 ----------------------
 
-Format one packages following REP-0127 [1]_ are not affected unless
-they are updated to declare ``<package format="2">``, at which time
-all ``<run_depend>`` elements must be removed and replaced with other
-appropriate dependencies.
+Format one or two packages following REP-0127 [1]_ or REP-0140 [12]_ are
+not affected unless they are updated to declare ``<package format="3">``.
+
+Since format three only adds new functionality and doesn't modify any
+existing markup a migration to format three only makes sense when the
+package wants to use any of the new features.
+
+.. raw:: html
+
+  </font>
 
 
 Schema
 ======
+
+.. raw:: html
+
+  <font color="blue">
 
 A schema defining the structure specified in this document is available
 at [11]_.
@@ -768,15 +1069,19 @@ To specify the schema within a manifest you can reference a self
 contained schema file like this:
 
   <?xml version="1.0"?>
-  <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-  <package format="2">
+  <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+  <package format="3">
+
+.. raw:: html
+
+  </font>
 
 
 References
 ==========
 
 .. [1] REP-0127
-   (http://ros.org/reps/rep-0127.html)
+   (http://ros.org/reps/rep-0127)
 .. [2] ROS naming conventions
    (http://www.ros.org/wiki/ROS/Patterns/Conventions#Naming_ROS_Resources)
 .. [3] ros-infrastructure/catkin_pkg#43: `"add support for depend tag"
@@ -794,9 +1099,21 @@ References
 .. [9] Buildsystem mailing list discussion: `"REP-0140: internal review"
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_QVFLQi-6wk>`_
 .. [10] REP-0134
-   (http://ros.org/reps/rep-0134.html)
+   (http://ros.org/reps/rep-0134)
 .. [11] Schema file
-   (https://github.com/ros-infrastructure/rep/blob/master/xsd/package_format2.xsd)
+   (https://github.com/ros-infrastructure/rep/blob/master/xsd/package_format3.xsd)
+.. [12] REP-0140
+   (http://ros.org/reps/rep-0140)
+.. [13] Discussion on REP-0127
+   (https://groups.google.com/forum/#!topic/ros-sig-buildsystem/_jRvhXFfsVk)
+.. [14] Related topic of versioning ROS libraries
+   (https://groups.google.com/forum/#!topic/ros-sig-buildsystem/Q9BK3MGFY_U)
+.. [15] SO versioning from a package perspective
+   (https://groups.google.com/forum/#!topic/ros-sig-buildsystem/jTB9r3zu580)
+.. [16] REP-0143
+   (http://ros.org/reps/rep-0143)
+.. [17] ROS_DISTRO environment variable
+  (https://github.com/ros/ros/blob/b202645dc6bea6d4b9ca408dc703c8c7cc8204d9/core/roslib/env-hooks/10.ros.sh.em#L16)
 
 
 Copyright

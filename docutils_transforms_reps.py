@@ -28,7 +28,8 @@ class Headers(Transform):
 
     default_priority = 360
 
-    rep_url = 'rep-%04d'
+    rep_rst_nr = 12
+    rep_url = 'rep-%04d.html'
     rep_git_url = \
         'https://github.com/ros-infrastructure/rep/blob/master/rep-%04d.rst'
     rcs_keyword_substitutions = (
@@ -127,7 +128,8 @@ class Headers(Transform):
                     para[:] = [nodes.reference('', date, refuri=repo_url)]
             elif name == 'content-type':
                 rep_type = para.astext()
-                uri = self.document.settings.rep_base_url + self.rep_url % 12
+                uri = (self.document.settings.rep_base_url + self.rep_url
+                       % self.rep_rst_nr)
                 para[:] = [nodes.reference('', rep_type, refuri=uri)]
             elif name == 'version' and len(body):
                 utils.clean_rcs_keywords(para, self.rcs_keyword_substitutions)
