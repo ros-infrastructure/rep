@@ -1,0 +1,189 @@
+REP: 145
+Title: Conventions for IMU Sensor Drivers
+Author: Paul Bovbel <paul@bovbel.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 02-Feb-2015
+Post-History: 02-Feb-2015
+
+
+Abstract
+========
+
+This REP defines common parameters, topics, namespaces, and data processing conventions for drivers of Inertial Measurement Unit (IMU) sensors. This includes accelerometers, gyroscopes, magnetometers, and any combination thereof.
+
+Motivation
+==========
+
+This REP seeks to standardize an interface for IMU drivers in the ROS ecosystem, providing for IMU-type sensors with a variety of capabilities and conventions. By formalizing a common approach based on existing driver implementations, this REP serves as a guideline for new driver development, while minimizing the changes required to non-conforming implementations. This REP discourages the in-driver manipulation of sensor data, by specifying the conditions where sensor data will be properly handled by ROS transform and coordinate specifications. The REP also specifies fallback approaches to correcting sensor data that does not conform to ROS conventions.
+
+Specification
+=============
+
+Frame Conventions
+-----------------
+
+An IMU device may measure data with respect to two frames, specified by the manufacturer:
+
+* The **sensor frame** represents the device's internal reference frame (the "input reference axes", IRA). It may be found in the device specification documents, and is sometimes indicated directly on the package of the device. This frame is fixed to the device (i.e. it is a moving coordinate frame).
+
+* If an orientation estimate is provided (see `Data Reporting`_), the device **world frame** represents the external reference with respect to which the **sensor frame** is indicated. Two out of three degrees of freedom of the **sensor frame** w.r.t. the **world frame** are usually considered "fixed" through gravity, with the relevant conventions from REP 103 [1]_ :
+
+  - For NED type IMUs, the orientation of the world frame is x-north, y-east, z-down, relative to magnetic north.
+
+  - For ENU type IMUs, the orientation of the world frame is x-east, y-north, z-up, relative to magnetic north.
+
+* If the device does not have an absolute yaw reference (magnetometer), the world frame will only be aligned in roll and pitch (due to gravity), while the orientation around the z axis can be arbitrary.
+
+* If the device does not have an absolute gravity reference (accelerometer), the world frame is not aligned to any external reference and aligned entirely to the power-on orientation of the sensor.
+
+* The `frame_id` for all message types published by an IMU represents the sensor frame - the default frame ID for IMUs is `imu_link`. In compliance with REP 0103 [1]_, and as a hint to integrators, the default frame name for IMUs that use an NED world reference should be `imu_link_ned`.
+
+  - The configuration of the sensor frame relative to other frames (e.g. `base_link`) represents the mounting position and orientation of the IMU [2]_.
+
+  - The world frame orientation depends on the IMU device, and is not explicitly defined in the transform tree.
+
+* The device has an associated *neutral orientation*, defined as the orientation of the device where the body and the world frame align [3]_.
+
+Data Reporting
+--------------
+
+* To maintain interoperability with ROS conventions, all frames must be right handed. If any data is reported left handed the driver must convert it to right handed by inverting the `y` axis.
+
+* All data from a sensor should be published with respect to a single consistent sensor frame. If any data is reported in an inconsistent frame of reference relative to the other data, the driver must transform it into the sensor frame before publishing.
+
+* Otherwise, all data should be published by the driver as it is reported by the device. Any subsequent modifications to the data (e.g. filtering, transformations) should be delegated to a downstream consumer of the data [3]_.
+
+* A prominent note should be made in the driver documentation regarding any internal data manipulation that does not comply with the requirements in this document.
+
+Data Sources
+''''''''''''
+
+* Accelerometers
+
+  - The accelerometers report linear acceleration data expressed in the sensor frame of the device. This data is output from the driver as a 3D vector, representing the specific force acting on the sensor.
+
+  - When the device is at rest, the vector will represent the specific force solely due to gravity. I.e. if the body `z` axis points upwards, its `z` axis should indicate +g. This data must be in m/s^2.
+
+* Gyroscopes
+
+  - The gyroscopes report the rotational velocity of the sensor frame w.r.t. an inertial frame, expressed in the sensor frame. This data is provided from the driver as a 3D vector.
+
+  - The rotational velocity is right handed with respect to the body axes, and independent of the orientation of the device. This data must be in rad/s.
+
+* Magnetometers
+
+  - The magnetometers report magnetic field strength in the sensor frame of the device. This data is output from the driver as a 3D vector, with the components representing magnetic field strength in each direction. When an axis is aligned with magnetic north, its field strength reading is at maximum. This data must be in Tesla.
+
+* Orientation
+
+  - The IMU sensor may provide a fused orientation estimate. This data is output from the driver in the form of a quaternion, which represents the orientation of the sensor frame w.r.t. the world frame.
+
+  - In the neutral orientation, the sensor frame is aligned with the world frame, hence the orientation will be the identity quaternion.
+
+
+Transformation
+--------------
+
+Applying a transformation to IMU data requires transforming both the body and the world frames. After a transformation, the output data represents the output of a simulated IMU having the new body and world frames.
+
+Topics
+------
+
+The following topics are expected to be common to many devices - an IMU device driver is expected to publish at least one. Note that some of these topics may be also published by support libraries, rather than the base driver implementation. All message types below are supplemented with a std_msgs/Header, containing time and coordinate frame information.
+
+
+* `imu/data_raw` (sensor_msgs/Imu)
+
+  - Sensor output grouping accelerometer (`linear_acceleration`) and gyroscope (`angular_velocity`) data.
+
+* `imu/data` (sensor_msgs/Imu)
+
+  - Same as `imu/data_raw`, with an included quaternion orientation estimate (`orientation`).
+
+* `imu/mag` (sensor_msgs/MagneticField)
+
+  - Sensor output containing magnetometer data.
+
+
+All message types provide a covariance matrix (see REP 103 [1]_) alongside the data field (`*_covariance`). If the data's covariance is unknown, all elements of the covariance matrix should be set to 0, unless overridden by a parameter. If a data field is unreported, the first element (`0`) of the covariance matrix should be set to `-1`.
+
+Namespacing
+'''''''''''
+
+By convention, IMU output topics are pushed down to a local namespace. The primary source of IMU data for a system is published in the `imu` namespace. Additional sources, such as secondary IMUs or unprocessed raw data should be published in alternative `imu_...` local namespaces. IMU driver implementations should take care to allow convenient remapping of the local namespace through a single remap argument (e.g. imu:=imu_raw), rather than separate remap calls for each topic.
+
+Common Parameters
+-----------------
+
+IMU driver implementations should read as many of these parameters as are relevant.
+
+* `~frame_id` (`string`, default: `imu_link` or `imu_link_ned`)
+
+  - The frame ID to set in outgoing messages.
+
+* `~linear_acceleration_stddev` (`double`)
+
+  - Square root of the linear_acceleration_covariance diagonal elements in m/s^2. Overrides any values reported by the sensor.
+
+* `~angular_velocity_stddev` (`double`)
+
+  - Square root of the angular_velocity_covariance diagonal elements in rad/s. Overrides any values reported by the sensor.
+
+* `~magnetic_field_stddev` (`double`)
+
+  - Square root of the magnetic_field_covariance diagonal elements in Tesla. Overrides any values reported by the sensor.
+
+* `~orientation_stddev` (`double`)
+
+  - Square root of the orientation_covariance diagonal elements in rad. Overrides any values reported by the sensor.
+
+Rationale
+=========
+
+The goal of this REP is to provide a standard for IMU data reporting in the ROS ecosystem. By defining a consistent interface between sensor drivers and consumers, the REP serves as a reference for new driver implementations, and reduces the overhead of accounting for sensor data from non-conforming implementations. This REP also maintains the legacy IMU message structure in ROS, which is currently preferable to breaking existing workflows, implementations, and recorded datasets.
+
+
+Backwards Compatibility
+=======================
+
+It is up to the maintainer of a driver to determine if the driver should be updated to follow this REP.  If a maintainer chooses to update the driver, the current usage should at minimum follow a tick tock pattern where the old usage is deprecated and warns the user, followed by removal of the old usage.  The maintainer may choose to support both standard and custom usage, as well as extend this usage or implement this usage partially depending on the specifics of the driver.
+
+Reference Implementation
+========================
+
+A reference implementation of the IMU data transformation mechanism has been implemented in the IMU Transformer node/nodelet [4]_, and is under review to be merged into tf2. A reference implementation of an IMU driver for this REP is in development for the CHR-UM6 IMU [5]_ driver, targeting ROS Jade.
+
+References
+==========
+
+.. [1] REP-0103 Standard Units of Measure and Coordinate Conventions
+   (http://www.ros.org/reps/rep-0103.html)
+
+.. [2] ROS Answers discussion
+   (http://answers.ros.org/question/50870/what-frame-is-sensor_msgsimuorientation-relative-to/)
+
+.. [3] ros-sig-drivers discussion
+   (https://groups.google.com/forum/#!topic/ros-sig-drivers/Fb4cxdRqjlU)
+
+.. [4] IMU Transformer
+   (http://wiki.ros.org/imu_transformer)
+
+.. [5] ROS Driver for CHR-UM6
+   (http://wiki.ros.org/um6)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
