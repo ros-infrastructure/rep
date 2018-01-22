@@ -1,6 +1,6 @@
 REP: 145
 Title: Conventions for IMU Sensor Drivers
-Author: Paul Bovbel <pbovbel@clearpathrobotics.com>
+Author: Paul Bovbel <paul@bovbel.com>
 Status: Draft
 Type: Informational
 Content-Type: text/x-rst
@@ -74,7 +74,7 @@ Data Sources
 
 * Magnetometers
 
-  - The magnetometers report magnetic field strength in the sensor frame of the device. This data is output from the driver as a 3D vector, with the components representing magnetic field strength in each direction. This data must be in Tesla.
+  - The magnetometers report magnetic field strength in the sensor frame of the device. This data is output from the driver as a 3D vector, with the components representing magnetic field strength in each direction. When an axis is aligned with magnetic north, its field strength reading is at maximum. This data must be in Tesla.
 
 * Orientation
 
@@ -187,4 +187,3 @@ This document has been placed in the public domain.
    fill-column: 70
    coding: utf-8
    End:
-
