@@ -201,6 +201,12 @@ to migrate to dual Python 2/3 support during ROS Melodic, such that leaf Python 
 are able to opt into Python 3 any time during M or N, whenever their dependencies are
 ready to go.
 
+This proposal offers flexibility to users, with the primary costs being the risk of
+user confusion or side effects around the "alternative python" shim, and the cost
+of dual-depending on all Python dependencies, which may frustrate users with limited
+disk who would prefer not to have both `python-numpy` and `python3-numpy` installed
+unncessarily.
+
 The following timeline describes a transition over multiple ROS releases:
 
  * ROS O-turtle (May 2020, LTS):
@@ -247,6 +253,9 @@ To support the proposal `C)` a few capabilities must be developed in catkin:
    where `/usr/bin/python` is already Python 3).
    
  * Similarly, Python nosetests will run twice if the `PYTHON_ALT_*` vars are set.
+   Perhaps a CMake function could be used to disable this behaviour, especially
+   for packages which migrate to Python 3 and don't want to receive test failures for
+   Python 2 issues. For example, `catkin_python_policy(ONLY_3)` or similar.
  
  * In order to do the right thing with conventional `usr/bin/env python3` shebangs,
    ROS Melodic will need to ship a small wrapper shim which mutates the `PYTHONPATH`
@@ -257,7 +266,8 @@ To support the proposal `C)` a few capabilities must be developed in catkin:
     /usr/bin/python3 $*
     ```
    Similarly, ROS N would have to do the reverse operation in a `python2` shim. No
-   shim would be required for ROS O and beyond.
+   shim would be required for ROS O and beyond. This shim could be part of the
+   `catkin` package itself, or potentially live separately.
 
 And in other tools:
 
@@ -268,7 +278,7 @@ And in other tools:
 
  * `ros_buildfarm` should set the new `PYTHON_ALT_*` vars according to the release
    plan given above.
-
+   
  * Packages which generate compiled Python extensions will require bespoke CMake
    logic to ensure that these extensions are correctly built and installed twice.
    Upon examining the individual cases, it's possible that the `catkin` package may
