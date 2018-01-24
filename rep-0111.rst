@@ -1,12 +1,12 @@
 REP: 111
 Title: Multiple Package Manager Support for Rosdep
-Author: Tully Foote
+Author: Tully Foote, Dirk Thomas
 Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 28-June-2011
 ROS-Version: 1.6
-Post-History: 30-Jun-2011
+Post-History: 30-Jun-2011, 24-Jan-2018
 
 
 Abstract
@@ -271,6 +271,72 @@ In this ambiguous case, rosdep first interprets the key as a
 ``OS_VERSION``.  Developers should exercise caution in keeping
 ``OS_VERSION`` and ``PACKAGE_MANAGER`` keys globally distinct.
 
+
+Wildcard OS_VERSION
+-------------------
+
+Many rosdep keys exist with a generic mapping independent of the OS version.
+This is great since the rule doesn't have to be updated for new OS versions as
+long as the system package name stays the same.
+But when at some point the system package name does change there are only two
+choices which are both not optimal:
+
+* Either all OS versions need to be explicitly enumerated and from that point
+  on forward the entry needs to be updated for every new OS version or
+* at some point the "old" OS versions before the system package was renamed are
+  being dropped to collapse the mapping back into a generic rule again (in
+  order to not require to update the entry in the future).
+
+To avoid either of these downsides the OS_VERSION can be specified as `*`.
+When a specific rule is being looked up and the desired OS version isn't in the
+dictionary but an OS_VERSION `*` is present it will be used as a fallback
+(instead of failing the lookup).
+
+This allows "future proofing" rosdep rules and avoids the need to update them
+for every future OS version without requiring an order on those to be
+defined (which would need to be maintained too).
+
+
+Allow PACKAGE_ARGUMENT to be explicitly null
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since the wildcard matches every not explicitly defined OS_VERSION it is not
+usable as-is in the following example:
+
+::
+
+    rosdep_name:
+      debian:
+        jessie: [other-name]
+        wheezy: [some-name]
+
+Using the wildcard to use `other-name` also for newer OS versions would look
+like this:
+
+::
+
+    rosdep_name:
+      debian:
+        '*': [other-name]
+        wheezy: [some-name]
+
+While `other-name` will now also be used for newer OS versions like `stretch`
+the wildcard will also be used for older releases which are not explicitly
+defined, like `squeeze`.
+
+In order to declare that there is no valid mapping for `squeeze` and still be
+able to use the wildcard OS version it is allowed to use `null` as a
+PACKAGE_ARGUMENT:
+
+::
+
+    rosdep_name:
+      debian:
+        '*': [other-name]
+        squeeze: null
+        wheezy: [some-name]
+
+
 Dependencies
 ------------
 
@@ -357,6 +423,15 @@ It is expected that all future releases will refer to the correct
 codename, e.g. 'oneiric'.
 
 This will be supported through ROS Fuerte.
+
+History
+=======
+
+24-Jan-2018
+-----------
+
+The sections `Wildcard OS_VERSION`_ and
+`Allow PACKAGE_ARGUMENT to be explicitly null`_ have been added.
 
 References and Footnotes
 ========================
