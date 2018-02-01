@@ -370,19 +370,15 @@ ROS package downloads for this architecture.
 C++
 ---
 
-The C++ code in ROS is meant to be compiler-agnostic.  While we mainly develop
-with gcc, no use of compiler-specific features is allowed without proper use
-of macros to allow use on other platforms or with other compilers.
+The C++ code in ROS is meant to be compiler-agnostic.
+While we mainly develop with gcc, no use of compiler-specific features is allowed without proper use of macros to allow use on other platforms or with other compilers.
 
 Melodic
 ~~~~~~~
-As of ROS Melodic, we are using the C++14 (ISO/IEC 14882:2014) standard.  All
-packages are free to use C++14 features in public and private APIs.  Before
-changing existing public APIs to use C++14 features, package maintainers should
-carefully consider whether the change is worth the breakage to downstream
-consumers of the API.  If at all possible, maintainers should use a "tick-tock"
-model where the new APIs are introduced alongside the old (deprecated) APIs, and
-then remove the old APIs in a subsequent release.
+As of ROS Melodic, we are using the C++14 (ISO/IEC 14882:2014) standard.
+All packages are free to use C++14 features in public and private APIs.
+Before changing existing public APIs to use C++14 features, package maintainers should carefully consider whether the change is worth the breakage to downstream consumers of the API.
+If at all possible, maintainers should use a "tick-tock" model where the new APIs are introduced alongside the old (deprecated) APIs, and then remove the old APIs in a subsequent release.
 
 Lunar and earlier
 ~~~~~~~~~~~~~~~~~
@@ -410,12 +406,9 @@ platforms that support ROS to determine a reasonable minimum target.
 
 Melodic
 ~~~~~~~
-Ubuntu will most likely stop supporting Python 2 in release 20.04.  To make
-sure ROS will be able to support that version of Ubuntu, ROS Python packages
-starting with Melodic Morenia are highly encouraged to support both Python 2.7
-and Python 3.5 or later.  During the development of Melodic there will be work
-undertaken to support both Python 2 and Python 3 (including rosdep keys) so ROS
-package developers can more easily test with either version of Python.
+Ubuntu will most likely stop supporting Python 2 in release 20.04.
+To make sure ROS will be able to support that version of Ubuntu, ROS Python packages starting with Melodic Morenia are highly encouraged to support both Python 2.7 and Python 3.5 or later.
+During the development of Melodic there will be work undertaken to support both Python 2 and Python 3 (including rosdep keys) so ROS package developers can more easily test with either version of Python.
 
 Lunar and earlier
 ~~~~~~~~~~~~~~~~~
