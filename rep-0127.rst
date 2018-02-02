@@ -676,7 +676,7 @@ References
 .. [1] Naming conventions
    (http://www.ros.org/wiki/ROS/Patterns/Conventions#Naming_ROS_Resources)
 .. [2] REP-0140
-   (http://ros.org/reps/rep-0140)
+   (http://ros.org/reps/rep-0140.html)
 .. [3] Comparison between YAML and XML for manifests
    (https://github.com/ros/catkin/issues/128)
 .. [4] Declaring relationships between packages (Debian Policy Manual)
