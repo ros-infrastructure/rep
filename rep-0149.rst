@@ -370,8 +370,8 @@ Example
     </description>
     <maintainer email="someone@example.com">Someone</maintainer>
 
-    <license>BSD</license>
-    <license>LGPL</license>
+    <license file="LICENSE">BSD</license>
+    <license file="LICENSE">LGPL</license>
 
     <url type="website">http://wiki.ros.org/my_package</url>
     <url type="repository">http://www.github.com/my_org/my_package</url>
@@ -511,6 +511,25 @@ Commonly used license strings:
  - LGPLv3
  - MIT
  - Mozilla Public License Version 1.1
+
+Attributes
+''''''''''
+
+  .. raw:: html
+
+    <font color="blue">
+
+ ``file="FILE"`` *(optional)*
+
+  A relative path from ``package.xml`` pointing the full license text.
+
+  Some open source licenses require provision of the license text when a user
+  redistribute the software in a binary form [18]_. This attribution will help a
+  user or a tool find the right license text easily.
+
+  .. raw:: html
+
+    </font>
 
 <url> (multiple)
 ----------------
@@ -1114,6 +1133,8 @@ References
    (http://ros.org/reps/rep-0143)
 .. [17] ROS_DISTRO environment variable
   (https://github.com/ros/ros/blob/b202645dc6bea6d4b9ca408dc703c8c7cc8204d9/core/roslib/env-hooks/10.ros.sh.em#L16)
+.. [18] Licenses & Standards
+  (https://opensource.org/licenses)
 
 
 Copyright
