@@ -1081,7 +1081,7 @@ References
 ==========
 
 .. [1] REP-0127
-   (http://ros.org/reps/rep-0127)
+   (http://ros.org/reps/rep-0127.html)
 .. [2] ROS naming conventions
    (http://www.ros.org/wiki/ROS/Patterns/Conventions#Naming_ROS_Resources)
 .. [3] ros-infrastructure/catkin_pkg#43: `"add support for depend tag"
@@ -1099,11 +1099,11 @@ References
 .. [9] Buildsystem mailing list discussion: `"REP-0140: internal review"
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_QVFLQi-6wk>`_
 .. [10] REP-0134
-   (http://ros.org/reps/rep-0134)
+   (http://ros.org/reps/rep-0134.html)
 .. [11] Schema file
    (https://github.com/ros-infrastructure/rep/blob/master/xsd/package_format3.xsd)
 .. [12] REP-0140
-   (http://ros.org/reps/rep-0140)
+   (http://ros.org/reps/rep-0140.html)
 .. [13] Discussion on REP-0127
    (https://groups.google.com/forum/#!topic/ros-sig-buildsystem/_jRvhXFfsVk)
 .. [14] Related topic of versioning ROS libraries
@@ -1111,7 +1111,7 @@ References
 .. [15] SO versioning from a package perspective
    (https://groups.google.com/forum/#!topic/ros-sig-buildsystem/jTB9r3zu580)
 .. [16] REP-0143
-   (http://ros.org/reps/rep-0143)
+   (http://ros.org/reps/rep-0143.html)
 .. [17] ROS_DISTRO environment variable
   (https://github.com/ros/ros/blob/b202645dc6bea6d4b9ca408dc703c8c7cc8204d9/core/roslib/env-hooks/10.ros.sh.em#L16)
 
