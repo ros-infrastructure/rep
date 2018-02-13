@@ -33,6 +33,8 @@ It is expressed in the ros/metapackages repository on github.com
 This REP proposes the same entrypoints as REP 108 and merely updates
 the variant definitions to reflect the organizational changes in ROS
 stacks.
+In particular, in ROS Melodic the `robot` metapackage is contracted to remove
+`robot_model` and instead explicitly list the necessary packages.
 
 The definitions in this REP are more focused and concise for clearer
 purpose, and do not list all transitive dependencies explicitly.
@@ -92,8 +94,6 @@ The `robot` metapackage is defined to be core, stable, ROS libraries
 for any robot hardware.
 It is the "general robotics" libraries of ROS.
 It may not contain any GUI dependencies.
-In ROS Melodic `robot` is contracted to remove `robot_model` and instead
-explicitly list the necessary packages.
 
 ::
 
