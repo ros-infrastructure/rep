@@ -1,6 +1,6 @@
 REP: 107
 Title: Diagnostic System for Robots Running ROS
-Author: Tully Foote <tfoote@willowgarage.com>
+Author: Tully Foote <tfoote@openrobotics.org>
 Status: Final
 Type: Standards Track
 Content-Type: text/x-rst

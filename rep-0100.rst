@@ -1,6 +1,6 @@
 REP: 100
 Title: ROS Stack Separation
-Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>, Brian Gerkey <gerkey@willowgarage.com>
+Author: Tully Foote <tfoote@openrobotics.org>, Ken Conley <kwc@willowgarage.com>, Brian Gerkey <gerkey@willowgarage.com>
 Status: Final
 Type: Standards Track
 Content-Type: text/x-rst

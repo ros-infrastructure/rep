@@ -1,6 +1,6 @@
 REP: 142
 Title: ROS Indigo and Newer Metapackages
-Author: Tully Foote <tfoote@willowgarage.com>
+Author: Tully Foote <tfoote@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
