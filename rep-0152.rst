@@ -81,7 +81,14 @@ c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml
 
 ``<maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>``
 
-2. Releasing orphaned packages
+2. Adopting packages
+--------------------
+
+Orphaned packages are seeking a new maintainer.
+If you willing to step forward the package maintainer, more than just to release into new ROS distros, but respond to the issues, pull requests and so on.
+Contact to the ROS Orphaned Package Maintainers by sending email to ros-orphaned-packages@googlegroups.com and/or post to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_.
+
+3. Releasing orphaned packages
 ------------------------------
 
 a. The package release process is as same as normal packages, so please follow bloom tutorial titled ``Releasing into a new ROS Distribution`` in ROS wiki documents [9]_ to release the orphaned package.
@@ -103,13 +110,6 @@ a. The package release process is as same as normal packages, so please follow b
    - end-of-life: should not be used, will disappear at some point
 
 b. Add your package to the list of orphaned packages in `ROS OrphanedPackage page <http://wiki.ros.org/OrphanedPackage>`_ of ROSwiki.
-
-3. Adopting packages
---------------------
-
-Orphaned packages are seeking a new maintainer.
-If you willing to step forward the package maintainer, more than just to release into new ROS distros, but respond to the issues, pull requests and so on.
-Contact to the ROS Orphaned Package Maintainers by sending email to ros-orphaned-packages@googlegroups.com and/or post to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_.
 
 4. Joining ROS Orphaned Package Maintainers
 -------------------------------------------
