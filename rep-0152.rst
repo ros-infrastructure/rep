@@ -29,7 +29,8 @@ Main drawback of this situation is these packages do not get released into newer
 Ideally everyone willing to use newer ROS distro almost equivalent to the set of packages in previous ROS distro.
 
 It is understandable that original maintainer could not continue serving as an active maintainer, because of starting new project, moving an institute/company, loosing interest and so on.
-And being a maintainer is not a easy job. It includes respond to incoming questions and issues, check for proposed changes and decide to include them to a main source tree and so on.
+And being a maintainer is not a easy job.
+It includes respond to incoming questions and issues, check for proposed changes and decide to include them to a main source tree and so on.
 
 The idea behind this document is to have a team of volunteers who can do ONLY the release job.
 This will enable to continue using same set of previous ROS distros with minimum set of community efforts.
@@ -88,7 +89,8 @@ a. The package release process is as same as normal packages, so please follow b
 
    1. Updated maintainer section in ``package.xml`` indicating that the package is orphaned and commit to the source tree, before you run the ``catkin_generate_changelog`` command.
 
-   2. During ``bloom-release`` process, you will asked to set maintenance status as follows. Choose ``unmaintained`` . ::
+   2. During ``bloom-release`` process, you will asked to set maintenance status as follows.
+   Choose ``unmaintained`` . ::
       
 ::
 
@@ -105,7 +107,8 @@ b. Add your package to the list of orphaned packages in `ROS OrphanedPackage pag
 3. Adopting packages
 --------------------
 
-Orphaned packages are seeking a new maintainer. If you willing to step forward the package maintainer, more than just to release into new ROS distros, but respond to the issues, pull requests and so on.
+Orphaned packages are seeking a new maintainer.
+If you willing to step forward the package maintainer, more than just to release into new ROS distros, but respond to the issues, pull requests and so on.
 Contact to the ROS Orphaned Package Maintainers by sending email to ros-orphaned-packages@googlegroups.com and/or post to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_.
 
 4. Joining ROS Orphaned Package Maintainers
