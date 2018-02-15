@@ -32,7 +32,7 @@ It is understandable that original maintainer could not continue serving as an a
 And being a maintainer is not a easy job.
 It includes respond to incoming questions and issues, check for proposed changes and decide to include them to a main source tree and so on.
 
-The idea behind this document is to have a team of volunteers who can do ONLY the release job.
+The idea behind this document is to have a team of volunteers who can do ONLY the release job, which includes send source tree to ros build firm and act on notification mail form that.
 This will enable to continue using same set of previous ROS distros with minimum set of community efforts.
 To this end, we followed Debian QA Group System and Debian Developer's Reference ('Dealing with inactive and/or unreachable maintainers'[3]_), which is considered non-normative, but best practice.
 
