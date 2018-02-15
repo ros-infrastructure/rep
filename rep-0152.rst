@@ -56,10 +56,10 @@ If you can no longer maintain a your package.
 
 a. Set the package maintainer section in the ``package.xml`` file as follows.
 
-``<maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>``
+   ``<maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>``
 
 b. Send email to ros-orphaned-packages@googlegroups.com and/or post to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_, indicating that package is now orphaned.
-Wait response from someone in the ROS Orphaned Package Maintainer team.
+   Wait response from someone in the ROS Orphaned Package Maintainer team.
 
 c. Add admin permission of both source and release repository to who respond from in the ROS Orphaned Package Maintainers team.
 
@@ -79,7 +79,7 @@ b. If the current maintainer is not responsible (a single day isn't enough to co
 c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml as follows.
 
 
-``<maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>``
+   ``<maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>``
 
 2. Adopting packages
 --------------------
