@@ -83,7 +83,7 @@ c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml
 2. Releasing orphaned packages
 ------------------------------
 
-a. The package release process is as same as normal packages, so please follow bloom tutorial titled ``Releasing a Package for the First Time`` in ROS wiki documents [9]_ to release the orphaned package.
+a. The package release process is as same as normal packages, so please follow bloom tutorial titled ``Releasing into a new ROS Distribution`` in ROS wiki documents [9]_ to release the orphaned package.
 
 
    1. Updated maintainer section in ``package.xml`` indicating that the package is orphaned and commit to the source tree, before you run the ``catkin_generate_changelog`` command.
@@ -124,7 +124,7 @@ References
 .. [6] Package Manifest Format Two Specification, Data Representation, maintainer (https://github.com/ros-infrastructure/rep/blob/master/rep-0140.rst#data-representation)
 .. [7] ROS distribution file, Distribution file, status (https://github.com/ros-infrastructure/rep/blob/master/rep-0141.rst#distribution-file)
 .. [8] Maintenance Guide, Claiming Maintainership (http://wiki.ros.org/MaintenanceGuide#Claiming_Maintainership)
-.. [9] Releasing catkin packages (http://wiki.ros.org/bloom/Tutorials/FirstTimeRelease)
+.. [9] Releasing catkin packages (http://wiki.ros.org/bloom/Tutorials/ReleasingForANewROSDistro)
 
 
 Copyright
