@@ -31,7 +31,7 @@ This is the recommended layout for development is as follows:
 
     workspace_folder/        --WORKSPACE
       src/                   --SOURCE SPACE
-        CMakeLists.txt/      --This is symlinked to catkin/cmake/toplevel.cmake
+        CMakeLists.txt       --This is symlinked to catkin/cmake/toplevel.cmake
         package_1/
           CMakeLists.txt
           package.xml
@@ -45,7 +45,7 @@ This is the recommended layout for development is as follows:
       devel/                 --DEVEL SPACE (targets go here, parameterizable, but defaults to peer of Build Space)
         bin/
         etc/
-        /include/
+        include/
         lib/
         share/
         .catkin              --Marking the folder as a development space (the file contains a semicolon separated list of Source space paths)
@@ -75,13 +75,13 @@ Workspace
 
 The workspace is the folder inside which you are going to be actively
 developing.  Keeping things in a folder with connected development
-helps keep seperation of development models.
+helps keep separation of development models.
 
 Source Space
 ------------
 
 The source space is the folder is where catkin will be expected to
-look for packages when building.  This folder is easily identifed as
+look for packages when building.  This folder is easily identified as
 it is where the toplevel.cmake is linked from the catkin project.
 
 Each catkin project desired to be compiled from source should be
@@ -149,7 +149,7 @@ generic term should be used instead.
 To visually distinguish the result space from spaces that have a direct
 folder name correspondence (such as the folder ``install`` for the install
 space) it is recommended to refer to the result space as ``RESULT-SPACE``
-in documention, for example:
+in documentation, for example:
 ::
 
     source RESULT-SPACE/setup.sh
@@ -183,17 +183,17 @@ Let us say we have several catkin workspaces in our home folder (~/).
 ::
 
  ~/workspace1/
-     /src
-     /build
-     /devel
+     src/
+     build/
+     devel/
  ~/workspace2/
-     /src
-     /build
-     /devel
+     src/
+     build/
+     devel/
  ~/workspace3/
-     /src
-     /build
-     /devel
+     src/
+     build/
+     devel/
 
 Example 1: Installing workspace1 to system
 ::
@@ -283,9 +283,6 @@ The steps to achieve this layout are:
 
 With this layout, sourcing ~/rosbuild_ws/setup.*sh also sources ~/catkin_ws/devel/setup.*sh
 
-Resources
-=========
-
 
 References
 ==========
@@ -300,7 +297,6 @@ Copyright
 This document has been placed in the public domain.
 
 
-
 ..
    Local Variables:
    mode: indented-text
