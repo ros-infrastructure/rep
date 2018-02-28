@@ -11,7 +11,7 @@ Outline
 
 #. Abstract_
 #. Motivation_
-#. Rationale_
+#. Reference_
 #. Operations_
 #. References_
 #. Copyright_
@@ -39,7 +39,7 @@ To this end, we followed Debian QA Group System and Debian Developer's Reference
 In ROS system, we use 'Unmaintained' package status([4]_) and ROS Orphaned Packages Group([5]_), who do not have to take full responsibility to package maintenance jobs, but expecting to take minimum responsibilities such as just to releasing into newer ROS distros.
 
 
-Rationale
+Reference
 =========
 
 REP-0140 [6]_ and REP-0141 [7]_ provide maintainer information in package manifest file and maintainer status in ROS distribution file.
