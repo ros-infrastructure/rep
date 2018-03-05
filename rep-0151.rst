@@ -291,6 +291,11 @@ While proposal `A)` provides a smoother transition it requires a significantly
 higher development effort.
 Proposal `B)` requires the least tooling effort, but will be the roughest on the
 community, offering little in the way of a migration plan.
+Proposal `C)` also provides a smooth transition, but also requires significantly
+higher development effort.
+
+Since there are limited resources available to fix the tooling, Proposal B) will
+be chosen and implemented.
 
 References
 ==========
