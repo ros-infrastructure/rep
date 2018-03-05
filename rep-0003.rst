@@ -337,7 +337,7 @@ Requirements:
 
 " ! " means that this package will be at least this version (since these distributions have not yet been released); this may change as those releases get closer.
 
-Note that Gazebo is a special case, since it spans versions 7, 8, and 9.  The only long-term supported platform (Bionic) has Gazebo 9, so packages should target that.  Packages are encouraged to additionally support Gazebo 7, but it is not required.
+Note that Gazebo is a special case, since it spans versions 7, 8, and 9.  Since Bionic is the only LTS required support platform for Melodic, all packages should target Gazebo 9.  Packages are encouraged to additionally support Gazebo 7, but it is not required.
 
 Maintainers can choose to support even lower versions to also cover older ROS distributions and thus avoid branching out.
 
