@@ -148,10 +148,10 @@ The urdf tutorials are only in `desktop_full` because they depend on the simulat
   - desktop:
       extends: [robot, viz]
       packages: [common_tutorials, geometry_tutorials, ros_tutorials,
-                 roslint, visualization_tutorials]
+                 roslint, urdf_tutorial, visualization_tutorials]
   - desktop_full:
       extends: [desktop, perception, simulators]
-      packages: [urdf_sim_tutorial, urdf_tutorial]
+      packages: [urdf_sim_tutorial]
 
 Institution-specific and robot-specific
 '''''''''''''''''''''''''''''''''''''''
