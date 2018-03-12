@@ -1,12 +1,52 @@
+group: travis_latest
 language: python
+env:
+    - REPO=ros-infrastructure/bloom
+    - REPO=ros-infrastructure/buildfarm
+    - REPO=ros-infrastructure/catkin-sphinx
+    - REPO=ros-infrastructure/catkin_pkg
+    - REPO=ros-infrastructure/catkinize
+    - REPO=ros-infrastructure/dry_prerelease_job_generator
+    - REPO=ros-infrastructure/jenkins_tools
+    - REPO=ros-infrastructure/reprepro-updater
+    - REPO=ros-infrastructure/ros.org_scripts
+    - REPO=ros-infrastructure/ros_buildfarm
+    - REPO=ros-infrastructure/ros_buildfarm_config
+    - REPO=ros-infrastructure/ros_release_python
+    - REPO=ros-infrastructure/rosdep
+    - REPO=ros-infrastructure/rosdistro
+    - REPO=ros-infrastructure/rosdoc_lite
+    - REPO=ros-infrastructure/rosinstall_generator
+    - REPO=ros-infrastructure/rospkg
+    - REPO=ros-infrastructure/rosrelease-legacy
+    - REPO=ros-infrastructure/superflore
+cache: pip
 python:
-  - "2.7"
-  - "3.3"
-# command to install dependencies
+    - 2.7
+    - 3.6
+    #- nightly
+    #- pypy
+    #- pypy3
+matrix:
+    allow_failures:
+        - python: nightly
+        - python: pypy
+        - python: pypy3
 install:
-  - pip install docutils
-# command to run tests
+    #- pip install -r requirements.txt
+    - pip install flake8  # pytest  # add other testing frameworks later
+before_script:
+    - URL=https://github.com/${REPO}
+    - echo ; echo -n "flake8 testing of ${URL} on " ; python -V
+    - git clone --depth=50 ${URL} ~/${REPO}  # --branch=master
+    - cd ~/${REPO}
 script:
-  - make
+    - echo stop the build if there are Python syntax errors or undefined names
+    - echo ; echo -n "flake8 testing of ${URL} on " ; python -V
+    - time flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+    - echo exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
+    - time flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    #- true  # pytest --capture=sys
 notifications:
-  email: false
+    on_success: change
+    on_failure: change  # `always` will be the setting once code changes slow down
