@@ -201,6 +201,7 @@ Example package.xml
 Here is an example package.xml template for a third party package being released (using the recommended format 2 or format 3)::
 
   <?xml version="1.0"?>
+  <!-- Replace the "2" below with "3" when using format 3 -->
   <package format="2">
     <name>foo</name>
     <version>:{version}</version>
