@@ -77,7 +77,7 @@ The recommendation of this REP for releasing third party packages in the ROS com
 
  * Optionally, put the install rule for the package.xml into the actual upstream repository
 
-* Have a run_depend on catkin in the package.xml(s), or exec_depend when using format 2
+* Have an exec_depend on catkin in the package.xml(s) when using format 2 or 3, or run_depend when using the legacy format 1
 
 
 This provides the least intrusive, but most automated and correct method for releasing non-catkin packages through the ROS infrastructure.
@@ -198,7 +198,7 @@ There are updated bloom tutorials on the ROS wiki which explain how to release t
 Example package.xml
 -------------------
 
-Here is an example package.xml template for a third party package being released (using the recommended format 2)::
+Here is an example package.xml template for a third party package being released (using the recommended format 2 or format 3)::
 
   <?xml version="1.0"?>
   <package format="2">
