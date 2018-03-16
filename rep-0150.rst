@@ -66,11 +66,10 @@ It may not contain any GUI dependencies.
 
  - ros_core:
       extends: [ros, ros_comm]
-      packages: [catkin, cmake_modules, common_msgs, console_bridge,
-                 gencpp, geneus, gennodejs, genlisp, genmsg, genpy,
-                 message_generation, message_runtime, rosbag_migration_rule,
-                 rosconsole_bridge, roscpp_core, rosgraph_msgs, roslisp,
-                 rospack, std_msgs, std_srvs]
+      packages: [catkin, cmake_modules, common_msgs, gencpp, geneus, genlisp,
+                 genmsg, gennodejs, genpy, message_generation, message_runtime,
+                 rosbag_migration_rule, rosconsole_bridge, rosconsole_bridge,
+                 roscpp_core, roslisp, rospack, std_msgs]
 
 ROS Base
 ''''''''
@@ -83,7 +82,7 @@ It may not contain any GUI dependencies.
 
   - ros_base:
       extends: [ros_core]
-      packages: [actionlib, angles, bond_core, class_loader,
+      packages: [actionlib, bond_core, class_loader,
                  dynamic_reconfigure, nodelet_core,
                  pluginlib]
 
@@ -99,10 +98,9 @@ It may not contain any GUI dependencies.
 
   - robot:
       extends: [ros_base]
-      packages: [collada_parser, control_msgs, diagnostics, executive_smach,
-                 filters, geometry, joint_state_publisher, kdl_parser,
-                 kdl_parser_py, robot_state_publisher, urdf,
-                 urdf_parser_plugin, xacro]
+      packages: [control_msgs, diagnostics, executive_smach, filters, geometry,
+                 joint_state_publisher, kdl_parser, kdl_parser_py,
+                 robot_state_publisher, urdf, urdf_parser_plugin, xacro]
 
 Capability variants
 '''''''''''''''''''
@@ -127,7 +125,7 @@ We discourage GUI dependencies in these stacks, if possible.
                  stage_ros]
 
   - viz:
-      extends: [robot]
+      extends: [ros_base]
       packages: [rqt_common_plugins, rqt_robot_plugins, rviz]
 
 Desktop variants
