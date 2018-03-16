@@ -68,8 +68,8 @@ It may not contain any GUI dependencies.
       extends: [ros, ros_comm]
       packages: [catkin, cmake_modules, common_msgs, gencpp, geneus, genlisp,
                  genmsg, gennodejs, genpy, message_generation, message_runtime,
-                 rosbag_migration_rule, rosconsole_bridge, rosconsole_bridge,
-                 roscpp_core, roslisp, rospack, std_msgs]
+                 rosbag_migration_rule, rosconsole_bridge, roscpp_core,
+                 roslisp, rospack, std_msgs]
 
 ROS Base
 ''''''''
