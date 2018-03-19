@@ -148,7 +148,8 @@ Both of these variants contain tutorials for the stacks they provide.
                  roslint, visualization_tutorials]
 
   - desktop_full:
-      extends: [desktop, perception, simulators, urdf_tutorials]
+      extends: [desktop, perception, simulators]
+      packages: [urdf_tutorial]
 
 Institution-specific and robot-specific
 '''''''''''''''''''''''''''''''''''''''
