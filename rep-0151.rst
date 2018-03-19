@@ -12,8 +12,9 @@ Outline
 #. Abstract_
 #. Motivation_
 #. Rationale_
-#. Proposal_
-#. Requirements_
+#. Proposals_
+#. Rosdep_
+#. Conclusion_
 #. References_
 #. Copyright_
 
@@ -112,16 +113,8 @@ To support the proposal `A)` a few capabilities have to be developed:
 
  * `catkin` / `catkin_tools` need to support choosing the Python version.
 
- * `rosdep`: choose between Python 2 and Python 3 dependencies.
-   Multiple different options can be considered for this:
-
-   * Beside the `python.yaml` file create a `python3.yaml` file and let
-     `rosdep` choose between them.
-   * Use different installers for Python 2 and Python 3 packages, e.g. `xenial`
-     and `xenial_python3`, and let `rosdep` choose between them.
-   * Create explicit rosdep keys with a `python2` and `python3` prefix and use
-     them in the package manifest files with conditional dependencies as
-     specified in REP 149 [3]_.
+ * `rosdep`: choose between Python 2 and Python 3 dependencies; see the Rosdep_
+    section for more information.
 
  * `bloom` needs to generate releases for both Python versions in parallel.
    The user should only need to release each package once.
@@ -177,7 +170,8 @@ Requirements
 To support the proposal `B)` less effort is necessary compared to proposal
 `A)`:
 
- * `rosdep`: choose between Python 2 and Python 3 dependencies.
+ * `rosdep`: choose between Python 2 and Python 3 dependencies; see the Rosdep_
+    section for more information.
 
  * `bloom` needs to generate releases for both Python versions in parallel.
    The user should only need to release each package once.
@@ -196,16 +190,16 @@ Similar goals and timeline to proposal `A)`, but with only a single set of
 installable debs, significantly lowering the complexity barrier for users and
 package deveopers/maintainers.
 
-The concept is that each installed package which supplies Python modules will be able
-to migrate to dual Python 2/3 support during ROS Melodic, such that leaf Python packages
-are able to opt into Python 3 any time during M or N, whenever their dependencies are
-ready to go.
+The concept is that each installed package which supplies Python modules will be
+able to migrate to dual Python 2/3 support during ROS Melodic, such that leaf
+Python packages are able to opt into Python 3 any time during Melodic or
+N-Turtle, whenever their dependencies are ready to go.
 
-This proposal offers flexibility to users, with the primary costs being the risk of
-user confusion or side effects around the "alternative python" shim, and the cost
-of dual-depending on all Python dependencies, which may frustrate users with limited
-disk who would prefer not to have both `python-numpy` and `python3-numpy` installed
-unncessarily.
+This proposal offers flexibility to users, with the primary costs being the risk
+of user confusion or side effects around the "alternative python" shim, and the
+cost of dual-depending on all Python dependencies, which may frustrate users
+with limited disk who would prefer not to have both `python-numpy` and
+`python3-numpy` installed unncessarily.
 
 The following timeline describes a transition over multiple ROS releases:
 
@@ -227,7 +221,7 @@ The following timeline describes a transition over multiple ROS releases:
      instead Python 2 or to use the dual-build behaviour.
 
  * ROS Melodic (May 2018, LTS):
- 
+
    * Debian packages using catkin_setup_python install to both
      `lib/python3/dist-packages/` and `lib/python2.7/dist-packages/`
    * Default behaviour of `catkin_install_python` (with an ambiguous
@@ -243,46 +237,81 @@ To support the proposal `C)` a few capabilities must be developed in catkin:
 
  * It will need to be updated with bilingual awareness around the
    `catkin_install_python` and `catkin_python_setup` functions.
-   
+
  * The existing `PYTHON_EXECUTABLE`, `PYTHON_LIBRARY`, and `PYTHON_INCLUDE_DIR`
    variables which may be used today to select the preferred Python will need to
-   be supplemented by a separate `PYTHON_ALT_*` vars which control which Python is
-   used for the second `setup.py` invocation. If the `PYTHON_ALT_*` vars are unset,
-   catkin will build only for the default Python (this would be default behaviour
-   in a source workspace, in order to not break Arch and other from-source systems
-   where `/usr/bin/python` is already Python 3).
-   
- * Similarly, Python nosetests will run twice if the `PYTHON_ALT_*` vars are set.
-   Perhaps a CMake function could be used to disable this behaviour, especially
-   for packages which migrate to Python 3 and don't want to receive test failures for
-   Python 2 issues. For example, `catkin_python_policy(ONLY_3)` or similar.
- 
- * In order to do the right thing with conventional `usr/bin/env python3` shebangs,
-   ROS Melodic will need to ship a small wrapper shim which mutates the `PYTHONPATH`
-   variable. This shim would live at `/opt/ros/melodic/bin/python3` and look like
-    ```
-    #!/bin/sh
-    PYTHONPATH=$(echo $PYTHONPATH | sed "s/lib\/python2\.7/lib\/python3/")
-    /usr/bin/python3 $*
-    ```
-   Similarly, ROS N would have to do the reverse operation in a `python2` shim. No
-   shim would be required for ROS O and beyond. This shim could be part of the
-   `catkin` package itself, or potentially live separately.
+   be supplemented by a separate `PYTHON_ALT_*` vars which control which Python
+   is used for the second `setup.py` invocation. If the `PYTHON_ALT_*` vars are
+   unset, catkin will build only for the default Python (this would be default
+   behaviour in a source workspace, in order to not break Arch and other
+   from-source systems where `/usr/bin/python` is already Python 3).
+
+ * Similarly, Python nosetests will run twice if the `PYTHON_ALT_*` vars are
+   set. Perhaps a CMake function could be used to disable this behaviour,
+   especially for packages which migrate to Python 3 and don't want to receive
+   test failures for Python 2 issues. For example,
+   `catkin_python_policy(ONLY_3)` or similar.
+
+ * In order to do the right thing with conventional `/usr/bin/env python3`
+   shebangs, ROS Melodic will need to ship a small wrapper shim which mutates
+   the `PYTHONPATH` variable. This shim would live at
+   `/opt/ros/melodic/bin/python3` and look like
+   ```
+   #!/bin/sh
+   PYTHONPATH=$(echo $PYTHONPATH | sed "s/lib\/python2\.7/lib\/python3/")
+   /usr/bin/python3 $*
+   ```
+   Similarly, ROS N-Turtle would have to do the reverse operation in a `python2`
+   shim. No shim would be required for ROS O-Turtle and beyond. This shim could
+   be part of the `catkin` package itself, or potentially live separately.
 
 And in other tools:
 
- * `rosdep`: choose between Python 2 and Python 3 dependencies.
- 
- * `bloom`: For the transitional releases (N and M), the default bloom behaviour will
-   be to depend on both the Python 2 and Python 3 versions of all Python dependencies.
+ * `rosdep`: choose between Python 2 and Python 3 dependencies; see the Rosdep_
+    section for more information.
 
- * `ros_buildfarm` should set the new `PYTHON_ALT_*` vars according to the release
-   plan given above.
-   
+ * `bloom`: For the transitional releases (N and M), the default bloom behaviour
+   will be to depend on both the Python 2 and Python 3 versions of all Python
+   dependencies.
+
+ * `ros_buildfarm` should set the new `PYTHON_ALT_*` vars according to the
+   release plan given above.
+
  * Packages which generate compiled Python extensions will require bespoke CMake
-   logic to ensure that these extensions are correctly built and installed twice.
-   Upon examining the individual cases, it's possible that the `catkin` package may
-   be able to provide some tooling to streamline this.
+   logic to ensure that these extensions are correctly built and installed
+   twice. Upon examining the individual cases, it's possible that the `catkin`
+   package may be able to provide some tooling to streamline this.
+
+Rosdep
+======
+
+To support any of the proposals above, rosdep must be updated to allow either
+Python 2 or Python 3 keys.
+
+Multiple different options can be considered for this:
+
+ #. Beside the `python.yaml` file create a `python3.yaml` file and let
+    `rosdep` choose between them.
+ #. Use different installers for Python 2 and Python 3 packages, e.g. `xenial`
+    and `xenial_python3`, and let `rosdep` choose between them.
+ #. Create explicit rosdep keys with a `python2` and `python3` prefix and use
+    them in the package manifest files with conditional dependencies as
+    specified in REP 149 [3]_.
+ #. A combination of 1. and 3., where the default dependency resolution for
+    rosdep depends on the ROS distribution in use, with an environment variable
+    to let users manually control it.  For instance, for a rosdep key of
+    `python-foo`, there would be an entry in `python.yaml` that resolves to
+    `python-foo` on Ubuntu, and an entry in `python3.yaml` that resolves to
+    `python3-foo` on Ubuntu.  On Melodic, rosdep would resolve dependencies
+    using the `python.yaml` file by default.  An environment variable called
+    `ROS_PYTHON_VERSION` would allow the user to force the use of `python3.yaml`
+    for dependency resolution for testing (though this requires a removal and
+    re-initialization of the entire rosdep database).  On N-Turtle, this would
+    be reversed and rosdep would resolve dependencies using the `python3.yaml`
+    file by default.  Additionally, there may be keys called `python2-foo` and
+    `python3-foo` that would allow package maintainers to support Python 2 and
+    Python 3 simultaneously in their package by utilizing conditional
+    dependencies in package format 3 [3]_.
 
 Conclusion
 ==========
