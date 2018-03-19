@@ -65,13 +65,12 @@ In ROS Kinetic `ros_core` is extended to include `gennodejs`.
 ::
 
  - ros_core:
-      extends: [ros, ros_comm]
-      packages: [catkin, cmake_modules, common_msgs, console_bridge,
-                 gencpp, geneus(Jade and newer), gennodejs(Kinetic and newer),
-                 genlisp, genmsg, genpy, message_generation, message_runtime,
-                 rosbag_migration_rule, rosconsole_bridge,
-                 roscpp_core, rosgraph_msgs, roslisp, rospack,
-                 std_msgs, std_srvs]
+      packages: [catkin, cmake_modules, common_msgs, gencpp,
+                 geneus(Jade and newer), genlisp, genmsg,
+                 gennodejs(Kinetic and newer), genpy, message_generation,
+                 message_runtime, ros, ros_comm, rosbag_migration_rule,
+                 rosconsole_bridge, roscpp_core, rosgraph_msgs, roslisp,
+                 rospack, std_msgs, std_srvs]
 
 ROS Base
 ''''''''
@@ -84,9 +83,8 @@ It may not contain any GUI dependencies.
 
   - ros_base:
       extends: [ros_core]
-      packages: [actionlib, angles, bond_core, class_loader,
-                 dynamic_reconfigure, nodelet_core,
-                 pluginlib]
+      packages: [actionlib, bond_core, class_loader, dynamic_reconfigure,
+                 nodelet_core, pluginlib]
 
 Robot metapackage
 '''''''''''''''''
@@ -126,7 +124,7 @@ We discourage GUI dependencies in these stacks, if possible.
                  stage_ros]
 
   - viz:
-      extends: [robot]
+      extends: [ros_base]
       packages: [rqt_common_plugins, rqt_robot_plugins, rviz]
 
 Desktop variants
@@ -146,8 +144,9 @@ Both of these variants contain tutorials for the stacks they provide.
 
   - desktop:
       extends: [robot, viz]
-      packages: [common_tutorials, geometry_tutorials, ros_tutorials,
+      packages: [angles, common_tutorials, geometry_tutorials, ros_tutorials,
                  roslint, visualization_tutorials]
+
   - desktop_full:
       extends: [desktop, perception, simulators, urdf_tutorials]
 
