@@ -1,6 +1,6 @@
 REP: 131
 Title: ROS Groovy Variants
-Author: Tully Foote <tfoote@willowgarage.com>
+Author: Tully Foote <tfoote@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst

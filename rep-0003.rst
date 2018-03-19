@@ -1,6 +1,6 @@
 REP: 3
 Title: Target Platforms
-Author: Tully Foote <tfoote@willowgarage.com>, Ken Conley <kwc@willowgarage.com>
+Author: Tully Foote <tfoote@openrobotics.org>, Ken Conley <kwc@willowgarage.com>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
