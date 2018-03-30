@@ -370,7 +370,7 @@ Example
     </description>
     <maintainer email="someone@example.com">Someone</maintainer>
 
-    <license file="LICENSE">BSD</license>
+    <license>BSD</license>
     <license file="LICENSE">LGPL</license>
 
     <url type="website">http://wiki.ros.org/my_package</url>
