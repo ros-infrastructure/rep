@@ -521,11 +521,13 @@ Attributes
 
  ``file="FILE"`` *(optional)*
 
-  A relative path from ``package.xml`` pointing the full license text.
+  A path relative to the ``package.xml`` file containing the full license text.
 
-  Some open source licenses require provision of the license text when a user
-  redistribute the software in a binary form [18]_. This attribution will help a
-  user or a tool find the right license text easily.
+  Many licenses require including the license text when
+  redistributing the software.
+  E.g. the ``Apache License, Version 2.0`` states in paragraph 4.1:
+  
+    "You must give any other recipients of the Work or Derivative Works a copy of this License"
 
   .. raw:: html
 
@@ -1133,8 +1135,6 @@ References
    (http://ros.org/reps/rep-0143)
 .. [17] ROS_DISTRO environment variable
   (https://github.com/ros/ros/blob/b202645dc6bea6d4b9ca408dc703c8c7cc8204d9/core/roslib/env-hooks/10.ros.sh.em#L16)
-.. [18] Licenses & Standards
-  (https://opensource.org/licenses)
 
 
 Copyright
