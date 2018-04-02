@@ -371,7 +371,7 @@ Example
     <maintainer email="someone@example.com">Someone</maintainer>
 
     <license>BSD</license>
-    <license>LGPL</license>
+    <license file="LICENSE">LGPL</license>
 
     <url type="website">http://wiki.ros.org/my_package</url>
     <url type="repository">http://www.github.com/my_org/my_package</url>
@@ -511,6 +511,27 @@ Commonly used license strings:
  - LGPLv3
  - MIT
  - Mozilla Public License Version 1.1
+
+Attributes
+''''''''''
+
+  .. raw:: html
+
+    <font color="blue">
+
+ ``file="FILE"`` *(optional)*
+
+  A path relative to the ``package.xml`` file containing the full license text.
+
+  Many licenses require including the license text when redistributing the
+  software.
+  E.g. the ``Apache License, Version 2.0`` states in paragraph 4.1:
+  
+    "You must give any other recipients of the Work or Derivative Works a copy of this License"
+
+  .. raw:: html
+
+    </font>
 
 <url> (multiple)
 ----------------
