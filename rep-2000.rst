@@ -1,0 +1,121 @@
+REP: 2000
+Title: ROS 2.0 Target Platforms
+Author: Mikael Arguedas <mikael@openrobotics.org>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 10-Apr-2018
+
+
+Abstract
+========
+
+This REP defines target platforms for each ROS 2.0 Distribution Release.
+We define platforms to include both operating system releases (e.g. Ubuntu
+Xenial (16.04 LTS)) as well as major language releases (e.g. Python 3.5). The
+target platforms represent the set on which all core stacks are
+expected to work. Exceptions can be made for stacks that are
+intentionally platform-specific.
+
+Platforms by Distribution
+=========================
+
+If planned support for a target platform is changed, notice will be
+sent to ros-users to enable discussion of this issue.
+
+Ardent Apalone (December 2017 - December 2018)
+----------------------------------------------
+Required Support for:
+
+- Ubuntu Xenial (16.04)
+- MacOS El Capitan
+- MacOS Sierra
+- MacOS High Sierra
+- Windows 10
+
+Recommended Support for:
+
+- Debian Stretch (9)
+
+Architectures Supported:
+
+- amd64
+- arm64
+
+Targeted Languages:
+
+- C++14
+- Python 3.5
+
+Requirements:
+
+
++---------+---------------+---------------+----------------+
+| Package | Ubuntu Xenial |     MacOS**   |   Windows 10** |
++=========+===============+===============+================+
+| CMake   |     3.5.1     |     3.11.0    |     3.10.2     |
++---------+---------------+---------------+----------------+
+| EmPY    |     3.3.2     |     3.6.5     |     3.3.2      |
++---------+---------------+---------------+----------------+
+| Poco    |     1.7.7     |     1.7.7     |     1.7.7      |
++---------+---------------+---------------+----------------+
+| Python  |     3.5.1     |     3.6.5     |     3.6.4      |
++---------+---------------+---------------+----------------+
+| Ogre    |     1.10*     |     1.10*     |     1.10*      |
++---------+---------------+---------------+----------------+
+| OpenCV  |     2.4.9     |     3.4.1     |     2.4.13.2*  |
++---------+---------------+---------------+----------------+
+
+" * " means that this is not the upstream version (available on the official
+Operating System repositories) but a package distributed by OSRF or the community
+(package built and distributed on custom repositories).
+
+" ** " Rolling distributions will see multiple version changes of these dependencies
+during their lifetime.
+This document only captures the version at the first release of a ROS distribution
+and will not be updated as the dependencies move forward. These versions are thus a low watermark.
+
+Build System Support:
+
+- ament
+- cmake
+- setuptools
+
+
+Motivation
+==========
+
+This document is provided to help plan future development for
+libraries. The primary platforms for ROS 2.0 are Canonical's Ubuntu
+releases, and our intent is to track these releases as best as
+possible while also allowing for current, thirdparty libraries to be
+used.
+MacOS and Windows being rolling distributions, ROS 2.0 will target the latest state of these
+distributions at the time of the release.
+
+Rationale
+=========
+
+Target platforms for future releases are speculative and are based on
+consulting Ubuntu's release and end-of-life schedule [1]_.
+
+
+References and Footnotes
+========================
+
+.. [1] Ubuntu Releases with End-of-Life Dates
+   (https://wiki.ubuntu.com/Releases)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
