@@ -28,9 +28,9 @@ Ardent Apalone (December 2017 - December 2018)
 Required Support for:
 
 - Ubuntu Xenial (16.04)
-- MacOS El Capitan
-- MacOS Sierra
-- MacOS High Sierra
+- MacOS El Capitan (10.11)
+- MacOS Sierra (10.12)
+- MacOS High Sierra (10.13)
 - Windows 10
 
 Recommended Support for:
