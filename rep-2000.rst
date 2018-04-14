@@ -20,17 +20,14 @@ intentionally platform-specific.
 Platforms by Distribution
 =========================
 
-If planned support for a target platform is changed, notice will be
-sent to ros-users to enable discussion of this issue.
+If planned support for a target platform is changed, notice will be sent to discourse to enable discussion of this issue.
 
 Ardent Apalone (December 2017 - December 2018)
 ----------------------------------------------
 Required Support for:
 
 - Ubuntu Xenial (16.04)
-- MacOS El Capitan (10.11)
 - MacOS Sierra (10.12)
-- MacOS High Sierra (10.13)
 - Windows 10
 
 Recommended Support for:
@@ -57,11 +54,11 @@ Requirements:
 +---------+---------------+---------------+----------------+
 | EmPY    |     3.3.2     |     3.6.5     |     3.3.2      |
 +---------+---------------+---------------+----------------+
-| Poco    |     1.7.7     |     1.7.7     |     1.7.7      |
+| Poco    |                     1.7.7*                     |
 +---------+---------------+---------------+----------------+
 | Python  |     3.5.1     |     3.6.5     |     3.6.4      |
 +---------+---------------+---------------+----------------+
-| Ogre    |     1.10*     |     1.10*     |     1.10*      |
+| Ogre    |                     1.10*                      |
 +---------+---------------+---------------+----------------+
 | OpenCV  |     2.4.9     |     3.4.1     |     2.4.13.2*  |
 +---------+---------------+---------------+----------------+
