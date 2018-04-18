@@ -328,9 +328,9 @@ Requirements:
 +---------+---------------+----------------+----------------+-----------+
 | PCL     |     1.8.1     |     1.8.1!     |    1.8.0       |   1.8.1!  |
 +---------+---------------+----------------+----------------+-----------+
-| PyQt    |     5.7       |     5.9.2!     |    5.7         |   5.10!   |
+| PyQt    |     5.7       |     5.10.1!    |    5.7         |   5.10!   |
 +---------+---------------+----------------+----------------+-----------+
-| Qt5     |     5.9.1     |     5.9.4!     |    5.7.1       |   5.10.0! |
+| Qt5     |     5.9.1     |     5.9.5!     |    5.7.1       |   5.10.0! |
 +---------+---------------+----------------+----------------+-----------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
