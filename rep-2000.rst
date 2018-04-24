@@ -22,27 +22,24 @@ If planned support for a target platform is changed, notice will be sent to disc
 
 Ardent Apalone (December 2017 - December 2018)
 ----------------------------------------------
-Required Support for:
 
-- Ubuntu Xenial (16.04)
-- MacOS Sierra (10.12)
-- Windows 10
++--------------------------------------------------------------------------------------+
+|                                     Required support                                 |
++--------------+-----------------------+------------------------------+----------------+
+| Architecture | Ubuntu Xenial (16.04) |     MacOS Sierra (10.12)     |   Windows 10   |
++==============+=======================+==============================+================+
+|    amd64     |       X               |       X                      |       X        |
++--------------+-----------------------+------------------------------+----------------+
+|    arm64     |       X               |                              |                |
++--------------+-----------------------+------------------------------+----------------+
 
-Recommended Support for:
-
-- Debian Stretch (9)
-
-Architectures Supported:
-
-- amd64
-- arm64
-
-Targeted Languages:
+Minumum language requirements:
 
 - C++14
 - Python 3.5
 
-Requirements:
+
+Dependency Requirements:
 
 
 +---------+---------------+---------------+----------------+
