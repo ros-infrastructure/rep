@@ -28,9 +28,9 @@ Ardent Apalone (December 2017 - December 2018)
 +--------------+-----------------------+------------------------------+------------------------+
 | Architecture | Ubuntu Xenial (16.04) |     MacOS Sierra (10.12)     |   Windows 10 (VS2015)  |
 +==============+=======================+==============================+========================+
-|    amd64     |       X               |             X                |          X             |
+|    amd64     |          X            |             X                |          X             |
 +--------------+-----------------------+------------------------------+------------------------+
-|    arm64     |       X               |                              |                        |
+|    arm64     |          X            |                              |                        |
 +--------------+-----------------------+------------------------------+------------------------+
 
 Minumum language requirements:
@@ -64,6 +64,14 @@ Dependency Requirements:
 
 This document only captures the version at the first release of a ROS distribution and will not be updated as the dependencies move forward.
 These versions are thus a low watermark.
+
+
+Package manager use for dependencies:
+
+- Ubuntu Xenial: apt
+- MacOS: Homebrew, pip
+- Windows: Chocolatey, pip
+
 
 Build System Support:
 
