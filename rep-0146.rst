@@ -42,18 +42,14 @@ URDF format.
 robot_type
 ''''''''''
 
-`robot_type` stores robot type in lower cases, for example 'pr2' in PR2 robot case [1], 'pepper' in Pepper robot case and 'fetch' in Fetch robot cases. This could be regarded as manufacturer's model name.
+The `robot_type` should capture the name of the class of robot in a way that a user would understand the scope of the robot. If it's a commercial product it is recommended to use the production model name. ` For example 'pr2' in PR2 robot case [1], 'pepper' in Pepper robot case and 'fetch' in Fetch robot cases.
 
 
 robot_name
 ''''''''''
 
-`robot_name` stores robot name, default pr2 name is 'robot' [1], which is given individual name to the robot. So robot name of 'pr2' robot type could be 'james', 'gutsy' etc...
+`robot_name` stores robot name. It should be set to make sure that this robot instance is unique on the system in much that computers are recommended to have unique hostnames. For the case of PR2 robot, the default robot name is 'robot' [1], but other individuals have named 'james', 'gutsy' etc...
 
-robot/info
-''''''''''
-
-`robot_info` stores any other characteristics of the robot in YAML dict type, including type, serial number, owner name / email address, timezone, language it uses ...
 
 Examples
 ========
@@ -65,8 +61,6 @@ Example behaviors::
     olive
     $ rosparam get robot_type
     pepper
-    $ rosparam get robot_info
-    {serial number: 00000000, owner name : Kei Okada, language: Japanese,....}
 
 References
 ==========
