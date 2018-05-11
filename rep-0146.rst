@@ -39,21 +39,21 @@ robot_description
 URDF format.
 
 
-robot/type
+robot_type
 ''''''''''
 
-`robot/type` stores robot type, for example 'pr2' in PR2 robot case [1]
+`robot_type` stores robot type in lower cases, for example 'pr2' in PR2 robot case [1], 'pepper' in Pepper robot case and 'fetch' in Fetch robot cases. This could be regarded as manufacturer's model name.
 
 
-robot/name
+robot_name
 ''''''''''
 
-`robot/name` stores robot name, default pr2 name is 'robot' [1]
+`robot_name` stores robot name, default pr2 name is 'robot' [1], which is given individual name to the robot. So robot name of 'pr2' robot type could be 'james', 'gutsy' etc...
 
 robot/info
 ''''''''''
 
-`robot/info` stores any other characteristics of the robot, including type, serial number, owner name / email address, timezone, language it uses ...
+`robot_info` stores any other characteristics of the robot in YAML dict type, including type, serial number, owner name / email address, timezone, language it uses ...
 
 Examples
 ========
@@ -61,11 +61,11 @@ Examples
 
 Example behaviors::
 
-    $ rosparam get robot/name
+    $ rosparam get robot_name
     olive
-    $ rosparam get robot/type
+    $ rosparam get robot_type
     pepper
-    $ rosparam get robot/info
+    $ rosparam get robot_info
     {serial number: 00000000, owner name : Kei Okada, language: Japanese,....}
 
 References
