@@ -866,8 +866,16 @@ It is not appropriate for any package which compiles C or C++ code.
 Be sure to remove this tag if some subsequent update adds
 architecture-dependent targets to a formerly independent package.
 
-<build_type>
+.. raw:: html
+
+  <font color="red">
+
+<build_type> (multiple)
 ''''''''''''
+
+.. raw:: html
+
+  </font>
 
 Various tools use this tag to determine how to handle a package.  It
 was defined in REP-0134 [10]_, which currently specifies only two
@@ -896,6 +904,8 @@ Attributes
 ..........
 
  The `condition` attribute as defined for `\<build_depend\> (multiple)`_.
+ Only one build type should be active after conditions are evaluated.
+ If multiple types are active then the behavior is undefined.
 
 .. raw:: html
 
