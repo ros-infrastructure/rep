@@ -1007,6 +1007,12 @@ Therefore the environment variable `ROS_VERSION` is used with the value being
 either `1` or `2`.
 This new environment variable can be defined beside the `ROS_DISTRO` one.
 
+An additional environment variable to choose the Python version in use
+(either 2 or 3) is also provided.  In ROS 1, this allows users to test out
+packages on Python 3 before the distribution is officially switched to
+Python 3.  On ROS 2, changing this environment variable will have no effect,
+as it always uses Python 3.
+
 Once a specific ROS environment has been sourced all tools can determine the
 ROS major version as well as the distribution name and therefore evaluate
 conditions which use those to limit the scope of dependencies.
