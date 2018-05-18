@@ -98,6 +98,8 @@ ROS 1 as well as ROS 2 is explicitly not part of this document.
 In general it is possible to conditionally handle those cases in programming
 languages like CMake, C++, Python, etc.
 
+See `Alternatives for Universal Packages`_ for options not chosen.
+
 .. raw:: html
 
   </font>
@@ -1138,7 +1140,28 @@ Copyright
 
 This document has been placed in the public domain.
 
+.. raw:: html
 
+  <font color="red">
+
+Appendix
+========
+
+Alternatives for Universal Packages
+-----------------------------------
+
+One option is to not allow different dependencies depending on the ROS version.
+For example, a package that depends on `roscpp` in ROS 1 and `rclcpp` in ROS 2 would depend on `roscpp`.
+ROS 2 would have a dummy packcage called `roscpp` that depended on `rclcpp`.
+That would allow all downstream packages to use a single name as their dependency.
+
+This option was not chosen because it would be burdensome to create dummy packages for every naming difference between ROS 1 and ROS 2.
+It is even more cumbersome if a package needs to declare a dependency only in one of the ROS versions.
+There would be a dummy package in both ROS version where one is empty and the other declares a dependency.
+
+.. raw:: html
+
+  </font>
 
 ..
    Local Variables:
