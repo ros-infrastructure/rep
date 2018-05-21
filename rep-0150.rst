@@ -65,10 +65,12 @@ It may not contain any GUI dependencies.
 ::
 
  - ros_core:
-      packages: [catkin, cmake_modules, common_msgs, gencpp, geneus, genlisp,
-                 genmsg, gennodejs, genpy, message_generation, message_runtime,
-                 ros, ros_comm, rosbag_migration_rule, rosconsole_bridge,
-                 roscpp_core, rosgraph_msgs, roslisp, rospack, std_msgs, std_srvs]
+      packages: [catkin, cmake_modules, class_loader, common_msgs, gencpp,
+                 geneus, genlisp, genmsg, gennodejs, genpy, message_generation,
+                 message_runtime, pluginlib, ros, ros_comm,
+                 rosbag_migration_rule, rosconsole, rosconsole_bridge,
+                 roscpp_core, rosgraph_msgs, roslisp, rospack, std_msgs,
+                 std_srvs]
 
 ROS Base
 ''''''''
@@ -81,9 +83,7 @@ It may not contain any GUI dependencies.
 
   - ros_base:
       extends: [ros_core]
-      packages: [actionlib, bond_core, class_loader,
-                 dynamic_reconfigure, nodelet_core,
-                 pluginlib]
+      packages: [actionlib, bond_core, dynamic_reconfigure, nodelet_core]
 
 Robot metapackage
 '''''''''''''''''
