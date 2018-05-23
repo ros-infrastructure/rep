@@ -157,7 +157,7 @@ Package manager use for dependencies:
 
 Build System Support:
 
-- ament
+- ament_cmake
 - cmake
 - setuptools
 
