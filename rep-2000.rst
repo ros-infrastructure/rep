@@ -89,7 +89,7 @@ Middleware Implementation Support:
 
 - eProsima Fast-RTPS
 - RTI Connext
-- ADLink Opensplice
+- ADLink OpenSplice
 
 
 Bouncy Bolson (June 2018 - June 2019)
@@ -165,7 +165,7 @@ Middleware Implementation Support:
 
 - eProsima Fast-RTPS
 - RTI Connext
-- ADLink Opensplice
+- ADLink OpenSplice
 
 Motivation
 ==========
