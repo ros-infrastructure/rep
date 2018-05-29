@@ -873,7 +873,7 @@ architecture-dependent targets to a formerly independent package.
   <font color="red">
 
 <build_type> (multiple)
-''''''''''''
+'''''''''''''''''''''''
 
 .. raw:: html
 
