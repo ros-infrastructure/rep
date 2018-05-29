@@ -91,7 +91,7 @@ In order for a ROS package to work with ROS 1 and ROS 2 from a single source
 the dependencies listed in the package manifest are a problem.
 E.g. in ROS 1 a package needs to depend on `roscpp` where as in ROS 2 it needs
 to depend on `rclcpp`.
-This ammends the manifest to support this use case.
+This amends the manifest to support this use case.
 
 The necessary part outside of the manifest to make a package compatible with
 ROS 1 as well as ROS 2 is explicitly not part of this document.
