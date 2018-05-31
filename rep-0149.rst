@@ -895,6 +895,11 @@ configures and builds a different kind of workspace in which
 ``cmake``, ``make``, and ``make install`` are invoked separately for
 each package.  See REP-0134 for details.
 
+Only one build type should be active after conditions are evaluated.
+If multiple are active then the tool should use the last supported build type.
+If it is not possible to determine which build types are supported then the
+last build type is to be used.
+
 Further build types may eventually be defined, such as: "make",
 "autotools", "rosbuild", or "custom".
 
@@ -906,8 +911,6 @@ Attributes
 ..........
 
  The `condition` attribute as defined for `\<build_depend\> (multiple)`_.
- Only one build type should be active after conditions are evaluated.
- If multiple types are active then the behavior is undefined.
 
 .. raw:: html
 
