@@ -84,20 +84,21 @@ In order to allow package releases without enforcing a rebuild of all
 downstream packages a package should be able to declare if such a rebuild
 is necessary or not.
 
-Dependencies across ROS 1 and ROS 2
+Packages across ROS 1 and ROS 2
 -----------------------------------
 
 In order for a ROS package to work with ROS 1 and ROS 2 from a single source
 the dependencies listed in the package manifest are a problem.
 E.g. in ROS 1 a package needs to depend on `roscpp` where as in ROS 2 it needs
 to depend on `rclcpp`.
-Currently the manifest doesn't support this use case and requires two different
-code bases (usually two separate branches).
+This amends the manifest to support this use case.
 
 The necessary part outside of the manifest to make a package compatible with
 ROS 1 as well as ROS 2 is explicitly not part of this document.
 In general it is possible to conditionally handle those cases in programming
 languages like CMake, C++, Python, etc.
+
+See `Alternatives for Universal Packages`_ for options not chosen.
 
 .. raw:: html
 
@@ -178,44 +179,21 @@ Therefore the need to avoid unnecessary rebuilds has increased.
 It is also desired to be able to encourage more frequent releases if they
 don't require downstream packages to be rebuilt.
 
-Dependencies across ROS 1 and ROS 2
+Packages across ROS 1 and ROS 2
 -----------------------------------
 
-The differences in dependencies in ROS 1 and ROS 2 could be handled in various
-ways.
+In order for a ROS package to work with ROS 1 and ROS 2 from a single source
+the manifest must describe the package's requirements for both cases.
+This means describing different dependencies (`rclcpp` vs `roscpp`), and
+possibly a different build type (`catkin` vs `ament_cmake`).
 
-Use the same package names
-''''''''''''''''''''''''''
+The ``condition`` attribute as defined for `\<build_depend\> (multiple)`_ is
+intended to satisfy this use case.
+A package may define one manifest where all tags supporting the `condition`
+attribute are conditioned on the environment variable `ROS_VERSION`.
+The value is a string with an integer: **1** or **2**.
 
-One option (A) would be to not allow different dependencies depending on the
-ROS version.
-That would imply that for the previously described example of `roscpp` and
-`rclcpp` a "dummy" package could be provided to provide the same package names.
-This could be either a ROS 1 package named `rclcpp` which simply depends on
-`roscpp` or a ROS 2 package named `roscpp` which depends on `rclcpp`.
-That would allow all downstream packages to use a single name as their
-dependency.
-While that would be possible it would require dummy packages for every naming
-difference between ROS 1 and ROS 2.
-
-But option (A) would become even more cumbersome if a package needs to declare
-a dependency only in one of the ROS versions.
-It would require a dummy package in both ROS version where as in one of them
-the dummy would be empty and in the other it would declare a dependency.
-
-Annotate dependencies
-'''''''''''''''''''''
-
-Another option (B) is to annotate the dependencies in the manifest if they are
-specific to a ROS version.
-The annotation could happen in various ways in the markup.
-One way is an optional attribute for each dependency tag.
-Another way would be a new conditional tag under which one or multiple
-dependency tags would be grouped.
-In case a dependency doesn't have such an annotation it is being used
-unconditionally.
-
-In this case various tools will need to be aware of the condition choosing
+Various tools will need to be aware of the condition responsible for choosing
 which dependencies should be used:
 
  * `bloom`
@@ -223,10 +201,8 @@ which dependencies should be used:
  * `rosinstall_generator`
  * the build tool
 
-The first three tools are all operating on a specific ROS distribution.
-Assume that a ROS distribution "knows" which ROS version it represents (which
-would require adding a new field to the distribution file specified in REP 143
-[16]_) the necessary information should be available to decide the condition.
+A new field must be added to the distribution file specified in REP 143
+[16]_ so that a ROS distribution "knows" which ROS version it represents.
 
 The build tool does not have access to the ROS distribution metadata.
 It could either use information provided by an environment variable or fall
@@ -892,8 +868,16 @@ It is not appropriate for any package which compiles C or C++ code.
 Be sure to remove this tag if some subsequent update adds
 architecture-dependent targets to a formerly independent package.
 
-<build_type>
-''''''''''''
+.. raw:: html
+
+  <font color="red">
+
+<build_type> (multiple)
+'''''''''''''''''''''''
+
+.. raw:: html
+
+  </font>
 
 Various tools use this tag to determine how to handle a package.  It
 was defined in REP-0134 [10]_, which currently specifies only two
@@ -911,9 +895,24 @@ configures and builds a different kind of workspace in which
 ``cmake``, ``make``, and ``make install`` are invoked separately for
 each package.  See REP-0134 for details.
 
+Only one build type should be active after conditions are evaluated.
+If multiple are active then the last build type is to be used.
+
 Further build types may eventually be defined, such as: "make",
 "autotools", "rosbuild", or "custom".
 
+.. raw:: html
+
+  <font color="red">
+
+Attributes
+..........
+
+ The `condition` attribute as defined for `\<build_depend\> (multiple)`_.
+
+.. raw:: html
+
+  </font>
 
 <deprecated>
 ''''''''''''
@@ -1149,7 +1148,28 @@ Copyright
 
 This document has been placed in the public domain.
 
+.. raw:: html
 
+  <font color="red">
+
+Appendix
+========
+
+Alternatives for Universal Packages
+-----------------------------------
+
+One option is to not allow different dependencies depending on the ROS version.
+For example, a package that depends on `roscpp` in ROS 1 and `rclcpp` in ROS 2 would depend on `roscpp`.
+ROS 2 would have a dummy packcage called `roscpp` that depended on `rclcpp`.
+That would allow all downstream packages to use a single name as their dependency.
+
+This option was not chosen because it would be burdensome to create dummy packages for every naming difference between ROS 1 and ROS 2.
+It is even more cumbersome if a package needs to declare a dependency only in one of the ROS versions.
+There would be a dummy package in both ROS version where one is empty and the other declares a dependency.
+
+.. raw:: html
+
+  </font>
 
 ..
    Local Variables:
