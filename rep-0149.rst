@@ -896,9 +896,7 @@ configures and builds a different kind of workspace in which
 each package.  See REP-0134 for details.
 
 Only one build type should be active after conditions are evaluated.
-If multiple are active then the tool should use the last supported build type.
-If it is not possible to determine which build types are supported then the
-last build type is to be used.
+If multiple are active then the last build type is to be used.
 
 Further build types may eventually be defined, such as: "make",
 "autotools", "rosbuild", or "custom".
