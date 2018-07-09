@@ -1,7 +1,7 @@
 REP: 149
 Title: Package Manifest Format Three Specification
 Author: Dirk Thomas
-Status: Draft
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Oct-2017
@@ -21,8 +21,8 @@ Outline
 
 .. raw:: html
 
-  The current draft highlights significant changes compared to REP-0140 [2]_
-  in <font color="red">red</font>.
+  Significant changes compared to REP-0140 [2]_ are highlighted in
+  <font color="red">red</font>.
   Trivial changes appear in <font color="blue">blue</font>.
 
 
