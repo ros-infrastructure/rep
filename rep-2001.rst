@@ -52,9 +52,17 @@ It may not contain any GUI dependencies.
 
  - ros_core:
       packages: [ament_cmake, ament_cmake_ros, ament_index, ament_lint,
-                 ament_package, class_loader, common_interfaces, launch,
-                 pluginlib, rcl, rclcpp, rclpy, rcutils, rmw, ros2cli,
-                 ros_environment]
+                 ament_package, class_loader, common_interfaces,
+                 console_bridge, googletest, launch, libyaml_vendor,
+                 osrf_testing_tools_cpp, osrf_pycommon, pluginlib,
+                 poco_vendor, rcl, rcl_interfaces, rclcpp, rclpy,
+                 rcutils, rmw, rmw_implementation, ros2cli, rosidl,
+                 rosidl_dds, rosidl_defaults, rosidl_python,rosidl_typesupport,
+                 ros_environment, tinyxml2_vendor, uncrustify]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
 
 
 ROS Base
@@ -68,7 +76,9 @@ It may not contain any GUI dependencies.
 
   - ros_base:
       extends: [ros_core]
-      packages: [geometry2, robot_state_publisher, urdf]
+      packages: [geometry2, kdl_parser, orocos_kinematics_dynamics,
+                 robot_state_publisher, tinyxml_vendor, urdf, urdfdom,
+                 urdfdom_headers]
 
 
 Desktop variants
@@ -81,9 +91,12 @@ It provides all commonly used libraries as well as visualization tools and tutor
 
   - desktop:
       extends: [ros_base]
-      packages: [angles, cartographer_ros, demos, depthimage_to_laserscan,
-                 examples, joystick_drivers, navigation, ros_astra_camera,
-                 rviz, sros2, teleop_twist_joy, teleop_twist_keyboard,
+      packages: [angles, cartographer, cartographer_ros, demos,
+                 depthimage_to_laserscan, example_interfaces, examples,
+                 joystick_drivers, laser_geometry, navigation,
+                 navigation_msgs, pcl_conversions, realtime_support,
+                 resource_retriever, ros_astra_camera, rviz, sros2,
+                 teleop_twist_joy, teleop_twist_keyboard, tlsf,
                  vision_opencv]
 
 
