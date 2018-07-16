@@ -120,7 +120,7 @@ References
 .. [1] REP 108: Diamondback Variants
    (http://www.ros.org/reps/rep-0108.html)
 
-.. [2] ROS Variantsa Repository
+.. [2] ROS Variants Repository
    (https://github.com/ros2/variants)
 
 
