@@ -81,9 +81,10 @@ It provides all commonly used libraries as well as visualization tools and tutor
 
   - desktop:
       extends: [ros_base]
-      packages: [cartographer_ros, demos, depthimage_to_laserscan, examples,
-                 joystick_drivers, navigation, ros_astra_camera, rviz, sros2,
-                 teleop_twist_joy, teleop_twist_keyboard, vision_opencv]
+      packages: [angles, cartographer_ros, demos, depthimage_to_laserscan,
+                 examples, joystick_drivers, navigation, ros_astra_camera,
+                 rviz, sros2, teleop_twist_joy, teleop_twist_keyboard,
+                 vision_opencv]
 
 
 Institution-specific and robot-specific
