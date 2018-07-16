@@ -53,7 +53,7 @@ It may not contain any GUI dependencies.
  - ros_core:
       packages: [ament_cmake, ament_cmake_ros, ament_index, ament_lint,
                  ament_package, class_loader, common_interfaces, launch,
-                 rcl, rclcpp, rclpy, ros2cli, ros_environment]
+                 pluginlib, rcl, rclcpp, rclpy, ros2cli, ros_environment]
 
 
 ROS Base
