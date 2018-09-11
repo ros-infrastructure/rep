@@ -54,10 +54,10 @@ It may not contain any GUI dependencies.
       packages: [ament_cmake, ament_cmake_ros, ament_index, ament_lint,
                  ament_package, class_loader, common_interfaces,
                  console_bridge, googletest, launch, libyaml_vendor,
-                 osrf_testing_tools_cpp, osrf_pycommon, pluginlib,
+                 osrf_pycommon, osrf_testing_tools_cpp, pluginlib,
                  poco_vendor, rcl, rcl_interfaces, rclcpp, rclpy,
                  rcutils, rmw, rmw_implementation, ros2cli, rosidl,
-                 rosidl_dds, rosidl_defaults, rosidl_python,rosidl_typesupport,
+                 rosidl_dds, rosidl_defaults, rosidl_python, rosidl_typesupport,
                  ros_environment, tinyxml2_vendor, uncrustify]
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
