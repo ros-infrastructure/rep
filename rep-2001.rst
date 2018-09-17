@@ -1,11 +1,11 @@
 REP: 2001
 Title: ROS Bouncy and Newer Variants
 Author: Tully Foote <tfoote@openrobotics.org>, Mikael Arguedas <mikael@openrobotics.org>
-Status: Draft
+Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 16-Jul-2018
-Post-History:
+Post-History: 17-Sep-2018
 
 
 Abstract
