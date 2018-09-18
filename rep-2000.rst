@@ -268,15 +268,15 @@ Build System Support:
 Middleware Implementation Support:
 
 - eProsima Fast-RTPS
-  Version: TBD
+  Version: latest, TBD
   Tier 1 support on all Tier 1 platforms and architectures.
 
 - RTI Connext
-  Version: 5.3.1
+  Version: latest, TBD
   Tier 1 support on all Tier 1 platforms and architectures except arm64.
 
 - ADLink OpenSplice
-  Version: 6.7
+  Version: latest, TBD
   Tier 2 support on all Tier 1 and Tier 2 platforms and architectures.
 
 Motivation
