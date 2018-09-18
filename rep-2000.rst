@@ -252,11 +252,9 @@ These versions are thus a low watermark.
 
 Package manager use for dependencies:
 
-- Ubuntu Bionic: apt
+- Ubuntu, Debian: apt
 - MacOS: Homebrew, pip
 - Windows: Chocolatey, pip
-- Ubuntu Xenial: apt
-- Debian Stretch: apt
 
 
 Build System Support:
