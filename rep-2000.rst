@@ -175,16 +175,34 @@ Middleware Implementation Support:
 Crystal Clemmys (December 2018 - December 2019)
 -------------------------------------
 
+Support Tiers:
+
+Tier 1
+
+Tier 1 platforms are subjected to our unit test suite and other internal testing tools on a frequent basis including continuous integration jobs, nightly jobs, packaging jobs, and performance testing.
+Errors or bugs discovered in these platforms are prioritized for correction by the development team.
+Significant errors discovered in Tier 1 platforms can impact release dates and we strive to resolve all known high priority errors in Tier 1 platforms prior to new version releases.
+
+Tier 2
+
+Tier 2 platforms are subject to ad hoc and internal testing and binary packages or archives may not be provided or supported.
+However users should note that errors may be present in released product versions for Tier 2 platforms and, subject to resource availability, known errors in Tier 2 platforms may or may not be corrected prior to new version releases.
+
+Tier 3
+
+All platforms not specifically listed above are not supported by us.
+We neither run the unit test suite nor perform any other internal tests on platforms not listed above.
+We expect installation instructions to be present and up-to-date in order for a platform to be listed in this category.
+Other community members might provide assistance with these platforms.
+
 Targeted platforms:
 
-+--------------+-----------------------------------------------------------------------------------------------------------+------------------------+
-|              |                                              Required Support                                             |  Recommended Support   |
 +--------------+-----------------------+------------------------------+------------------------+---------------------------+------------------------+
 | Architecture | Ubuntu Bionic (18.04) |     MacOS Sierra (10.12)     |   Windows 10 (VS2017)  | Ubuntu Xenial (16.04) [s] | Debian Stretch (9) [s] |
 +==============+=======================+==============================+========================+===========================+========================+
-|    amd64     |          X            |             X                |          X             |             X [s]         |         X [s]          |
+|    amd64     |        Tier 1         |           Tier 1             |          Tier 1        |           Tier 2          |        Tier 3          |
 +--------------+-----------------------+------------------------------+------------------------+---------------------------+------------------------+
-|    arm64     |          X            |                              |                        |             X [s]         |         X [s]          |
+|    arm64     |        Tier 1         |                              |                        |           Tier 2          |        Tier 3          |
 +--------------+-----------------------+------------------------------+------------------------+---------------------------+------------------------+
 
 " [s] " Compilation from source, the ROS buildfarm will not produce any binary packages for these platforms.
@@ -248,11 +266,18 @@ Build System Support:
 - setuptools
 
 Middleware Implementation Support:
-*TODO(nuclearsandwich) should we put version numbers on the middleware support?*
 
 - eProsima Fast-RTPS
+  Version: TBD
+  Tier 1 support on all Tier 1 platforms and architectures.
+
 - RTI Connext
+  Version: 5.3.1
+  Tier 1 support on all Tier 1 platforms and architectures except arm64.
+
 - ADLink OpenSplice
+  Version: 6.7
+  Tier 2 support on all Tier 1 and Tier 2 platforms and architectures.
 
 Motivation
 ==========
