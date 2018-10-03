@@ -201,10 +201,14 @@ Targeted platforms:
 +--------------+-----------------------+------------------------------+------------------------+---------------------------+------------------------+
 | Architecture | Ubuntu Bionic (18.04) |     MacOS Sierra (10.12)     |   Windows 10 (VS2017)  | Ubuntu Xenial (16.04) [s] | Debian Stretch (9) [s] |
 +==============+=======================+==============================+========================+===========================+========================+
-|    amd64     |        Tier 1         |           Tier 1             |          Tier 1        |           Tier 2          |        Tier 3          |
+|    amd64     |        Tier 1         |           Tier 1*            |          Tier 1*       |           Tier 2          |        Tier 3          |
 +--------------+-----------------------+------------------------------+------------------------+---------------------------+------------------------+
 |    arm64     |        Tier 1         |                              |                        |           Tier 2          |        Tier 3          |
 +--------------+-----------------------+------------------------------+------------------------+---------------------------+------------------------+
+
+
+" * " Individual binary packages are not currently available for these platforms.
+Binary releases are provided in the form of {comprehensive,omnibus} (TODO: choose a word here that isn't "fat") archives.
 
 " [s] " Compilation from source, the ROS buildfarm will not produce any binary packages for these platforms.
 
