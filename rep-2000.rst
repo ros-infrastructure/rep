@@ -185,7 +185,8 @@ Significant errors discovered in Tier 1 platforms can impact release dates and w
 
 Tier 2
 
-Tier 2 platforms are subject to ad hoc testing and binary packages or archives may not be provided or supported.
+Tier 2 platforms are subject to ad hoc testing and binary packages may not be provided or supported.
+Tier 2 platforms may have downloadable binary archives
 However users should note that errors may be present in released product versions for Tier 2 platforms and, subject to resource availability, known errors in Tier 2 platforms may or may not be corrected prior to new version releases.
 
 Tier 3
