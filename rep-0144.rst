@@ -31,44 +31,55 @@ Some of those rules are mandatory, others merely advised.
 Package Naming
 ==============
 
-Mandatory Rules
----------------
-
 By habit, a package name is often used as a namespace (in C++ or any other language).
 Thus, the naming rules have to be strict.
 
+Definitions
+-----------
+
 * ``alphanumerics`` are ``a-z0-9`` only
 * ``alphabetics`` are ``a-z`` only
-* it must only consist of alphanumerics and ``_`` separators.
-  Other symbols might not be supported by some OSes (e.g. unicode characters) or would
-  make it hard to follow OSes conventions.
-  Do not use multiple ``_`` separators consecutively. 
-  This allows generated symbols to be guarenteed not to collide with package names.
-* they must be at least two characters long and must start with an alphabetic character.
+
+For clarity these are both specifically exclusively lowercase.
+
+
+Mandatory Rules
+---------------
+
+**A name must:**
+
+* **only consist of alphanumerics and _ separators and start with an alphabetic character.**
+  This allows it to be used in generated symbols and functions in all supported languages.
+* **not use multiple _ separators consecutively.**
+  This allows generated symbols to use the ``__`` separator to guarenteed the avoidance
+  of collisions with symbols from other packages, for example in the message generators.
+* **be at least two characters long.**
   This rule is simply to force the name of the package to be more human understandable.
+  It's recommended to be noteably longer, see below.
 
 Global Rules
 ------------
 
-* package names should be specific enough to identify what the package does.
+* **Package names should be specific enough to identify what the package does.**
   For example, a motion planner should not be called ``planner``.
   If it implements the wavefront propagation algorithm, it might be called
   ``wavefront_planner``.
   There's obviously tension between making a name specific and keeping it from becoming
   overly verbose
-* using catchall names such as ``utils`` should be avoided as they do not scope what goes
+* **Using catchall names such as** ``utils`` **should be avoided.** They do not scope what goes
   into the package or what should be outside the package
-* a package name should not contain ``ros`` as it is redundant.
+* **A package name should not contain** ``ros`` **as it is redundant.**
   Exceptions include core packages and ROS bindings of an upstream library
   (e.g. ``moveit_ros``)
-* one of ROS's goals is to develop a canonical set of tools for making robots do
+* **The package name should describe what the package does, not where it came from.**
+  One of ROS's goals is to develop a canonical set of tools for making robots do
   interesting things.
-  The package name should describe what the package does, not where it came from.
   Then again, as stated in the rules below, ``if a package is specialized
   by an entity (lab, company, ...), prepend the name of the entity``.
   But once the package is commonly used, owned and maintained, that name can be dropped
   as the package becomes the reference
-* to check whether a name is taken, consult [2]_. If you'd like your
+* **Do not use a name that's already been taken.** 
+  To check whether a name is taken, consult [2]_. If you'd like your
   repository included in that list, see the tutorial at [3]_
 
 Naming Rules
