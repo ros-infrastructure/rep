@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 28-Jan-2015
-Post-History:
+Post-History: 17-Oct-2018
 
 Abstract
 ========
@@ -50,6 +50,8 @@ Mandatory Rules
 
 * **only consist of alphanumerics and _ separators and start with an alphabetic character.**
   This allows it to be used in generated symbols and functions in all supported languages.
+  Lowercase is required because the names are used in directories and filenames and some
+  platforms do not have case sensitive filesystems.
 * **not use multiple _ separators consecutively.**
   This allows generated symbols to use the ``__`` separator to guarenteed the avoidance
   of collisions with symbols from other packages, for example in the message generators.
