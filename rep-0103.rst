@@ -131,7 +131,7 @@ In the case of cameras, there is often a second frame defined with a
 * x right
 * y down
 
-For outdoor systems where it is desireable to work under the
+For outdoor systems where it is desirable to work under the
 `north east down`_ (NED) convention, define an appropriately transformed
 secondary frame with the "_ned" suffix:
 
