@@ -1,0 +1,94 @@
+REP: 153
+Title: ROS distribution files
+Author: Dirk Thomas <dthomas@osrfoundation.org>
+Status: Final
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 27-Oct-2018
+Post-History: 27-Oct-2018
+
+
+.. contents::
+
+Abstract
+========
+This REP updates the specification of the ROS distribution files facilitated in
+the building, packaging, testing and documenting process.
+
+The intention is to annotate ROS version with their major version (``1`` or
+``2``) and avoid the need to externally define and update a classification of
+ROS distribution names as ROS 1 or ROS 2.
+
+This REP is a revised version of REP 143 [1]_.
+It currently does not repeat the content of REP 143 but only states the
+differences.
+
+
+Specification
+=============
+
+Index file
+----------
+
+* distributions
+
+  * distribution:
+
+    * ros_version: an optional integer describing the major version of ROS
+      (either ``1`` or ``2``). If not set the value defaults to ``1``.
+
+    The files are read in the order they are listed and entries in later
+    distribution files are overwriting entries from previous distribution
+    files.
+    This can be used to override specific repositories with either a forked
+    variant or a specific version number.
+    ``bloom`` will create pull requests against the last distribution file
+    since even when the repository is present in any of the other distribution
+    files the "overlaying" version should be stored in the last one.
+
+  * release_builds / source_builds / doc_builds: are being removed since they
+    only contain information relevant to the buildfarm
+
+* version: version number, this REP describes version 4 (instead of version 3
+  described in REP 143 [1]_, version 2 described in REP 141 [2]_ and version 1
+  described in REP 137 [3]_)
+
+
+Reference implementation
+------------------------
+This REP is to be implemented in version 0.7 of the Python package *rosdistro*.
+It will serve as a reference implementation for this REP.
+A draft implementation can be found in [4]_.
+
+
+Compatibility issues
+====================
+
+The draft implementation of rosdistro is able to parse multiple index format
+versions: 2, 3 as well as 4.
+
+As soon as the new version of 'rosdistro' is released and the ROS 2
+distributions have been moved from the forked repository into the
+'ros/rosdistro' repository [5]_ the new field is being used to annotate the ROS
+2 distributions.
+Any client accessing trying to access the data with an old 'rosdistro'
+version will get an error message like this:
+
+::
+
+  Unable to handle 'index' format version '4', please update rosdistro...
+
+
+References
+==========
+.. [1] REP 143: http://www.ros.org/reps/rep-0143.html
+.. [2] REP 141: http://www.ros.org/reps/rep-0141.html
+.. [3] REP 137: http://www.ros.org/reps/rep-0137.html
+.. [4] Patch to python-rosdistro:
+  https://github.com/ros-infrastructure/rosdistro/pull/124
+.. [5] ROS distro: https://github.com/ros/rosdistro/
+
+
+Copyright
+=========
+This document has been placed in the public domain.
