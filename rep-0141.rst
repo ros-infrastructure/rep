@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 18-Dec-2013
-Post-History: 18-Dec-2013
+Post-History: 18-Dec-2013, 27-Oct-2018
 
 .. contents::
 
@@ -155,6 +155,8 @@ The information stored in the index file is:
   * release_cache: reference to a release cache. Whether this field is
     a dictionary, a list or a scalar is left as an implementation detail. The
     following examples will assume that the implementation necessitates an url.
+  * ros_version: an optional integer describing the major version of ROS (either ``1`` or ``2``).
+    If not set the value defaults to ``1``.
   * source_builds: list of references to the source-build files used to run the tests
   * doc_builds: list of references to the doc-build files used to run the documentation
 
@@ -178,6 +180,7 @@ doc files and their corresponding build files.
       distribution: groovy/distribution.yaml
       release_builds: [groovy/release-build-ubuntu.yaml, releases/release-build-arm.yaml]
       release_cache: http://www.example.com/groovy-cache
+      ros_version: 1
       source_builds: [groovy/source-build.yaml]
       doc_builds: [groovy/doc-build.yaml]
     hydro:
