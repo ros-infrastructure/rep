@@ -71,7 +71,7 @@ As soon as the new version of 'rosdistro' is released and the ROS 2
 distributions have been moved from the forked repository into the
 'ros/rosdistro' repository [5]_ the new field is being used to annotate the ROS
 2 distributions.
-Any client accessing trying to access the data with an old 'rosdistro'
+Any client trying to access the data with an old 'rosdistro'
 version will get an error message like this:
 
 ::
