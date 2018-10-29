@@ -19,7 +19,7 @@ The intention is to annotate ROS version with their major version (``1`` or
 ``2``) and avoid the need to externally define and update a classification of
 ROS distribution names as ROS 1 or ROS 2.
 
-This REP is a revised version of REP 143 [1]_.
+This REP is an extension to the file format defined in REP 143[1]_.
 It currently does not repeat the content of REP 143 but only states the
 differences.
 
