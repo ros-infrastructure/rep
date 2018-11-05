@@ -29,7 +29,7 @@ Motivation
 
 For the following use cases additional metadata is currently necessary:
 
-A. The ROS buildfarm has to distinguish ROS 1 distributions from ROS 2
+1. The ROS buildfarm has to distinguish ROS 1 distributions from ROS 2
    distributions because they require different dependencies to build a
    workspace.
    E.g. for ROS 1 workspaces ``catkin`` needs to be installed - even
@@ -39,7 +39,7 @@ A. The ROS buildfarm has to distinguish ROS 1 distributions from ROS 2
    setup files for the workspace and therefore the environment necessary to
    find resources.
 
-B. The ROS wiki shows the list of currently active ROS distributions.
+2. The ROS wiki shows the list of currently active ROS distributions.
    Since the ``rosdistro`` contains all ROS distros - EOLed ones as well as
    upcoming distributions before their release date.
 
@@ -61,7 +61,7 @@ Index file
 
     * distribution_status: an optional string describing the status of a ROS
       distribution.
-      For the use case *B.* the semantic of the following values is defined:
+      For the use case *2.* the semantic of the following values is defined:
 
       * ``prerelease``: An upcoming distribution which hasn't been released yet
       * ``active``: A distribution which has been released and is actively
@@ -70,7 +70,7 @@ Index file
 
     * distribution_type: an optional string describing the type of the ROS
       distribution.
-      For use case *A.* the values ``ros1`` and ``ros2`` will be used to
+      For use case *1.* the values ``ros1`` and ``ros2`` will be used to
       distinguish the major ROS version.
 
 * version: version number, this REP describes version 4 (instead of version 3
