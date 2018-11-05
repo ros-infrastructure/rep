@@ -33,10 +33,11 @@ A. The ROS buildfarm has to distinguish ROS 1 distributions from ROS 2
    distributions because they require different dependencies to build a
    workspace.
    E.g. for ROS 1 workspaces ``catkin`` needs to be installed - even
-   for plain CMake packages - since the tool ``catkin_make_isolated`` is
-   provided by it.
-   For ROS 2 the package ``ros_workspace`` needs it provides the setup files
-   for the workspace and therefore the environment necessary to find resources.
+   for plain CMake packages - since it provides the workspace level setup
+   files.
+   For ROS 2 the package ``ros_workspace`` is needed since it provides the
+   setup files for the workspace and therefore the environment necessary to
+   find resources.
 
 B. The ROS wiki shows the list of currently active ROS distributions.
    Since the ``rosdistro`` contains all ROS distros - EOLed ones as well as
