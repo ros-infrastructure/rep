@@ -15,9 +15,9 @@ Abstract
 This REP updates the specification of the ROS distribution files facilitated in
 the building, packaging, testing and documenting process.
 
-The intention is to annotate a ROS distribution with more information (like the
-"major" version (``1`` or ``2``) to avoid the need to externally define and
-update these metadata.
+The intention is to annotate a ROS distribution with more information,
+such as whether the distribution should use ROS 1 or ROS 2 semantics,
+to avoid the need to externally define and update these metadata.
 
 This REP is an extension to the file format defined in REP 143[1]_.
 It currently does not repeat the content of REP 143 but only states the
