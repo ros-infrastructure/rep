@@ -73,6 +73,11 @@ Index file
       For use case *1.* the values ``ros1`` and ``ros2`` will be used to
       distinguish the major ROS version.
 
+    As of version 4 unknown keys should be ignored (instead of resulting in an
+    error).
+    This will allow future additions in a backward compatible way without the
+    need to bump the version of the file.
+
 * version: version number, this REP describes version 4 (instead of version 3
   described in REP 143 [1]_, version 2 described in REP 141 [2]_ and version 1
   described in REP 137 [3]_)
