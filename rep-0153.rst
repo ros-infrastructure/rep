@@ -134,7 +134,7 @@ References
 .. [4] Patch to python-rosdistro:
   https://github.com/ros-infrastructure/rosdistro/pull/124
 .. [5] bloom asserting the index file version: https://github.com/ros-infrastructure/bloom/blob/d8be9d1d3469f00f936ad6e4869b847c5a6f8962/bloom/commands/release.py#L221-L223
-.. [8] bloom PR to support v4 https://github.com/ros-infrastructure/bloom/pull/493
+.. [6] bloom PR to support v4 https://github.com/ros-infrastructure/bloom/pull/493
 
 
 Copyright
