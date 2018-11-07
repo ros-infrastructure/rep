@@ -90,23 +90,41 @@ It will serve as a reference implementation for this REP.
 A draft implementation can be found in [4]_.
 
 
-Compatibility issues
-====================
+Compatibility considerations
+============================
 
 The draft implementation of rosdistro is able to parse multiple index format
 versions: 2, 3 as well as 4.
 
-As soon as the new version of 'rosdistro' is released and the ROS 2
-distributions have been moved from the forked repository into the
-'ros/rosdistro' repository [5]_ the new field is being used to annotate the ROS
-2 distributions.
-Any client trying to access the data with an old 'rosdistro'
-version will get an error message like this:
+If the version of the existing ``index.yaml`` file would be bumped that would
+require every user to update to the latest version of the Python package
+``rosdistro``.
+While generating some friction it is especially a problem on some systems (e.g.
+Debian) which might not provide a newer version in stable distributions.
 
-::
+Therefore the existing index file isn't being changed but a sibling file named
+``index-v4.yaml`` is being added.
+The file has the same content except that is uses version 4 as specified in
+this document and includes the additional metadata fields.
 
-  Unable to handle 'index' format version '4', please update rosdistro...
+To make use of the new index file the new version of the Python package will
+update the default URL to point to the v4 file.
 
+This provides a smooth transition for all users: users using the old version of
+the Python package can continue to use it as is, users updating to the newer
+version will benefit from the additional metadata.
+Python code using the ``rosdistro`` API can easily check if the metadata is
+present and if yes use it.
+If desired other Python packages can explicily depend on the newer version to
+ensure the v4 index is being used.
+
+bloom
+-----
+
+Beside using the ``rosdistro`` API ``bloom`` also includes an explicit check
+for the version of the index file [5]_.
+Therefore a new patch release of ``bloom`` is required to also support the new
+version 4 [6]_.
 
 References
 ==========
@@ -115,7 +133,8 @@ References
 .. [3] REP 137: http://www.ros.org/reps/rep-0137.html
 .. [4] Patch to python-rosdistro:
   https://github.com/ros-infrastructure/rosdistro/pull/124
-.. [5] ROS distro: https://github.com/ros/rosdistro/
+.. [5] bloom asserting the index file version: https://github.com/ros-infrastructure/bloom/blob/d8be9d1d3469f00f936ad6e4869b847c5a6f8962/bloom/commands/release.py#L221-L223
+.. [8] bloom PR to support v4 https://github.com/ros-infrastructure/bloom/pull/493
 
 
 Copyright
