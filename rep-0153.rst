@@ -1,0 +1,142 @@
+REP: 153
+Title: ROS distribution files
+Author: Dirk Thomas <dthomas@osrfoundation.org>
+Status: Final
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 27-Oct-2018
+Post-History: 09-Nov-2018
+
+
+.. contents::
+
+Abstract
+========
+This REP updates the specification of the ROS distribution files facilitated in
+the building, packaging, testing and documenting process.
+
+The intention is to annotate a ROS distribution with more information,
+such as whether the distribution should use ROS 1 or ROS 2 semantics,
+to avoid the need to externally define and update these metadata.
+
+This REP is an extension to the file format defined in REP 143[1]_.
+It currently does not repeat the content of REP 143 but only states the
+differences.
+
+
+Motivation
+==========
+
+For the following use cases additional metadata is currently necessary:
+
+1. The ROS buildfarm has to distinguish ROS 1 distributions from ROS 2
+   distributions because they require different dependencies to build a
+   workspace.
+   E.g. for ROS 1 workspaces ``catkin`` needs to be installed - even
+   for plain CMake packages - since it provides the workspace level setup
+   files.
+   For ROS 2 the package ``ros_workspace`` is needed since it provides the
+   setup files for the workspace and therefore the environment necessary to
+   find resources.
+
+2. The ROS wiki shows the list of currently active ROS distributions.
+   Since the ``rosdistro`` contains all ROS distros - EOLed ones as well as
+   upcoming distributions before their release date.
+
+In both cases the missing metadata is currently being hard coded in the source
+code and needs to be updated with every new ROS release.
+Therefore this REP aims to add the necessary metadata about a ROS distribution
+into the ``rosdistro`` instead.
+
+
+Specification
+=============
+
+Index file
+----------
+
+* distributions
+
+  * distribution:
+
+    * distribution_status: an optional string describing the status of a ROS
+      distribution.
+      For the use case *2.* the semantic of the following values is defined:
+
+      * ``prerelease``: An upcoming distribution which hasn't been released yet
+      * ``active``: A distribution which has been released and is actively
+        being supported
+      * ``end-of-life``: A distribution which has reached its end of life
+
+    * distribution_type: an optional string describing the type of the ROS
+      distribution.
+      For use case *1.* the values ``ros1`` and ``ros2`` will be used to
+      distinguish the major ROS version.
+
+    As of version 4 unknown keys should be ignored (instead of resulting in an
+    error).
+    This will allow future additions in a backward compatible way without the
+    need to bump the version of the file.
+
+* version: version number, this REP describes version 4 (instead of version 3
+  described in REP 143 [1]_, version 2 described in REP 141 [2]_ and version 1
+  described in REP 137 [3]_)
+
+
+Reference implementation
+------------------------
+This REP is to be implemented in version 0.7 of the Python package *rosdistro*.
+It will serve as a reference implementation for this REP.
+A draft implementation can be found in [4]_.
+
+
+Compatibility considerations
+============================
+
+The draft implementation of rosdistro is able to parse multiple index format
+versions: 2, 3 as well as 4.
+
+If the version of the existing ``index.yaml`` file would be bumped that would
+require every user to update to the latest version of the Python package
+``rosdistro``.
+While generating some friction it is especially a problem on some systems (e.g.
+Debian) which might not provide a newer version in stable distributions.
+
+Therefore the existing index file isn't being changed but a sibling file named
+``index-v4.yaml`` is being added.
+The file has the same content except that is uses version 4 as specified in
+this document and includes the additional metadata fields.
+
+To make use of the new index file the new version of the Python package will
+update the default URL to point to the v4 file.
+
+This provides a smooth transition for all users: users using the old version of
+the Python package can continue to use it as is, users updating to the newer
+version will benefit from the additional metadata.
+Python code using the ``rosdistro`` API can easily check if the metadata is
+present and if yes use it.
+If desired other Python packages can explicily depend on the newer version to
+ensure the v4 index is being used.
+
+bloom
+-----
+
+Beside using the ``rosdistro`` API ``bloom`` also includes an explicit check
+for the version of the index file [5]_.
+Therefore a new patch release of ``bloom`` is required to also support the new
+version 4 [6]_.
+
+References
+==========
+.. [1] REP 143: http://www.ros.org/reps/rep-0143.html
+.. [2] REP 141: http://www.ros.org/reps/rep-0141.html
+.. [3] REP 137: http://www.ros.org/reps/rep-0137.html
+.. [4] Patch to python-rosdistro:
+  https://github.com/ros-infrastructure/rosdistro/pull/124
+.. [5] bloom asserting the index file version: https://github.com/ros-infrastructure/bloom/blob/d8be9d1d3469f00f936ad6e4869b847c5a6f8962/bloom/commands/release.py#L221-L223
+.. [6] bloom PR to support v4 https://github.com/ros-infrastructure/bloom/pull/493
+
+
+Copyright
+=========
+This document has been placed in the public domain.
