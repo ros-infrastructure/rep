@@ -31,6 +31,7 @@ A short list of existing known bridges and implementations follows:
  - autopilot_bridge [#autopilot_bridge]_
  - CRATES [#crates]_
  - dji_sdk_dji2ros [#djisdk]_
+ - dji_sdk [#dji_sdk]_
  - hector_quadrotor [#hector]_
  - mav_tools [#mav_tools]_
  - mavlink2ros [#mavlink2ros]_
@@ -453,6 +454,9 @@ References
 
 .. [#djisdk] dji_sdk_dji2ros
    (http://www.ros.org/browse/details.php?distro=indigo&name=dji_sdk_dji2mav)
+
+.. [#dji_sdk] dji_sdk
+   (http://wiki.ros.org/dji_sdk)
 
 .. [#batterystate] sensor_msgs/BatteryState
    (http://docs.ros.org/api/sensor_msgs/html/msg/BatteryState.html)
