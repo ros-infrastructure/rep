@@ -214,19 +214,24 @@ Binary releases are provided in the form of {comprehensive,omnibus} (TODO: choos
 
 Middleware Implementation Support:
 
-+--------------------+-------------+---------------+---------------------------------+---------------------------------------+
-| Middleware         | Version     | Support Level | Platforms                       | Architectures                         |
-+====================+=============+===============+=================================+=======================================+
-| eProsima Fast-RTPS | latest, TBD | Tier 1        | All Tier 1 Platforms            | All Tier 1 Architectures              |
-+--------------------+-------------+---------------+---------------------------------+---------------------------------------+
-| eProsima Fast-RTPS | latest, TBD | Tier 2        | All Tier 2 Platforms            | All Tier 2 Architectures              |
-+--------------------+-------------+---------------+---------------------------------+---------------------------------------+
-| RTI Connext        | latest, TBD | Tier 1        | All Tier 1 Platforms            | All Tier 1 Architectures except arm64 |
-+--------------------+-------------+---------------+---------------------------------+---------------------------------------+
-| RTI Connext        | latest, TBD | Tier 2        | All Tier 2 Platforms            | All Tier 2 Architectures except arm64 |
-+--------------------+-------------+---------------+---------------------------------+---------------------------------------+
-| ADLink OpenSplice  | latest, TBD | Tier 2        | All Tier 1 and Tier 2 platforms | All Tier 1 and Tier 2 architectures   |
-+--------------------+-------------+---------------+---------------------------------+---------------------------------------+
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
+| Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                  |
++--------------------------+=====================+===============+=============================+================================+
+|  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures              |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
+|  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64 |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
+| rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures              |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
+| rmw_fastrtps_shared_cpp  | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures              |
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures              |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
+|  rmw_connext_shared_cpp  | RTI Connext         | Tier 2        | All platforms except Debian | All architectures except arm64 |
+|  rmw_connext_dynamic_cpp | RTI Connext         | Tier 2        | All platforms except Debian | All architectures except arm64 |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
+
+Middleware implementation support is dependent upon the platform support tier.
+For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
 
 Minumum language requirements:
 
