@@ -1,10 +1,10 @@
 REP: 2000
 Title: ROS 2.0 Target Platforms
-Author: Mikael Arguedas <mikael@openrobotics.org>
+Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarök <steven@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
-Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018
+Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 13-Sep-2018
 
 
 Abstract
