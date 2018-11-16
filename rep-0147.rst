@@ -409,6 +409,8 @@ A standard way to communicate goals will also be important following the mavlink
   geometry_msgs/Twist acceleration_or_force
   float32 yaw
 
+To send a series of goals a list of GlobalPositions can be used.
+
 * Datatype: ``nav_msgs/GlobalWaypoints`` `[proposed]`
 * Topic: ``command_gps_pose``
 
@@ -432,6 +434,21 @@ Shared State
 
 The shared state between the collision mapping and motion planning controller is expected to be very specific to the implementation.
 As such it is not proposed to be standardized.
+
+Missions
+--------
+
+Currently there are quite a few varieties of missions data formats that are available.
+The most prominent is the mavlink mission protocol. [#mavlinkmission]_
+These missions are heavily used and often customized.
+A ROS equivalent could be defined but the current mission protocol is both relatively complicated and only provides relatively simple primative constructs with which to compose a mission.
+It is expected that mission planners can dynamically construct lower level controls for the vehicle that can then be executed upon by the vehicle controller.
+The simplest of these mission planners would generate a target waypoint for the vehicle to fly to and send a new one when there's a new position to fly to.
+A slightly more complex flight mission might send a series of waypoints which the vehicle will follow until the end.
+If a change in path is required the mission planner will deliver a whole new set of waypoints for the vehicle to follow.
+For more complicated missions the mission planner can generate the lower level trajectories for controlling the vehicles path more specifically, such as when doing an orbit or other more advanced mission operation.
+There are a lot more advanced missions that can be run with state machines and higher level logic.
+Until there is more development in this area we will not propose a standardized mission profile.
 
 Other Interfaces
 ================
@@ -548,6 +565,9 @@ References
 
 .. [#rep105] REP 105: Coordinate Frames for Mobile Platforms
    (http://www.ros.org/reps/rep-0105.html)
+
+.. [#mavlinkmission] Mavlink Mission protocol
+   (https://mavlink.io/en/services/mission.html)
 
 Copyright
 =========
