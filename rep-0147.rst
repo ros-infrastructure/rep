@@ -462,6 +462,42 @@ This is a recently standardized message which is much more broadly applicable th
 * Topic: ``battery_state``
 
 
+Flight Modes
+------------
+
+Drones have quite a few flight modes. For example the PX4 Flight Modes number between 9 and 12 for different configurations. [#px4flight]_
+Many of these different modes are modifying which user inputs are used and/or how they are interpreted.
+For working with ROS it is expected that the user inputs will be modulated and recieved through the ROS system and that the system will be in control the whole time including implementing fallback and recovery behaviors.
+Without the need for these extra modes we will reduce the state diagram significantly.
+The autopilot itself is expected to be in Offboard control mode for most configurations using ROS.
+In theory all of the states could be eliminated and the arming, takeoff, landing, and return to land logic could be fully implemented, but we will keep those states which are related to safety system already implemented.
+
+To that end the following modes for ROS flight operations are proposed.
+
+.. raw:: html
+  
+  <div class="mermaid">
+  graph LR
+    DISARMED[Disarmed]
+    ARMED[Armed]
+    FLYING[Flying]
+    LANDED[Landed]
+    RTL[Return to Land]
+    DISARMED --> |Arm| ARMED
+    ARMED --> |Takeoff| FLYING
+    FLYING --> |Land| LANDED
+    FLYING --> | RTL<br>Lost Link | RTL
+    LANDED --> |Auto Disarm| DISARMED
+    RTL --> |Disarm| DISARMED
+    FLYING --> |Disarm| DISARMED
+    RTL --> | Auto Land | LANDED
+    %% Links to DISARMED
+    linkStyle 5 fill:#fff,stroke:#f00,stroke-width:3px;
+    linkStyle 6 fill:#fff,stroke:#f00,stroke-width:3px;
+  </div>
+
+Note that the red disarm transitions are potentially unsafe as they could lead to the vehicle falling.
+
 Summary
 =======
 
@@ -565,6 +601,9 @@ References
 
 .. [#rep105] REP 105: Coordinate Frames for Mobile Platforms
    (http://www.ros.org/reps/rep-0105.html)
+
+.. [#px4flight] PX4 Flight Modes
+   (https://dev.px4.io/en/concept/flight_modes.html)
 
 .. [#mavlinkmission] Mavlink Mission protocol
    (https://mavlink.io/en/services/mission.html)
