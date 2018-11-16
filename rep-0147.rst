@@ -436,7 +436,7 @@ The shared state between the collision mapping and motion planning controller is
 As such it is not proposed to be standardized.
 
 Missions
---------
+,,,,,,,,
 
 Currently there are quite a few varieties of missions data formats that are available.
 The most prominent is the mavlink mission protocol. [#mavlinkmission]_
