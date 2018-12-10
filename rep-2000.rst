@@ -172,7 +172,7 @@ Middleware Implementation Support:
 - RTI Connext
 - ADLink OpenSplice
 
-Crystal Clemmys (December 2018 - TBD, at least December 2019)
+Crystal Clemmys (December 2018 - December 2019)
 -------------------------------------
 
 Support Tiers:
