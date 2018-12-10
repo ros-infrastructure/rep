@@ -224,10 +224,8 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 | rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures              |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
-| rmw_fastrtps_shared_cpp  | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures              |
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures              |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
-|  rmw_connext_shared_cpp  | RTI Connext         | Tier 2        | All platforms except Debian | All architectures except arm64 |
 |  rmw_connext_dynamic_cpp | RTI Connext         | Tier 2        | All platforms except Debian | All architectures except arm64 |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 
