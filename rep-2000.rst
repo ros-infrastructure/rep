@@ -173,7 +173,7 @@ Middleware Implementation Support:
 - ADLink OpenSplice
 
 Crystal Clemmys (December 2018 - December 2019)
--------------------------------------
+-----------------------------------------------
 
 Support Tiers:
 
