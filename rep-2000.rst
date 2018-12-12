@@ -209,7 +209,7 @@ Targeted platforms:
 
 
 " * " Individual binary packages are not currently available for these platforms.
-Binary releases are provided in the form of {comprehensive,omnibus} (TODO: choose a word here that isn't "fat") archives.
+Binary releases are provided as a single archive per platform containing all packages in [this repos file](https://github.com/ros2/ros2/blob/master/ros2.repos).
 
 " [s] " Compilation from source, the ROS buildfarm will not produce any binary packages for these platforms.
 
