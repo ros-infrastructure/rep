@@ -58,7 +58,7 @@ It may not contain any GUI dependencies.
                  poco_vendor, rcl, rcl_interfaces, rclcpp, rclpy,
                  rcutils, rmw, rmw_implementation, ros2cli, rosidl,
                  rosidl_dds, rosidl_defaults, rosidl_python, rosidl_typesupport,
-                 ros_environment, tinyxml2_vendor, uncrustify]
+                 ros_environment, sros2, tinyxml2_vendor, uncrustify]
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
       - Connext: [rmw_connext, rosidl_typesupport_connext]
@@ -94,7 +94,7 @@ It provides all commonly used libraries as well as visualization tools and tutor
       packages: [angles, demos, depthimage_to_laserscan, example_interfaces,
                  examples, joystick_drivers, laser_geometry,
                  navigation_msgs, pcl_conversions, realtime_support,
-                 resource_retriever, rviz, sros2, teleop_twist_joy,
+                 resource_retriever, rviz, teleop_twist_joy,
                  teleop_twist_keyboard, tlsf, vision_opencv]
 
 
