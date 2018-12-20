@@ -498,6 +498,29 @@ To that end the following modes for ROS flight operations are proposed.
 
 Note that the red disarm transitions are potentially unsafe as they could lead to the vehicle falling.
 
+* Datatype: ``mav_msgs/FlightMode`` (proposed)
+
+::
+
+  uint8 FLIGHT_MODE_DISARMED=0
+  uint8 FLIGHT_MODE_ARMED=1
+  uint8 FLIGHT_MODE_FLYING=2
+  uint8 FLIGHT_MODE_LANDED=3
+  uint8 FLIGHT_MODE_RTL=4
+
+  uint8 flight_mode # The flight mode indicated
+
+
+* Datatype: ``mav_msgs/SetFlightMode`` (proposed)
+* Service Name: `set_flight_mode`
+
+::
+
+  mav_msgs/FlightMode goal # The desired flight mode
+  ---
+  mav_msgs/FlightMode result # The resultant state after the attempted transition.
+  bool success # True if desired change was executed False otherwise.
+
 Summary
 =======
 
