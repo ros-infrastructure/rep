@@ -94,20 +94,22 @@ Topics
 The following topics are expected to be common to many devices - an IMU device driver is expected to publish at least one. Note that some of these topics may be also published by support libraries, rather than the base driver implementation. All message types below are supplemented with a std_msgs/Header, containing time and coordinate frame information.
 
 
-* `imu/data_raw` (sensor_msgs/Imu)
+* `imu/angular_velocity` (sensor_msgs/AngularVelocity)
 
   - Sensor output grouping accelerometer (`linear_acceleration`) and gyroscope (`angular_velocity`) data.
 
-* `imu/data` (sensor_msgs/Imu)
+* `imu/attitude` (sensor_msgs/Attitude)
 
-  - Same as `imu/data_raw`, with an included quaternion orientation estimate (`orientation`).
+  - Sensor output containing information about the attitude
 
-* `imu/mag` (sensor_msgs/MagneticField)
+* `imu/linear_acceleration` (sensor_msgs/LinearAccleration)
 
-  - Sensor output containing magnetometer data.
+  - The sensor output of the measured linear accleration.
 
-
-All message types provide a covariance matrix (see REP 103 [1]_) alongside the data field (`*_covariance`). If the data's covariance is unknown, all elements of the covariance matrix should be set to 0, unless overridden by a parameter. If a data field is unreported, the first element (`0`) of the covariance matrix should be set to `-1`.
+All message types provide a covariance matrix (see REP 103 [1]_) alongside the data field (`*_covariance`). If the data's covariance is unknown, all elements of the covariance matrix should be set to 0, unless overridden by a parameter. If a data field is unreported, the first element (`0`) of the covariance matrix should be set to `NaN`.
+The timestamp for these messages sould reflect the best estimate of when the observation was made.
+It is expected that downstream users may want to use data from multiple of these topics.
+To that end data from a unified solution should make sure to publish the data with the same timestamp so that an ``ExactTimeSynchronizer`` ``message_filter`` can be used to subscribe to the set of all the data.
 
 Namespacing
 '''''''''''
