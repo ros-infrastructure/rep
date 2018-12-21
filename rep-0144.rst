@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 28-Jan-2015
-Post-History: 17-Oct-2018
+Post-History: 21-Dec-2018
 
 Abstract
 ========
@@ -48,7 +48,7 @@ Mandatory Rules
 
 **A name must:**
 
-* **only consist of alphanumerics and _ separators and start with an alphabetic character.**
+* **only consist of lowercase alphanumerics and _ separators and start with an alphabetic character.**
   This allows it to be used in generated symbols and functions in all supported languages.
   Lowercase is required because the names are used in directories and filenames and some
   platforms do not have case sensitive filesystems.
