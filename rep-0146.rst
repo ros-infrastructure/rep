@@ -10,21 +10,20 @@ Post-History:
 Abstract
 ========
 
-This REP aims to define the best practices for robot related parameter
-name space for making robot-agnostic packages.
+This REP aims to define best practices for robot-related ROS parameters
+for use in robot-agnostic packages.
 
 
 Motivation
 ==========
 
-As the number of ROS-supported robot increases, we will write
+As the number of ROS-supported robots increases, we will write
 robot-agnostic packages, but still they need robot-specific
-information as calibration parameters.
+information, such as calibration parameters.
 
-A `robot_description` parameter is widely shared naming convention
-among ROS community and this REP proposes such conventions for robot specific information on
-parameter, so application program can build their program on top of that.
-
+The `robot_description` parameter is an example of a widely shared naming convention
+among the ROS community. This REP proposes similar conventions for robot-specific information to be stored on the
+parameter server, helping applications that use these parameters to more easily run on a greater range of platforms.
 
 Specifications
 ==============
@@ -36,19 +35,18 @@ robot_description
 '''''''''''''''''
 
 `robot_description` stores robot kinematics / geometry information using
-URDF format.
+the URDF format.
 
 
 robot_type
 ''''''''''
-
-The `robot_type` should capture the name of the class of robot in a way that a user would understand the scope of the robot. If it's a commercial product it is recommended to use the production model name. ` For example 'pr2' in PR2 robot case [1], 'pepper' in Pepper robot case and 'fetch' in Fetch robot cases.
+The `robot_type` should capture the name of the class of robot in a way that a user would understand the scope of the robot. If it's a commercial product it is recommended to use the production model name. For example 'pr2' in PR2 robot case [1], 'pepper' in Pepper robot case and 'fetch' in Fetch robot cases.
 
 
 robot_name
 ''''''''''
 
-`robot_name` stores robot name. It should be set to make sure that this robot instance is unique on the system in much that computers are recommended to have unique hostnames. For the case of PR2 robot, the default robot name is 'robot' [1], but other individuals have named 'james', 'gutsy' etc...
+`robot_name` stores the robot's unique name. It should be set to make sure that this robot instance is unique on the system, in same way that computers are recommended to have unique hostnames. For the case of PR2 robot, the default robot name is 'robot' [1], but other individuals have named 'james', 'gutsy' etc...
 
 
 Examples
