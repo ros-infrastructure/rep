@@ -5,7 +5,7 @@ Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Created: 16-May-2016
-Post-History: 12-Jul-2016 
+Post-History: 12-Jul-2016, 18-Jan-2018
 
 
 Abstract
@@ -31,6 +31,7 @@ A short list of existing known bridges and implementations follows:
  - autopilot_bridge [#autopilot_bridge]_
  - CRATES [#crates]_
  - dji_sdk_dji2ros [#djisdk]_
+ - dji_sdk [#dji_sdk]_
  - hector_quadrotor [#hector]_
  - mav_tools [#mav_tools]_
  - mavlink2ros [#mavlink2ros]_
@@ -115,7 +116,7 @@ A higher level view of the system uses the following abstraction.
     L --> OS
     subgraph Generic Planning Framework
     CM[Collision Mapping]
-    MSC[Minimum Snap Controller]
+    MSC[Planner e.g.<br>Minimum Snap Trajectory Generator]
     CM ---|Shared State|MSC
     end
     CS -->|Obstacle Observations|CM
@@ -123,7 +124,7 @@ A higher level view of the system uses the following abstraction.
     OS -->|Odometry|CM
     OS -->|Odometry|C
     GCS -->|Goals|MSC
-    MSC -->|Trajectory|C
+    MSC -->|Control Abstraction|C
     %% Links to L 
     linkStyle 0 fill:#fff,stroke:#ff0,stroke-width:0px;
     linkStyle 1 fill:#fff,stroke:#ff0,stroke-width:0px;
@@ -187,139 +188,69 @@ The reference position is the origin of the ``base_link`` as defined in [#REP105
 Rate Interface
 ,,,,,,,,,,,,,,
 
-The messge to send a velocity command is ``geometry_msgs/Twist`` [#twist]_.
+The messge to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
 This is the standard way to command ROS vehicles.
 The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
 
-* Datatype: ``geometry_msgs/Twist`` [#twist]_
-* Topic: ``cmd_vel``
+* Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
+* Topic: ``command_velocity``
 
 ::
 
-    geometry_msgs/Vector3 linear
-      float64 x
-      float64 y
-      float64 z
-    geometry_msgs/Vector3 angular
-      float64 x
-      float64 y
-      float64 z
+    std_msgs/Header header
+      uint32 seq
+      time stamp
+      string frame_id
+    geometry_msgs/Twist twist
+      geometry_msgs/Vector3 linear
+        float64 x
+        float64 y
+        float64 z
+      geometry_msgs/Vector3 angular
+        float64 x
+        float64 y
+        float64 z
+
+The command is a body relative set of accelerations in linear and angular space.
+This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
+A pure ``Twist`` based inteface could be provided for backwards compatability as well.
+It was chosen to diverge here since this is a much more powerful inteface for the vehicles and does not require all commands to be reverse calculated for the instantaneous attitude of the vehicle.
 
 
-
-The command is a body relative set of velocities in linear and angular space.
-The reference position is the origin of the ``base_link`` as defined in [#REP105]_
-
-
-
-
-.. TODO remove after review
-.. The Rate interface can be implemented by two messages.
-..
-.. The messages are ``mav_msgs/AttitudeThrust`` [#attitudethrust]_ and ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_.
-.. These are both well established messages which have evolved from usage.
-.. They are well established and have several existing implementations.
-.. The ``mav_msgs/RollPitchYawrateThrust`` is a convenience message to support low level controllers that are not aware of the absolute yaw.
-..
-.. They diverge from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
-.. A ``Twist`` based inteface could be provided for backwards compatability as well.
-.. It was chosen do diverge here since this is a much more natural interface for aerial vehicles.
-..
-.. * Datatype: ``mav_msgs/AttitudeThrust`` [#attitudethrust]_
-.. * Topic: ``command_velocity``
-..
-.. ::
-..
-..   Header header
-..
-..   geometry_msgs/Quaternion attitude    # Attitude expressed in the header/frame_id frame.
-..   geometry_msgs/Vector3 thrust         # Thrust [N] expressed in the body frame.
-..                                       # For a fixed-wing, usually the x-component is used.
-..                                       # For a multi-rotor, usually the z-component is used.
-..                                       # Set all un-used components to 0.
-..
-.. * Datatype: ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_
-.. * Topic: ``command_velocity_rpy``
-..
-.. ::
-..
-..   Header header
-..
-..   # We use the coordinate frames with the following convention:
-..   #   x: forward
-..   #   y: left
-..   #   z: up
-..
-..   # rotation convention (z-y'-x''):
-..   # yaw rotates around fixed frame's z axis
-..   # pitch rotates around new y-axis (y')
-..   # roll rotates around new x-axis (x'')
-..
-..   # This is a convenience-message to support that low-level (microcontroller-based) state
-..   # estimators may not have knowledge about the absolute yaw.
-..   # Roll- and pitch-angle should be specified in the header/frame_id frame
-..   float64 roll                   # Roll angle [rad]
-..   float64 pitch                  # Pitch angle  [rad]
-..   float64 yaw_rate               # Yaw rate around z-axis [rad/s]
-..
-..   geometry_msgs/Vector3 thrust   # Thrust [N] expressed in the body frame.
-..                                  # For a fixed-wing, usually the x-component is used.
-..                                  # For a multi-rotor, usually the z-component is used.
-..                                  # Set all un-used components to 0.
-..
-..
-.. Implementations of this interface should accept messages on either topic/datatype.
-.. Publishers are expected to choose only one.
+This is replacing ``mav_msgs/AttitudeThrust`` [#attitudethrust]_ and ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_.
 
 Acceleration Interface
 ,,,,,,,,,,,,,,,,,,,,,,
 
 
-The messge to send a velocity command is ``geometry_msgs/Twist`` [#twist]_.
+The messge to send a velocity command is ``geometry_msgs/Twist`` [#twiststamped]_.
 The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
 
-* Datatype: ``geometry_msgs/Twist`` [#twist]_
+* Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
 * Topic: ``command_acceleration``
 
 ::
 
-    geometry_msgs/Vector3 linear
-      float64 x
-      float64 y
-      float64 z
-    geometry_msgs/Vector3 angular
-      float64 x
-      float64 y
-      float64 z
+    std_msgs/Header header
+      uint32 seq
+      time stamp
+      string frame_id
+    geometry_msgs/Twist twist
+      geometry_msgs/Vector3 linear
+        float64 x
+        float64 y
+        float64 z
+      geometry_msgs/Vector3 angular
+        float64 x
+        float64 y
+        float64 z
 
 
 
 The command is a body relative set of accelerations in linear and angular space.
 The reference position is the origin of the ``base_link`` as defined in [#REP105]_
 
-
-.. TODO remove after review
-.. The acceleartion interface is implemented using the established ``mav_msgs/RateThrust`` [#ratethrust]_ message.
-.. This message is very similar to the standard ``Twist`` message however it removes some of the ambiguities of the reference frame by explicitly referencing the body frame.
-..
-.. * Datatype: ``mav_msgs/RateThrust``  [#ratethrust]_
-.. * Topic: ``command_acceleration``
-..
-.. ::
-..
-..   Header header
-..
-..   # We use the coordinate frames with the following convention:
-..   #   x: forward
-..   #   y: left
-..   #   z: up
-..
-..   geometry_msgs/Vector3 angular_rates  # Roll-, pitch-, yaw-rate around body axes [rad/s]
-..   geometry_msgs/Vector3 thrust         # Thrust [N] expressed in the body frame.
-..                                        # For a fixed-wing, usually the x-component is used.
-..                                        # For a multi-rotor, usually the z-component is used.
-..                                        # Set all un-used components to 0.
-
+This is replacing the ``mav_msgs/RateThrust`` [#ratethrust]_ message for a more standard one with the specific call out of the ``base_link``.
 
 High Level Interfaces
 ---------------------
@@ -366,8 +297,50 @@ Goal Interface
 ,,,,,,,,,,,,,,
 
 It is expected that there will be several high level ways to communicate goals which are application specific.
+A standard way to communicate goals will also be important following the mavlink protocol we can send the same messages over ROS using the following pair of messages.
 
-TODO(tfoote): Maybe add a standard GPS waypoint list here? Things already in mavlink?
+* SubDatatype: ``nav_msgs/GlobalPosition`` `[proposed]`
+* Topic: ``command_gps_pose``
+
+::
+
+  std_msgs/Header header
+
+  uint8 coordinate_frame
+  uint8 FRAME_GLOBAL_INT = 5
+  uint8 FRAME_GLOBAL_REL_ALT = 6
+  uint8 FRAME_GLOBAL_TERRAIN_ALT = 11
+
+  uint16 type_mask
+  uint16 IGNORE_LATITUDE = 1	# Position ignore flags
+  uint16 IGNORE_LONGITUDE = 2
+  uint16 IGNORE_ALTITUDE = 4
+  uint16 IGNORE_VX = 8	# Velocity vector ignore flags
+  uint16 IGNORE_VY = 16
+  uint16 IGNORE_VZ = 32
+  uint16 IGNORE_AFX = 64	# Acceleration/Force vector ignore flags
+  uint16 IGNORE_AFY = 128
+  uint16 IGNORE_AFZ = 256
+  uint16 FORCE = 512	# Force in af vector flag
+  uint16 IGNORE_YAW = 1024
+  uint16 IGNORE_YAW_RATE = 2048
+
+  float64 latitude
+  float64 longitude
+  float32 altitude	# in meters, AMSL or above terrain
+  geometry_msgs/Twist velocity
+  geometry_msgs/Twist acceleration_or_force
+  float32 yaw
+
+To send a series of goals a list of GlobalPositions can be used.
+
+* Datatype: ``nav_msgs/GlobalWaypoints`` `[proposed]`
+* Topic: ``command_gps_pose``
+
+:: 
+
+  nav_msgs/GlobalPosition[] waypoints
+
 
 Currently Unspecified
 ---------------------
@@ -385,6 +358,21 @@ Shared State
 The shared state between the collision mapping and motion planning controller is expected to be very specific to the implementation.
 As such it is not proposed to be standardized.
 
+Missions
+,,,,,,,,
+
+Currently there are quite a few varieties of missions data formats that are available.
+The most prominent is the mavlink mission protocol. [#mavlinkmission]_
+These missions are heavily used and often customized.
+A ROS equivalent could be defined but the current mission protocol is both relatively complicated and only provides relatively simple primative constructs with which to compose a mission.
+It is expected that mission planners can dynamically construct lower level controls for the vehicle that can then be executed upon by the vehicle controller.
+The simplest of these mission planners would generate a target waypoint for the vehicle to fly to and send a new one when there's a new position to fly to.
+A slightly more complex flight mission might send a series of waypoints which the vehicle will follow until the end.
+If a change in path is required the mission planner will deliver a whole new set of waypoints for the vehicle to follow.
+For more complicated missions the mission planner can generate the lower level trajectories for controlling the vehicles path more specifically, such as when doing an orbit or other more advanced mission operation.
+There are a lot more advanced missions that can be run with state machines and higher level logic.
+Until there is more development in this area we will not propose a standardized mission profile.
+
 Other Interfaces
 ================
 
@@ -396,6 +384,65 @@ This is a recently standardized message which is much more broadly applicable th
 * Datatype: ``sensor_msgs/BatteryState`` [#batterystate]_
 * Topic: ``battery_state``
 
+
+Flight Modes
+------------
+
+Drones have quite a few flight modes. For example the PX4 Flight Modes number between 9 and 12 for different configurations. [#px4flight]_
+Many of these different modes are modifying which user inputs are used and/or how they are interpreted.
+For working with ROS it is expected that the user inputs will be modulated and recieved through the ROS system and that the system will be in control the whole time including implementing fallback and recovery behaviors.
+Without the need for these extra modes we will reduce the state diagram significantly.
+The autopilot itself is expected to be in Offboard control mode for most configurations using ROS.
+In theory all of the states could be eliminated and the arming, takeoff, landing, and return to land logic could be fully implemented, but we will keep those states which are related to safety system already implemented.
+
+To that end the following modes for ROS flight operations are proposed.
+
+.. raw:: html
+  
+  <div class="mermaid">
+  graph LR
+    DISARMED[Disarmed]
+    ARMED[Armed]
+    FLYING[Flying]
+    LANDED[Landed]
+    RTL[Return to Land]
+    DISARMED --> |Arm| ARMED
+    ARMED --> |Takeoff| FLYING
+    FLYING --> |Land| LANDED
+    FLYING --> | RTL<br>Lost Link | RTL
+    LANDED --> |Auto Disarm| DISARMED
+    RTL --> |Disarm| DISARMED
+    FLYING --> |Disarm| DISARMED
+    RTL --> | Auto Land | LANDED
+    %% Links to DISARMED
+    linkStyle 5 fill:#fff,stroke:#f00,stroke-width:3px;
+    linkStyle 6 fill:#fff,stroke:#f00,stroke-width:3px;
+  </div>
+
+Note that the red disarm transitions are potentially unsafe as they could lead to the vehicle falling.
+
+* Datatype: ``mav_msgs/FlightMode`` (proposed)
+
+::
+
+  uint8 FLIGHT_MODE_DISARMED=0
+  uint8 FLIGHT_MODE_ARMED=1
+  uint8 FLIGHT_MODE_FLYING=2
+  uint8 FLIGHT_MODE_LANDED=3
+  uint8 FLIGHT_MODE_RTL=4
+
+  uint8 flight_mode # The flight mode indicated
+
+
+* Datatype: ``mav_msgs/SetFlightMode`` (proposed)
+* Service Name: `set_flight_mode`
+
+::
+
+  mav_msgs/FlightMode goal # The desired flight mode
+  ---
+  mav_msgs/FlightMode result # The resultant state after the attempted transition.
+  bool success # True if desired change was executed False otherwise.
 
 Summary
 =======
@@ -447,6 +494,9 @@ References
 .. [#djisdk] dji_sdk_dji2ros
    (http://www.ros.org/browse/details.php?distro=indigo&name=dji_sdk_dji2mav)
 
+.. [#dji_sdk] dji_sdk
+   (http://wiki.ros.org/dji_sdk)
+
 .. [#batterystate] sensor_msgs/BatteryState
    (http://docs.ros.org/api/sensor_msgs/html/msg/BatteryState.html)
 
@@ -492,8 +542,17 @@ References
 .. [#twist] geometry_msgs/Twist
    (http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html)
 
+.. [#twiststamped] geometry_msgs/TwistStamped
+  (http://docs.ros.org/api/geometry_msgs/html/msg/TwistStamped.html)
+
 .. [#rep105] REP 105: Coordinate Frames for Mobile Platforms
    (http://www.ros.org/reps/rep-0105.html)
+
+.. [#px4flight] PX4 Flight Modes
+   (https://dev.px4.io/en/concept/flight_modes.html)
+
+.. [#mavlinkmission] Mavlink Mission protocol
+   (https://mavlink.io/en/services/mission.html)
 
 Copyright
 =========
