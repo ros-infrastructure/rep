@@ -38,7 +38,6 @@ To this end, we followed Debian QA Group System and Debian Developer's Reference
 
 In ROS system, we use 'Unmaintained' package status([4]_) and ROS Orphaned Packages Group([5]_), who do not have to take full responsibility to package maintenance jobs, but expecting to take minimum responsibilities such as just to releasing into newer ROS distros.
 
-
 Reference
 =========
 
@@ -77,7 +76,6 @@ b. If the current maintainer is not responsible (a single day isn't enough to co
    2. If nobody else beside the original author (which doesn't respond) has access, you should fork the repository.
 
 c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml as follows.
-
 
    ``<maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>``
 
@@ -129,13 +127,10 @@ References
 .. [8] Maintenance Guide, Claiming Maintainership (http://wiki.ros.org/MaintenanceGuide#Claiming_Maintainership)
 .. [9] Releasing catkin packages (http://wiki.ros.org/bloom/Tutorials/ReleasingForANewROSDistro)
 
-
 Copyright
 =========
 
 This document has been placed in the public domain.
-
-
 
 ..
    Local Variables:
