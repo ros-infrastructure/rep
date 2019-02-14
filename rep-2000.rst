@@ -35,6 +35,7 @@ Ardent Apalone (December 2017 - December 2018)
 
 Minumum language requirements:
 
+- C11
 - C++14
 - Python 3.5
 
@@ -112,6 +113,7 @@ Targeted platforms:
 
 Minumum language requirements:
 
+- C11
 - C++14
 - Python 3.5
 
@@ -234,6 +236,7 @@ For example a Tier 1 middleware implementation on a Tier 2 platform can only rec
 
 Minumum language requirements:
 
+- C11
 - C++14
 - Python 3.5
 
