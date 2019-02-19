@@ -1,5 +1,5 @@
 REP: 152
-Title: Orphaned Pakcage Maintaining
+Title: Orphaned Package Maintaining
 Author: Kei Okada
 Status: Draft
 Type: Standards Track
@@ -24,19 +24,19 @@ This REP specifies how we can organize and release packages without active maint
 Motivation
 ==========
 
-As the size of ROS ecosystem grows, there are several packages which loosing active maintainers.
-Main drawback of this situation is these packages do not get released into newer ROS distro coming every year, even if they are commonly used (For example, usb camera drivers are not released into Kinetic for more than half year [1]_ [2]_).
+As the size of the ROS ecosystem grows, there are several packages which losing active maintainers.
+The main drawback of this situation is these packages do not get released into newer ROS distro coming every year, even if they are commonly used (For example, USB camera drivers are not released into Kinetic for more than half year [1]_ [2]_).
 Ideally everyone willing to use newer ROS distro almost equivalent to the set of packages in previous ROS distro.
 
-It is understandable that original maintainer could not continue serving as an active maintainer, because of starting new project, moving an institute/company, loosing interest and so on.
-And being a maintainer is not a easy job.
-It includes respond to incoming questions and issues, check for proposed changes and decide to include them to a main source tree and so on.
+It is understandable that original maintainer could not continue serving as an active maintainer, because of starting a new project, moving an institute/company, losing interest and so on.
+And being a maintainer is not an easy job.
+It includes responding to incoming questions and issues, check for proposed changes and decide to add them to the main source tree and so on.
 
-The idea behind this document is to have a team of volunteers who can do ONLY the release job, which includes send source tree to ros build firm and act on notification mail form that.
-This will enable to continue using same set of previous ROS distros with minimum set of community efforts.
+The idea behind this document is to have a team of volunteers who can do ONLY the release job, which includes sending source tree to ros build firm and act on notification mail form that.
+The volunteers of release maintainers will enable the community to continue using the same set of previous ROS distros with a minimum set of community efforts.
 To this end, we followed Debian QA Group System and Debian Developer's Reference ('Dealing with inactive and/or unreachable maintainers'[3]_), which is considered non-normative, but best practice.
 
-In ROS system, we use 'Unmaintained' package status([4]_) and ROS Orphaned Packages Group([5]_), who do not have to take full responsibility to package maintenance jobs, but expecting to take minimum responsibilities such as just to releasing into newer ROS distros.
+In ROS system, we use 'Unmaintained' package status([4]_) and ROS Orphaned Packages Group([5]_), who do not have to take full responsibility to package maintenance jobs but expecting to take minimum responsibilities such as just to releasing into newer ROS distros.
 
 Reference
 =========
@@ -51,14 +51,14 @@ Operations
 1-A. Orphaning a package by maintainers
 ---------------------------------------
 
-If you can no longer maintain a your package.
+If you can no longer maintain your package.
 
 a. Set the package maintainer section in the ``package.xml`` file as follows.
 
    ``<maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>``
 
 b. Post a message to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_ indicating that package is now orphaned.
-   Wait response from someone in the ROS Orphaned Package Maintainer team.
+   Wait for response from someone in the ROS Orphaned Package Maintainer team.
 
 c. Add admin permission of both source and release repository to who respond from in the ROS Orphaned Package Maintainers team.
 
@@ -67,13 +67,13 @@ c. Add admin permission of both source and release repository to who respond fro
 
 If you find a package is not actively maintained and willing to release as a ROS Orphaned Package Maintainer.
 
-a. Contact the current maintainer, ask for transition to orphaned package and request access to source and release repository in order to make releases.
+a. Contact the current maintainer, ask for a transition to orphaned package and request access to the source and release repository to make releases.
 
 b. If the current maintainer is not responsible (a single day isn't enough to conclude that) and you still want to release the packages, there are two different paths forward depend on the "location" of the source and release repositories.
 
-   1. If the repositories are hosted on GitHub within an `ros-` org unit, the admins of the org unit will usually grant the necessary access to these repositories.
+   1. If the repositories are hosted on GitHub within a `ros-` org unit, the admins of the org group will usually grant the necessary access to these repositories.
 
-   2. If nobody else beside the original author (which doesn't respond) has access, you should fork the repository.
+   2. If nobody else besides the original author (which doesn't respond) has access, you should fork the repository.
 
 c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml as follows.
 
@@ -83,18 +83,18 @@ c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml
 --------------------
 
 Orphaned packages are seeking a new maintainer.
-If you willing to step forward the package maintainer, more than just to release into new ROS distros, but respond to the issues, pull requests and so on.
+If you are willing to step forward the package maintainer, more than to release into new ROS distros, but respond to the issues, pull requests and so on.
 Contact to the ROS Orphaned Package Maintainers by posting a message to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_.
 
 3. Releasing orphaned packages
 ------------------------------
 
-a. The package release process is as same as normal packages, so please follow bloom tutorial titled ``Releasing into a new ROS Distribution`` in ROS wiki documents [9]_ to release the orphaned package.
+a. The package release process is as same as standard packages, so please follow bloom tutorial titled ``Releasing into a new ROS Distribution`` in ROS wiki documents [9]_ to release the orphaned package.
 
 
-   1. Updated maintainer section in ``package.xml`` indicating that the package is orphaned and commit to the source tree, before you run the ``catkin_generate_changelog`` command.
+   1. Updated maintainer section in ``package.xml`` indicating that the package is orphaned and commit to the source tree before you run the ``catkin_generate_changelog`` command.
 
-   2. During ``bloom-release`` process, you will asked to set maintenance status as follows.
+   2. During ``bloom-release`` process, you will be asked to set maintenance status as follows.
    Choose ``unmaintained`` . ::
       
 ::
@@ -107,7 +107,7 @@ a. The package release process is as same as normal packages, so please follow b
    - unmaintained: looking for new maintainer, bug fixes and pull requests will not be addressed
    - end-of-life: should not be used, will disappear at some point
 
-b. Add your package to the list of orphaned packages in `ROS OrphanedPackage page <http://wiki.ros.org/OrphanedPackage>`_ of ROSwiki.
+b. Add your package to the list of orphaned packages in `ROS OrphanedPackage page <http://wiki.ros.org/OrphanedPackage>`_ of ROSWiki.
 
 4. Joining ROS Orphaned Package Maintainers
 -------------------------------------------
