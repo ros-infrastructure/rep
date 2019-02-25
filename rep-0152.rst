@@ -73,7 +73,7 @@ b. If the current maintainer is not responsive (a single day isn't enough to con
 
    1. If the repositories are hosted on GitHub within a `ros-` org unit, the admins of the org group will usually grant the necessary access to these repositories.
 
-   2. If nobody else besides the original author (which doesn't respond) has access, you should fork the repository.
+   2. If no one else aside from the original author (who doesn't respond) has access, you should fork the repository.
 
 c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml as follows.
 
