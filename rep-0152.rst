@@ -29,7 +29,7 @@ The main drawback of this situation is these packages do not get released into n
 Ideally everyone willing to use newer ROS distro almost equivalent to the set of packages in previous ROS distro.
 
 It is understandable that original maintainer could not continue serving as an active maintainer, because of starting a new project, moving an institute/company, losing interest and so on.
-And being a maintainer is not an easy job.
+Being a maintainer is not an easy job.
 It includes responding to incoming questions and issues, check for proposed changes and decide to add them to the main source tree and so on.
 
 The idea behind this document is to have a team of volunteers who can do ONLY the release job, which includes sending source tree to ros build firm and act on notification mail form that.
