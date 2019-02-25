@@ -112,7 +112,7 @@ b. Add your package to the list of orphaned packages in `ROS OrphanedPackage pag
 4. Joining ROS Orphaned Package Maintainers
 -------------------------------------------
 
-To join ROS Orphaned Package Maintainers, please subscribe ros-orphaned-packages@googlegroups.com mailing list and also add your name and GitHub account to `ROS OrphanedPackage page <http://wiki.ros.org/OrphanedPackage>`_ .
+To join ROS Orphaned Package Maintainers, please subscribe to the ros-orphaned-packages@googlegroups.com mailing list and also add your name and GitHub account to the `ROS OrphanedPackage page <http://wiki.ros.org/OrphanedPackage>`_ .
 
 References
 ==========
