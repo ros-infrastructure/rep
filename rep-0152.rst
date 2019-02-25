@@ -26,7 +26,7 @@ Motivation
 
 As the size of the ROS ecosystem grows, some packages will lose active maintainers.
 The main drawback of this situation is these packages do not get released into newer ROS distros which are released every year, even if they are commonly used (For example, USB camera drivers have not been released into Kinetic for more than half year [1]_ [2]_).
-Ideally everyone willing to use newer ROS distro almost equivalent to the set of packages in previous ROS distro.
+Ideally, everyone wants to use a newer ROS distro which contains a set of packages almost equivalent to the set of packages in the previous ROS distro.
 
 It is understandable that the original maintainer of a package might not continue serving as an active maintainer due to starting a new project, moving institutions/companies, losing interest, and so on.
 Being a maintainer is not an easy job.
