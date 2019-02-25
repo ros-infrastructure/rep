@@ -89,7 +89,7 @@ Contact to the ROS Orphaned Package Maintainers by posting a message to the `ROS
 3. Releasing orphaned packages
 ------------------------------
 
-a. The package release process is as same as standard packages, so please follow bloom tutorial titled ``Releasing into a new ROS Distribution`` in ROS wiki documents [9]_ to release the orphaned package.
+a. The package release process is the same as for standard packages, so please follow bloom tutorial titled ``Releasing into a new ROS Distribution`` in the ROS wiki documents [9]_ to release the orphaned package.
 
 
    1. Update the maintainer section in the ``package.xml`` file indicating that the package is orphaned and commit to the source tree before you run the ``catkin_generate_changelog`` command.
