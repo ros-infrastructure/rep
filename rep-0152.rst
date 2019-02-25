@@ -83,7 +83,7 @@ c. Add ROS Orphaned Package Maintainers to the maintainer section of package.xml
 --------------------
 
 Orphaned packages are seeking a new maintainer.
-If you are willing to step forward the package maintainer, more than to release into new ROS distros, but respond to the issues, pull requests and so on.
+If you are willing to step forward as an official package maintainer (not just releasing into new ROS distros but also respond to issues, pull requests and so on):
 Contact to the ROS Orphaned Package Maintainers by posting a message to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_.
 
 3. Releasing orphaned packages
