@@ -32,7 +32,7 @@ It is understandable that the original maintainer of a package might not continu
 Being a maintainer is not an easy job.
 It includes responding to incoming questions and issues, checking for proposed changes and deciding to add them to the main source tree, and other responsibilities.
 
-The idea behind this document is to have a team of volunteers who can do ONLY the release job, which includes sending source tree to ros build firm and act on notification mail form that.
+The idea behind this document is to organize a team of volunteers who can do ONLY the release job, which includes sending the source tree to the ROS Build Farm and acting on notification emails form the builds.
 The volunteers of release maintainers will enable the community to continue using the same set of previous ROS distros with a minimum set of community efforts.
 To this end, we followed Debian QA Group System and Debian Developer's Reference ('Dealing with inactive and/or unreachable maintainers'[3]_), which is considered non-normative, but best practice.
 
