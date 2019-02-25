@@ -69,7 +69,7 @@ If you find a package is not actively maintained and are willing to release as a
 
 a. Contact the current maintainer, ask for a transition to orphaned package and request access to the source and release repository to make releases.
 
-b. If the current maintainer is not responsible (a single day isn't enough to conclude that) and you still want to release the packages, there are two different paths forward depend on the "location" of the source and release repositories.
+b. If the current maintainer is not responsive (a single day isn't enough to conclude that) and you still want to release the packages, there are two different paths forward depending on the "location" of the source and release repositories.
 
    1. If the repositories are hosted on GitHub within a `ros-` org unit, the admins of the org group will usually grant the necessary access to these repositories.
 
