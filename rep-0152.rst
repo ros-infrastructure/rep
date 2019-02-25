@@ -36,7 +36,7 @@ The idea behind this document is to organize a team of volunteers who can do ONL
 The volunteers of the release maintainers group will enable the community to continue using the same set of packages from previous ROS distros with minimal community effort.
 To this end, we followed the Debian QA Group system and the Debian Developer's Reference ('Dealing with inactive and/or unreachable maintainers'[3]_), which is considered non-normative, but best practice.
 
-In ROS system, we use 'Unmaintained' package status([4]_) and ROS Orphaned Packages Group([5]_), who do not have to take full responsibility to package maintenance jobs but expecting to take minimum responsibilities such as just to releasing into newer ROS distros.
+In ROS, we use 'Unmaintained' package status([4]_) and ROS Orphaned Packages Group([5]_), who do not have to take full responsibility for package maintenance jobs but are expected to take minimum responsibilities which mostly include releasing their packages into newer ROS distros.
 
 Reference
 =========
