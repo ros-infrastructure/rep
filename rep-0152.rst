@@ -94,7 +94,7 @@ a. The package release process is as same as standard packages, so please follow
 
    1. Updated maintainer section in ``package.xml`` indicating that the package is orphaned and commit to the source tree before you run the ``catkin_generate_changelog`` command.
 
-   2. During ``bloom-release`` process, you will be asked to set maintenance status as follows.
+   2. During ``bloom-release`` process, you will be asked to set maintenance status.
    Choose ``unmaintained`` . ::
       
 ::
