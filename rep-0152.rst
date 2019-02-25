@@ -65,7 +65,7 @@ c. Add admin permission of both source and release repository to who respond fro
 1-B. Orphaning a package by users
 ---------------------------------
 
-If you find a package is not actively maintained and willing to release as a ROS Orphaned Package Maintainer.
+If you find a package is not actively maintained and are willing to release as a ROS Orphaned Package Maintainer.
 
 a. Contact the current maintainer, ask for a transition to orphaned package and request access to the source and release repository to make releases.
 
