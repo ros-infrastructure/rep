@@ -24,7 +24,7 @@ This REP specifies how we can organize and release packages without active maint
 Motivation
 ==========
 
-As the size of the ROS ecosystem grows, there are several packages which losing active maintainers.
+As the size of the ROS ecosystem grows, some packages will lose active maintainers.
 The main drawback of this situation is these packages do not get released into newer ROS distro coming every year, even if they are commonly used (For example, USB camera drivers are not released into Kinetic for more than half year [1]_ [2]_).
 Ideally everyone willing to use newer ROS distro almost equivalent to the set of packages in previous ROS distro.
 
