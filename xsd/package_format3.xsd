@@ -2,6 +2,23 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:include schemaLocation="package_common.xsd"/>
 
+  <xs:complexType name="DependencyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <!-- The dependency must have a version less then the specified limit. -->
+        <xs:attribute name="version_lt" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version less then or equal to the specified limit. -->
+        <xs:attribute name="version_lte" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version equal to the specified limit. -->
+        <xs:attribute name="version_eq" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version greater then or equal to the specified limit. -->
+        <xs:attribute name="version_gte" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version greater then the specified limit. -->
+        <xs:attribute name="version_gt" type="VersionLimitType" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
   <xs:complexType name="VersionWithOptionalCompatibilityType">
     <xs:simpleContent>
       <xs:extension base="VersionType">
