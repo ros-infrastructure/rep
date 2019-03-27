@@ -15,12 +15,15 @@ SUBDIRS=$(wildcard rep-????)
 
 TARGETS=$(REPS:.rst=.html) rep-0000.html
 
-all: rep-0000.rst $(TARGETS)
+all: rep-0000.rst $(TARGETS) xsdvalid
 
 $(TARGETS): rep2html.py
 
 rep-0000.rst: $(REPS)
 	$(PYTHON) genrepindex.py .
+
+xsdvalid:
+	$(PYTHON) xsdValid.py
 
 clean:
 	-rm *.html

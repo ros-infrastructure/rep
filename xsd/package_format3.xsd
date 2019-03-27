@@ -2,6 +2,44 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:include schemaLocation="package_common.xsd"/>
 
+  <xs:complexType name="ConditionalType">
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute name="condition" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:pattern value="[$A-Za-z0-9_\s&lt;&gt;=]*"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="DependencyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <!-- The dependency must have a version less then the specified limit. -->
+        <xs:attribute name="version_lt" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version less then or equal to the specified limit. -->
+        <xs:attribute name="version_lte" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version equal to the specified limit. -->
+        <xs:attribute name="version_eq" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version greater then or equal to the specified limit. -->
+        <xs:attribute name="version_gte" type="VersionLimitType" use="optional"/>
+        <!-- The dependency must have a version greater then the specified limit. -->
+        <xs:attribute name="version_gt" type="VersionLimitType" use="optional"/>
+        <xs:attribute name="condition" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:pattern value="[$A-Za-z0-9_\s&lt;&gt;=]*"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
   <xs:complexType name="VersionWithOptionalCompatibilityType">
     <xs:simpleContent>
       <xs:extension base="VersionType">
@@ -56,8 +94,8 @@
           <xs:element type="DependencyType" name="replace"/>
         </xs:choice>
 
-        <xs:element name="group_depend" type="xs:token" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element name="member_of_group" type="xs:token" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="group_depend" type="ConditionalType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="member_of_group" type="ConditionalType" minOccurs="0" maxOccurs="unbounded"/>
 
         <xs:element name="export" type="ExportType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
