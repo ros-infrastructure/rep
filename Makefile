@@ -15,9 +15,11 @@ SUBDIRS=$(wildcard rep-????)
 
 TARGETS=$(REPS:.rst=.html) rep-0000.html
 
-all: rep-0000.rst $(TARGETS)
+all: rep-0000.rst $(TARGETS) $(XMLVALID)
 
 $(TARGETS): rep2html.py
+
+$(XMLVALID): xmlValid.py
 
 rep-0000.rst: $(REPS)
 	$(PYTHON) genrepindex.py .
