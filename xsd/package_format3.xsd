@@ -40,6 +40,14 @@
     </xs:simpleContent>
   </xs:complexType>
 
+  <xs:complexType name="LicenseType">
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute name="file" type="xs:token" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
   <xs:complexType name="VersionWithOptionalCompatibilityType">
     <xs:simpleContent>
       <xs:extension base="VersionType">
@@ -76,7 +84,7 @@
         <xs:element name="version" type="VersionType" minOccurs="1" maxOccurs="1"/>
         <xs:element name="description" type="DescriptionType" minOccurs="1" maxOccurs="1"/>
         <xs:element name="maintainer" type="PersonWithEmailType" minOccurs="1" maxOccurs="unbounded"/>
-        <xs:element name="license" type="xs:token" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element name="license" type="LicenseType" minOccurs="1" maxOccurs="unbounded"/>
 
         <xs:element name="url" type="UrlType" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="author" type="PersonWithOptionalEmailType" minOccurs="0" maxOccurs="unbounded"/>
