@@ -179,6 +179,9 @@ Crystal Clemmys (December 2018 - December 2019)
 
 Support Tiers:
 
+Platforms are defined as a combination of the OS, the Architecture, and the RMW implementation.
+By default the tiers are expected to apply upto the desktop variant in a rosdistro, unless otherwise specified.
+
 Tier 1
 
 Tier 1 platforms are subjected to our unit test suite and other testing tools on a frequent basis including continuous integration jobs, nightly jobs, packaging jobs, and performance testing.
@@ -187,10 +190,13 @@ Significant errors discovered in Tier 1 platforms can impact release dates and w
 
 Tier 2
 
-Tier 2 platforms are subject to ad hoc testing and binary packages may not be provided or supported.
+Tier 2 platforms are subject to periodic CI testing which runs both test builds and unit tests with publically accessible results.
+The CI is expected to be run at least within a week of a relevant changes for the current state of the rosdistro.
+Binary packages may not be provided or supported.
 Tier 2 platforms may have downloadable binary archives.
 Errors may be present in released product versions for Tier 2 platforms.
 Known errors in Tier 2 platforms will be addressed subject to resource availability on a best effort basis and may or may not be corrected prior to new version releases.
+One or more entities should be committed to continuing support of the platform.
 
 Tier 3
 
