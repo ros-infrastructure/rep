@@ -181,6 +181,7 @@ Support Tiers:
 
 Platforms are defined as a combination of the OS, the Architecture, and the RMW implementation.
 By default the tiers are expected to apply upto the desktop variant in a rosdistro, unless otherwise specified.
+ROS 2 variants are defined in REP 2000 [3]_.
 
 Tier 1
 
@@ -190,10 +191,9 @@ Significant errors discovered in Tier 1 platforms can impact release dates and w
 
 Tier 2
 
-Tier 2 platforms are subject to periodic CI testing which runs both test builds and unit tests with publically accessible results.
-The CI is expected to be run at least within a week of a relevant changes for the current state of the rosdistro.
-Binary packages may not be provided or supported.
-Tier 2 platforms may have downloadable binary archives.
+Tier 2 platforms are subject to periodic CI testing which runs both builds and tests with publicly accessible results.
+The CI is expected to be run at least within a week of relevant changes for the current state of the rosdistro.
+Package-level binary packages may not be provided but providing a downloadable archive of the built workspace is encouraged.
 Errors may be present in released product versions for Tier 2 platforms.
 Known errors in Tier 2 platforms will be addressed subject to resource availability on a best effort basis and may or may not be corrected prior to new version releases.
 One or more entities should be committed to continuing support of the platform.
@@ -325,6 +325,8 @@ References and Footnotes
 .. [1] Ubuntu Releases with End-of-Life Dates
    (https://wiki.ubuntu.com/Releases)
 .. [2] C11 is required, but support for some non-compliant systems is also provided, e.g. MSVC.
+.. [3] REP 2001
+   (http://www.ros.org/reps/rep-2001.html)
 
 Copyright
 =========
