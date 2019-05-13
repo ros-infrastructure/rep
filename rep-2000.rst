@@ -181,7 +181,7 @@ Support Tiers:
 
 Platforms are defined as a combination of the OS, the Architecture, and the RMW implementation.
 By default the tiers are expected to apply upto the desktop variant in a rosdistro, unless otherwise specified.
-ROS 2 variants are defined in REP 2000 [3]_.
+ROS 2 variants are defined in REP 2001 [3]_.
 
 Tier 1
 
