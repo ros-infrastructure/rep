@@ -192,7 +192,7 @@ Significant errors discovered in Tier 1 platforms can impact release dates and w
 Tier 2
 
 Tier 2 platforms are subject to periodic CI testing which runs both builds and tests with publicly accessible results.
-The CI is expected to be run at least within a week of relevant changes for the current state of the rosdistro.
+The CI is expected to be run at least within a week of relevant changes for the current state of the ROS distribution.
 Package-level binary packages may not be provided but providing a downloadable archive of the built workspace is encouraged.
 Errors may be present in released product versions for Tier 2 platforms.
 Known errors in Tier 2 platforms will be addressed subject to resource availability on a best effort basis and may or may not be corrected prior to new version releases.
