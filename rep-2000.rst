@@ -342,8 +342,6 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-|  rmw_connext_dynamic_cpp | RTI Connext         | Tier 2        | All platforms except Debian | All architectures except arm64/arm32 |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
