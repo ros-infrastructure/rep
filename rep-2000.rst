@@ -403,9 +403,9 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+---------------------+
 | Connext DDS |                              5.3.1              |         N/A         |
 +-------------+----------------+---------------+----------------+---------------------+
-|  Fast-RTPS  |                                      1.7.0                            |
+|  Fast-RTPS  |                                      1.8.0                            |
 +-------------+----------------+---------------+----------------+---------------------+
-| OpenSplice  |                                  6.9.181126OSS                        |
+| OpenSplice  |                                  6.9.190403OSS                        |
 +-------------+----------------+---------------+----------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
