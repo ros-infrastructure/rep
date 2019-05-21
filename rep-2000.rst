@@ -306,7 +306,7 @@ Build System Support:
 - cmake
 - setuptools
 
-Dashing Diademata (TBD Summer/Fall 2019 - Summer/Fall 2021)
+Dashing Diademata (May 2019 - May 2021)
 ---------------------------------------------------------------
 
 Support Tiers:
