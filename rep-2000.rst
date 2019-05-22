@@ -435,9 +435,9 @@ References and Footnotes
 .. [2] C11 is required, but support for some non-compliant systems is also provided, e.g. MSVC.
 .. [3] REP 2001
    (http://www.ros.org/reps/rep-2001.html)
-.. [4] Crystal ROS2 Repos File
+.. [4] Crystal ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/crystal/ros2.repos)
-.. [5] Dashing ROS2 Repos File
+.. [5] Dashing ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/master/ros2.repos)
 
 Copyright
