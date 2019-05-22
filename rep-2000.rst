@@ -220,7 +220,7 @@ The following indicators show what delivery mechanisms are available for each pl
 
 " [d] " Debian packages will be provided for this platform for packages submitted to the rosdistro.
 
-" [a] " Binary releases are provided as a single archive per platform containing all packages in this repos file [4]_. 
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Crystal ROS 2 repos file [4]_. 
 
 " [s] " Compilation from source.
 
@@ -329,7 +329,7 @@ The following indicators show what delivery mechanisms are available for each pl
 
 " [d] " Debian packages will be provided for this platform for packages submitted to the rosdistro.
 
-" [a] " Binary releases are provided as a single archive per platform containing all packages in this repos file [4]_. 
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Dashing ROS 2 repos file [5]_. 
 
 " [s] " Compilation from source.
 
@@ -435,7 +435,9 @@ References and Footnotes
 .. [2] C11 is required, but support for some non-compliant systems is also provided, e.g. MSVC.
 .. [3] REP 2001
    (http://www.ros.org/reps/rep-2001.html)
-.. [4] ROS2 Repos File
+.. [4] Crystal ROS2 Repos File
+   (https://github.com/ros2/ros2/blob/crystal/ros2.repos)
+.. [5] Dashing ROS2 Repos File
    (https://github.com/ros2/ros2/blob/master/ros2.repos)
 
 Copyright
