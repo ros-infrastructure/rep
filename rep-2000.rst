@@ -4,7 +4,7 @@ Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@open
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
-Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019
+Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May-2019
 
 
 Abstract
@@ -14,6 +14,35 @@ This REP defines target platforms for each ROS 2.0 Distribution Release.
 We define platforms to include both operating system releases (e.g. Ubuntu Xenial (16.04 LTS)) as well as major language releases (e.g. Python 3.5).
 The target platforms represent the set on which all core stacks are expected to work.
 Exceptions can be made for stacks that are intentionally platform-specific.
+
+Support Tiers
+=============
+
+Platforms are defined as a combination of the OS, the architecture, and the RMW implementation.
+By default the tiers are expected to apply up to the desktop variant in a rosdistro, unless otherwise specified.
+ROS 2 variants are defined in REP 2001 [3]_.
+
+Tier 1
+
+Tier 1 platforms are subjected to our unit test suite and other testing tools on a frequent basis including continuous integration jobs, nightly jobs, packaging jobs, and performance testing.
+Errors or bugs discovered in these platforms are prioritized for correction by the development team.
+Significant errors discovered in Tier 1 platforms can impact release dates and we strive to resolve all known high priority errors in Tier 1 platforms prior to new version releases.
+
+Tier 2
+
+Tier 2 platforms are subject to periodic CI testing which runs both builds and tests with publicly accessible results.
+The CI is expected to be run at least within a week of relevant changes for the current state of the ROS distribution.
+Package-level binary packages may not be provided but providing a downloadable archive of the built workspace is encouraged.
+Errors may be present in released product versions for Tier 2 platforms.
+Known errors in Tier 2 platforms will be addressed subject to resource availability on a best effort basis and may or may not be corrected prior to new version releases.
+One or more entities should be committed to continuing support of the platform.
+
+Tier 3
+
+Tier 3 platforms are those for which community reports indicate that the release is functional.
+The development team does not run the unit test suite or perform any other tests on platforms in Tier 3.
+Installation instructions should be available and up-to-date in order for a platform to be listed in this category.
+Community members may provide assistance with these platforms.
 
 Platforms by Distribution
 =========================
@@ -60,7 +89,7 @@ Dependency Requirements:
 +---------+---------------+---------------+----------------+
 | Qt      |     5.5.1     |     5.10.0    |     5.10.0     |
 +---------+---------------+---------------+----------------+
-|            Linux only (used for turtlebot demo)          |
+|          **Linux only (used for turtlebot demo)**        |
 +---------+---------------+---------------+----------------+
 | PCL     |     1.7.2     |     N/A       |     N/A        |
 +---------+---------------+---------------+----------------+
@@ -139,7 +168,7 @@ Dependency Requirements:
 +---------+----------------+---------------+----------------+-------------------+---------------------+
 | Qt      |     5.9.5      |     5.10.0    |     5.10.0     |       5.5.1       |        5.7.1        |
 +---------+----------------+---------------+----------------+-------------------+---------------------+
-|                                          Linux only (used for turtlebot demo)                       |
+|                                        **Linux only (used for turtlebot demo)**                     |
 +---------+----------------+---------------+----------------+-------------------+---------------------+
 | PCL     |     1.8.1      |     N/A       |     N/A        |       1.7.2       |        1.8.0        |
 +---------+----------------+---------------+----------------+-------------------+---------------------+
@@ -176,34 +205,6 @@ Middleware Implementation Support:
 
 Crystal Clemmys (December 2018 - December 2019)
 -----------------------------------------------
-
-Support Tiers:
-
-Platforms are defined as a combination of the OS, the architecture, and the RMW implementation.
-By default the tiers are expected to apply up to the desktop variant in a rosdistro, unless otherwise specified.
-ROS 2 variants are defined in REP 2001 [3]_.
-
-Tier 1
-
-Tier 1 platforms are subjected to our unit test suite and other testing tools on a frequent basis including continuous integration jobs, nightly jobs, packaging jobs, and performance testing.
-Errors or bugs discovered in these platforms are prioritized for correction by the development team.
-Significant errors discovered in Tier 1 platforms can impact release dates and we strive to resolve all known high priority errors in Tier 1 platforms prior to new version releases.
-
-Tier 2
-
-Tier 2 platforms are subject to periodic CI testing which runs both builds and tests with publicly accessible results.
-The CI is expected to be run at least within a week of relevant changes for the current state of the ROS distribution.
-Package-level binary packages may not be provided but providing a downloadable archive of the built workspace is encouraged.
-Errors may be present in released product versions for Tier 2 platforms.
-Known errors in Tier 2 platforms will be addressed subject to resource availability on a best effort basis and may or may not be corrected prior to new version releases.
-One or more entities should be committed to continuing support of the platform.
-
-Tier 3
-
-Tier 3 platforms are those for which community reports indicate that the release is functional.
-The development team does not run the unit test suite or perform any other tests on platforms in Tier 3.
-Installation instructions should be available and up-to-date in order for a platform to be listed in this category.
-Community members may provide assistance with these platforms.
 
 Targeted platforms:
 
@@ -270,11 +271,11 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
 | Qt          |     5.9.5      |     5.12.0    |     5.10.0     |       5.5.1       |        5.7.1        |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
-|                              |           Linux only           |                                         |
+|                              |         **Linux only**         |                                         |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
 | PCL         |     1.8.1      |     N/A       |     N/A        |       1.7.2       |        1.8.0        |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
-|                                  RMW DDS Milddleware Providers                                          |
+|                                **RMW DDS Milddleware Providers**                                        |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
 | Connext DDS |                              5.3.1                                  |         N/A         |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
@@ -305,6 +306,111 @@ Build System Support:
 - ament_cmake
 - cmake
 - setuptools
+
+
+Dashing Diademata (May 2019 - May 2021)
+---------------------------------------------------------------
+
+Targeted platforms:
+
++--------------+-----------------------+------------------------------+------------------------+------------------------+
+| Architecture | Ubuntu Bionic (18.04) |     MacOS Sierra (10.12)     |   Windows 10 (VS2019)  | Debian Stretch (9) [s] |
++==============+=======================+==============================+========================+========================+
+|    amd64     |        Tier 1         |           Tier 2*            |          Tier 1*       |        Tier 3          |
++--------------+-----------------------+------------------------------+------------------------+------------------------+
+|    arm64     |        Tier 1         |                              |                        |        Tier 3          |
++--------------+-----------------------+------------------------------+------------------------+------------------------+
+|    arm32     |        Tier 2         |                              |                        |        Tier 3          |
++--------------+-----------------------+------------------------------+------------------------+------------------------+
+
+
+" * " Individual binary packages are not currently available for these platforms.
+Binary releases are provided as a single archive per platform containing all packages in [this repos file](https://github.com/ros2/ros2/blob/master/ros2.repos).
+
+" [s] " Compilation from source, the ROS buildfarm will not produce any binary packages for these platforms.
+
+Middleware Implementation Support:
+
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                        |
++==========================+=====================+===============+=============================+======================================+
+|  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+|  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+
+Middleware implementation support is dependent upon the platform support tier.
+For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
+
+Minumum language requirements:
+
+- C++14
+- Python 3.5
+
+
+Dependency Requirements:
+
++-------------+-------------------------------------------------+---------------------+
+|             |                        Required Support         | Recommended Support |
++-------------+----------------+---------------+----------------+---------------------+
+| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Stretch [s]  |
++=============+================+===============+================+=====================+
+| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |        3.7.2        |
++-------------+----------------+---------------+----------------+---------------------+
+| EmPY        |     3.3.2      |     3.3.2     |     3.3.2      |        3.3.2        |
++-------------+----------------+---------------+----------------+---------------------+
+| Ogre        |                                      1.10*                            |
++-------------+----------------+---------------+----------------+---------------------+
+| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |        3.2*         |
++-------------+----------------+---------------+----------------+---------------------+
+| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |        1.1.0j       |
++-------------+----------------+---------------+----------------+---------------------+
+| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |        1.8.0*       |
++-------------+----------------+---------------+----------------+---------------------+
+| Python      |     3.6.5      |     3.7.3     |     3.7.3      |        3.5.3        |
++-------------+----------------+---------------+----------------+---------------------+
+| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |        5.7.1        |
++-------------+----------------+---------------+----------------+---------------------+
+|                              |         **Linux only**                               |
++-------------+----------------+---------------+----------------+---------------------+
+| PCL         |     1.8.1      |     N/A       |     N/A        |        1.8.0        |
++-------------+----------------+---------------+----------------+---------------------+
+|                                **RMW DDS Milddleware Providers**                    |
++-------------+----------------+---------------+----------------+---------------------+
+| Connext DDS |                              5.3.1              |         N/A         |
++-------------+----------------+---------------+----------------+---------------------+
+|  Fast-RTPS  |                                      1.8.0                            |
++-------------+----------------+---------------+----------------+---------------------+
+| OpenSplice  |                                  6.9.190403OSS                        |
++-------------+----------------+---------------+----------------+---------------------+
+
+" * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
+
+" ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
+
+" [s] " Compilation from source, the ROS buildfarm will not produce any binary packages for these platforms.
+
+This document only captures the version at the first release of a ROS distribution and will not be updated as the dependencies move forward.
+These versions are thus a low watermark.
+
+
+Package manager use for dependencies:
+
+- Ubuntu, Debian: apt
+- MacOS: Homebrew, pip
+- Windows: Chocolatey, pip
+
+
+Build System Support:
+
+- ament_cmake
+- cmake
+- setuptools
+
 
 Motivation
 ==========
