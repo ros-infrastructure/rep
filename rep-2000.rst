@@ -356,8 +356,7 @@ Middleware Implementation Support:
 | rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms except        | All Architectures                    |
-|                          |                     |               | OpenEmbedded                |                                      |
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 
 Middleware implementation support is dependent upon the platform support tier.
