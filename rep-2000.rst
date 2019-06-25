@@ -220,7 +220,7 @@ The following indicators show what delivery mechanisms are available for each pl
 
 " [d] " Debian packages will be provided for this platform for packages submitted to the rosdistro.
 
-" [a] " Binary releases are provided as a single archive per platform containing all packages in the Crystal ROS 2 repos file [4]_. 
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Crystal ROS 2 repos file [4]_.
 
 " [s] " Compilation from source.
 
@@ -260,6 +260,8 @@ Dependency Requirements:
 | CMake       |     3.10.2     |     3.13.3    |     3.13.3     |       3.5.1       |        3.7.2        |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
 | EmPY        |     3.3.2      |     3.3.2     |     3.3.2      |       3.3.2       |        3.3.2        |
++-------------+----------------+---------------+----------------+-------------------+---------------------+
+| Gazebo      |     9.0.0      |     9.9.0     |      N/A       |       9.9.0*      |        9.8.0*      |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
 | Ogre        |                                      1.10*                                                |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
@@ -329,7 +331,7 @@ The following indicators show what delivery mechanisms are available for each pl
 
 " [d] " Debian packages will be provided for this platform for packages submitted to the rosdistro.
 
-" [a] " Binary releases are provided as a single archive per platform containing all packages in the Dashing ROS 2 repos file [5]_. 
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Dashing ROS 2 repos file [5]_.
 
 " [s] " Compilation from source.
 
@@ -366,6 +368,8 @@ Dependency Requirements:
 | CMake       |     3.10.2     |     3.14.4    |     3.14.4     |        3.7.2        |
 +-------------+----------------+---------------+----------------+---------------------+
 | EmPY        |     3.3.2      |     3.3.2     |     3.3.2      |        3.3.2        |
++-------------+----------------+---------------+----------------+---------------------+
+| Gazebo      |     9.0.0      |     9.9.0     |      N/A       |        9.8.0*       |
 +-------------+----------------+---------------+----------------+---------------------+
 | Ogre        |                                      1.10*                            |
 +-------------+----------------+---------------+----------------+---------------------+
