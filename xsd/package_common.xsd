@@ -15,7 +15,7 @@
   <xs:complexType name="DescriptionType" mixed="true">
     <xs:annotation>
       <xs:documentation>
-        The description allows any content but should be limit to XHTML.
+        The description allows any content but should be limited to XHTML.
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -28,7 +28,7 @@
       <xs:documentation>
         A valid email address must follow several complex rules
         (see https://en.wikipedia.org/wiki/Email_address).
-        For ROS packages only a few are enforced and not the full character set
+        For ROS packages only a few are enforced, and not the full character set
         is supported.
       </xs:documentation>
     </xs:annotation>
