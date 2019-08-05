@@ -71,7 +71,7 @@ Tooling support for Python 3
 rosdep keys
 '''''''''''
 All exsiting Python rosdep keys including `<platform>_python3` entries will
-stay as they are to avoid breaking unknown existing use cases.
+stay the same to avoid breaking unknown existing use cases.
 Even if an key refers to a Python 2 package on one platform and Python 3 on
 another, it should stay that way.
 
