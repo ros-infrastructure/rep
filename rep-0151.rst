@@ -11,10 +11,9 @@ Outline
 
 #. Abstract_
 #. Motivation_
-#. Rationale_
-#. Proposals_
+#. Context_
+#. Proposal_
 #. Rosdep_
-#. Conclusion_
 #. References_
 #. Copyright_
 
@@ -29,314 +28,223 @@ Motivation
 As described in the Python release schedule [1]_ Python 2.7 will only receive
 bugfix releases until 2020.
 As a consequence Ubuntu is trying to demote Python 2.7 into the `universe`
-repository for 18.04 since they don't want to guarantee support for 5 years.
+repository [2]_.
 While it is unlikely that Python 2.7 will be removed from the archives entirely
 it should not be relied on past its EOL date.
-Therefore ROS 1 needs to begin moving to Python 3 in order to make the
-transition as smooth as possible.
+Therefore ROS 1 must move to Python 3.
 
-Rationale
-=========
+Context
+=======
 
-The goal for a future ROS 1 distribution to support Python 3 should be achieved
-no later than for ROS O-turtle (May 2020).
-Since O-turtle is a LTS release it is strongly desired to already support
-Python 3 in the non-LTS release N-turtle to allow enough "soak" time.
+Different versions of Python can't be mixed within a single ROS distribution.
+A package using Python 3 can't import Python modules from a package built using
+Python 2.
+All ROS packages containing Python code need to support Python 3 before they can
+be released into Noetic.
 
-In general a single Python version must be used since different versions can't
-be mixed within a single ROS distribution.
-E.g. a package `A` using Python 3 can't use the Python modules from package `B`
-if that was built with/for Python 2.
+Past proposals for Python 3 support have assumed a ROS distro will need to
+support Python 2 and Python 3 at the same time.
+Since then it was decided the first ROS 1 distribution to support Python 3
+will be Noetic Ninjemys (May 2020) [3]_, and it will only support Python 3.
+This REP only describes the current proposal since the change in requirements
+has made past proposals obsolete.
 
-In order to support Python 3 it is mandatory that the testing infrastructure
-(namely `devel` and `PR` jobs) can run the build and tests with Python 3.
-Since each of these jobs require Debian packages of the dependencies to be
-present being able to test for a specific Python version requires Debian
-packages for this Python version to be present.
-The alternative of building all dependencies from-source in these jobs doesn't
-scale and is therefore not feasible since the time necessary for a single build
-gets increasingly high the further up in the stack the package is.
-
-Updating all ROS packages which contain Python code to support Python 2
-as well as 3 is a significant effort.
-Therefore it is expected that this will take a while and will require the ROS
-community to share the necessary workload.
-
-Proposals
-=========
-
-Neither of the proposals specifies a specific minimum minor version for Python
-3 support but focuses on the general effort to transition to Python 3.
-The minimum version is being defined in REP 3 [2]_ together with all other
+This proposal does not specify a minimum minor version for Python.
+The minimum version will being defined in REP 3 [4]_ together with all other
 versions.
 
-A) Transition over multiple releases (separate debs for other Python)
----------------------------------------------------------------------
+Proposal
+========
 
-The goals of this proposal are to provide early feedback for Python 3 related
-problems by providing parallel testing capabilities.
-The following timeline describes a transition over multiple ROS releases:
+Python 3 support at the time of Noetic release means:
 
- * ROS O-turtle (May 2020, LTS):
+* All ROS tooling supports creating a Python 3 only ROS distro
+* All ROS packages released to Noetic support Python 3
 
-   * The only Debian packages provided are using Python 3.
-   * From-source builds are using Python 3 by default.
-   * All ROS packages should support Python 3.
-   * Python 2 support is not required anymore.
+The amount of work to transition to Python 3 is expected to be significant.
+The entire ROS community will need to share the workload.
+This effort should be started as soon as possible to reduce the risk of the
+Noetic release being delayed.
 
- * ROS N-turtle (May 2019):
+Tooling support for Python 3
+----------------------------
 
-   * The set of recommended Debian packages is using Python 3.
-   * There is an alternative set of Debian packages which is using Python 2,
-     this can be used in case some packages don't support Python 3 yet.
-     These two sets of Debian packages should be side-by-side installable in
-     order to ease testing.
-   * From-source builds are using Python 3 by default, optionally choosing
-     Python 2 should be possible for all packages.
-   * All ROS packages should support Python 2 as well as Python 3.
+rosdep keys
+'''''''''''
+All exsiting Python rosdep keys including `<platform>_Python3` entries will
+stay as they are to avoid breaking unknown existing use cases.
+Even if an key refers to a Python 2 package on one platform and Python 3 on
+another, it should stay that way.
 
- * ROS Melodic (May 2018, LTS):
+Some Python rosdep keys have `<platform>_Python3` entries.
+This was an experiment at having a rosdep key conditionally evaluate to either
+a Python 2 or Python 3 system dependency.
+No new `<platform>_Python3` entries should be added, and the entries should
+not be relied on.
 
-   * The set of recommended Debian packages is using Python 2.
-   * There is an alternative set of Debian packages which is using Python 3,
-     this can be used by the CI infrastructure as well as users choosing to use
-     Python 3.
-   * From-source builds are using Python 2 by default, optionally choosing
-     Python 3 should be possible.
-   * All ROS packages should support Python 2 while support for Python 3 is
-     recommended (as it has been for the past ROS distributions).
+For new Python keys, when a platform has separate Python 2 and Python 3 versions
+of a package there should be a rosdep key for each.
+For example, there are two keys `Python-catkin-pkg` and `Python3-catkin-pkg`.
+The `Python-catkin-pkg` key should resolve to a Python 2 dependency on any
+platform where one exists, while `Python3-catkin-pkg` should only resolve to a
+Python 3 dependency.
 
-Requirements
-''''''''''''
 
-To support the proposal `A)` a few capabilities have to be developed:
+ROS_PYTHON_VERSION
+''''''''''''''''''
 
- * `catkin` / `catkin_tools` need to support choosing the Python version.
+`ROS_PYTHON_VERSION` is an environment variable that is set to either `2` or
+`3` to indicate the major version of Python supported by a ROS distro.
+The intent is to allow `package.xml` files to have conditional Python
+dependencies.
 
- * `rosdep`: choose between Python 2 and Python 3 dependencies; see the Rosdep_
-    section for more information.
+It is set by the package `ros_environment` when sourcing a ROS workspace.
+The version set will be dictated by REP 3 [4]_.
+For example, in Melodic it defaults to `2`, but in Noetic this must be `3`.
 
- * `bloom` needs to generate releases for both Python versions in parallel.
-   The user should only need to release each package once.
+Users building ROS from source will not have an existing ROS workspace set, so
+the variable won't be set and conditional dependencies can't be evalulated
+when using `rosdep` to instal them.
+To fix this, `rosdep` should set `ROS_PYTHON_VERSION` to the same version of
+Python used to invoke it.
+It will get this information using `sys.version[0]`.
+A user wanting to use a different Python version must set `ROS_PYTHON_VERSION`
+explicitly.
 
- * `ros_buildfarm` needs to provide jobs for both Python versions in parallel.
+rosdep and pip packages
+'''''''''''''''''''''''
+Unlike debian packages, keys that resolve to packages on PyPI may refer to
+either Python2 or Python 3 dependencies.
+The version that gets downloaded depends on the version of Python used to
+invoke pip.
+Rosdep currently calls the command `pip`.
+It might use Python2 when using the debian package Python-pip, but it could use
+Python3 inside a venv.
 
- * Across all ROS packages which contain Python code it needs to be ensured
-   that they support both major Python versions.
-   In the majority of the cases this can be easily achieved, some examples how
-   to convert Python 2-only code to work for both major versions can be found
-   in the ROS wiki [4]_.
+`rosdep` could default to `sys.executable -m pip` to use the same version of
+Python as rosdep, but a user building the ROS 1 bridge for Melodic is likely
+using the debian package `Python3-rosdep`.
+To support this, rosdep should use `Python$ROS_PYTHON_VERSION -m pip`.
+Since `rosdep` sets `ROS_PYTHON_VERSION` for itself if unset, this will default
+to the same version of Python as rosdep if `ROS_PYTHON_VERSION` is unset, but
+it can still be overridden automatically when a ROS workspace is sourced.
 
-B) Transition from one release to the next
-------------------------------------------
+ROS packages support for Python 3
+---------------------------------
 
-This proposal minimizes the effort necessary on the infrastructure and tooling
-side.
-Instead of supporting both Python versions in parallel the only supported
-Python version changes from one release to the next:
+There are many ROS packages using Python that will need to be modified to
+support Python 3.
+Packages using different branches for different ROS distros can drop support
+for Python 2 in their Noetic branch.
+Packages which use the same branch in multiple ROS distros may need to support
+both Python 2 and Python 3 at the same time.
+This section describes what needs to be done in both cases.
 
- * ROS O-turtle (May 2020, LTS):
+Shebangs and reliance on the Python command
+'''''''''''''''''''''''''''''''''''''''''''
+Python scripts on unix systemx typically have shebang lines written as:
 
-   * The Debian packages as well as the infrastructure and tools only support
-     Python 3.
+.. code-block: bash
 
- * ROS N-turtle (May 2019):
+    #!/usr/bin/env Python
 
-   * The Debian packages as well as the infrastructure and tools only support
-     Python 3.
-   * To maximize the testing time the buildfarm should be provided as early as
-     possible (around November 2018 once the first Ubuntu 19.04 packages are
-     available).
-   * The downside of this is that N-turtle will target the same Ubuntu LTS
-     18.04 which makes it more difficult to choose the "right" `rosdep`
-     mapping.
-     The effort is not higher than for proposal `A)` though.
-     An alternative would be to keep using Python 2 in N-turtle and only switch
-     to Python 3 in O-turtle but that would imply a drastic change in an LTS
-     release which doesn't seem to be a good idea.
+PEP 394 recommends distributed Python scripts to use either `Python2` or 
+`Python3` [7]_.
+The `Python` command cannot be trusted to a spefic Python version.
+On older ROS distros, scripts can continue to use `Python` since they're known
+to work on those platforms.
+In preparation for Noetic, these shebang's should be rewritten to the specific
+version of Python supported, `Python3`.
 
- * ROS Melodic (May 2018, LTS):
+Packages using the same branch will need to conditionally rewrite the shebangs.
+Packages can use the CMake macro `catkin_install_Python()` to install Python
+scripts with rewritten shebangs.
 
-   * The Debian packages as well as the infrastructure and tools only support
-     Python 2.
-   * It should be made possible to do a from-source build with Python 3 for
-     early testing.
-   * It is encouraged to make the code base work with both Python version in
-     order to ease the upcoming transition.
+The same issue appears in scripts that call the `Python` command directly.
+If they are Python scripts, they should be modified to invoke `sys.executable`.
+Otherwise, they should be edited to invoke the specific version of Python they
+require, or `Python$ROS_PYTHON_VERSION` if the script works with both.
 
-Requirements
-''''''''''''
+Dependencies and package.xml
+''''''''''''''''''''''''''''
 
-To support the proposal `B)` less effort is necessary compared to proposal
-`A)`:
+On platforms where the target version of Python is 2, the package.xml of a ROS
+package must refer to Python 2 dependencies, and when the target Python
+version is 3 it must refer to Python 3 dependencies.
+Packages which release from different branches for each ROS distro can replace
+rosdep keys that resolve to Python 2 dependencies to ones that resolve to
+Python 3 equivalents.
+Packages using the same code base for multiple ROS distros should instead use
+conditional dependencies as described in REP 149 [5]_.
 
- * `rosdep`: choose between Python 2 and Python 3 dependencies; see the Rosdep_
-    section for more information.
+.. code-block: xml
 
- * `bloom` needs to generate releases for both Python versions in parallel.
-   The user should only need to release each package once.
+    <depend condition="$ROS_PYTHON_VERSION == '2'">Python-numpy</depend>
+    <depend condition="$ROS_PYTHON_VERSION == '3'">Python3-numpy</depend>
 
- * `ros_buildfarm` needs to provide jobs for both Python versions in parallel.
+If `ROS_PYTHON_VERSION` is relied upon at build time, such as when using
+`catkin_install_Python()` to rewrite shebangs, then the package must declare a
+`<buildtool_depend>` on `ros_environment`.
+Any ROS package which uses `ROS_PYTHON_VERSION` in a script intended to be
+run at runtime should add an `<exec_depend>` tag for `ros_environment`.
 
- * ROS packages don't have to support both Python versions in parallel but they
-   all have to switch to Python 3 for the same release.
-   While the effort is slightly lower than to support both Python versions
-   simultaneously the transition window is rather short.
+Making Python fixes available to downstream packages
+''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-C) Transition over multiple releases (single set of bilingual debs)
--------------------------------------------------------------------
+Transitioning to Python 3 is expected to be a significant effort.
+Typicically ROS packages are tested using the ROS build farm; however, that
+will not be available until packages for the targeted Ubuntu distribution
+become available.
+Instead, a placehoder `Noetic` `distribution.yaml` will be made available in
+advance of the buildfarm availability.
+Maintainers should add `source` entries for their Noetic branches to this file
+to enable downstream users to use `rosinstall_generator` with the
+`--upstream-development` flag to get Python 3 fixes.
+Instructions to build from source using Python 3 will be made available to
+the ROS community.
 
-Similar goals and timeline to proposal `A)`, but with only a single set of
-installable debs, significantly lowering the complexity barrier for users and
-package deveopers/maintainers.
+Once the build farm is available, Maintainers should release packages with
+Python 3 fixes to Noetic as soon as possible, even if they intend to make
+breaking changes later.
 
-The concept is that each installed package which supplies Python modules will be
-able to migrate to dual Python 2/3 support during ROS Melodic, such that leaf
-Python packages are able to opt into Python 3 any time during Melodic or
-N-Turtle, whenever their dependencies are ready to go.
+Organizing Community effort
+---------------------------
 
-This proposal offers flexibility to users, with the primary costs being the risk
-of user confusion or side effects around the "alternative python" shim, and the
-cost of dual-depending on all Python dependencies, which may frustrate users
-with limited disk who would prefer not to have both `python-numpy` and
-`python3-numpy` installed unncessarily.
+In order to achieve this, prior to the Noetic release community members must
+be able to see:
 
-The following timeline describes a transition over multiple ROS releases:
+* which ROS packages already support Python 3
+* which ROS packages need help supporting Python 3
 
- * ROS O-turtle (May 2020, LTS):
+The presence of a `source` entry in the Noetic `distribution.yaml` should be
+taken to mean a package has started transitioning to Python 3.
+Community members can use the differences between this and the previous ROS
+distro's `distribution.yaml` as an indication of which packages would benefit
+the most from their contributions.
 
-   * Debian packages using catkin_setup_python install to
-     `lib/python3/dist-packages/`.
-   * From-source builds use Python 3 by default.
-   * All ROS packages should support Python 3.
-
- * ROS N-turtle (May 2019):
-
-   * Debian packages using catkin_setup_python install to both
-     `lib/python3/dist-packages/` and `lib/python2.7/dist-packages/`
-   * Default behaviour of `catkin_install_python` (with an ambiguous
-     `usr/bin/env python` shebang) is to use Python 3. Users may choose
-     explicitly a `python2` or `python3` shebang, as desired.
-   * From-source builds are using Python 3 by default; users may choose
-     instead Python 2 or to use the dual-build behaviour.
-
- * ROS Melodic (May 2018, LTS):
-
-   * Debian packages using catkin_setup_python install to both
-     `lib/python3/dist-packages/` and `lib/python2.7/dist-packages/`
-   * Default behaviour of `catkin_install_python` (with an ambiguous
-     `usr/bin/env python` shebang) is to use Python 2. Users may choose
-     explicitly a `python2` or `python3` shebang, as desired.
-   * From-source builds are using Python 2 by default; users may choose
-     instead Python 3 or to use the dual-build behaviour.
-
-Requirements
-''''''''''''
-
-To support the proposal `C)` a few capabilities must be developed in catkin:
-
- * It will need to be updated with bilingual awareness around the
-   `catkin_install_python` and `catkin_python_setup` functions.
-
- * The existing `PYTHON_EXECUTABLE`, `PYTHON_LIBRARY`, and `PYTHON_INCLUDE_DIR`
-   variables which may be used today to select the preferred Python will need to
-   be supplemented by a separate `PYTHON_ALT_*` vars which control which Python
-   is used for the second `setup.py` invocation. If the `PYTHON_ALT_*` vars are
-   unset, catkin will build only for the default Python (this would be default
-   behaviour in a source workspace, in order to not break Arch and other
-   from-source systems where `/usr/bin/python` is already Python 3).
-
- * Similarly, Python nosetests will run twice if the `PYTHON_ALT_*` vars are
-   set. Perhaps a CMake function could be used to disable this behaviour,
-   especially for packages which migrate to Python 3 and don't want to receive
-   test failures for Python 2 issues. For example,
-   `catkin_python_policy(ONLY_3)` or similar.
-
- * In order to do the right thing with conventional `/usr/bin/env python3`
-   shebangs, ROS Melodic will need to ship a small wrapper shim which mutates
-   the `PYTHONPATH` variable. This shim would live at
-   `/opt/ros/melodic/bin/python3` and look like
-   ```
-   #!/bin/sh
-   PYTHONPATH=$(echo $PYTHONPATH | sed "s/lib\/python2\.7/lib\/python3/")
-   /usr/bin/python3 $*
-   ```
-   Similarly, ROS N-Turtle would have to do the reverse operation in a `python2`
-   shim. No shim would be required for ROS O-Turtle and beyond. This shim could
-   be part of the `catkin` package itself, or potentially live separately.
-
-And in other tools:
-
- * `rosdep`: choose between Python 2 and Python 3 dependencies; see the Rosdep_
-    section for more information.
-
- * `bloom`: For the transitional releases (N and M), the default bloom behaviour
-   will be to depend on both the Python 2 and Python 3 versions of all Python
-   dependencies.
-
- * `ros_buildfarm` should set the new `PYTHON_ALT_*` vars according to the
-   release plan given above.
-
- * Packages which generate compiled Python extensions will require bespoke CMake
-   logic to ensure that these extensions are correctly built and installed
-   twice. Upon examining the individual cases, it's possible that the `catkin`
-   package may be able to provide some tooling to streamline this.
-
-Rosdep
-======
-
-To support any of the proposals above, rosdep must be updated to allow either
-Python 2 or Python 3 keys.
-
-Multiple different options can be considered for this:
-
- #. Beside the `python.yaml` file create a `python3.yaml` file and let
-    `rosdep` choose between them.
- #. Use different installers for Python 2 and Python 3 packages, e.g. `xenial`
-    and `xenial_python3`, and let `rosdep` choose between them.
- #. Create explicit rosdep keys with a `python2` and `python3` prefix and use
-    them in the package manifest files with conditional dependencies as
-    specified in REP 149 [3]_.
- #. A combination of 1. and 3., where the default dependency resolution for
-    rosdep depends on the ROS distribution in use, with an environment variable
-    to let users manually control it.  For instance, for a rosdep key of
-    `python-foo`, there would be an entry in `python.yaml` that resolves to
-    `python-foo` on Ubuntu, and an entry in `python3.yaml` that resolves to
-    `python3-foo` on Ubuntu.  On Melodic, rosdep would resolve dependencies
-    using the `python.yaml` file by default.  An environment variable called
-    `ROS_PYTHON_VERSION` would allow the user to force the use of `python3.yaml`
-    for dependency resolution for testing (though this requires a removal and
-    re-initialization of the entire rosdep database).  On N-Turtle, this would
-    be reversed and rosdep would resolve dependencies using the `python3.yaml`
-    file by default.  Additionally, there may be keys called `python2-foo` and
-    `python3-foo` that would allow package maintainers to support Python 2 and
-    Python 3 simultaneously in their package by utilizing conditional
-    dependencies in package format 3 [3]_.
-
-Conclusion
-==========
-
-While proposal `A)` provides a smoother transition it requires a significantly
-higher development effort.
-Proposal `B)` requires the least tooling effort, but will be the roughest on the
-community, offering little in the way of a migration plan.
-Proposal `C)` also provides a smooth transition, but also requires significantly
-higher development effort.
-
-Since there are limited resources available to fix the tooling, Proposal B) will
-be chosen and implemented.
+There are many ROS package maintainers in the community, and each has the
+responsibility of deciding how the packages they maintain should make the
+transition to Python 3.
+On an individual repository level, community members are encouraged to open
+issues and pull requests with Python 3 fixes.
 
 References
 ==========
 
 .. [1] PEP 373 Python 2.7 Release Schedule
-   (https://www.python.org/dev/peps/pep-0373/)
-.. [2] REP-0003 Target Platforms
+   (https://www.Python.org/dev/peps/pep-0373/)
+.. [2] Python2 to be demoted to universe
+   (https://bugs.launchpad.net/ubuntu/+source/swift/+bug/1817023)
+.. [3] Planning future ROS 1 distributions
+   (https://discourse.ros.org/t/planning-future-ros-1-distribution-s/6538)
+.. [4] REP-0003 Target Platforms
    (http://ros.org/reps/rep-0003)
-.. [3] REP-0149 Package Manifest Format Three Specification
+.. [5] REP-0149 Package Manifest Format Three Specification
    (http://ros.org/reps/rep-0149)
-.. [4] ROS Wiki - Python 2 and 3 compatible code
-   (http://wiki.ros.org/python_2_and_3_compatible_code)
+.. [6] ROS Wiki - Python 2 and 3 compatible code
+   (http://wiki.ros.org/Python_2_and_3_compatible_code)
+.. [7] PEP 394 The "Python" Command on Unix-Like Systems
+   (https://www.Python.org/dev/peps/pep-0394/)
 
 Copyright
 =========
