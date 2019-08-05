@@ -70,22 +70,22 @@ Tooling support for Python 3
 
 rosdep keys
 '''''''''''
-All exsiting Python rosdep keys including `<platform>_Python3` entries will
+All exsiting Python rosdep keys including `<platform>_python3` entries will
 stay as they are to avoid breaking unknown existing use cases.
 Even if an key refers to a Python 2 package on one platform and Python 3 on
 another, it should stay that way.
 
-Some Python rosdep keys have `<platform>_Python3` entries.
+Some Python rosdep keys have `<platform>_python3` entries.
 This was an experiment at having a rosdep key conditionally evaluate to either
 a Python 2 or Python 3 system dependency.
-No new `<platform>_Python3` entries should be added, and the entries should
+No new `<platform>_python3` entries should be added, and the entries should
 not be relied on.
 
 For new Python keys, when a platform has separate Python 2 and Python 3 versions
 of a package there should be a rosdep key for each.
-For example, there are two keys `Python-catkin-pkg` and `Python3-catkin-pkg`.
-The `Python-catkin-pkg` key should resolve to a Python 2 dependency on any
-platform where one exists, while `Python3-catkin-pkg` should only resolve to a
+For example, there are two keys `python-catkin-pkg` and `python3-catkin-pkg`.
+The `python-catkin-pkg` key should resolve to a Python 2 dependency on any
+platform where one exists, while `python3-catkin-pkg` should only resolve to a
 Python 3 dependency.
 
 
@@ -113,17 +113,17 @@ explicitly.
 rosdep and pip packages
 '''''''''''''''''''''''
 Unlike debian packages, keys that resolve to packages on PyPI may refer to
-either Python2 or Python 3 dependencies.
+either Python 2 or Python 3 dependencies.
 The version that gets downloaded depends on the version of Python used to
 invoke pip.
 Rosdep currently calls the command `pip`.
-It might use Python2 when using the debian package Python-pip, but it could use
-Python3 inside a venv.
+It might use Python 2 when using the debian package `python-pip`, but it could
+use Python 3 inside a venv.
 
 `rosdep` could default to `sys.executable -m pip` to use the same version of
 Python as rosdep, but a user building the ROS 1 bridge for Melodic is likely
-using the debian package `Python3-rosdep`.
-To support this, rosdep should use `Python$ROS_PYTHON_VERSION -m pip`.
+using the debian package `python3-rosdep`.
+To support this, rosdep should use `python$ROS_PYTHON_VERSION -m pip`.
 Since `rosdep` sets `ROS_PYTHON_VERSION` for itself if unset, this will default
 to the same version of Python as rosdep if `ROS_PYTHON_VERSION` is unset, but
 it can still be overridden automatically when a ROS workspace is sourced.
@@ -145,24 +145,24 @@ Python scripts on unix systemx typically have shebang lines written as:
 
 .. code-block: bash
 
-    #!/usr/bin/env Python
+    #!/usr/bin/env python
 
-PEP 394 recommends distributed Python scripts to use either `Python2` or 
-`Python3` [7]_.
-The `Python` command cannot be trusted to a spefic Python version.
-On older ROS distros, scripts can continue to use `Python` since they're known
+PEP 394 recommends distributed Python scripts to use either `python2` or
+`python3` [7]_.
+The `python` command cannot be trusted to a spefic Python version.
+On older ROS distros, scripts can continue to use `python` since they're known
 to work on those platforms.
 In preparation for Noetic, these shebang's should be rewritten to the specific
-version of Python supported, `Python3`.
+version of Python supported, `python3`.
 
 Packages using the same branch will need to conditionally rewrite the shebangs.
-Packages can use the CMake macro `catkin_install_Python()` to install Python
+Packages can use the CMake macro `catkin_install_python()` to install Python
 scripts with rewritten shebangs.
 
-The same issue appears in scripts that call the `Python` command directly.
+The same issue appears in scripts that call the `python` command directly.
 If they are Python scripts, they should be modified to invoke `sys.executable`.
 Otherwise, they should be edited to invoke the specific version of Python they
-require, or `Python$ROS_PYTHON_VERSION` if the script works with both.
+require, or `python$ROS_PYTHON_VERSION` if the script works with both.
 
 Dependencies and package.xml
 ''''''''''''''''''''''''''''
@@ -178,11 +178,11 @@ conditional dependencies as described in REP 149 [5]_.
 
 .. code-block: xml
 
-    <depend condition="$ROS_PYTHON_VERSION == '2'">Python-numpy</depend>
-    <depend condition="$ROS_PYTHON_VERSION == '3'">Python3-numpy</depend>
+    <depend condition="$ROS_PYTHON_VERSION == '2'">python-numpy</depend>
+    <depend condition="$ROS_PYTHON_VERSION == '3'">python3-numpy</depend>
 
 If `ROS_PYTHON_VERSION` is relied upon at build time, such as when using
-`catkin_install_Python()` to rewrite shebangs, then the package must declare a
+`catkin_install_python()` to rewrite shebangs, then the package must declare a
 `<buildtool_depend>` on `ros_environment`.
 Any ROS package which uses `ROS_PYTHON_VERSION` in a script intended to be
 run at runtime should add an `<exec_depend>` tag for `ros_environment`.
