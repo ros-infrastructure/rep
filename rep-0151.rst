@@ -1,10 +1,10 @@
 REP: 151
 Title: Python 3 Support
-Author: Dirk Thomas
+Author: Dirk Thomas, Shane Loretz
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
-Created: 23-Dec-2017
+Created: 05-Aug-2019
 
 Outline
 =======
