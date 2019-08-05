@@ -13,7 +13,6 @@ Outline
 #. Motivation_
 #. Context_
 #. Proposal_
-#. Rosdep_
 #. References_
 #. Copyright_
 
