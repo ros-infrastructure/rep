@@ -75,39 +75,39 @@ stay the same to avoid breaking unknown existing use cases.
 Even if an key refers to a Python 2 package on one platform and Python 3 on
 another, it should stay that way.
 
-Some Python rosdep keys have `<platform>_python3` entries.
+Some Python rosdep keys have ``<platform>_python3`` entries.
 This was an experiment at having a rosdep key conditionally evaluate to either
 a Python 2 or Python 3 system dependency.
-No new `<platform>_python3` entries should be added, and the entries should
+No new ``<platform>_python3`` entries should be added, and the entries should
 not be relied on.
 
 For new Python keys, when a platform has separate Python 2 and Python 3 versions
 of a package there should be a rosdep key for each.
-For example, there are two keys `python-catkin-pkg` and `python3-catkin-pkg`.
-The `python-catkin-pkg` key should resolve to a Python 2 dependency on any
-platform where one exists, while `python3-catkin-pkg` should only resolve to a
+For example, there are two keys ``python-catkin-pkg`` and ``python3-catkin-pkg``.
+The ``python-catkin-pkg`` key should resolve to a Python 2 dependency on any
+platform where one exists, while ``python3-catkin-pkg`` should only resolve to a
 Python 3 dependency.
 
 
 ROS_PYTHON_VERSION
 ''''''''''''''''''
 
-`ROS_PYTHON_VERSION` is an environment variable that is set to either `2` or
-`3` to indicate the major version of Python supported by a ROS distro.
-The intent is to allow `package.xml` files to have conditional Python
+``ROS_PYTHON_VERSION`` is an environment variable that is set to either ``2`` or
+``3`` to indicate the major version of Python supported by a ROS distro.
+The intent is to allow ``package.xml`` files to have conditional Python
 dependencies.
 
-It is set by the package `ros_environment` when sourcing a ROS workspace.
+It is set by the package ``ros_environment`` when sourcing a ROS workspace.
 The version set will be dictated by REP 3 [4]_.
-For example, in Melodic it defaults to `2`, but in Noetic this must be `3`.
+For example, in Melodic it defaults to ``2``, but in Noetic this must be ``3``.
 
 Users building ROS from source will not have an existing ROS workspace set, so
 the variable won't be set and conditional dependencies can't be evalulated
-when using `rosdep` to instal them.
-To fix this, `rosdep` should set `ROS_PYTHON_VERSION` to the same version of
+when using ``rosdep`` to instal them.
+To fix this, ``rosdep`` should set ``ROS_PYTHON_VERSION`` to the same version of
 Python used to invoke it.
-It will get this information using `sys.version[0]`.
-A user wanting to use a different Python version must set `ROS_PYTHON_VERSION`
+It will get this information using ``sys.version[0]``.
+A user wanting to use a different Python version must set ``ROS_PYTHON_VERSION``
 explicitly.
 
 rosdep and pip packages
@@ -116,16 +116,16 @@ Unlike debian packages, keys that resolve to packages on PyPI may refer to
 either Python 2 or Python 3 dependencies.
 The version that gets downloaded depends on the version of Python used to
 invoke pip.
-Rosdep currently calls the command `pip`.
-It might use Python 2 when using the debian package `python-pip`, but it could
+Rosdep currently calls the command ``pip``.
+It might use Python 2 when using the debian package ``python-pip``, but it could
 use Python 3 inside a venv.
 
-`rosdep` could default to `sys.executable -m pip` to use the same version of
+``rosdep`` could default to ``sys.executable -m pip`` to use the same version of
 Python as rosdep, but a user building the ROS 1 bridge for Melodic is likely
-using the debian package `python3-rosdep`.
-To support this, rosdep should use `python$ROS_PYTHON_VERSION -m pip`.
-Since `rosdep` sets `ROS_PYTHON_VERSION` for itself if unset, this will default
-to the same version of Python as rosdep if `ROS_PYTHON_VERSION` is unset, but
+using the debian package ``python3-rosdep``.
+To support this, rosdep should use ``python$ROS_PYTHON_VERSION -m pip``.
+Since ``rosdep`` sets ``ROS_PYTHON_VERSION`` for itself if unset, this will default
+to the same version of Python as rosdep if ``ROS_PYTHON_VERSION`` is unset, but
 it can still be overridden automatically when a ROS workspace is sourced.
 
 ROS packages support for Python 3
@@ -147,22 +147,22 @@ Python scripts on unix systemx typically have shebang lines written as:
 
     #!/usr/bin/env python
 
-PEP 394 recommends distributed Python scripts to use either `python2` or
-`python3` [7]_.
-The `python` command cannot be trusted to a spefic Python version.
-On older ROS distros, scripts can continue to use `python` since they're known
+PEP 394 recommends distributed Python scripts to use either ``python2`` or
+``python3`` [7]_.
+The ``python`` command cannot be trusted to a spefic Python version.
+On older ROS distros, scripts can continue to use ``python`` since they're known
 to work on those platforms.
 In preparation for Noetic, these shebang's should be rewritten to the specific
-version of Python supported, `python3`.
+version of Python supported, ``python3``.
 
 Packages using the same branch will need to conditionally rewrite the shebangs.
-Packages can use the CMake macro `catkin_install_python()` to install Python
+Packages can use the CMake macro ``catkin_install_python()`` to install Python
 scripts with rewritten shebangs.
 
-The same issue appears in scripts that call the `python` command directly.
-If they are Python scripts, they should be modified to invoke `sys.executable`.
+The same issue appears in scripts that call the ``python`` command directly.
+If they are Python scripts, they should be modified to invoke ``sys.executable``.
 Otherwise, they should be edited to invoke the specific version of Python they
-require, or `python$ROS_PYTHON_VERSION` if the script works with both.
+require, or ``python$ROS_PYTHON_VERSION`` if the script works with both.
 
 Dependencies and package.xml
 ''''''''''''''''''''''''''''
@@ -181,11 +181,11 @@ conditional dependencies as described in REP 149 [5]_.
     <depend condition="$ROS_PYTHON_VERSION == '2'">python-numpy</depend>
     <depend condition="$ROS_PYTHON_VERSION == '3'">python3-numpy</depend>
 
-If `ROS_PYTHON_VERSION` is relied upon at build time, such as when using
-`catkin_install_python()` to rewrite shebangs, then the package must declare a
-`<buildtool_depend>` on `ros_environment`.
-Any ROS package which uses `ROS_PYTHON_VERSION` in a script intended to be
-run at runtime should add an `<exec_depend>` tag for `ros_environment`.
+If ``ROS_PYTHON_VERSION`` is relied upon at build time, such as when using
+``catkin_install_python()`` to rewrite shebangs, then the package must declare a
+``<buildtool_depend>`` on ``ros_environment``.
+Any ROS package which uses ``ROS_PYTHON_VERSION`` in a script intended to be
+run at runtime should add an ``<exec_depend>`` tag for ``ros_environment``.
 
 Making Python fixes available to downstream packages
 ''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -194,11 +194,11 @@ Transitioning to Python 3 is expected to be a significant effort.
 Typicically ROS packages are tested using the ROS build farm; however, that
 will not be available until packages for the targeted Ubuntu distribution
 become available.
-Instead, a placehoder `Noetic` `distribution.yaml` will be made available in
+Instead, a placehoder ``Noetic`` ``distribution.yaml`` will be made available in
 advance of the buildfarm availability.
-Maintainers should add `source` entries for their Noetic branches to this file
-to enable downstream users to use `rosinstall_generator` with the
-`--upstream-development` flag to get Python 3 fixes.
+Maintainers should add ``source`` entries for their Noetic branches to this file
+to enable downstream users to use ``rosinstall_generator`` with the
+``--upstream-development`` flag to get Python 3 fixes.
 Instructions to build from source using Python 3 will be made available to
 the ROS community.
 
@@ -215,10 +215,10 @@ be able to see:
 * which ROS packages already support Python 3
 * which ROS packages need help supporting Python 3
 
-The presence of a `source` entry in the Noetic `distribution.yaml` should be
+The presence of a ``source`` entry in the Noetic ``distribution.yaml`` should be
 taken to mean a package has started transitioning to Python 3.
 Community members can use the differences between this and the previous ROS
-distro's `distribution.yaml` as an indication of which packages would benefit
+distro's ``distribution.yaml`` as an indication of which packages would benefit
 the most from their contributions.
 
 There are many ROS package maintainers in the community, and each has the
