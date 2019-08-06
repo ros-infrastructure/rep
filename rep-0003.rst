@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 21-Sep-2010
-Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017, 23-Oct-2017
+Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017, 23-Oct-2017, xx-xxx-2019
 
 
 Abstract
@@ -342,6 +342,53 @@ Maintainers can choose to support even lower versions to also cover older ROS di
 Build System Support:
 
 - Same as Indigo
+
+Noetic Ninjemys (May 2018 - May 2023)
+--------------------------------------
+Required Support for:
+
+- Ubuntu F----- (20.04)
+
+Recommended Support for:
+
+- Debian Buster
+- Fedora 30
+
+Architectures Supported:
+
+- amd64
+- arm32
+- arm64
+
+Targeted Languages:
+
+- C++14
+- Python 3.7
+- Lisp SBCL 1.4.16
+
+Requirements:
+
++---------+------------------+----------------+-----------+
+| Package |  Ubuntu F-----   | Debian Buster  | Fedora 30 |
++=========+==================+================+===========+
+|         | Required Support |    Recommended support     |
++---------+------------------+----------------+-----------+
+| Boost   |      1.67!       |    1.67        |   1.69!   |
++---------+------------------+----------------+-----------+
+| CMake   |      3.13.4!     |    3.13.4      |   3.14.5! |
++---------+------------------+----------------+-----------+
+| Gazebo  |      11.0.0!     |    11.0.0*     |   9.5.0!  |
++---------+------------------+----------------+-----------+
+| Ogre    |      1.9!        |    1.9         |   1.9!    |
++---------+------------------+----------------+-----------+
+| OpenCV  |      3.2         |    3.2*        |   3.4.4   |
++---------+------------------+----------------+-----------+
+| PCL     |      1.9.1!      |    1.9.1       |   1.9.1!  |
++---------+------------------+----------------+-----------+
+| PyQt    |      5.11.3!     |    5.11.3      |     !     |
++---------+------------------+----------------+-----------+
+| Qt5     |      5.11.3!     |    5.11.3      |   5.12.4! |
++---------+------------------+----------------+-----------+
 
 Motivation
 ==========
