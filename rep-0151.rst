@@ -99,7 +99,7 @@ dependencies.
 
 It is set by the package ``ros_environment`` when sourcing a ROS workspace.
 The version set will be dictated by REP 3 [4]_.
-For example, in Melodic it defaults to ``2``, but in Noetic this must be ``3``.
+For example, in Melodic it defaults to ``2``, but in Noetic it must be ``3``.
 
 Users building ROS from source will not have an existing ROS workspace set, so
 the variable won't be set and conditional dependencies can't be evalulated
