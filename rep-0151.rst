@@ -103,7 +103,7 @@ For example, in Melodic it defaults to ``2``, but in Noetic this must be ``3``.
 
 Users building ROS from source will not have an existing ROS workspace set, so
 the variable won't be set and conditional dependencies can't be evalulated
-when using ``rosdep`` to instal them.
+when using ``rosdep`` to install them.
 To fix this, ``rosdep`` should set ``ROS_PYTHON_VERSION`` to the same version of
 Python used to invoke it.
 It will get this information using ``sys.version[0]``.
