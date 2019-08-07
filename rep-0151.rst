@@ -82,7 +82,7 @@ No new ``<platform>_python3`` entries should be added, and the entries should
 not be relied on.
 
 For new Python keys, when a platform has separate Python 2 and Python 3 versions
-of a package there should be a rosdep key for each.
+of a package, there should be a rosdep key for each.
 For example, there are two keys ``python-catkin-pkg`` and ``python3-catkin-pkg``.
 The ``python-catkin-pkg`` key should resolve to a Python 2 dependency on any
 platform where one exists, while ``python3-catkin-pkg`` should only resolve to a
