@@ -206,7 +206,7 @@ Once the build farm is available, maintainers should release packages with
 Python 3 fixes to Noetic as soon as possible, even if they intend to make
 breaking changes later.
 
-Organizing Community effort
+Organizing community effort
 ---------------------------
 
 In order to achieve this, prior to the Noetic release community members must
