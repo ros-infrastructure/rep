@@ -107,7 +107,7 @@ when using ``rosdep`` to install them.
 To fix this, ``rosdep`` should set ``ROS_PYTHON_VERSION`` to the same version of
 Python used to invoke it.
 It will get this information using ``sys.version[0]``.
-A user wanting to use a different Python version must set ``ROS_PYTHON_VERSION``
+In order to use a different Python version, ``ROS_PYTHON_VERSION`` must be set
 explicitly.
 
 rosdep and pip packages
