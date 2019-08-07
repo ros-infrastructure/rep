@@ -49,7 +49,7 @@ This REP only describes the current proposal since the change in requirements
 has made past proposals obsolete.
 
 This proposal does not specify a minimum minor version for Python.
-The minimum version will being defined in REP 3 [4]_ together with all other
+The minimum version will be defined in REP 3 [4]_ together with all other
 versions.
 
 Proposal
