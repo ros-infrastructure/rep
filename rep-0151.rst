@@ -191,7 +191,7 @@ Making Python fixes available to downstream packages
 ''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 Transitioning to Python 3 is expected to be a significant effort.
-Typicically ROS packages are tested using the ROS build farm; however, that
+Typically, ROS packages are tested using the ROS build farm; however, that
 will not be available until packages for the targeted Ubuntu distribution
 become available.
 Instead, a placehoder ``Noetic`` ``distribution.yaml`` will be made available in
