@@ -141,7 +141,7 @@ This section describes what needs to be done in both cases.
 
 Shebangs and reliance on the Python command
 '''''''''''''''''''''''''''''''''''''''''''
-Python scripts on unix systemx typically have shebang lines written as:
+Python scripts on UNIX systems typically have shebang lines written as:
 
 .. code-block: bash
 
