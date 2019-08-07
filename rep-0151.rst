@@ -149,7 +149,7 @@ Python scripts on UNIX systems typically have shebang lines written as:
 
 PEP 394 recommends distributed Python scripts to use either ``python2`` or
 ``python3`` [7]_.
-The ``python`` command cannot be trusted to a spefic Python version.
+The ``python`` command cannot be trusted to a specific Python version.
 On older ROS distros, scripts can continue to use ``python`` since they're known
 to work on those platforms.
 In preparation for Noetic, these shebang's should be rewritten to the specific
