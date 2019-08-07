@@ -112,7 +112,7 @@ explicitly.
 
 rosdep and pip packages
 '''''''''''''''''''''''
-Unlike debian packages, keys that resolve to packages on PyPI may refer to
+Unlike Debian packages, keys that resolve to packages on PyPI may refer to
 either Python 2 or Python 3 dependencies.
 The version that gets downloaded depends on the version of Python used to
 invoke pip.
