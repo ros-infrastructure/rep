@@ -28,7 +28,7 @@ As described in the Python release schedule [1]_ Python 2.7 will only receive
 bugfix releases until 2020.
 As a consequence Ubuntu is trying to demote Python 2.7 into the `universe`
 repository [2]_.
-While it is unlikely that Python 2.7 will be removed from the archives entirely
+While it is unlikely that Python 2.7 will be removed from the archives entirely,
 it should not be relied on past its EOL date.
 Therefore ROS 1 must move to Python 3.
 
