@@ -125,8 +125,8 @@ Python as rosdep, but a user building the ROS 1 bridge for Melodic is likely
 using the Debian package ``python3-rosdep``.
 To support this, rosdep should use ``python$ROS_PYTHON_VERSION -m pip``.
 Since ``rosdep`` sets ``ROS_PYTHON_VERSION`` for itself if unset, this will default
-to the same version of Python as rosdep if ``ROS_PYTHON_VERSION`` is unset, but
-it can still be overridden automatically when a ROS workspace is sourced.
+to the same version of Python rosdep was run with.
+However, it will be overridden automatically when a ROS workspace is sourced.
 
 ROS packages support for Python 3
 ---------------------------------
