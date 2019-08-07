@@ -72,7 +72,7 @@ rosdep keys
 '''''''''''
 All exsiting Python rosdep keys including ``<platform>_python3`` entries will
 stay the same to avoid breaking unknown existing use cases.
-Even if an key refers to a Python 2 package on one platform and Python 3 on
+Even if a key refers to a Python 2 package on one platform and Python 3 on
 another, it should stay that way.
 
 Some Python rosdep keys have ``<platform>_python3`` entries.
