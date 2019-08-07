@@ -171,7 +171,7 @@ On platforms where the target version of Python is 2, the package.xml of a ROS
 package must refer to Python 2 dependencies, and when the target Python
 version is 3 it must refer to Python 3 dependencies.
 Packages which release from different branches for each ROS distro can replace
-rosdep keys that resolve to Python 2 dependencies to ones that resolve to
+rosdep keys that resolve to Python 2 dependencies with ones that resolve to
 Python 3 equivalents.
 Packages using the same code base for multiple ROS distros should instead use
 conditional dependencies as described in REP 149 [5]_.
