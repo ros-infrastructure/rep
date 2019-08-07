@@ -202,7 +202,7 @@ to enable downstream users to use ``rosinstall_generator`` with the
 Instructions to build from source using Python 3 will be made available to
 the ROS community.
 
-Once the build farm is available, Maintainers should release packages with
+Once the build farm is available, maintainers should release packages with
 Python 3 fixes to Noetic as soon as possible, even if they intend to make
 breaking changes later.
 
