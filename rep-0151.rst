@@ -122,7 +122,7 @@ use Python 3 inside a venv.
 
 ``rosdep`` could default to ``sys.executable -m pip`` to use the same version of
 Python as rosdep, but a user building the ROS 1 bridge for Melodic is likely
-using the debian package ``python3-rosdep``.
+using the Debian package ``python3-rosdep``.
 To support this, rosdep should use ``python$ROS_PYTHON_VERSION -m pip``.
 Since ``rosdep`` sets ``ROS_PYTHON_VERSION`` for itself if unset, this will default
 to the same version of Python as rosdep if ``ROS_PYTHON_VERSION`` is unset, but
