@@ -117,7 +117,7 @@ either Python 2 or Python 3 dependencies.
 The version that gets downloaded depends on the version of Python used to
 invoke pip.
 Rosdep currently calls the command ``pip``.
-It might use Python 2 when using the debian package ``python-pip``, but it could
+It might use Python 2 when using the Debian package ``python-pip``, but it could
 use Python 3 inside a venv.
 
 ``rosdep`` could default to ``sys.executable -m pip`` to use the same version of
