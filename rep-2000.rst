@@ -437,7 +437,7 @@ The following indicators show what delivery mechanisms are available for each pl
 
 " [d] " Debian packages will be provided for this platform for packages submitted to the rosdistro.
 
-" [a] " Binary releases are provided as a single archive per platform containing all packages in the Dashing ROS 2 repos file [5]_.
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Eloquent ROS 2 repos file [6]_.
 
 " [s] " Compilation from source.
 
@@ -548,6 +548,8 @@ References and Footnotes
 .. [4] Crystal ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/crystal/ros2.repos)
 .. [5] Dashing ROS 2 Repos File
+   (https://github.com/ros2/ros2/blob/dashing/ros2.repos)
+.. [6] Eloquent ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/master/ros2.repos)
 
 Copyright
