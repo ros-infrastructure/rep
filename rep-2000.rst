@@ -62,7 +62,7 @@ Ardent Apalone (December 2017 - December 2018)
 |    arm64     |          X            |                              |                        |
 +--------------+-----------------------+------------------------------+------------------------+
 
-Minumum language requirements:
+Minimum language requirements:
 
 - C11 [2]_
 - C++14
@@ -140,7 +140,7 @@ Targeted platforms:
 " [s] " Compilation from source, the ROS buildfarm will not produce any binary packages for these platforms.
 
 
-Minumum language requirements:
+Minimum language requirements:
 
 - C11 [2]_
 - C++14
@@ -243,7 +243,7 @@ Middleware Implementation Support:
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
 
-Minumum language requirements:
+Minimum language requirements:
 
 - C11 [2]_
 - C++14
@@ -352,7 +352,7 @@ Middleware Implementation Support:
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
 
-Minumum language requirements:
+Minimum language requirements:
 
 - C++14
 - Python 3.5
@@ -458,10 +458,10 @@ Middleware Implementation Support:
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
 
-Minumum language requirements:
+Minimum language requirements:
 
 - C++14
-- Python 3.5
+- Python 3.6
 
 
 Dependency Requirements:
