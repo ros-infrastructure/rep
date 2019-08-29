@@ -495,16 +495,18 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+---------------------+
 |                                **RMW DDS Milddleware Providers**                    |
 +-------------+----------------+---------------+----------------+---------------------+
-| Connext DDS |                              5.3.1              |         N/A         |
+| Connext DDS |                              5.3.1***           |         N/A         |
 +-------------+----------------+---------------+----------------+---------------------+
-|  Fast-RTPS  |                                      1.8.0                            |
+|  Fast-RTPS  |                                      1.9.0                            |
 +-------------+----------------+---------------+----------------+---------------------+
-| OpenSplice  |                                  6.9.190403OSS                        |
+| OpenSplice  |                                  6.9.190705OSS                        |
 +-------------+----------------+---------------+----------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
 " ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
+
+" *** " It is anticipated that this will be increased to Connext DDS 6.0.0 pending migration patches [7]_.
 
 This document only captures the version at the first release of a ROS distribution and will not be updated as the dependencies move forward.
 These versions are thus a low watermark.
@@ -551,6 +553,8 @@ References and Footnotes
    (https://github.com/ros2/ros2/blob/dashing/ros2.repos)
 .. [6] Eloquent ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/master/ros2.repos)
+.. [7] Connext DDS 6.0.0 Migration
+   (https://github.com/ros2/rmw_connext/pull/351)
 
 Copyright
 =========
