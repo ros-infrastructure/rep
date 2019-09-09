@@ -188,7 +188,7 @@ The reference position is the origin of the ``base_link`` as defined in [#REP105
 Rate Interface
 ,,,,,,,,,,,,,,
 
-The messge to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
+The message to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
 This is the standard way to command ROS vehicles.
 The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
 
@@ -223,7 +223,7 @@ Acceleration Interface
 ,,,,,,,,,,,,,,,,,,,,,,
 
 
-The messge to send a velocity command is ``geometry_msgs/Twist`` [#twiststamped]_.
+The message to send a velocity command is ``geometry_msgs/Twist`` [#twiststamped]_.
 The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
 
 * Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
