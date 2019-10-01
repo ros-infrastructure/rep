@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 27-Oct-2018
-Post-History: 09-Nov-2018
+Post-History: 09-Nov-2018, 01-Oct-2019
 
 
 .. contents::
@@ -43,7 +43,12 @@ For the following use cases additional metadata is currently necessary:
    Since the ``rosdistro`` contains all ROS distros - EOLed ones as well as
    upcoming distributions before their release date.
 
-In both cases the missing metadata is currently being hard coded in the source
+3. A ROS distribution uses either Python 2 or Python 3.
+   When a package is bloomed the rosdep key are mapped to Debian package
+   names and depending on the targeted Python version the conditional
+   dependencies need to be evaluated.
+
+In all cases the missing metadata is currently being hard coded in the source
 code and needs to be updated with every new ROS release.
 Therefore this REP aims to add the necessary metadata about a ROS distribution
 into the ``rosdistro`` instead.
@@ -72,6 +77,9 @@ Index file
       distribution.
       For use case *1.* the values ``ros1`` and ``ros2`` will be used to
       distinguish the major ROS version.
+
+    * python_version: an optional integer describing the major version of
+      Python version of the ROS distribution.
 
     As of version 4 unknown keys should be ignored (instead of resulting in an
     error).
@@ -109,6 +117,11 @@ this document and includes the additional metadata fields.
 
 To make use of the new index file the new version of the Python package will
 update the default URL to point to the v4 file.
+
+``rosdistro`` version 0.7.5 or newer is necessary to access the
+``python_version`` key.
+Older versions of ``rosdistro`` will simply ignore the key in the yaml file and
+not expose it through the API.
 
 This provides a smooth transition for all users: users using the old version of
 the Python package can continue to use it as is, users updating to the newer
