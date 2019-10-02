@@ -79,7 +79,7 @@ Index file
       distinguish the major ROS version.
 
     * python_version: an optional integer describing the major version of
-      Python version of the ROS distribution.
+      Python of the ROS distribution.
 
     As of version 4 unknown keys should be ignored (instead of resulting in an
     error).
