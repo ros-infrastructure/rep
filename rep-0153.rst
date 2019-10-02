@@ -44,7 +44,7 @@ For the following use cases additional metadata is currently necessary:
    upcoming distributions before their release date.
 
 3. A ROS distribution uses either Python 2 or Python 3.
-   When a package is bloomed the rosdep key are mapped to Debian package
+   When a package is bloomed the rosdep keys are mapped to Debian package
    names and depending on the targeted Python version the conditional
    dependencies need to be evaluated.
 
