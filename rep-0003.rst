@@ -369,7 +369,7 @@ Targeted Languages:
 Requirements:
 
 +---------+------------------+----------------+-----------+
-| Package |  Ubuntu F-----   | Debian Buster  | Fedora 30 |
+| Package |  Ubuntu Focal   | Debian Buster  | Fedora 30 |
 +=========+==================+================+===========+
 |         | Required Support |    Recommended support     |
 +---------+------------------+----------------+-----------+
