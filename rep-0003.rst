@@ -347,7 +347,7 @@ Noetic Ninjemys (May 2020 - May 2025)
 --------------------------------------
 Required Support for:
 
-- Ubuntu F----- (20.04)
+- Ubuntu Focal Fossa (20.04)
 
 Recommended Support for:
 
