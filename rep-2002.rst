@@ -5,7 +5,7 @@ Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Created: 05-Sep-2019
-Post-History: 05-Sep-2019, 03-Oct-2019
+Post-History: 05-Sep-2019, 03-Oct-2019, 18-Oct-2019
 
 
 Abstract
@@ -112,6 +112,12 @@ References
 
 .. [3] bloom repository
    (https://github.com/ros-infrastructure/bloom)
+
+.. [4] Time for reviewing ROS distro release cycle on Discourse
+   (https://discourse.ros.org/t/time-for-reviewing-ros-distro-release-cycle/2744/3)
+
+.. [5] Proposed changes to the ROS releases discussion on Discourse
+   (https://discourse.ros.org/t/proposed-changes-to-the-ros-releases/4736)
 
 
 Copyright
