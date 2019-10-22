@@ -367,14 +367,6 @@ Minimum language requirements:
 
 Dependency Requirements:
 
-| Connext DDS |                      5.3.1                      |               N/A                  |
-+-------------+----------------+---------------+----------------+----------------+-------------------+
-| Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
-| Connext DDS |                      5.3.1                      |               N/A                  |
-+-------------+----------------+---------------+----------------+----------------+-------------------+
-| Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
-+-------------+----------------+---------------+----------------+----------------+-------------------+
-
 +-------------+-------------------------------------------------+------------------------------------+
 |             |                 Required Support                |        Recommended Support         |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -406,10 +398,13 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Connext DDS |                      5.3.1                      |               N/A                  |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
+| Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
++-------------+----------------+---------------+----------------+----------------+-------------------+
 |  Fast-RTPS  |                                      1.8.0                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | OpenSplice  |                          6.9.190403OSS                           |        N/A        |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
+
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
 " ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
@@ -472,10 +467,8 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_cyclonedds           | Eclipse Cyclone DDS | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
-|                          |                     |               | and OpenEmbedded            |                                      |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_opensplice_cpp       | ADLINK OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
+| rmw_opensplice_cpp       | ADLINK OpenSplice   | Tier 2        | All Platforms except        | All Architectures                    
+|                          |                     |               | OpenEmbedded                |                                      
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
