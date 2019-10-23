@@ -467,7 +467,7 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_opensplice_cpp       | ADLINK OpenSplice   | Tier 2        | All Platforms except        | All Architectures                 |                          |                     |               | OpenEmbedded                |                                      |
+| rmw_opensplice_cpp       | ADLINK OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
