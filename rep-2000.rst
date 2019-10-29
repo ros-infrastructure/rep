@@ -119,7 +119,7 @@ Middleware Implementation Support:
 
 - eProsima Fast-RTPS
 - RTI Connext
-- ADLink OpenSplice
+- ADLINK OpenSplice
 
 
 Bouncy Bolson (June 2018 - June 2019)
@@ -201,7 +201,7 @@ Middleware Implementation Support:
 
 - eProsima Fast-RTPS
 - RTI Connext
-- ADLink OpenSplice
+- ADLINK OpenSplice
 
 Crystal Clemmys (December 2018 - December 2019)
 -----------------------------------------------
@@ -233,7 +233,7 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 |  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64 |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
-| rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures              |
+| rmw_opensplice_cpp       | ADLINK OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures              |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures              |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
@@ -347,6 +347,9 @@ Middleware Implementation Support:
 |  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 2        | All Platforms               | All Architectures                    |
+|                          |                     |               | except OpenEmbedded         |                                      |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
@@ -394,6 +397,8 @@ Dependency Requirements:
 |                                **RMW DDS Milddleware Providers**                                   |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Connext DDS |                      5.3.1                      |               N/A                  |
++-------------+----------------+---------------+----------------+----------------+-------------------+
+| Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |  Fast-RTPS  |                                      1.8.0                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -460,8 +465,9 @@ Middleware Implementation Support:
 |  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
-|                          |                     |               | and OpenEmbedded            |                                      |
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 2        | All Platforms               | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_opensplice_cpp       | ADLINK OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
@@ -507,6 +513,8 @@ Dependency Requirements:
 |                                **RMW DDS Milddleware Providers**                                   |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Connext DDS |                              5.3.1***           |               N/A                  |
++-------------+----------------+---------------+----------------+----------------+-------------------+
+| Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |  Fast-RTPS  |                                      1.9.0                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
