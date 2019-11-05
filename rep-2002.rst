@@ -18,7 +18,7 @@ It also describes how future releases of ROS 2 may be produced by taking a snaps
 Motivation
 ==========
 
-In order to reduce the workload of Open Robotics staff and individual package maintainers when bootstrapping new ROS releases a rolling ROS distribution will be created to serve as the foundation for subsequent stable ROS distributions.
+Create a rolling ROS distribution to serve as the foundation for subsequent stable ROS distributions in order to reduce the workload of Open Robotics staff and individual package maintainers when bootstrapping new ROS releases.
 
 
 Support status
