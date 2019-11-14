@@ -25,7 +25,7 @@ This is to allow for reliable transmission of map data and provide the map infor
 The depth of the transient-local storage depth is left to the designer, however a single map depth is a reasonable choice for static or globally-updated dynamic map serving applications.
 Map clients are also expected to receive maps over a reliable local-transient topic with variable depth.
 
-This specification does not enforce any particular map representation but rather applies for all shared map representations including but not limited to occupancy grids, feature maps, or dense representations.
+This specification does not prescribe any particular map representation but rather applies to all shared map representations, including but not limited to: occupancy grids, feature maps and dense representations.
 
 Sensor Driver Quality of Service
 --------------------------------
