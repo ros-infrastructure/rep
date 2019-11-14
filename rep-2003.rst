@@ -20,17 +20,17 @@ Specification
 Map Quality of Service
 ----------------------
 
-Map providers such as map servers and SLAM implementations are expected to provide all maps as over a reliable transient-local topic.
+Map providers such as map servers and SLAM implementations are expected to provide all maps over a reliable transient-local topic.
 This is to allow for reliable transmission of map data and provide the map information to any new map clients without delay.
 The depth of the transient-local storage depth is left to the designer, however a single map depth is a reasonable choice for static or globally-updated dynamic map serving applications.
-Map clients are also expected to receive maps over a reliable transient-local topic with variably depth.
+Map clients are also expected to receive maps over a reliable transient-local topic with variable depth.
 
-This specification does not enforce any particular map representation but rather applies for all shared map representations including but not limited to occupancy grids, feature maps, or dense representations.
+This specification does not prescribe any particular map representation but rather applies to all shared map representations, including but not limited to: occupancy grids, feature maps and dense representations.
 
 Sensor Driver Quality of Service
 --------------------------------
 
-Sensor data provided by a sensor driver from a camera, inertial measurement unit, laser scanner, GPS, depth, or range finder are expected to be provided over a SensorDataQoS quality of service as provided by the implemented ROS2 version API.
+Sensor data provided by a sensor driver from a camera, inertial measurement unit, laser scanner, GPS, depth, or range finder are expected to be provided over a `SensorDataQoS` quality of service as provided by the implemented ROS2 version API.
 This is to allow for unreliable transmission of sensor data directly from source to its first processing stage(s).
 These processing stage(s) are also expected to receive a sensor reading using the SensorDataQoS provided QoS profile implemented by the ROS2 version API.
 
@@ -42,18 +42,18 @@ Rationale
 Why Specify QoS Settings
 ------------------------
 
-Unlike ROS1, ROS2's QoS settings chosen by an application can effect the ability for data to be transmitted from a publisher to a subscriber.
+Unlike ROS1, ROS2's QoS settings chosen by an application can affect the ability for data to be transmitted from a publisher to a subscriber.
 There exists several combinations of QoS settings that will not transmit data from one node to another even while composed in a single process.
 By specifying QoS settings for common interfaces, the aim is to ensure all sensor data and map sources can be interchangable with each other at run-time.
 
 Why Not Specify Later Stage Sensor QoS Settings
 -----------------------------------------------
 
-There exists numerous requirements and uses of pre-processed sensor data.
+There exist numerous requirements and uses of pre-processed sensor data.
 It would be presumptuous of this REP to equally treat data transmissions in safety critical or best-effort pipelines.
 
 
-Backwards Compatibility
+Backward Compatibility
 =======================
 
 It is up to the maintainer of a sensor driver or map source provider to determine if the provider should be updated to follow this REP.
