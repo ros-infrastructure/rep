@@ -53,7 +53,7 @@ There exist numerous requirements and uses of pre-processed sensor data.
 It would be presumptuous of this REP to equally treat data transmissions in safety critical or best-effort pipelines.
 
 
-Backwards Compatibility
+Backward Compatibility
 =======================
 
 It is up to the maintainer of a sensor driver or map source provider to determine if the provider should be updated to follow this REP.
