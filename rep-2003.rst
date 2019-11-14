@@ -20,10 +20,10 @@ Specification
 Map Quality of Service
 ----------------------
 
-Map providers such as map servers and SLAM implementations are expected to provide all maps as over a reliable local-transient topic.
+Map providers such as map servers and SLAM implementations are expected to provide all maps as over a reliable transient-local topic.
 This is to allow for reliable transmission of map data and provide the map information to any new map clients without delay.
 The depth of the transient-local storage depth is left to the designer, however a single map depth is a reasonable choice for static or globally-updated dynamic map serving applications.
-Map clients are also expected to receive maps over a reliable local-transient topic with variably depth.
+Map clients are also expected to receive maps over a reliable transient-local topic with variably depth.
 
 This specification does not enforce any particular map representation but rather applies for all shared map representations including but not limited to occupancy grids, feature maps, or dense representations.
 
