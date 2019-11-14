@@ -30,7 +30,7 @@ This specification does not prescribe any particular map representation but rath
 Sensor Driver Quality of Service
 --------------------------------
 
-Sensor data provided by a sensor driver from a camera, inertial measurement unit, laser scanner, GPS, depth, or range finder are expected to be provided over a SensorDataQoS quality of service as provided by the implemented ROS2 version API.
+Sensor data provided by a sensor driver from a camera, inertial measurement unit, laser scanner, GPS, depth, or range finder are expected to be provided over a `SensorDataQoS` quality of service as provided by the implemented ROS2 version API.
 This is to allow for unreliable transmission of sensor data directly from source to its first processing stage(s).
 These processing stage(s) are also expected to receive a sensor reading using the SensorDataQoS provided QoS profile implemented by the ROS2 version API.
 
