@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 01-Sep-2014
-Post-History: 25-Nov-2014
+Post-History: 25-Nov-2014, 15-Nov-2019
 
 
 .. contents::
@@ -67,6 +67,8 @@ Distribution file
       request against the branch specified under ``version``. (default: false)
     * version: if ``test_pull_requests`` is enabled the version must specify a
       branch.
+    * test_abi: a boolean flag used when ``test_pull_requests`` is enabled to
+      perform an ABI. (default: false)
 
 * tags: list of tag names to identify the group of repositories specified by
   the distribution file.
