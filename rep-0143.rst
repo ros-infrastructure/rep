@@ -68,7 +68,7 @@ Distribution file
     * version: if ``test_pull_requests`` is enabled the version must specify a
       branch.
     * test_abi: a boolean flag used when ``test_pull_requests`` is enabled to
-      perform an ABI. (default: false)
+      perform an ABI/API check on the changes. (default: false)
 
 * tags: list of tag names to identify the group of repositories specified by
   the distribution file.
