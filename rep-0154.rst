@@ -1,7 +1,7 @@
 REP: 154
 Title: test_abi support for ROS distribution files
 Author: Jose Luis Rivero <jrivero@openrobotics.org>
-Status: Final
+Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 21-Nov-2018
