@@ -1,0 +1,103 @@
+REP: 154
+Title: test_abi support for ROS distribution files
+Author: Jose Luis Rivero <jrivero@openrobotics.org>
+Status: Final
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 21-Nov-2018
+Post-History: 21-Nov-2019
+
+
+.. contents::
+
+Abstract
+========
+This REP updates the specification of the ROS distribution files facilitated in
+the building, packaging, testing and documenting process.
+
+The intention is to annotate a ROS distribution with more information,
+particularly with the option of running an ABI/API analysis for pull requests
+and devel jobs.
+
+This REP is an extension to the file format originally defined in REP 143[1]_
+and extended in REP 153[2]_. It currently does not repeat the content of REP
+143 but only states the differences.
+
+
+Motivation
+==========
+
+Since the creation of ROS1 some developers and users has been looking into
+improving the stability of the different updates that reach the set of
+ROS packages. Two aspects of the stability are the respect of the current
+API and, extending this first one, the stability of the ABI.
+
+Traditionally the ROS policy related to releases[3]_ does not impose any
+restriction to changes in the application or binary interface of the
+ROS packages. This lack of restriction applies to: changes inside the
+same ROS distribution or changes between different ROS distributions.
+
+The inclusion of an option for testing the ABI/API changes in ROS
+packages can cover at least two scenarios:
+
+1. Run an API/ABI analysis together with changes coming from
+   pull requests. Currently the option to use CI in the pull request
+   is covered by the `test_pull_requests` (as described in REP 143[1]_)
+
+1. Run an API/ABI analysis of changes that appear in the source code
+   of ROS packages. This would be part of the CI cycle present  in the devel
+   scripts.
+
+The original target to compare both use cases and to be taken as the stable
+API/ABI are the latest stable released packages.
+
+Specification
+=============
+
+Distribution file
+-----------------
+
+* repositories
+
+  * source
+
+    * test_abi: an optional boolean (default false) to run an API/ABI analsys
+      of the code in the pull request against the latest released packages in
+      devel jobs. If ``test_pull_requests`` is enabled, run the analysis as
+      part of the CI integrated in pull requests.
+
+Reference implementation
+------------------------
+This REP is to be implemented in version 0.7.6 of the Python package *rosdistro*.
+It will serve as a reference implementation for this REP.
+A draft implementation can be found in [4]_.
+
+
+Compatibility considerations
+============================
+
+Given the nature of being an optional flag added, the default behaviour should
+be not to change the current actions in devel or pull requests scripts. That
+is the goal of defaulting the option to false in the absence of this option.
+This way current configurations are perfectly valid and unless a proactive
+action is done by ROS Package maintainers or ROS admins nothing new
+should happen in the CI scripts.
+
+
+Affected tools
+-----
+
+Only the buildfarm code and rosdistro need to be updated.
+
+References
+==========
+.. [1] REP 153: http://www.ros.org/reps/rep-0153.html
+.. [2] REP 143: http://www.ros.org/reps/rep-0143.html
+.. [3] ROS Release Policy http://wiki.ros.org/Distributions/ReleasePolicy
+.. [4] Patch to python-rosdistro:
+  https://github.com/ros-infrastructure/rosdistro/pull/TODO
+
+
+Copyright
+=========
+This document has been placed in the public domain.
