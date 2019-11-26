@@ -20,8 +20,8 @@ particularly with the option of running an ABI/API analysis for pull requests
 and devel jobs.
 
 This REP is an extension to the file format originally defined in REP 143[1]_
-and extended in REP 153[2]_. It currently does not repeat the content of REP
-143 but only states the differences.
+and extended in REP 153[2]_. It currently does not repeat the content of REPs
+143 and 153 but only states the differences.
 
 
 Motivation
