@@ -34,7 +34,7 @@ API and, extending this first one, the stability of the ABI.
 
 Traditionally the ROS policy related to releases[3]_ does not impose any
 restriction to changes in the application or binary interface of the
-ROS packages. This lack of restriction applies to: changes inside the
+ROS packages. This lack of restriction applies to changes inside the
 same ROS distribution or changes between different ROS distributions.
 
 The inclusion of an option for testing the ABI/API changes in ROS
