@@ -27,7 +27,7 @@ and extended in REP 153[2]_. It currently does not repeat the content of REP
 Motivation
 ==========
 
-Since the creation of ROS1 some developers and users has been looking into
+Since the creation of ROS1 some developers and users have been looking into
 improving the stability of the different updates that reach the set of
 ROS packages. Two aspects of the stability are the respect of the current
 API and, extending this first one, the stability of the ABI.
