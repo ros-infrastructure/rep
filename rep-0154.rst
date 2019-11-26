@@ -27,14 +27,14 @@ and extended in REP 153[2]_. It currently does not repeat the content of REPs
 Motivation
 ==========
 
-Since the creation of ROS1 some developers and users has been looking into
+Since the creation of ROS1 some developers and users have been looking into
 improving the stability of the different updates that reach the set of
 ROS packages. Two aspects of the stability are the respect of the current
 API and, extending this first one, the stability of the ABI.
 
 Traditionally the ROS policy related to releases[3]_ does not impose any
 restriction to changes in the application or binary interface of the
-ROS packages. This lack of restriction applies to: changes inside the
+ROS packages. This lack of restriction applies to changes inside the
 same ROS distribution or changes between different ROS distributions.
 
 The inclusion of an option for testing the ABI/API changes in ROS
@@ -45,7 +45,7 @@ packages can cover at least two scenarios:
    is covered by the `test_pull_requests` (as described in REP 143[1]_)
 
 1. Run an API/ABI analysis of changes that appear in the source code
-   of ROS packages. This would be part of the CI cycle present  in the devel
+   of ROS packages. This would be part of the CI cycle present in the devel
    scripts.
 
 The original target to compare both use cases and to be taken as the stable
