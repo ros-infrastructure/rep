@@ -45,7 +45,7 @@ packages can cover at least two scenarios:
    is covered by the `test_pull_requests` (as described in REP 143[1]_)
 
 1. Run an API/ABI analysis of changes that appear in the source code
-   of ROS packages. This would be part of the CI cycle present  in the devel
+   of ROS packages. This would be part of the CI cycle present in the devel
    scripts.
 
 The original target to compare both use cases and to be taken as the stable
