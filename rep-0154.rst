@@ -49,7 +49,8 @@ packages can cover at least two scenarios:
    scripts.
 
 The original target to compare both use cases and to be taken as the stable
-API/ABI are the latest stable released packages.
+API/ABI are the latest stable released packages for each ROS distribution
+under testing.
 
 Specification
 =============
