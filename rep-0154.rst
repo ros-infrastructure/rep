@@ -66,7 +66,7 @@ Distribution file
 
   * source
 
-    * test_abi: an optional boolean (default false) to run an API/ABI analsys
+    * test_abi: an optional boolean (default false) to run an API/ABI analysis
       of the code in the pull request against the latest released packages in
       devel jobs.
       If ``test_pull_requests`` is enabled, run the analysis as part of the CI
