@@ -19,10 +19,10 @@ The intention is to annotate a ROS distribution with more information,
 particularly with the option of running an ABI/API analysis for pull requests
 and devel jobs.
 
-This REP is an extension to the file format originally defined in REP 143[1]_
-and extended in REP 153[2]_.
-It currently does not repeat the content of REPs 143 and 153 but only states
-the differences.
+This REP is an extension to the file format originally defined in REP 137[1]_
+and extended in REPS: 141[2]_, 143[3]_ and 153[4]_.
+It currently does not repeat the content of these REPs but only states the
+differences.
 
 
 Motivation
@@ -34,7 +34,7 @@ ROS packages.
 Two aspects of the stability are the respect of the current API and, extending
 this first one, the stability of the ABI.
 
-Traditionally the ROS policy related to releases[3]_ does not impose any
+Traditionally the ROS policy related to releases[4]_ does not impose any
 restriction to changes in the application or binary interface of the
 ROS packages.
 This lack of restriction applies to changes inside the same ROS distribution or
@@ -46,7 +46,7 @@ packages can cover at least two scenarios:
 1. Run an API/ABI analysis together with changes coming from
    pull requests.
    Currently the option to use CI in the pull request is covered by the
-   `test_pull_requests` (as described in REP 143[1]_)
+   `test_pull_requests` (as described in REP 143[3]_)
 
 1. Run an API/ABI analysis of changes that appear in the source code
    of ROS packages.
@@ -76,7 +76,7 @@ Reference implementation
 ------------------------
 This REP is to be implemented in version 0.7.6 of the Python package *rosdistro*.
 It will serve as a reference implementation for this REP.
-A draft implementation can be found in [4]_.
+A draft implementation can be found in [6]_.
 
 
 Compatibility considerations
@@ -98,10 +98,12 @@ Only the buildfarm code and rosdistro need to be updated.
 
 References
 ==========
-.. [1] REP 153: http://www.ros.org/reps/rep-0153.html
-.. [2] REP 143: http://www.ros.org/reps/rep-0143.html
-.. [3] ROS Release Policy http://wiki.ros.org/Distributions/ReleasePolicy
-.. [4] Patch to python-rosdistro:
+.. [1] REP 137: http://www.ros.org/reps/rep-0137.html
+.. [2] REP 141: http://www.ros.org/reps/rep-0141.html
+.. [3] REP 143: http://www.ros.org/reps/rep-0143.html
+.. [4] REP 153: http://www.ros.org/reps/rep-0153.html
+.. [5] ROS Release Policy http://wiki.ros.org/Distributions/ReleasePolicy
+.. [6] Patch to python-rosdistro:
   https://github.com/ros-infrastructure/rosdistro/pull/TODO
 
 
