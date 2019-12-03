@@ -65,7 +65,7 @@ API/ABI analysis
 The stability of the different ROS distributions with respect to API/ABI
 stability has been part of the work done by ROS maintainers.
 Until now the changes are manually reviewed and their impact on the API or ABI
-is being judged by the reviewer with no automated tool that assist with this
+is being judged by the reviewer with no automated tool to assist with this
 task.
 
 The motivation of this REP is to ensure that undesired changes in terms of
@@ -88,7 +88,7 @@ The original target to compare both use cases and to be taken as the stable
 API/ABI are the latest stable released packages for each ROS distribution
 under testing.
 
-The new flag to check for ABI compatibility follows the same rational as the
+The new flag to check for ABI compatibility follows the same rationale as the
 two existing flags to run CI on every commit and/or pull request.
 
 
@@ -136,7 +136,7 @@ Distribution file
 
   * source
 
-    * test_abi: a boolean flag used to enable API/ABI analysis of the code
+    * ``test_abi``: a boolean flag used to enable API/ABI analysis of the code
       against the latest released packages.
       When ``test_commits`` is enabled the analysis is performed as part of the
       devel job.
@@ -154,7 +154,7 @@ Reference implementation
 Distribution metadata
 ^^^^^^^^^^^^^^^^^^^^^
 
-This index file changes have been implemented in version 0.7 of the Python package *rosdistro*.
+The index file changes have been implemented in version 0.7 of the Python package *rosdistro*.
 It serves as a reference implementation for this REP.
 The draft implementation can be found in [4]_.
 
@@ -212,7 +212,7 @@ The downside of bumping the distribution version would be that existing clients
 which haven't updated to the latest version of the ``rosdistro`` Python package
 would fail trying to parse that unknown version.
 With several EOL ROS distributions not receiving new releases of the Python
-package ``rosdistro`` anymore but are still used by many users this breakage
+package ``rosdistro`` anymore but still being used by many users this breakage
 should be avoided.
 
 Therefore the new flag was added to the existing format version 2 instead.
