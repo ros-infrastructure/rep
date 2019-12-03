@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 27-Oct-2018
-Post-History: 09-Nov-2018, 01-Oct-2019
+Post-History: 09-Nov-2018, 01-Oct-2019, 03-Dec-2019
 
 
 .. contents::
@@ -19,6 +19,8 @@ The intention is to annotate a ROS distribution with more information,
 such as whether the distribution should use ROS 1 or ROS 2 semantics,
 to avoid the need to externally define and update these metadata.
 
+Additionally a flag to enable checking for API/ABI compatibility is introduced.
+
 This REP is an extension to the file format defined in REP 143[1]_.
 It currently does not repeat the content of REP 143 but only states the
 differences.
@@ -26,6 +28,9 @@ differences.
 
 Motivation
 ==========
+
+Distribution metadata
+---------------------
 
 For the following use cases additional metadata is currently necessary:
 
@@ -54,8 +59,47 @@ Therefore this REP aims to add the necessary metadata about a ROS distribution
 into the ``rosdistro`` instead.
 
 
+API/ABI analysis
+----------------
+
+The stability of the different ROS distributions with respect to API/ABI
+stability has been part of the work done by ROS maintainers.
+Until now the changes are manually reviewed and their impact on the API or ABI
+is being judged by the reviewer with no automated tool that assist with this
+task.
+
+The motivation of this REP is to ensure that undesired changes in terms of
+source/binary stability are caught in the review process and maintainers can
+make decisions with more information about the effects of changes.
+
+The inclusion of an option for testing the API/ABI changes in ROS
+packages can cover at least two scenarios:
+
+1. Run an API/ABI analysis together with changes coming from
+   pull requests.
+   Currently the option to use CI in the pull request is covered by the
+   `test_pull_requests` (as described in REP 143[3]_)
+
+1. Run an API/ABI analysis of changes that appear in the source code
+   of ROS packages.
+   This would be part of the CI cycle present in the devel scripts.
+
+The original target to compare both use cases and to be taken as the stable
+API/ABI are the latest stable released packages for each ROS distribution
+under testing.
+
+The new flag to check for ABI compatibility follows the same rational as the
+two existing flags to run CI on every commit and/or pull request.
+
+
 Specification
 =============
+
+As of this REP unknown keys in the ``yaml`` files should be ignored (instead of
+resulting in an error).
+This will allow future additions in a backward compatible way without the
+need to bump the format version of each file.
+
 
 Index file
 ----------
@@ -81,25 +125,51 @@ Index file
     * python_version: an optional integer describing the major version of
       Python of the ROS distribution.
 
-    As of version 4 unknown keys should be ignored (instead of resulting in an
-    error).
-    This will allow future additions in a backward compatible way without the
-    need to bump the version of the file.
-
 * version: version number, this REP describes version 4 (instead of version 3
   described in REP 143 [1]_, version 2 described in REP 141 [2]_ and version 1
   described in REP 137 [3]_)
 
+Distribution file
+-----------------
+
+* repositories
+
+  * source
+
+    * test_abi: a boolean flag used to enable API/ABI analysis of the code
+      against the latest released packages.
+      When ``test_commits`` is enabled the analysis is performed as part of the
+      devel job.
+      When ``test_pull_requests`` is enabled the analysis is performed as part
+      of the pull request job.
+
+* version: version number, this REP still describes version 2 (same as REP 143
+  [1]_).
+  See the compatibility considerations below why a version bump was avoided.
+
 
 Reference implementation
 ------------------------
-This REP is to be implemented in version 0.7 of the Python package *rosdistro*.
-It will serve as a reference implementation for this REP.
-A draft implementation can be found in [4]_.
+
+Distribution metadata
+^^^^^^^^^^^^^^^^^^^^^
+
+This index file changes have been implemented in version 0.7 of the Python package *rosdistro*.
+It serves as a reference implementation for this REP.
+The draft implementation can be found in [4]_.
+
+ABI analysis
+^^^^^^^^^^^^
+
+The distribution file changes are implemented in version 0.8 of the Python package *rosdistro*.
+The draft implementation can be found in [7]_.
 
 
 Compatibility considerations
 ============================
+
+Distribution metadata
+---------------------
 
 The draft implementation of rosdistro is able to parse multiple index format
 versions: 2, 3 as well as 4.
@@ -131,6 +201,30 @@ present and if yes use it.
 If desired other Python packages can explicily depend on the newer version to
 ensure the v4 index is being used.
 
+API/ABI analysis
+----------------
+
+The new ``test_abi`` could be added in a new format version 3 of the
+distribution file.
+That would ensure that implementations of this specification won't break if
+they decided to result in an error when unknown keys are found.
+The downside of bumping the distribution version would be that existing clients
+which haven't updated to the latest version of the ``rosdistro`` Python package
+would fail trying to parse that unknown version.
+With several EOL ROS distributions not receiving new releases of the Python
+package ``rosdistro`` anymore but are still used by many users this breakage
+should be avoided.
+
+Therefore the new flag was added to the existing format version 2 instead.
+The reference implementation is already tolerant to unknown keys and simply
+ignores them so the newly added flag won't affect existing users.
+
+``rosdistro`` version 0.8.0 or newer is necessary to access the
+``test_abi`` key.
+Older versions of ``rosdistro`` will simply ignore the key in the yaml file and
+not expose it through the API.
+
+
 bloom
 -----
 
@@ -148,6 +242,8 @@ References
   https://github.com/ros-infrastructure/rosdistro/pull/124
 .. [5] bloom asserting the index file version: https://github.com/ros-infrastructure/bloom/blob/d8be9d1d3469f00f936ad6e4869b847c5a6f8962/bloom/commands/release.py#L221-L223
 .. [6] bloom PR to support v4 https://github.com/ros-infrastructure/bloom/pull/493
+.. [7] Second patch to python-rosdistro:
+  https://github.com/ros-infrastructure/rosdistro/pull/147
 
 
 Copyright
