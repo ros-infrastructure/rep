@@ -28,17 +28,14 @@ differences.
 Motivation
 ==========
 
-Since the creation of ROS1 some developers and users have been looking into
-improving the stability of the different updates that reach the set of
-ROS packages.
-Two aspects of the stability are the respect of the current API and, extending
-this first one, the stability of the ABI.
+The stability of the different ROS distributions with respect to API/ABI stability
+has been part of the work done by ROS maintainers.
+Until now the changes are manually reviewed and their impact on the API or ABI is
+being judged by the reviewer with no automated tool that assist with this task.
 
-Traditionally the ROS policy related to releases[4]_ does not impose any
-restriction to changes in the application or binary interface of the
-ROS packages.
-This lack of restriction applies to changes inside the same ROS distribution or
-changes between different ROS distributions.
+The motivation of this REP is to ensure that undesired changes in terms of
+source/binary stability are caught in the review process and maintainers can
+make decisions with more information about the effects of changes.
 
 The inclusion of an option for testing the ABI/API changes in ROS
 packages can cover at least two scenarios:
@@ -76,7 +73,7 @@ Reference implementation
 ------------------------
 This REP is to be implemented in version 0.7.6 of the Python package *rosdistro*.
 It will serve as a reference implementation for this REP.
-A draft implementation can be found in [6]_.
+A draft implementation can be found in [5]_.
 
 
 Compatibility considerations
@@ -102,8 +99,7 @@ References
 .. [2] REP 141: http://www.ros.org/reps/rep-0141.html
 .. [3] REP 143: http://www.ros.org/reps/rep-0143.html
 .. [4] REP 153: http://www.ros.org/reps/rep-0153.html
-.. [5] ROS Release Policy http://wiki.ros.org/Distributions/ReleasePolicy
-.. [6] Patch to python-rosdistro:
+.. [5] Patch to python-rosdistro:
   https://github.com/ros-infrastructure/rosdistro/pull/TODO
 
 
