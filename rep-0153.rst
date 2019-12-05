@@ -78,7 +78,7 @@ packages can cover at least two scenarios:
 1. Run an API/ABI analysis together with changes coming from
    pull requests.
    Currently the option to use CI in the pull request is covered by the
-   `test_pull_requests` (as described in REP 143[3]_)
+   `test_pull_requests` (as described in REP 143[1]_)
 
 1. Run an API/ABI analysis of changes that appear in the source code
    of ROS packages.
