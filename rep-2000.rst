@@ -543,6 +543,7 @@ Package manager use for dependencies:
 - Ubuntu, Debian: apt
 - MacOS: Homebrew, pip
 - Windows: Chocolatey, pip
+- OpenEmbedded: opkg
 
 
 Build System Support:
