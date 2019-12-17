@@ -1,6 +1,6 @@
 REP: 2004
 Title: Package Quality Categories
-Author: William Woodall <william@osrfoundation.org>
+Author: William Woodall <william@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
