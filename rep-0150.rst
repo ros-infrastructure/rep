@@ -143,8 +143,8 @@ Both of these variants contain tutorials for the stacks they provide.
 
   - desktop:
       extends: [robot, viz]
-      packages: [angles, common_tutorials, geometry_tutorials, ros_tutorials,
-                 roslint, urdf_tutorial, visualization_tutorials]
+      packages: [actionlib_tools, angles, common_tutorials, geometry_tutorials,
+                 ros_tutorials, roslint, urdf_tutorial, visualization_tutorials]
   - desktop_full:
       extends: [desktop, perception, simulators]
       packages: [urdf_sim_tutorial]
