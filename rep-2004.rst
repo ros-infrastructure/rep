@@ -518,10 +518,4 @@ References and Footnotes
 Copyright
 =========
 
-Copyright 2019 Open Source Robotics Foundation, Inc.
-
-
-License
-=======
-
-Creative Commons Attribution 4.0 International
+This document is placed in the public domain or under the CC0-1.0-Universal license, whichever is more permissive.
