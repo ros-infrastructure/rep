@@ -364,7 +364,7 @@ Targeted Languages:
 
 - C++14
 - Python 3.8
-  - Python 3.7 support is not required, but recommended.
+  - Testing against Python 3.7 is recommended, but not required.
 - Lisp SBCL 1.4.16
 
 Requirements:
