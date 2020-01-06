@@ -20,7 +20,7 @@ from docutils.writers import html4css1
 
 class Writer(html4css1.Writer):
 
-    default_stylesheet = 'rep.css'
+    default_stylesheet = 'css/rep.css'
 
     default_stylesheet_path = utils.relative_path(
         os.path.join(os.getcwd(), 'dummy'),

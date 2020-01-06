@@ -424,7 +424,7 @@ def push_rep(htmlfiles, rstfiles, username, verbose, local=0):
         #chmod_cmd = "ssh %s%s chmod" % (username, HOST)
     files = htmlfiles[:]
     files.extend(rstfiles)
-    files.append("rep.css")
+    files.append("css/rep.css")
     filelist = SPACE.join(files)
     rc = os.system("%s %s %s %s" % (copy_cmd, quiet, filelist, target))
     if rc:
