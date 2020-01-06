@@ -288,7 +288,7 @@ References
 ==========
 
 .. [1] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
-   (http://ros.org/reps/rep-0001.html)
+   (https://ros.org/reps/rep-0001.html)
 
 
 Copyright

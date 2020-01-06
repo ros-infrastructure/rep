@@ -182,7 +182,7 @@ References
    (http://www.ros.org/reps/rep-0109.html)
 
 .. [3] REP 100
-   (http://ros.org/reps/rep-0100.html)
+   (https://ros.org/reps/rep-0100.html)
 
    
 Copyright

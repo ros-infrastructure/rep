@@ -120,7 +120,7 @@ References
 ==========
 
 .. [1] REP 116
-   (http://ros.org/reps/rep-0116.html)
+   (https://ros.org/reps/rep-0116.html)
 .. [2] Patch
    (https://kforge.ros.org/common/pluginlib/file/1e14fef67d09/include/pluginlib/class_loader.h)
 .. [3] Patch

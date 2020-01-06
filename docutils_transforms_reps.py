@@ -37,7 +37,7 @@ class Headers(Transform):
         (re.compile(r'\$[a-zA-Z]+: (.+) \$$'), r'\1'),)
 
     def apply(self):
-        self.document.settings.rep_base_url = 'http://ros.org/reps/'
+        self.document.settings.rep_base_url = 'https://ros.org/reps/'
 
         if not len(self.document):
             # @@@ replace these DataErrors with proper system messages
@@ -263,7 +263,7 @@ class REPZeroSpecial(nodes.SparseNodeVisitor):
         self.entry = 0
 
     def visit_entry(self, node):
-        self.document.settings.rep_base_url = 'http://ros.org/reps/'
+        self.document.settings.rep_base_url = 'https://ros.org/reps/'
 
         self.entry += 1
         if self.rep_table and self.entry == 2 and len(node) == 1:

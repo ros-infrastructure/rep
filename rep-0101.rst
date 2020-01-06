@@ -112,7 +112,7 @@ References
 .. [1] ROS Roadmap
    (http://ros.org/wiki/ROS/Roadmap)
 .. [#REP100] REP 100
-   (http://ros.org/reps/rep-0100.html)
+   (https://ros.org/reps/rep-0100.html)
 
 .. _rosh: http://ros.org/wiki/rosh
 .. _rxlab: http://ros.org/wiki/rxlab

@@ -38,9 +38,9 @@ class Writer(html4css1.Writer):
         'option is "%s", and the default value for --template is "%s". '
         'See HTML-Specific Options above.'
         % (default_stylesheet_path, default_template_path),
-        (('ROS\'s home URL.  Default is "http://ros.org".',
+        (('ROS\'s home URL.  Default is "https://ros.org".',
           ['--ros-home'],
-          {'default': 'http://ros.org', 'metavar': '<URL>'}),
+          {'default': 'https://ros.org', 'metavar': '<URL>'}),
          ('Home URL prefix for REPs.  Default is "." (current directory).',
           ['--rep-home'],
           {'default': '.', 'metavar': '<URL>'}),

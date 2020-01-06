@@ -776,7 +776,7 @@ References
 ==========
 
 .. [1] REP-0127
-   (http://ros.org/reps/rep-0127.html)
+   (https://ros.org/reps/rep-0127.html)
 .. [2] ROS naming conventions
    (http://www.ros.org/wiki/ROS/Patterns/Conventions#Naming_ROS_Resources)
 .. [3] ros-infrastructure/catkin_pkg#43: `"add support for depend tag"
@@ -794,7 +794,7 @@ References
 .. [9] Buildsystem mailing list discussion: `"REP-0140: internal review"
    <https://groups.google.com/forum/?fromgroups=#!topic/ros-sig-buildsystem/_QVFLQi-6wk>`_
 .. [10] REP-0134
-   (http://ros.org/reps/rep-0134.html)
+   (https://ros.org/reps/rep-0134.html)
 .. [11] Schema file
    (https://github.com/ros-infrastructure/rep/blob/master/xsd/package_format2.xsd)
 

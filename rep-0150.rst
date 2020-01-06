@@ -177,7 +177,7 @@ References
    (http://www.ros.org/reps/rep-0108.html)
 
 .. [2] REP 127: Specification of package manifest format
-   (http://ros.org/reps/rep-0127.html)
+   (https://ros.org/reps/rep-0127.html)
 
 .. [3] REP 131: Groovy Variants
    (http://www.ros.org/reps/rep-0131.html)

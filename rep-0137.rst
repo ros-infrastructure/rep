@@ -117,7 +117,7 @@ As a good practice, the files should contain a header such as:
 
   %YAML 1.1
   # ROS index|release|release-build|source|source-build|doc|doc-build file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # see REP 137: https://ros.org/reps/rep-0137.html
   ---
 
 Index file
@@ -155,7 +155,7 @@ doc files and their corresponding build files.
 
   %YAML 1.1
   # ROS index file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # see REP 137: https://ros.org/reps/rep-0137.html
   ---
   distributions:
     groovy:
@@ -230,7 +230,7 @@ target platforms.
 
   %YAML 1.1
   # ROS release file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # see REP 137: https://ros.org/reps/rep-0137.html
   ---
   repositories:
     actionlib:
@@ -313,7 +313,7 @@ and specifying the platforms and architectures.
 
   %YAML 1.1
   # ROS release-build file
-  # see REP 137: http://ros.org/reps/rep-0137.html
+  # see REP 137: https://ros.org/reps/rep-0137.html
   ---
   package_whitelist: [ros_tutorials, common_tutorials]
   package_blacklist: [turtlesim]
@@ -469,7 +469,7 @@ References
 ==========
 .. [1] Bloom: a release automation tool
    (http://www.ros.org/wiki/bloom)
-.. [2] rosdep2: http://ros.org/reps/rep-0125.html
+.. [2] rosdep2: https://ros.org/reps/rep-0125.html
 .. [3] roslocate: http://www.ros.org/reps/rep-0115.html
 .. [4] rospkg.os_detect: http://www.ros.org/reps/rep-0114.html
 .. [5] Example files specifying a ROS distro: https://github.com/ros-infrastructure/rosdistro/tree/master/test/files

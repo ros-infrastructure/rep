@@ -175,10 +175,10 @@ References
    (http://www.ros.org/reps/rep-0108.html)
 
 .. [2] REP 127: Specification of package manifest format
-   (http://ros.org/reps/rep-0127.html)
+   (https://ros.org/reps/rep-0127.html)
 
 .. [3] REP 100
-   (http://ros.org/reps/rep-0100.html)
+   (https://ros.org/reps/rep-0100.html)
 
    
 Copyright
