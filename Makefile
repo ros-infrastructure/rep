@@ -27,4 +27,4 @@ clean:
 	-rm rep-0000.rst
 
 upload: all
-	rsync -r README.txt *.html mermaid.css mermaid.js rep.css style.css rep-0000.rst $(SUBDIRS) rosbot@ros.osuosl.org:/var/www/www.ros.org/reps
+	rsync -r README.txt *.html mermaid.js css rep-0000.rst $(SUBDIRS) rosbot@ros.osuosl.org:/var/www/www.ros.org/reps

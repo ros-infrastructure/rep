@@ -202,7 +202,7 @@ def fixfile(inpath, input_lines, outfile):
         'version': '',
         'title': 'REP '+rep+" -- "+title,
         'stylesheet': (
-            '<link rel="stylesheet" href="rep.css" type="text/css" />'),
+            '<link rel="stylesheet" href="css/rep.css" type="text/css" />'),
         }
 
     if 0:
@@ -210,7 +210,7 @@ def fixfile(inpath, input_lines, outfile):
             print('  <title>%s</title>' % cgi.escape(title), file=outfile)
 
         print(
-            '  <link rel="STYLESHEET" href="style.css" type="text/css" />\n'
+            '  <link rel="STYLESHEET" href="css/style.css" type="text/css" />\n'
             '</head>\n'
             '<body bgcolor="white">\n'
             '<table class="navigation" cellpadding="0" cellspacing="0"\n'
