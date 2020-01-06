@@ -205,31 +205,6 @@ def fixfile(inpath, input_lines, outfile):
             '<link rel="stylesheet" href="css/rep.css" type="text/css" />'),
         }
 
-    if 0:
-        if title:
-            print('  <title>%s</title>' % cgi.escape(title), file=outfile)
-
-        print(
-            '  <link rel="STYLESHEET" href="css/style.css" type="text/css" />\n'
-            '</head>\n'
-            '<body bgcolor="white">\n'
-            '<table class="navigation" cellpadding="0" cellspacing="0"\n'
-            '       width="100%%" border="0">\n'
-            '<tr><td class="navicon" width="150" height="35">\n'
-            '<a href="../" title="ROS Home Page">ROS</a></td>\n'
-            '<td class="textlinks" align="left">\n'
-            '[<b><a href="../">ROS Home</a></b>]', file=outfile)
-        if basename != 'rep-0000.rst':
-            print('[<b><a href=".">REP Index</a></b>]', file=outfile)
-        if rep:
-            try:
-                print('[<b><a href="rep-%04d.rst">REP Source</a></b>]' %
-                      int(rep), file=outfile)
-            except ValueError as error:
-                print('ValueError (invalid REP number): %s' % error,
-                      file=sys.stderr)
-        print('</td></tr></table>', file=outfile)
-
     real_outfile = outfile
 
     try:
@@ -449,7 +424,6 @@ def push_rep(htmlfiles, rstfiles, username, verbose, local=0):
         #chmod_cmd = "ssh %s%s chmod" % (username, HOST)
     files = htmlfiles[:]
     files.extend(rstfiles)
-    files.append("style.css")
     files.append("rep.css")
     filelist = SPACE.join(files)
     rc = os.system("%s %s %s %s" % (copy_cmd, quiet, filelist, target))
