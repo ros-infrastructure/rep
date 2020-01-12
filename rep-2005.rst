@@ -1,0 +1,235 @@
+REP: 2005
+Title: ROS 2 Standard Library
+Author: Brian Gerkey <gerkey@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 12-Jan-2020
+Post-History:
+
+
+Abstract
+========
+
+This REP describes a set of repositories which together form the standard library of ROS 2.
+
+
+Motivation
+==========
+
+Like ROS 1 before it, ROS 2 follows a federated development model.
+The open source code and other assets that make up the ROS 2 project are spread across multiple repositories, with different authors, maintainers, and contributors to each component.
+This federated model makes it easy for developers to share their contributions with the community while also retaining control over how those contributions are developed and released.
+As a result the community size and overall project scope can scale up naturally and efficiently.
+
+But in exchange, it can be difficult in a federated ecosystem for users and developers to know, of all the available ROS 2 packages, which are integral to the project.
+With the curated list below we aim to provide community members with guidance regarding which parts of the ROS 2 ecosystem are widely used, actively maintained, and of high quality.
+Furthermore, we encourage contributors to focus their efforts on items from this list.
+
+
+Scope
+=====
+
+The list below is curated to include repositories that are:
+
+* open source (not proprietary);
+* connected to the ROS 2 project (not general purpose software, except when included with ROS 2-specific bindings);
+* broadly usable (not narrowly tailored for uncommon use cases); and
+* evidently used by a nontrivial part of the community.
+
+We aim that all of these repositories are also:
+
+* actively maintained and following accepted software development processes, including code review and testing.
+
+
+Change process
+==============
+
+This content is maintained at GitHub in the [REP repo](https://github.com/ros-infrastructure/rep).
+To propose changes, such as adding or removing items, make a pull request to that repo.
+The ensuing public review and discussion will evaluate the change in light of the purpose and scope explained above, with the final merge decision being made by one of the REP maintainers.
+
+
+Content
+=======
+
+* Buildsystem, package index and tooling around
+
+  * `ament/ament_cmake <https://github.com/ament/ament_cmake>`_
+  * `ament/ament_index <https://github.com/ament/ament_index>`_
+  * `ament/ament_package <https://github.com/ament/ament_package>`_
+  * `ament/ament_lint <https://github.com/ament/ament_lint>`_
+  * `ros/ros_environment <https://github.com/ros/ros_environment>`_
+  * `ros-infrastructure/bloom <https://github.com/ros-infrastructure/bloom>`_
+  * `ros-infrastructure/catkin_pkg <https://github.com/ros-infrastructure/catkin_pkg>`_
+  * `ros-infrastructure/rosdistro <https://github.com/ros-infrastructure/rosdistro>`_
+  * `ros-infrastructure/ros_buildfarm <https://github.com/ros-infrastructure/ros_buildfarm>`_
+  * `ros2/ament_cmake_ros <https://github.com/ros2/ament_cmake_ros>`_
+
+* Third party packages
+
+  * `eProsima/foonathan_memory_vendor <https://github.com/eProsima/foonathan_memory_vendor>`_
+  * `ament/googletest <https://github.com/ament/googletest>`_
+  * `ament/uncrustify_vendor <https://github.com/ament/uncrustify_vendor>`_
+  * `ros2/console_bridge_vendor <https://github.com/ros2/console_bridge_vendor>`_
+  * `ros2/poco_vendor <https://github.com/ros2/poco_vendor>`_
+  * `ros2/spdlog_vendor <https://github.com/ros2/spdlog_vendor>`_
+  * `ros2/tinydir_vendor <https://github.com/ros2/tinydir_vendor>`_
+  * `ros2/tinyxml_vendor <https://github.com/ros2/tinyxml_vendor>`_
+  * `ros2/tinyxml2_vendor <https://github.com/ros2/tinyxml2_vendor>`_
+  * `ros2/yaml_cpp_vendor <https://github.com/ros2/yaml_cpp_vendor>`_
+
+* Utility functionality
+
+  * `micro-ROS/ros_tracing/ros2_tracing <https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing>`_
+  * `osrf/osrf_pycommon <https://github.com/osrf/osrf_pycommon>`_
+  * `osrf/osrf_testing_tools_cpp <https://github.com/osrf/osrf_testing_tools_cpp>`_
+  * `ros/class_loader <https://github.com/ros/class_loader>`_
+  * `ros/pluginlib <https://github.com/ros/pluginlib>`_
+  * `ros2/eigen3_cmake_module <https://github.com/ros2/eigen3_cmake_module>`_
+  * `ros2/python_cmake_module <https://github.com/ros2/python_cmake_module>`_
+  * `ros2/rcutils <https://github.com/ros2/rcutils>`_
+  * `ros2/rcpputils <https://github.com/ros2/rcpputils>`_
+  * `ros2/ros_testing <https://github.com/ros2/ros_testing>`_
+
+* ROS interface pipeline
+
+  * `ros2/rosidl <https://github.com/ros2/rosidl>`_
+  * `ros2/rosidl_dds <https://github.com/ros2/rosidl_dds>`_
+  * `ros2/rosidl_defaults <https://github.com/ros2/rosidl_defaults>`_
+  * `ros2/rosidl_python <https://github.com/ros2/rosidl_python>`_
+  * `ros2/rosidl_runtime_py <https://github.com/ros2/rosidl_runtime_py>`_
+  * `ros2/rosidl_typesupport <https://github.com/ros2/rosidl_typesupport>`_
+
+* Interface definitions
+
+  * `ros-planning/navigation_msgs <https://github.com/ros-planning/navigation_msgs>`_
+  * `ros2/common_interfaces <https://github.com/ros2/common_interfaces>`_
+  * `ros2/example_interfaces <https://github.com/ros2/example_interfaces>`_
+  * `ros2/rcl_interfaces <https://github.com/ros2/rcl_interfaces>`_
+  * `ros2/test_interface_files <https://github.com/ros2/test_interface_files>`_
+  * `ros2/unique_identifier_msgs <https://github.com/ros2/unique_identifier_msgs>`_
+
+* RMW
+
+  * `ros2/rmw <https://github.com/ros2/rmw>`_
+  * `ros2/rmw_implementation <https://github.com/ros2/rmw_implementation>`_
+  * Connext (Connext itself is not open source)
+
+    * `ros2/rmw_connext <https://github.com/ros2/rmw_connext>`_
+    * `ros2/rosidl_typesupport_connext <https://github.com/ros2/rosidl_typesupport_connext>`_
+
+  * CycloneDDS
+
+    * `eclipse-cyclonedds/cyclonedds <https://github.com/eclipse-cyclonedds/cyclonedds>`_
+    * `ros2/rmw_cyclonedds <https://github.com/ros2/rmw_cyclonedds>`_
+
+  * FastRTPS
+
+    * `eProsima/Fast-CDR <https://github.com/eProsima/Fast-CDR>`_
+    * `eProsima/Fast-RTPS <https://github.com/eProsima/Fast-RTPS>`_
+    * `ros2/rmw_fastrtps <https://github.com/ros2/rmw_fastrtps>`_
+    * `ros2/rosidl_typesupport_fastrtps <https://github.com/ros2/rosidl_typesupport_fastrtps>`_
+
+  * OpenSplice
+
+    * `ros2/rmw_opensplice <https://github.com/ros2/rmw_opensplice>`_
+    * `ros2/rosidl_typesupport_opensplice <https://github.com/ros2/rosidl_typesupport_opensplice>`_
+
+* Client libraries
+
+  * `ros2/rcl <https://github.com/ros2/rcl>`_
+  * `ros2/rcl_logging <https://github.com/ros2/rcl_logging>`_
+  * `ros2/rclcpp <https://github.com/ros2/rclcpp>`_
+  * `ros2/rclpy <https://github.com/ros2/rclpy>`_
+
+* Orchestration
+
+  * `ros2/launch <https://github.com/ros2/launch>`_
+  * `ros2/launch_ros <https://github.com/ros2/launch_ros>`_
+
+* Features
+
+  * `ros/xacro <https://github.com/ros/xacro>`_
+  * Sensor processing
+
+    * `ros-perception/image_common <https://github.com/ros-perception/image_common>`_
+    * `ros-perception/image_transport_plugins <https://github.com/ros-perception/image_transport_plugins>`_
+    * `ros-perception/perception_pcl <https://github.com/ros-perception/perception_pcl>`_
+    * `ros-perception/vision_opencv <https://github.com/ros-perception/vision_opencv>`_
+    * `ros-perception/laser_filters <https://github.com/ros-perception/laser_filters>`_
+    * `ros-perception/laser_geometry <https://github.com/ros-perception/laser_geometry>`_
+
+  * `ros-planning/navigation2 <https://github.com/ros-planning/navigation2>`_
+  * `ros-planning/moveit2 <https://github.com/ros-planning/moveit2>`_
+  * `ros-visualization/interactive_markers <https://github.com/ros-visualization/interactive_markers>`_
+  * `ros2/geometry2 <https://github.com/ros2/geometry2>`_
+  * `ros2/kdl_parser <https://github.com/ros2/kdl_parser>`_
+  * `ros2/message_filters <https://github.com/ros2/message_filters>`_
+  * `ros2/sros2 <https://github.com/ros2/sros2>`_
+  * `ros2/teleop_twist_joy <https://github.com/ros2/teleop_twist_joy>`_
+  * ROS Drivers
+
+    * `ros2/joystick_drivers <https://github.com/ros2/joystick_drivers>`_
+    * `ros-drivers/velodyne <https://github.com/ros-drivers/velodyne>`_
+    * `ros-drivers/urg_c <https://github.com/ros-drivers/urg_c>`_
+    * `ros-drivers/urg_node <https://github.com/ros-drivers/urg_node>`_
+
+* Documentation, Examples, Tutorials
+
+  * `ros2/demos <https://github.com/ros2/demos>`_
+  * `ros2/design <https://github.com/ros2/design>`_
+  * `ros2/examples <https://github.com/ros2/examples>`_
+  * `ros2/ros_core_documentation <https://github.com/ros2/ros_core_documentation>`_
+  * `ros2/ros2_documentation <https://github.com/ros2/ros2_documentation>`_
+
+* Robot
+
+  * `ros/urdfdom_headers <https://github.com/ros/urdfdom_headers>`_
+  * `ros2/urdf <https://github.com/ros2/urdf>`_
+  * `ros2/urdfdom <https://github.com/ros2/urdfdom>`_
+
+* Tools
+
+  * `ros-simulation/gazebo_ros_pkgs <https://github.com/ros-simulation/gazebo_ros_pkgs>`_
+  * `ros2/ros1_bridge <https://github.com/ros2/ros1_bridge>`_
+  * `ros2/ros2cli <https://github.com/ros2/ros2cli>`_
+  * `ros2/rosbag2 <https://github.com/ros2/rosbag2>`_
+  * `ros2/rviz <https://github.com/ros2/rviz>`_
+  * `ros-tooling/cross_compile <https://github.com/ros-tooling/cross_compile>`_
+  * `ros-tooling/system_metrics_collector <https://github.com/ros-tooling/system_metrics_collector>`_
+  * RQt
+
+    * `ros-visualization/python_qt_binding <https://github.com/ros-visualization/python_qt_binding>`_
+    * `ros-visualization/qt_gui_core <https://github.com/ros-visualization/qt_gui_core>`_
+    * `ros-visualization/rqt <https://github.com/ros-visualization/rqt>`_
+    * `ros-visualization/rqt_action <https://github.com/ros-visualization/rqt_action>`_
+    * `ros-visualization/rqt_console <https://github.com/ros-visualization/rqt_console>`_
+    * `ros-visualization/rqt_graph <https://github.com/ros-visualization/rqt_graph>`_
+    * `ros-visualization/rqt_image_view <https://github.com/ros-visualization/rqt_image_view>`_
+    * `ros-visualization/rqt_msg <https://github.com/ros-visualization/rqt_msg>`_
+    * `ros-visualization/rqt_plot <https://github.com/ros-visualization/rqt_plot>`_
+    * `ros-visualization/rqt_publisher <https://github.com/ros-visualization/rqt_publisher>`_
+    * `ros-visualization/rqt_py_console <https://github.com/ros-visualization/rqt_py_console>`_
+    * `ros-visualization/rqt_reconfigure <https://github.com/ros-visualization/rqt_reconfigure>`_
+    * `ros-visualization/rqt_robot_steering <https://github.com/ros-visualization/rqt_robot_steering>`_
+    * `ros-visualization/rqt_service_caller <https://github.com/ros-visualization/rqt_service_caller>`_
+    * `ros-visualization/rqt_srv <https://github.com/ros-visualization/rqt_srv>`_
+    * `ros-visualization/rqt_tf_tree <https://github.com/ros-visualization/rqt_tf_tree>`_
+    * `ros-visualization/rqt_topic <https://github.com/ros-visualization/rqt_topic>`_
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
