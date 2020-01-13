@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 27-Oct-2018
-Post-History: 09-Nov-2018, 01-Oct-2019, 03-Dec-2019
+Post-History: 09-Nov-2018, 01-Oct-2019, 03-Dec-2019, 10-Ene-2020
 
 
 .. contents::
@@ -19,7 +19,8 @@ The intention is to annotate a ROS distribution with more information,
 such as whether the distribution should use ROS 1 or ROS 2 semantics,
 to avoid the need to externally define and update these metadata.
 
-Additionally a flag to enable checking for API/ABI compatibility is introduced.
+Additionally flags to enable checking for API/ABI compatibility and require display
+and graphic acceleration for tests are introduced.
 
 This REP is an extension to the file format defined in REP 143[1]_.
 It currently does not repeat the content of REP 143 but only states the
@@ -91,6 +92,45 @@ under testing.
 The new flag to check for ABI compatibility follows the same rationale as the
 two existing flags to run CI on every commit and/or pull request.
 
+Display and graphic acceleration support for tests
+--------------------------------------------------
+
+Some of the packages that compose the ROS ecosystem use graphic interfaces with
+different proposes. Sometimes these packages implement tests that require some
+graphic infrastructure in place to be able to be run. These tests can also be
+categorized in two main categories: tests requiring a valid (physical or
+virtual) display and tests requiring not only a display but also hardware
+graphic acceleration. Without the buildfarm graphic support these tests are
+probably failing in the buildfarm or are skipped by buildsystem or detection
+mechanisms.
+
+The motivation of this REP is to provide graphics dependent tests with the
+necessary infrastructure to be run in the ROS buildfarm if graphic or GPU nodes
+are available in order to improve the quality of the software under testing.
+
+This support will affects the standard CI jobs and, if `test_pull_requests` is
+enabled, the CI jobs that run for the pull requests changes (as described in
+REP 143[1]_).
+
+The buildfarm nodes with graphic or acceleration support can be dedicated to
+run all tests (as the usual nodes) or could be dedicated to run only the tests
+requiring special support in order to maximize the use of their capabilities.
+These generates three use cases for nodes:
+
+1. Buildfarm nodes without graphic or acceleration support will run all tests
+   but skip those marked as graphic or hardware acceleration dependent.
+
+1. Buildfarm nodes with graphic support might run all tests or those only
+   tagged as graphic dependent. Skipping those marked as hardware
+   acceleration dependent.
+
+1. Buildfarm nodes with acceleration support might run: all tests, those tagged
+   as graphic dependent and/or those tagged as hardware acceleration
+   dependent.
+
+To implement these option tests need to be tagged as graphic/acceleration
+dependent and nodes need to be categorized as well depending on their
+capabilities.
 
 Specification
 =============
@@ -142,6 +182,19 @@ Distribution file
       devel job.
       When ``test_pull_requests`` is enabled the analysis is performed as part
       of the pull request job.
+
+    * ``tests_require_display``: a boolean flag used to indicate if there are
+      tests in the ROS package that needs a graphic environment to be run.
+
+    * ``tests_require_gpu``: a boolean flag used to indicate if there are
+      tests in the ROS package that needs a graphic accelerated environment
+      to be run.
+
+    * ``exclude_display_tests``: a boolean flag used to indicate when display
+      dependent tests are going to be skipped from the run.
+
+    * ``exclude_gpu_tests``: a boolean flag used to indicate when graphic
+      acceleration dependent tests are going to be skipped from the run.
 
 * version: version number, this REP still describes version 2 (same as REP 143
   [1]_).
@@ -198,14 +251,15 @@ the Python package can continue to use it as is, users updating to the newer
 version will benefit from the additional metadata.
 Python code using the ``rosdistro`` API can easily check if the metadata is
 present and if yes use it.
-If desired other Python packages can explicily depend on the newer version to
+If desired other Python packages can explicitly depend on the newer version to
 ensure the v4 index is being used.
 
-API/ABI analysis
-----------------
+API/ABI analysis and display support for tests
+----------------------------------------------
 
-The new ``test_abi`` could be added in a new format version 3 of the
-distribution file.
+The new ``test_abi``, ``tests_require_display``, ``tests_require_gpu``,
+``exclude_display_tests`` and ``exclude_gpu_tests`` could be added in a new
+format version 3 of the distribution file.
 That would ensure that implementations of this specification won't break if
 they decided to result in an error when unknown keys are found.
 The downside of bumping the distribution version would be that existing clients
@@ -220,7 +274,8 @@ The reference implementation is already tolerant to unknown keys and simply
 ignores them so the newly added flag won't affect existing users.
 
 ``rosdistro`` version 0.8.0 or newer is necessary to access the
-``test_abi`` key.
+``test_abi``, ``tests_require_display``, ``tests_require_gpu``,
+``exclude_display_tests`` and ``exclude_gpu_tests``  keys.
 Older versions of ``rosdistro`` will simply ignore the key in the yaml file and
 not expose it through the API.
 
