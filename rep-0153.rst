@@ -270,8 +270,8 @@ The reference implementation is already tolerant to unknown keys and simply
 ignores them so the newly added flag won't affect existing users.
 
 ``rosdistro`` version 0.8.0 or newer is necessary to access the
-``test_abi``, ``run_command_line_tests``, ``run_display_tests`` and
-``run_gpu_tests`` keys.
+``test_abi`` key. version 0.9.0 or newer is necessary to access the
+``run_command_line_tests``, ``run_display_tests`` and ``run_gpu_tests`` keys.
 Older versions of ``rosdistro`` will simply ignore the key in the yaml file and
 not expose it through the API.
 
