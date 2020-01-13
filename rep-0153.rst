@@ -183,18 +183,14 @@ Distribution file
       When ``test_pull_requests`` is enabled the analysis is performed as part
       of the pull request job.
 
-    * ``tests_require_display``: a boolean flag used to indicate if there are
-      tests in the ROS package that needs a graphic environment to be run.
+    * ``run_command_line_tests``: a boolean flag used to indicate when the
+      usual command line tests will be run.
 
-    * ``tests_require_gpu``: a boolean flag used to indicate if there are
-      tests in the ROS package that needs a graphic accelerated environment
-      to be run.
+    * ``run_display_tests``: a boolean flag used to indicate when display
+      dependent tests are going to be run.
 
-    * ``exclude_display_tests``: a boolean flag used to indicate when display
-      dependent tests are going to be skipped from the run.
-
-    * ``exclude_gpu_tests``: a boolean flag used to indicate when graphic
-      acceleration dependent tests are going to be skipped from the run.
+    * ``run_gpu_tests``: a boolean flag used to indicate when graphic
+      acceleration dependent tests are going to be run.
 
 * version: version number, this REP still describes version 2 (same as REP 143
   [1]_).
@@ -257,9 +253,9 @@ ensure the v4 index is being used.
 API/ABI analysis and display support for tests
 ----------------------------------------------
 
-The new ``test_abi``, ``tests_require_display``, ``tests_require_gpu``,
-``exclude_display_tests`` and ``exclude_gpu_tests`` could be added in a new
-format version 3 of the distribution file.
+The new ``test_abi``, ``run_command_line_tests``, ``run_display_tests`` and
+``run_gpu_tests`` could be added in a new format version 3 of the distribution
+file.
 That would ensure that implementations of this specification won't break if
 they decided to result in an error when unknown keys are found.
 The downside of bumping the distribution version would be that existing clients
@@ -274,11 +270,13 @@ The reference implementation is already tolerant to unknown keys and simply
 ignores them so the newly added flag won't affect existing users.
 
 ``rosdistro`` version 0.8.0 or newer is necessary to access the
-``test_abi``, ``tests_require_display``, ``tests_require_gpu``,
-``exclude_display_tests`` and ``exclude_gpu_tests``  keys.
+``test_abi``, ``run_command_line_tests``, ``run_display_tests`` and
+``run_gpu_tests`` keys.
 Older versions of ``rosdistro`` will simply ignore the key in the yaml file and
 not expose it through the API.
 
+In order to preserve current behaviour and keep all tests running, the default
+value for ``run_command_line_tests`` is ``True``.
 
 bloom
 -----
