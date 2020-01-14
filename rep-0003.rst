@@ -352,6 +352,7 @@ Required Support for:
 Recommended Support for:
 
 - Debian Buster
+- Fedora 31
 - Fedora 32
 
 Architectures Supported:
