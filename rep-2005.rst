@@ -62,6 +62,7 @@ Content
   * `ros/ros_environment <https://github.com/ros/ros_environment>`_
   * `ros-infrastructure/bloom <https://github.com/ros-infrastructure/bloom>`_
   * `ros-infrastructure/catkin_pkg <https://github.com/ros-infrastructure/catkin_pkg>`_
+  * `ros-infrastructure/rosdep <https://github.com/ros-infrastructure/rosdep>`_
   * `ros-infrastructure/rosdistro <https://github.com/ros-infrastructure/rosdistro>`_
   * `ros-infrastructure/ros_buildfarm <https://github.com/ros-infrastructure/ros_buildfarm>`_
   * `ros2/ament_cmake_ros <https://github.com/ros2/ament_cmake_ros>`_
