@@ -150,6 +150,7 @@ Content
 
 * Features
 
+  * `ros/diagnostics <https://github.com/ros/diagnostics>`_
   * `ros/xacro <https://github.com/ros/xacro>`_
   * Sensor processing
 
