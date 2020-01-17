@@ -162,6 +162,7 @@ Content
     * `ros-perception/vision_opencv <https://github.com/ros-perception/vision_opencv>`_
     * `ros-perception/laser_filters <https://github.com/ros-perception/laser_filters>`_
     * `ros-perception/laser_geometry <https://github.com/ros-perception/laser_geometry>`_
+    * `ros-perception/laser_proc <https://github.com/ros-perception/laser_proc>`_
     * `ros-perception/depthimage_to_laserscan <https://github.com/ros-perception/depthimage_to_laserscan>`_
 
   * `ros-planning/navigation2 <https://github.com/ros-planning/navigation2>`_
