@@ -200,6 +200,7 @@ Content
   * `ros2/rviz <https://github.com/ros2/rviz>`_
   * `ros-tooling/cross_compile <https://github.com/ros-tooling/cross_compile>`_
   * `ros-tooling/system_metrics_collector <https://github.com/ros-tooling/system_metrics_collector>`_
+  * `ApexAI/performance_test <https://gitlab.com/ApexAI/performance_test>`_
   * RQt
 
     * `ros-visualization/python_qt_binding <https://github.com/ros-visualization/python_qt_binding>`_
