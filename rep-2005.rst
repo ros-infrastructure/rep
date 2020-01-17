@@ -153,6 +153,7 @@ Content
 
   * `ros/diagnostics <https://github.com/ros/diagnostics>`_
   * `ros/xacro <https://github.com/ros/xacro>`_
+  * `ros/robot_state_publisher <https://github.com/ros/robot_state_publisher>`_
   * Sensor processing
 
     * `ros-perception/image_common <https://github.com/ros-perception/image_common>`_
@@ -161,6 +162,7 @@ Content
     * `ros-perception/vision_opencv <https://github.com/ros-perception/vision_opencv>`_
     * `ros-perception/laser_filters <https://github.com/ros-perception/laser_filters>`_
     * `ros-perception/laser_geometry <https://github.com/ros-perception/laser_geometry>`_
+    * `ros-perception/depthimage_to_laserscan <https://github.com/ros-perception/depthimage_to_laserscan>`_
 
   * `ros-planning/navigation2 <https://github.com/ros-planning/navigation2>`_
   * `ros-planning/moveit2 <https://github.com/ros-planning/moveit2>`_
@@ -178,6 +180,8 @@ Content
     * `ros-drivers/velodyne <https://github.com/ros-drivers/velodyne>`_
     * `ros-drivers/urg_c <https://github.com/ros-drivers/urg_c>`_
     * `ros-drivers/urg_node <https://github.com/ros-drivers/urg_node>`_
+    * `ros-drivers/phidgets_drivers <https://github.com/ros-drivers/phidgets_drivers>`_
+    * `KumarRobotics/imu_vn_100 <https://github.com/KumarRobotics/imu_vn_100>`_
 
 * Documentation, Examples, Tutorials
 
