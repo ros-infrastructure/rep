@@ -586,9 +586,6 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_opensplice_cpp       | ADLINK OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
-|                          |                     |               | and OpenEmbedded            |                                      |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 
@@ -639,8 +636,6 @@ Dependency Requirements:
 | Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |  Fast-RTPS  |                                      1.9.3                                           |
-+-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenSplice  |                                  6.9.190705OSS                   |        N/A        |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
