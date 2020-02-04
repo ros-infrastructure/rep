@@ -38,26 +38,45 @@ We define three main entry points for ROS users.
  * desktop (recommended)
  * ros_base
  * ros_core
+ * ros_minimal
 
 Variants
 --------
 
+ROS Minimal
+'''''''''''
+
+The `ros_minimal` variant is a highly restricted set of ROS2 functionality.
+It targets resource- and tool-constrained environments where package managers may be limited or unavailable.
+The intention is that this variant can target cross-compiling for custom OS sysroots that may not have build tools or Python available that run on the target platform.
+It may not contain any GUI or Python dependencies.
+It may not have any dependencies outside a source workspace of its members with an exception of ubiquitous Linux libraries.
+Note that this variant explicitly does not include an implementation of either RMW or rcl_logging, users will need to choose their own that handle the dependencies that come with them.
+
+::
+
+ - ros_minimal:
+      packages: [ament_cmake, ament_cmake_ros, ament_index,
+		 class_loader, common_interfaces, console_bridge,
+                 libyaml_vendor, poco_vendor, rcl, rcl_interfaces,
+                 rcl_logging, rclcpp, rcpputils, rcutils, rmw,
+                 rmw_implementation, ros_tracing, rosidl, rosidl_defaults,
+                 rosidl_typesupport, spdlog_vendor, test_interface_files,
+                 tinydir_vendor, unique_identifier_msgs]
+
+
 ROS Core
 ''''''''
 
-The `ros_core` variants composes the core communication protocols.
+The `ros_core` variant composes the core communication protocols.
 It may not contain any GUI dependencies.
 
 ::
 
  - ros_core:
-      packages: [ament_cmake, ament_cmake_ros, ament_index, ament_lint,
-                 ament_package, class_loader, common_interfaces,
-                 console_bridge, googletest, launch, libyaml_vendor,
-                 osrf_pycommon, osrf_testing_tools_cpp, pluginlib,
-                 poco_vendor, rcl, rcl_interfaces, rclcpp, rclpy,
-                 rcutils, rmw, rmw_implementation, ros2cli, rosidl,
-                 rosidl_dds, rosidl_defaults, rosidl_python, rosidl_typesupport,
+      extends: [ros_minimal]
+      packages: [ament_lint, googletest, osrf_pycommon, osrf_testing_tools_cpp,
+                 pluginlib, rclpy, ros2cli, rosidl_dds, rosidl_python,
                  ros_environment, sros2, tinyxml2_vendor, uncrustify]
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
