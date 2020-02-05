@@ -33,36 +33,61 @@ Specification
 End-user entry points
 ---------------------
 
-We define three main entry points for ROS users.
+We define these main entry points for ROS users.
 
  * desktop (recommended)
  * ros_base
  * ros_core
- * ros_minimal
+ * ros_cpp_core (advanced)
 
 Variants
 --------
 
-ROS Minimal
+ROS C++ Core
 '''''''''''
 
-The `ros_minimal` variant is a highly restricted set of ROS2 functionality.
+The `ros_cpp_core` variant is a restricted subset of `ros_core` functionality with support for only C and C++.
 It targets resource- and tool-constrained environments where package managers may be limited or unavailable.
 The intention is that this variant can target cross-compiling for custom OS sysroots that may not have build tools or Python available that run on the target platform.
+Build tools may use Python, this variant is not intended to restrict build tooling.
 It may not contain any GUI or Python dependencies.
-It may not have any dependencies outside a source workspace of its members with an exception of ubiquitous Linux libraries.
-Note that this variant explicitly does not include an implementation of either RMW or rcl_logging, users will need to choose their own that handle the dependencies that come with them.
+It may not have any dependencies outside a source workspace of its members.
+Note that this variant chooses an RMW and rcl_logging implementation based on their minimal dependency footprint.
 
 ::
 
- - ros_minimal:
-      packages: [ament_cmake, ament_cmake_ros, ament_index,
-		 class_loader, common_interfaces, console_bridge,
-                 libyaml_vendor, poco_vendor, rcl, rcl_interfaces,
-                 rcl_logging, rclcpp, rcpputils, rcutils, rmw,
-                 rmw_implementation, ros_tracing, rosidl, rosidl_defaults,
-                 rosidl_typesupport, spdlog_vendor, test_interface_files,
-                 tinydir_vendor, unique_identifier_msgs]
+ - ros_cpp_core:
+      # These are the packages we are actually targeting
+      packages_up_to: [rclcpp, rclcpp_action, rclcpp_lifecycle, rclcpp_components]
+      # This is the full package set that is actually built, and needs to meet above specified dependency criteria
+      packages_all: [
+            action_msgs, ament_cmake, ament_cmake_core,
+            ament_cmake_export_definitions, ament_cmake_export_dependencies,
+            ament_cmake_export_include_directories,
+            ament_cmake_export_interfaces, ament_cmake_export_libraries,
+            ament_cmake_export_link_flags, ament_cmake_gmock,
+            ament_cmake_gtest, ament_cmake_include_directories,
+            ament_cmake_libraries, ament_cmake_pytest, ament_cmake_python,
+            ament_cmake_ros, ament_cmake_target_dependencies, ament_cmake_test,
+            ament_cmake_version, ament_index_cpp, ament_index_python,
+            ament_package, builtin_interfaces, class_loader,
+            composition_interfaces, console_bridge_vendor, cyclonedds,
+            cyclonedds_cmake_module, domain_coordinator, libyaml_vendor,
+            lifecycle_msgs, poco_vendor, rcl, rcl_action, rclcpp,
+            rclcpp_action, rclcpp_components, rclcpp_lifecycle,
+            rcl_interfaces, rcl_lifecycle, rcl_logging_noop,
+            rcl_logging_spdlog, rcl_yaml_param_parser, rcpputils, rcutils, rmw,
+            rmw_cyclonedds_cpp, rmw_implementation, rmw_implementation_cmake,
+            rosgraph_msgs, rosidl_adapter, rosidl_cmake,
+            rosidl_default_generators, rosidl_default_runtime,
+            rosidl_generator_c, rosidl_generator_cpp, rosidl_parser,
+            rosidl_typesupport_c, rosidl_typesupport_cpp,
+            rosidl_typesupport_interface, rosidl_typesupport_introspection_c,
+            rosidl_typesupport_introspection_cpp, spdlog_vendor,
+            test_interface_files, test_msgs, tinydir_vendor, tracetools,
+            unique_identifier_msgs]
+      # These can't be built without external dependencies and are not desired, but they end up in the source workspace and need a COLCON_IGNORE file
+      packages_ignore: [rcl_logging_log4cxx]
 
 
 ROS Core
