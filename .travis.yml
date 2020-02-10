@@ -1,11 +1,14 @@
 language: python
-python:
-  - "2.7"
-  - "3.6"
-# command to install dependencies
-install:
-  - pip install docutils
-  - pip install xmlschema
+jobs:
+  include:
+  - python: "2.7"
+    install:
+    - pip install docutils
+    - pip install xmlschema<1.1
+  - python: "3.6"
+    install:
+    - pip install docutils
+    - pip install xmlschema
 # command to run tests
 script:
   - make
