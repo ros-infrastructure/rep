@@ -93,15 +93,19 @@ Note that this variant chooses an RMW and rcl_logging implementation based on th
 ROS Core
 ''''''''
 
-The `ros_core` variant composes the core communication protocols.
+The `ros_core` variants composes the core communication protocols.
 It may not contain any GUI dependencies.
 
 ::
 
  - ros_core:
-      extends: [ros_minimal]
-      packages: [ament_lint, googletest, osrf_pycommon, osrf_testing_tools_cpp,
-                 pluginlib, rclpy, ros2cli, rosidl_dds, rosidl_python,
+      packages: [ament_cmake, ament_cmake_ros, ament_index, ament_lint,
+                 ament_package, class_loader, common_interfaces,
+                 console_bridge, googletest, launch, libyaml_vendor,
+                 osrf_pycommon, osrf_testing_tools_cpp, pluginlib,
+                 poco_vendor, rcl, rcl_interfaces, rclcpp, rclpy,
+                 rcutils, rmw, rmw_implementation, ros2cli, rosidl,
+                 rosidl_dds, rosidl_defaults, rosidl_python, rosidl_typesupport,
                  ros_environment, sros2, tinyxml2_vendor, uncrustify]
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
