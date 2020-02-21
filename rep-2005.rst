@@ -50,6 +50,22 @@ To propose changes, such as adding or removing items, make a pull request to tha
 The ensuing public review and discussion will evaluate the change in light of the purpose and scope explained above, with the final merge decision being made by one of the REP maintainers.
 
 
+Schedule of changes
+-------------------
+
+To facilitate understanding of what items make up the integral list of packages for a distribution, accepted changes may only be merged on a fixed schedule, detailed below.
+
+* When the code freeze for distribution A occurs:
+  * the version of this list at that time becomes the *definitive* list for that distribution,
+  * the list becomes open for accepting changes, and
+  * a review of the current content is conducted to ensure all packages still meet the criteria for being on the list.
+* When the development of distribution B begins:
+  * the version of this list at that time becomes the *proposed* list for that distribution, and
+  * additions may no longer be made, but removals are still possible until the code freeze date.
+
+The purpose of this schedule is to ensure that the target for the under-development distribution is relatively fixed and known, while also providing a clear window for when to discuss what will be integral to the next distribution (and so potentially argue for making an addition to the list).
+
+
 Content
 =======
 
