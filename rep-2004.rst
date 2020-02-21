@@ -57,6 +57,55 @@ There are four quality levels described below, each roughly described as:
 
 While each quality level will have different requirements, it's always possible to overachieve in certain requirements even if other requirements prevent a package from moving up to the next quality level.
 
+.. try chart here
+
+.. list-table:: Quality Levels
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Policy
+     - Quality Level 1
+     - Quality Level 2
+     - Quality Level 3
+     - Quality Level 4
+     - Quality Level 5
+   * - Version
+     -
+     -
+     -
+     -
+     -
+   * - Change Control
+     -
+     -
+     -
+     -
+     -
+   * - Testing
+     -
+     -
+     -
+     -
+     -
+   * - Documentation
+     -
+     -
+     -
+     -
+     -
+   * - Dependencies
+     -
+     -
+     -
+     -
+     -
+   * - Platform Support
+     -
+     -
+     -
+     -
+     -
+
 Quality Level 1
 ^^^^^^^^^^^^^^^
 
@@ -499,6 +548,8 @@ References and Footnotes
 
 .. [2] What is a reasonable code coverage % for unit tests (and why)?
    https://stackoverflow.com/a/34698711/671658
+
+.. does linking like that ^ still interfere with the "same license" thing? https://creativecommons.org/licenses/by-sa/4.0/
 
 Copyright
 =========
