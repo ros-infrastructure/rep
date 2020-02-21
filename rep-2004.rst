@@ -221,7 +221,7 @@ However, if performance is a reasonable concern for use in a production system, 
 Note, the performance regression policy should not prevent regressions, but instead should aim to detect them and either address them directly, plan to address them in the future, or, when unavoidable (e.g. fixing a bug required more resources to be safe), explain why the regression has occurred in the memorandum of the change request that introduced it.
 
 Dependencies
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 Each package should examine the quality levels of their direct runtime dependencies.
 Packages should not claim a quality level higher than their dependencies, unless it can be reasonably explained why they do not affect the quality of the package in question.
