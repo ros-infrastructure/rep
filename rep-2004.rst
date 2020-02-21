@@ -59,52 +59,52 @@ While each quality level will have different requirements, it's always possible 
 
 .. try chart here
 
-.. list-table:: Quality Levels
-   :widths: 25 25 50
-   :header-rows: 1
+  .. list-table:: Quality Levels
+     :widths: 25 25 50
+     :header-rows: 1
 
-   * - Policy
-     - Quality Level 1
-     - Quality Level 2
-     - Quality Level 3
-     - Quality Level 4
-     - Quality Level 5
-   * - Version
-     -
-     -
-     -
-     -
-     -
-   * - Change Control
-     -
-     -
-     -
-     -
-     -
-   * - Testing
-     -
-     -
-     -
-     -
-     -
-   * - Documentation
-     -
-     -
-     -
-     -
-     -
-   * - Dependencies
-     -
-     -
-     -
-     -
-     -
-   * - Platform Support
-     -
-     -
-     -
-     -
-     -
+     * - Policy
+       - Quality Level 1
+       - Quality Level 2
+       - Quality Level 3
+       - Quality Level 4
+       - Quality Level 5
+     * - Version
+       -
+       -
+       -
+       -
+       -
+     * - Change Control
+       -
+       -
+       -
+       -
+       -
+     * - Testing
+       -
+       -
+       -
+       -
+       -
+     * - Documentation
+       -
+       -
+       -
+       -
+       -
+     * - Dependencies
+       -
+       -
+       -
+       -
+       -
+     * - Platform Support
+       -
+       -
+       -
+       -
+       -
 
 Quality Level 1
 ^^^^^^^^^^^^^^^
