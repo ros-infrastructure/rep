@@ -106,7 +106,7 @@ Requirements to be considered a 'Level 1' package:
    #. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
       #. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
-      #. *Must register with a centralized list of 'Level 1' packages, if one exists, to allow for peer review of the claim*
+      #. *Must register with a centralized list of 'Level N' packages, if one exists, to allow for peer review of the claim*
 
 #. **Testing:**
 
@@ -129,9 +129,9 @@ Requirements to be considered a 'Level 1' package:
 
 #. **Dependencies:**
 
-   #. Must not have direct runtime "ROS" dependencies which are not 'Level 1' dependencies, but...
-   #. May have optional direct runtime "ROS" dependencies which are not 'Level 1', e.g. tracing or debugging features that can be disabled
-   #. Must have justification for why each direct runtime "non-ROS" dependency is equivalent to a 'Level 1' package in terms of quality
+   #. Must not have direct runtime "ROS" dependencies which are not at the same level as the package in question ('Level N'), but...
+   #. May have optional direct runtime "ROS" dependencies which are not 'Level N', e.g. tracing or debugging features that can be disabled
+   #. Must have justification for why each direct runtime "non-ROS" dependency is equivalent to a 'Level N' package in terms of quality
 
 #. **Platform Support:**
 
@@ -360,7 +360,7 @@ Requirements to be considered a 'Level 4' package:
 
    #. No requirements, but having a policy is still recommended (e.g. ``semver``), even if the version is not yet stable (e.g. >= 1.0.0 for ``semver``)
 
-#. Change Control Process:
+#. **Change Control Process:**
 
    #. No explicit change control process required, but still recommended
 
@@ -389,6 +389,207 @@ Quality Level 5
 
 Packages in this category cannot even meet the simple 'Level 4' requirements, and for that reason should not be used.
 All packages should have at least a declared license or set of licenses and should include copyright statements in each file.
+
+Quality Level Comparison Chart
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+✓ = required
+
+● = recommended
+
+.. list-table:: Quality Levels
+    :widths: 5 10 10 10 10 10
+    :header-rows: 1
+    :stub-columns: 1
+    :align: left
+
+
+    * -
+      - Level 1
+      - Level 2
+      - Level 3
+      - Level 4
+      - Level 5
+    * - 1.i
+      - ✓
+      - ✓
+      - ✓
+      - ●
+      -
+    * - 1.ii
+      - ✓
+      - ✓
+      - ✓
+      -
+      -
+    * - 1.iii
+      - ✓
+      - ✓
+      - ●
+      -
+      -
+    * - 1.iv
+      - ✓
+      - ✓
+      - ✓
+      -
+      -
+    * - 1.v
+      - ✓
+      - ✓
+      - ✓
+      -
+      -
+    * - 1.vi
+      - ✓
+      - ✓
+      - ●
+      -
+      -
+    * - 2.i
+      - ✓
+      - ✓
+      - ✓
+      - ●
+      -
+    * - 2.ii
+      - ✓
+      -
+      -
+      -
+      -
+    * - 2.iii
+      - ✓
+      -
+      -
+      -
+      -
+    * - 2.iv
+      - ✓
+      - ✓
+      - ✓
+      -
+      -
+    * - 2.v
+      - ✓
+      -
+      -
+      -
+      -
+    * - 3.i
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 3.ii
+      - ✓
+      -
+      -
+      -
+      -
+    * - 3.iii
+      - ✓
+      - ✓
+      - ✓
+      - ✓
+      -
+    * - 3.iv
+      - ✓
+      - ✓
+      - ✓
+      - ✓
+      -
+    * - 3.v
+      - ✓
+      - ✓
+      - ●
+      -
+      -
+    * - 3.v.a
+      - ✓
+      - ✓
+      - ●
+      -
+      -
+    * - 3.v.b
+      - ✓
+      - ✓
+      - ●
+      -
+      -
+    * - 4.i
+      - ✓
+      - ✓
+      - ●
+      - ●
+      -
+    * - 4.ii
+      - ✓
+      -
+      -
+      -
+      -
+    * - 4.iii.a
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 4.iii.b
+      - ✓
+      -
+      -
+      -
+      -
+    * - 4.iv.a
+      - ✓
+      -
+      -
+      -
+      -
+    * - 4.iv.b
+      - ✓
+      -
+      -
+      -
+      -
+    * - 4.v.a
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 4.v.b
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 5.i
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 5.ii
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 5.iii
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 6.i
+      - ✓
+      - ✓
+      - ✓
+      - ●
+      -
 
 Repository Organization
 ^^^^^^^^^^^^^^^^^^^^^^^
