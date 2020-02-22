@@ -320,10 +320,6 @@ Requirements to be considered a 'Level 3' package:
    #. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
    #. Must have Continuous Integration (CI) policy for all change requests
 
-#. **Testing:**
-
-   #. No explicit testing requirements, though covering some if not all of the features with tests is recommended
-
 #. **Documentation:**
 
    #. Must have a declared license or set of licenses
@@ -332,6 +328,10 @@ Requirements to be considered a 'Level 3' package:
 
       #. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
       #. *May register with a centralized list of 'Level 3' packages, if one exists, to allow for peer review of the claim*
+
+#. **Testing:**
+
+   #. No explicit testing requirements, though covering some if not all of the features with tests is recommended
 
 #. **Dependencies:**
 
