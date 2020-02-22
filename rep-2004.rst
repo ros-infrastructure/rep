@@ -509,7 +509,7 @@ Quality Level Comparison Chart
     * - 3.v.a
       - ✓
       - ✓
-      - ●
+      - ✓
       -
       -
     * - 3.v.b
