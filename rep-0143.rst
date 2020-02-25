@@ -1,6 +1,6 @@
 REP: 143
 Title: ROS distribution files
-Author: Dirk Thomas <dthomas@osrfoundation.org>
+Author: Dirk Thomas <dthomas@openrobotics.org>
 Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
