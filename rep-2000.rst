@@ -1,19 +1,61 @@
 REP: 2000
-Title: ROS 2 Target Platforms
-Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>
+Title: ROS 2 Releases and Target Platforms
+Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
-Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May-2019, 29-Aug-2019
+Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May-2019, 29-Aug-2019, 25-Feb-2020
 
 
 Abstract
 ========
 
-This REP defines target platforms for each ROS 2 Distribution Release.
+This REP defines timeline for future ROS 2 releases as well as the targeted platforms for each specific one.
 We define platforms to include both operating system releases (e.g. Ubuntu Xenial (16.04 LTS)) as well as major language releases (e.g. Python 3.5).
 The target platforms represent the set on which all core stacks are expected to work.
 Exceptions can be made for stacks that are intentionally platform-specific.
+
+Release Schedule
+================
+
+Note: the following applies to ROS 2 releases *after* Foxy Fitzroy.
+Before, releases were made more frequent but with shorter support due to the fact that many foundational parts of ROS 2 were still heavily iterated on.
+
+Frequency
+---------
+
+New ROS 2 releases are published in a time based fashion **every 12 months**.
+The rational is that a shorter cycle (like 6 months) results in a significant overhead and many active releases at the same time (assuming they have the same support length).
+On the other hand a longer cycle (like 2 years) is considered to be too long for new features to be available in a ROS 2 release.
+
+Targeted Platforms
+------------------
+
+Since regular Ubuntu releases are only supported for 9 months ROS 2 is not targting those.
+A single ROS 2 distribution only **targets one Ubuntu LTS**.
+The rational is that supporting two LTS versions - which means 2-year-different versions of upstream dependencies - is a tremendous overhead and sometimes even impossible.
+
+Since macOS (or at least brew) as well as Windows are rolling platforms we aim to support the latest version available at the time of a ROS 2 distribution release.
+For Debian we also aim to target the latest stable version though if that version is two years behind the Ubuntu version that might not be possible.
+
+Support
+-------
+
+LTS releases
+~~~~~~~~~~~~
+
+Since Ubuntu LTS releases come with **5 years** of standard support we aim to match the same duration.
+In even years new ROS 2 releases happen shortly (a month) after the Ubuntu LTS has been released (some time in May).
+The ROS 2 release will be supported until the end of the standard support of the Ubuntu LTS release which is 4 years and 11 months from the ROS 2 release date.
+
+Regular Releases
+~~~~~~~~~~~~~~~~
+
+If every ROS 2 release would have that support we would end up with 5 active releases at the same time which would pose a significant maintenance effort.
+To lower that effort while still providing releases more frequently than every two years in odd years a regular ROS release is being published.
+It will target the same Ubuntu LTS as the previous ROS LTS release but is only supported for **1.5 years**.
+The duration will overlap with the next ROS LTS release by 6 months to provide a long enough transition window.
+We are aware that significantly less users will adopt a regular ROS release but think that at least for now it will be worth having to land new features and make them available to users in the time between two LTS releases.
 
 Support Tiers
 =============
