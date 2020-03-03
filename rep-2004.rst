@@ -13,7 +13,7 @@ Abstract
 
 This REP describes a set of categories meant to convey the quality or maturity of packages in the ROS ecosystem.
 Inclusion in a category, or quality level, is based on the policies to which a package adheres.
-The categories address version, change control, documentation, testing, and platform support policies.
+The categories address version, change control, documentation, testing, dependency and platform support policies.
 
 Motivation
 ==========
@@ -29,7 +29,7 @@ By providing these rough goals for package maintainers to strive towards, the ca
 Specification
 =============
 
-There are four quality levels described below, each roughly described as:
+There are four quality levels below, each roughly summarized as:
 
 * Quality Level 1:
 
@@ -66,14 +66,14 @@ These are the packages that remain as requirements for a basic ROS system to run
 
 Packages that would not normally fit this description can still be called 'Level 1'.
 If there is a need for a particular package in a reasonable production scenario, then that package should be considered for this category as well.
-However, packages which we consider essential to getting a robot up and running quickly, but perhaps provide a generic solution to a problem should probably not start out as 'Level 1' due to the high effort in getting a package to 'Level 1' and maintaining it there.
+However, packages which we consider essential to getting a robot up and running quickly, but perhaps provide a generic solution to a problem should probably not start out as 'Level 1' due to the high effort required to get a package to 'Level 1' and maintain it there.
 
 For example, packages which provide intra-process communication, inter-process communication, generated message runtime code, node lifecycle, etc. should probably all be considered for 'Level 1'.
 However, a package which provides pose estimation (like ``robot_pose_ekf``\ ) is a generic solution for something that most people need, but is often replaced with a domain specific solution in production, and therefore it should probably not start out as 'Level 1'.
-However, it may upgrade to it at a later date, if it proves to be a solution that people want to use in their products.
+Such a package may upgrade to 'Level 1' at a later date, if it proves to be a solution that people want to use in their products.
 
 Tools, like ``rostopic``\ , generally do not fall into this category either, but are not categorically excluded.
-For example, it may be the case the tool which launches and verifies a ROS graph (``ros2launch``\ ) may need to be considered 'Level 1' for use in production systems.
+For example, it may be the case that the tool which launches and verifies a ROS graph (``ros2launch``\ ) may need to be considered 'Level 1' for use in production systems.
 
 Package Requirements
 ~~~~~~~~~~~~~~~~~~~~
@@ -83,11 +83,11 @@ Requirements to be considered a 'Level 1' package:
 #. **Version Policy:**
 
    #. Must have a version policy (e.g. ``semver``)
-   #. Must be at a stable version (e.g. for ``semver`` that means have a version >= 1.0.0)
+   #. Must be at a stable version (e.g. for ``semver`` that means version >= 1.0.0)
    #. Must have a strictly declared public API
    #. Must have a policy for API stability
    #. Must have a policy for ABI stability
-   #. Must have a policy that keeps API and ABI stability within a released ROS Distribution
+   #. Must have a policy that keeps API and ABI stability within a released ROS distribution
 
 #. **Change Control Process:**
 
@@ -112,7 +112,7 @@ Requirements to be considered a 'Level 1' package:
 
    #. Must have system tests which cover all items in the "feature" documentation
    #. Must have system, integration, and/or unit tests which cover all of the public API
-   #. Code coverage:
+   #. Code Coverage:
 
       #. *Must have code coverage tracking for the package*
       #. *Must have and enforce a code coverage policy for new changes*
@@ -124,8 +124,8 @@ Requirements to be considered a 'Level 1' package:
 
    #. Linters and Static Analysis
 
-      #. *Must have a code style and enforce it.*
-      #. *Must use static analysis tools where applicable.*
+      #. *Must have a code style and enforce it*
+      #. *Must use static analysis tools where applicable*
 
 #. **Dependencies:**
 
@@ -143,7 +143,7 @@ Refer to the detailed description of the requirements below the chart for more i
 Quality Level Comparison Chart
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The chart below compares Quality Levels 1 through 4 relative to the Level 1 requirements' numbering scheme above.
+The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' requirements' numbering scheme above.
 
 ✓ = required
 
@@ -325,9 +325,9 @@ The chart below compares Quality Levels 1 through 4 relative to the Level 1 requ
       -
       -
     * - 5.ii
-      - ✓
-      - ✓
-      -
+      - ●
+      - ●
+      - ●
       -
       -
     * - 5.iii
@@ -352,7 +352,7 @@ For example, ``semver`` covers all the important points that a version policy sh
 The version policy should link public API changes, which may also impact ABI, to changes in the version number.
 
 For the ROS ecosystem, the version policy needs to state that API and ABI will be maintained within a stable ROS distribution.
-Following ``semver``, this means only patch and minor increases only into an existing ROS distribution.
+Following ``semver``, this means only patch and minor increases are allowed into an existing ROS distribution.
 
 Public API
 ~~~~~~~~~~
@@ -363,8 +363,8 @@ For C++, it's assumed that all installed headers are part of the public API, but
 For example, having an "experimental" namespace or a "detail" namespace which does not adhere to the API and ABI stability rules is allowed, but they must be clearly documented as such.
 Changes to these excluded APIs, especially something like a "detail" namespace, should still not break API or ABI for other public APIs indirectly.
 
-For Python, it's more important to explicitly declare which parts of the API is public, because all modules are typically installed and accessible to users.
-One easy thing to do is to say all of the API is public and therefore API stable, but "impl" or "detail" namespaces can be used if needed, they just need to be clearly documented as not public and therefore not stable.
+For Python, it's more important to explicitly declare which parts of the API are public, because all modules are typically installed and accessible to users.
+One easy thing to do is to say all of the API is public and therefore API stable, but ``impl`` or ``detail`` namespaces can be used if needed, they just need to be clearly documented as "not public" and therefore not stable.
 
 There are also other, non-API, things which should be considered and documented as part of the "stable interface" of the package.
 These could include, but aren't limited to, message definitions, command line tools (arguments and output format), ROS names (topic, service, node, etc.), and behaviors of the applications.
@@ -394,7 +394,7 @@ If the users feel that the justifications are insufficient or incorrect, they ca
 
 There should be one or more communal lists of 'Level 1' (and maybe 'Level 2' or 'Level 3') quality level packages.
 These lists should be modified via change requests (maybe a text document in a repository) so that there can be peer review.
-This document will not prescribe how or where these lists should be hosted, but one possibility is an informational REP, continually updated and versioned with each new ROS distribution.
+This REP will not prescribe how or where these lists should be hosted, but one possibility is an informational REP, continually updated and versioned with each new ROS distribution.
 
 Feature Testing and Code Coverage Policy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -404,15 +404,15 @@ The policy may be influenced by factors like:
 
 - what programming languages are being used, and whether or not there are multiple languages in use
 - what coverage information is available (statement vs. line vs. branch vs condition/path coverage)
-- what strategy is preferred for dealing with difficult to reach statements/branches
+- what strategy is preferred for dealing with difficult-to-reach statements/branches
 
 Tracking and enforcing code coverage statistics is strictly empirical and there are different reasons for using them.
 Among those reasons is satisfying stakeholders [2]_, which is the main goal of requiring a code coverage policy for high quality packages.
 A set of measurable standards and explanations of the goals they equate to is likely the most convincing method of proving to stakeholders that the package is properly tested.
 
 The general recommendation is to have at least line coverage and aim to achieve and maintain a high percentage of coverage (e.g. above 90%).
-This at least gives you and your stakeholders some confidence that all feature have basic tests.
-Any assurances beyond that would require branch coverage statistics and independent investigation of the tests and how they test the code.
+This at least gives you and your stakeholders some confidence that all features have basic tests.
+Any assurances beyond that would require branch coverage statistics and independent investigation of the tests.
 
 Performance Testing
 ^^^^^^^^^^^^^^^^^^^
@@ -479,14 +479,14 @@ Requirements to be considered a 'Level 2' package:
 #. **Testing:**
 
    #. Must have system tests which cover all items in the "feature" documentation
-   #. Code coverage:
+   #. Code Coverage:
 
       #. *Must have code coverage tracking for the package*
 
    #. Linters and Static Analysis
 
-      #. *Must have a code style and enforce it.*
-      #. *Must use static analysis tools where applicable.*
+      #. *Must have a code style and enforce it*
+      #. *Must use static analysis tools where applicable*
 
 #. **Dependencies:**
 
@@ -517,7 +517,7 @@ Requirements to be considered a 'Level 3' package:
    #. The same as 'Level 1' packages, except:
 
       #. *No public API needs to be explicitly declared, though this can make it harder to maintain API and ABI stability*
-      #. *No requirement to keep API/ABI stability within a stable ROS release, but it is recommended still*
+      #. *No requirement to keep API/ABI stability within a stable ROS release, but it is still recommended*
 
 #. **Change Control Process:**
 
