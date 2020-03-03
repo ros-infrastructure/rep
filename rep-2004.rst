@@ -92,8 +92,8 @@ Requirements to be considered a 'Level 1' package:
 #. **Change Control Process:**
 
    #. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
-   #. Must have `Developer Certificate of Origin (DCO) <https://developercertificate.org/>`_ on pull requests
-   #. Must have peer review policy for all change requests (e.g. require one or more reviewer)
+   #. Must have confirmation of contributor origin (e.g. `DCO  <https://developercertificate.org/>`_, CLA, etc.)
+   #. Must have peer review policy for all change requests (e.g. require one or more reviewers)
    #. Must have Continuous Integration (CI) policy for all change requests
    #. Must have documentation policy for all change requests
 
@@ -142,6 +142,8 @@ Refer to the detailed description of the requirements below the chart for more i
 
 Quality Level Comparison Chart
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The chart below compares Quality Levels 1 through 4 relative to the Level 1 requirements' numbering scheme above.
 
 ✓ = required
 
@@ -204,7 +206,7 @@ Quality Level Comparison Chart
       -
     * - 2.ii
       - ✓
-      -
+      - ✓
       -
       -
       -
@@ -347,7 +349,7 @@ Version Policy
 The most important thing is to have some version policy which developers may use to anticipate and understand changes to the version of the package.
 For example, ``semver`` covers all the important points that a version policy should cover, is well thought out, and is popular in the open source community.
 
-The policy should link changes to API and ABI to the version scheme.
+The version policy should link public API changes, which may also impact ABI, to changes in the version number.
 
 For the ROS ecosystem, the version policy needs to state that API and ABI will be maintained within a stable ROS distribution.
 Following ``semver``, this means only patch and minor increases only into an existing ROS distribution.
@@ -392,7 +394,7 @@ If the users feel that the justifications are insufficient or incorrect, they ca
 
 There should be one or more communal lists of 'Level 1' (and maybe 'Level 2' or 'Level 3') quality level packages.
 These lists should be modified via change requests (maybe a text document in a repository) so that there can be peer review.
-This document will not prescribe how or where these lists should be hosted, but one thought is that the list could live on the main ROS 2 documentation website.
+This document will not prescribe how or where these lists should be hosted, but one possibility is an informational REP, continually updated and versioned with each new ROS distribution.
 
 Feature Testing and Code Coverage Policy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -405,8 +407,8 @@ The policy may be influenced by factors like:
 - what strategy is preferred for dealing with difficult to reach statements/branches
 
 Tracking and enforcing code coverage statistics is strictly empirical and there are different reasons for using them.
-Among those reasons is satisfying stakeholders [2]_, which is main goal of requiring a code coverage policy for high quality packages.
-A set of measurable standards and explanations of the goals they equate to is likely the most convincing method of doing so.
+Among those reasons is satisfying stakeholders [2]_, which is the main goal of requiring a code coverage policy for high quality packages.
+A set of measurable standards and explanations of the goals they equate to is likely the most convincing method of proving to stakeholders that the package is properly tested.
 
 The general recommendation is to have at least line coverage and aim to achieve and maintain a high percentage of coverage (e.g. above 90%).
 This at least gives you and your stakeholders some confidence that all feature have basic tests.
@@ -461,6 +463,7 @@ Requirements to be considered a 'Level 2' package:
 #. **Change Control Process:**
 
    #. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
+   #. Must have confirmation of contributor origin (e.g. `DCO  <https://developercertificate.org/>`_, CLA, etc.)
    #. Must have Continuous Integration (CI) policy for all change requests
 
 #. **Documentation:**
@@ -536,7 +539,7 @@ Requirements to be considered a 'Level 3' package:
 
 #. **Dependencies:**
 
-   #. May have direct runtime "ROS" dependencies which are not 'Level 3' dependencies, but they should be documented
+   #. May have direct runtime "ROS" dependencies which are not 'Level 3' dependencies, but they should still be documented in the quality declaration
 
 #. **Platform Support:**
 
