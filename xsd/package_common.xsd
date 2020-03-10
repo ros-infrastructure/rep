@@ -15,7 +15,7 @@
   <xs:complexType name="DescriptionType" mixed="true">
     <xs:annotation>
       <xs:documentation>
-        The description allows any content but should be limit to XHTML.
+        The description allows any content but should be limited to XHTML.
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -28,7 +28,7 @@
       <xs:documentation>
         A valid email address must follow several complex rules
         (see https://en.wikipedia.org/wiki/Email_address).
-        For ROS packages only a few are enforced and not the full character set
+        For ROS packages only a few are enforced, and not the full character set
         is supported.
       </xs:documentation>
     </xs:annotation>
@@ -80,23 +80,6 @@
       <xs:pattern value="(0|[1-9][0-9]*)(.(0|[1-9][0-9]*)){0,2}"/>
     </xs:restriction>
   </xs:simpleType>
-
-  <xs:complexType name="DependencyType">
-    <xs:simpleContent>
-      <xs:extension base="xs:token">
-        <!-- The dependency must have a version less then the specified limit. -->
-        <xs:attribute name="version_lt" type="VersionLimitType" use="optional"/>
-        <!-- The dependency must have a version less then or equal to the specified limit. -->
-        <xs:attribute name="version_lte" type="VersionLimitType" use="optional"/>
-        <!-- The dependency must have a version equal to the specified limit. -->
-        <xs:attribute name="version_eq" type="VersionLimitType" use="optional"/>
-        <!-- The dependency must have a version greater then or equal to the specified limit. -->
-        <xs:attribute name="version_gte" type="VersionLimitType" use="optional"/>
-        <!-- The dependency must have a version greater then the specified limit. -->
-        <xs:attribute name="version_gt" type="VersionLimitType" use="optional"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
 
   <xs:complexType name="ExportType">
     <xs:sequence>

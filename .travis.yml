@@ -5,6 +5,8 @@ python:
 # command to install dependencies
 install:
   - pip install docutils
+  # xmlschema 1.1 dropped support for Python 2
+  - if [ $TRAVIS_PYTHON_VERSION == "2.7" ]; then pip install "xmlschema<1.1"; else pip install xmlschema; fi
 # command to run tests
 script:
   - make

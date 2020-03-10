@@ -65,7 +65,7 @@ It may not contain any GUI dependencies.
 ::
 
  - ros_core:
-      packages: [catkin, cmake_modules, class_loader, common_msgs, gencpp,
+      packages: [catkin, class_loader, cmake_modules, common_msgs, gencpp,
                  geneus, genlisp, genmsg, gennodejs, genpy, message_generation,
                  message_runtime, pluginlib, ros, ros_comm,
                  rosbag_migration_rule, rosconsole, rosconsole_bridge,
