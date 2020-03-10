@@ -435,7 +435,7 @@ References
 ==========
 
 .. [#REP102] REP 102
-   (http://ros.org/reps/rep-0102.html)
+   (https://ros.org/reps/rep-0102.html)
 
 
 Copyright

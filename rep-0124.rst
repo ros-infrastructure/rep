@@ -200,9 +200,9 @@ References
 .. [2] Wikipedia: Filesystem Hiearchy Standard
    (http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
 .. [3] REP 122: FHS layout for ROS installation
-   (http://ros.org/reps/rep-0122.html) 
+   (https://ros.org/reps/rep-0122.html) 
 .. [4] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
-   (http://ros.org/reps/rep-0123.html) 
+   (https://ros.org/reps/rep-0123.html) 
 
 
 

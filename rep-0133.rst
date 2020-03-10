@@ -627,7 +627,7 @@ References and Footnotes
   (https://github.com/ros/catkin/issues/249)
 
 .. [4] REP 110, SCM-like rosinstall command structure
-   (http://ros.org/reps/rep-0012.html)
+   (https://ros.org/reps/rep-0012.html)
 
 Copyright
 =========
