@@ -43,9 +43,6 @@ DO NOT USE THIS HTML FILE AS YOUR TEMPLATE!
  
 
 <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="mermaid.css">
-<script src="mermaid.js"></script>
-<script>mermaid.initialize({startOnLoad:true});</script>
-
 </head> 
  
 <body  lang="en" dir="ltr"> 
@@ -133,5 +130,8 @@ theForm.input.value=theForm.input.value
 %(body)s
 
 </div></div> <!-- /#dpage-inner, /#dpage --> 
+
+<script src="mermaid.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
 </body> 
 </html> 
