@@ -91,14 +91,13 @@ ros_buildfarm will require additional jobs that can re-run bloom unattended when
 Bloom may require some changes to allow it to be run unattended with pre-selected answers to interactive questions.
 
 
-Managing build farm writable release repositories
+Managing build farm-writable release repositories
 -------------------------------------------------
 
-In order to allow bloom to be run in an automated fashion the release repository must be writeable by the build farm agents.
-Release repositories may be hosted in a standard location such as the ros-gbp or ros2-gbp organizations on GitHub.
-If a repository isn't writeable by the build farm the release repository may be forked to a standard location for the purpose of making the release.
-Some form of breadcrumb will be left so that the previous release repository is noted.
-
+In order to allow bloom to be run in an automated fashion the release repository must be writeable by Open Robotics automation tools or staff.
+Therefore release repositories used by the rolling release distribution must be hosted in a standard location such as the ros-gbp or ros2-gbp organizations on GitHub.
+Release repositories outside the standard location will be forked to the standard location.
+Administrative access to release repositories will be granted to package mantainers for regular releases.
 
 
 References
