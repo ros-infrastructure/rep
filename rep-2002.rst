@@ -54,9 +54,8 @@ Once the platforms have been updated, everything currently in the rolling releas
 Bootstrapping the rolling release
 ---------------------------------
 
-The first release of the rolling rosdistro will use the same procedure we've used for all stable rosdistros previously.
-Packages will be released via bloom into an empty distribution until the distribution is relatively complete.
-Package maintainers may then choose to make releases into the rolling rosdistro.
+The initial creation of the rolling rosdistro will use the rolling release tools "in reverse" to create the rolling release from the May 2020 ROS 2 Foxy Fitzroy release.
+Package maintainers may then continue to release into either or both Foxy and the rolling release distribution independently.
 
 
 Recommendations for package maintainers
