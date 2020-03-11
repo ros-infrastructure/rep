@@ -45,7 +45,7 @@ If a package is prevented from being automatically released into the stable dist
 Updating the rolling release platforms
 --------------------------------------
 
-The rolling release is intended to remain availabe indefinitely and so will not be retired or reach end-of-support status without an update to this REP and the ROS distribution release process.
+The rolling release is intended to remain available indefinitely and so will not be retired or reach end-of-support status without an update to this REP and the ROS distribution release process.
 However, this does mean that platform changes during the life of the rolling distribution are going to occur and the rolling release may target platforms that are themselves unstable or in a pre-release state.
 When a platform change is coming, the intended date of change will be announced ahead of time.
 Once the platforms have been updated, everything currently in the rolling release will be automatically re-released via bloom to target the updated release platforms.
