@@ -29,7 +29,7 @@ By providing these rough goals for package maintainers to strive towards, the ca
 Specification
 =============
 
-There are four quality levels below, each roughly summarized as:
+There are five quality levels below, each roughly summarized as:
 
 * Quality Level 1:
 
@@ -55,6 +55,11 @@ There are four quality levels below, each roughly summarized as:
 
   * demos, tutorials, and experiments
   * e.g. research packages, ``demo_nodes_cpp``, ``examples_rclcpp_minimal_publisher``, etc.
+
+* Quality Level 5:
+
+  * default quality level
+  * e.g. for code that fails to meet requirements in 'Level 4'
 
 While each quality level will have different requirements, it's always possible to overachieve in certain requirements even if other requirements prevent a package from moving up to the next quality level.
 
@@ -122,7 +127,7 @@ Requirements to be considered a 'Level 1' package:
       #. *Must have performance tests (exceptions allowed if they don't make sense to have)*
       #. *Must have a performance regression policy (i.e. blocking either changes or releases on unexpected performance regressions)*
 
-   #. Linters and Static Analysis
+   #. Linters and Static Analysis:
 
       #. *Must have a code style and enforce it*
       #. *Must use static analysis tools where applicable*
