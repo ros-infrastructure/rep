@@ -2,7 +2,7 @@
 
 REP2HTML=rep2html.py
 
-PYTHON=python
+PYTHON=python3
 
 .SUFFIXES: .rst .html
 
