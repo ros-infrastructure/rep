@@ -10,7 +10,7 @@ Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May
 Abstract
 ========
 
-This REP defines timeline for future ROS 2 releases as well as the targeted platforms for each specific one.
+This REP defines the timeline for future ROS 2 releases as well as the targeted platforms for each specific one.
 We define platforms to include both operating system releases (e.g. Ubuntu Xenial (16.04 LTS)) as well as major language releases (e.g. Python 3.5).
 The target platforms represent the set on which all core stacks are expected to work.
 Exceptions can be made for stacks that are intentionally platform-specific.
