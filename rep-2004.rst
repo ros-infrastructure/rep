@@ -636,43 +636,43 @@ Quality Declaration Template
 
   Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level N in REP-2004](https://www.ros.org/reps/rep-2004.html).
 
-  ## Version Policy
+  ## [1] Version Policy
 
-  ### Version Scheme
+  ### [1.i] Version Scheme
 
-  ### API Stability Within a Released ROS Distribution
+  ### [1.iii] Public API Declaration
 
-  ### ABI Stability Within a Released ROS Distribution
+  ### [1.iv]/[1.vi] API Stability Within a Released ROS Distribution
 
-  ### Public API Declaration
+  ### [1.v]/[1.vi] ABI Stability Within a Released ROS Distribution
 
-  ## Change Control Process
+  ## [2] Change Control Process
 
-  ## Documentation
+  ## [3] Documentation
 
-  ### Feature Documentation
+  ### [3.i] Feature Documentation
 
-  ### Public API Documentation
+  ### [3.ii] Public API Documentation
 
-  ### License
+  ### [3.iii] License
 
-  ### Copyright Statements
+  ### [3.iv] Copyright Statements
 
-  ## Testing
+  ## [4] Testing
 
-  ### Feature Testing
+  ### [4.i] Feature Testing
 
-  ### Public API Testing
+  ### [4.ii] Public API Testing
 
-  ### Coverage
+  ### [4.iii] Coverage
 
-  ### Performance
+  ### [4.iv] Performance
 
-  ### Linters and Static Analysis
+  ### [4.v] Linters and Static Analysis
 
-  ## Dependencies
+  ## [5] Dependencies
 
-  ## Platform Support
+  ## [6] Platform Support
 
 References and Footnotes
 ========================
