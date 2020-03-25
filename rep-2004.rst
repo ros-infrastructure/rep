@@ -623,6 +623,8 @@ The `rcutils package's quality declaration <https://github.com/ros2/rcutils/pull
 
 .. update link when that draft is merged
 
+The following template is a suggestion; packages can choose to combine sub-items into one heading if applicable (e.g. [3.i]-[3.iv] combined into [3]).
+
 Quality Declaration Template
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -636,43 +638,61 @@ Quality Declaration Template
 
   Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level N in REP-2004](https://www.ros.org/reps/rep-2004.html).
 
-  ## [1] Version Policy
+  ## Version Policy [1]
 
-  ### [1.i] Version Scheme
+  ### Version Scheme [1.i]
 
-  ### [1.iii] Public API Declaration
+  ### Version Stability [1.ii]
 
-  ### [1.iv]/[1.vi] API Stability Within a Released ROS Distribution
+  ### Public API Declaration [1.iii]
 
-  ### [1.v]/[1.vi] ABI Stability Within a Released ROS Distribution
+  ### API Stability Within a Released ROS Distribution [1.iv]/[1.vi]
 
-  ## [2] Change Control Process
+  ### ABI Stability Within a Released ROS Distribution [1.v]/[1.vi]
 
-  ## [3] Documentation
+  ## Change Control Process [2]
 
-  ### [3.i] Feature Documentation
+  ### Change Requests [2.i]
 
-  ### [3.ii] Public API Documentation
+  ### Contributor Origin [2.ii]
 
-  ### [3.iii] License
+  ### Peer Review Policy [2.iii]
 
-  ### [3.iv] Copyright Statements
+  ### Continuous Integration [2.iv]
 
-  ## [4] Testing
+  ### Documentation Policy [2.v]
 
-  ### [4.i] Feature Testing
+  ## Documentation [3]
 
-  ### [4.ii] Public API Testing
+  ### Feature Documentation [3.i]
 
-  ### [4.iii] Coverage
+  ### Public API Documentation [3.ii]
 
-  ### [4.iv] Performance
+  ### License [3.iii]
 
-  ### [4.v] Linters and Static Analysis
+  ### Copyright Statement [3.iv]
 
-  ## [5] Dependencies
+  ## Testing [4]
 
-  ## [6] Platform Support
+  ### Feature Testing [4.i]
+
+  ### Public API Testing [4.ii]
+
+  ### Coverage [4.iii]
+
+  ### Performance [4.iv]
+
+  ### Linters and Static Analysis [4.v]
+
+  ## Dependencies [5]
+
+  ### Direct Runtime ROS Dependencies [5.i]
+
+  ### Optional Direct Runtime ROS Dependencies [5.ii]
+
+  ### Direct Runtime non-ROS Dependency [5.iii]
+
+  ## Platform Support [6]
 
 References and Footnotes
 ========================
