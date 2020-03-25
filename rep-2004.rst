@@ -185,25 +185,25 @@ Requirements to be considered a 'Level 1' package:
 
    iii. Code Coverage:
 
-      .. _4.iii.a:
+        .. _4.iii.a:
 
-      a. *Must have code coverage tracking for the package*
+        a. *Must have code coverage tracking for the package*
 
-      .. _4.iii.b:
+        .. _4.iii.b:
 
-      b. *Must have and enforce a code coverage policy for new changes*
+        b. *Must have and enforce a code coverage policy for new changes*
 
    .. _4.iv:
 
    iv. Performance:
 
-      .. _4.iv.a:
+       .. _4.iv.a:
 
-      a. *Must have performance tests (exceptions allowed if they don't make sense to have)*
+       a. *Must have performance tests (exceptions allowed if they don't make sense to have)*
 
-      .. _4.iv.b:
+       .. _4.iv.b:
 
-      b. *Must have a performance regression policy (i.e. blocking either changes or releases on unexpected performance regressions)*
+       b. *Must have a performance regression policy (i.e. blocking either changes or releases on unexpected performance regressions)*
 
    .. _4.v:
 
@@ -579,20 +579,20 @@ Requirements to be considered a 'Level 2' package:
    iii. Must have a copyright statement in each source file
    iv. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
-      a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
-      b. *Must register with a centralized list of 'Level 2' packages, if one exists, to allow for peer review of the claim*
+       a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
+       b. *Must register with a centralized list of 'Level 2' packages, if one exists, to allow for peer review of the claim*
 
 4. **Testing:**
 
    i. Must have system tests which cover all items in the "feature" documentation
    ii. Code Coverage:
 
-      a. *Must have code coverage tracking for the package*
+       a. *Must have code coverage tracking for the package*
 
    iii. Linters and Static Analysis
 
-      a. *Must have a code style and enforce it*
-      b. *Must use static analysis tools where applicable*
+        a. *Must have a code style and enforce it*
+        b. *Must use static analysis tools where applicable*
 
 5. **Dependencies:**
 
@@ -638,8 +638,8 @@ Requirements to be considered a 'Level 3' package:
    ii. Must have a copyright statement in each source file
    iii. May have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
-      a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
-      b. *May register with a centralized list of 'Level 3' packages, if one exists, to allow for peer review of the claim*
+        a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
+        b. *May register with a centralized list of 'Level 3' packages, if one exists, to allow for peer review of the claim*
 
 4. **Testing:**
 
