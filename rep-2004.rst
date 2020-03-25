@@ -85,62 +85,161 @@ Package Requirements
 
 Requirements to be considered a 'Level 1' package:
 
-#. **Version Policy:**
+.. _Version Policy:
 
-   #. Must have a version policy (e.g. ``semver``)
-   #. Must be at a stable version (e.g. for ``semver`` that means version >= 1.0.0)
-   #. Must have a strictly declared public API
-   #. Must have a policy for API stability
-   #. Must have a policy for ABI stability
-   #. Must have a policy that keeps API and ABI stability within a released ROS distribution
+1. **Version Policy:**
 
-#. **Change Control Process:**
+   .. _1.i:
 
-   #. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
-   #. Must have confirmation of contributor origin (e.g. `DCO  <https://developercertificate.org/>`_, CLA, etc.)
-   #. Must have peer review policy for all change requests (e.g. require one or more reviewers)
-   #. Must have Continuous Integration (CI) policy for all change requests
-   #. Must have documentation policy for all change requests
+   i. Must have a version policy (e.g. ``semver``)
 
-#. **Documentation:**
+   .. _1.ii:
 
-   #. Must have documentation for each "feature" (e.g. for ``rclcpp``: create a node, publish a message, spin, etc.)
-   #. Must have documentation for each item in the public API (e.g. functions, classes, etc.)
-   #. Must have a declared license or set of licenses
-   #. Must have a copyright statement in each source file
-   #. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
+   ii. Must be at a stable version (e.g. for ``semver`` that means version >= 1.0.0)
 
-      #. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
-      #. *Must register with a centralized list of 'Level N' packages, if one exists, to allow for peer review of the claim*
+   .. _1.iii:
 
-#. **Testing:**
+   iii. Must have a strictly declared public API
 
-   #. Must have system tests which cover all items in the "feature" documentation
-   #. Must have system, integration, and/or unit tests which cover all of the public API
-   #. Code Coverage:
+   .. _1.iv:
 
-      #. *Must have code coverage tracking for the package*
-      #. *Must have and enforce a code coverage policy for new changes*
+   iv. Must have a policy for API stability
 
-   #. Performance:
+   .. _1.v:
 
-      #. *Must have performance tests (exceptions allowed if they don't make sense to have)*
-      #. *Must have a performance regression policy (i.e. blocking either changes or releases on unexpected performance regressions)*
+   v. Must have a policy for ABI stability
 
-   #. Linters and Static Analysis:
+   .. _1.vi:
 
-      #. *Must have a code style and enforce it*
-      #. *Must use static analysis tools where applicable*
+   vi. Must have a policy that keeps API and ABI stability within a released ROS distribution
 
-#. **Dependencies:**
+.. _Change Control Process:
 
-   #. Must not have direct runtime "ROS" dependencies which are not at the same level as the package in question ('Level N'), but...
-   #. May have optional direct runtime "ROS" dependencies which are not 'Level N', e.g. tracing or debugging features that can be disabled
-   #. Must have justification for why each direct runtime "non-ROS" dependency is equivalent to a 'Level N' package in terms of quality
+2. **Change Control Process:**
 
-#. **Platform Support:**
+   .. _2.i:
 
-   #. Must support all target platforms for the package's ecosystem.
+   i. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
+
+   .. _2.ii:
+
+   ii. Must have confirmation of contributor origin (e.g. `DCO  <https://developercertificate.org/>`_, CLA, etc.)
+
+   .. _2.iii:
+
+   iii. Must have peer review policy for all change requests (e.g. require one or more reviewers)
+
+   .. _2.iv:
+
+   iv. Must have Continuous Integration (CI) policy for all change requests
+
+   .. _2.v:
+
+   v. Must have documentation policy for all change requests
+
+.. _Documentation:
+
+3. **Documentation:**
+
+   .. _3.i:
+
+   i. Must have documentation for each "feature" (e.g. for ``rclcpp``: create a node, publish a message, spin, etc.)
+
+   .. _3.ii:
+
+   ii. Must have documentation for each item in the public API (e.g. functions, classes, etc.)
+
+   .. _3.iii:
+
+   iii. Must have a declared license or set of licenses
+
+   .. _3.iv:
+
+   iv. Must have a copyright statement in each source file
+
+   .. _3.v:
+
+   v. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
+
+      .. _3.v.a:
+
+      a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
+
+      .. _3.v.b:
+
+      b. *Must register with a centralized list of 'Level N' packages, if one exists, to allow for peer review of the claim*
+
+.. _Testing:
+
+4. **Testing:**
+
+   .. _4.i:
+
+   i. Must have system tests which cover all items in the "feature" documentation
+
+   .. _4.ii:
+
+   ii. Must have system, integration, and/or unit tests which cover all of the public API
+
+   .. _4.iii:
+
+   iii. Code Coverage:
+
+        .. _4.iii.a:
+
+        a. *Must have code coverage tracking for the package*
+
+        .. _4.iii.b:
+
+        b. *Must have and enforce a code coverage policy for new changes*
+
+   .. _4.iv:
+
+   iv. Performance:
+
+       .. _4.iv.a:
+
+       a. *Must have performance tests (exceptions allowed if they don't make sense to have)*
+
+       .. _4.iv.b:
+
+       b. *Must have a performance regression policy (i.e. blocking either changes or releases on unexpected performance regressions)*
+
+   .. _4.v:
+
+   v. Linters and Static Analysis:
+
+      .. _4.v.a:
+
+      a. *Must have a code style and enforce it*
+
+      .. _4.v.b:
+
+      b. *Must use static analysis tools where applicable*
+
+.. _Dependencies:
+
+5. **Dependencies:**
+
+   .. _5.i:
+
+   i. Must not have direct runtime "ROS" dependencies which are not at the same level as the package in question ('Level N'), but...
+
+   .. _5.ii:
+
+   ii. May have optional direct runtime "ROS" dependencies which are not 'Level N', e.g. tracing or debugging features that can be disabled
+
+   .. _5.iii:
+
+   iii. Must have justification for why each direct runtime "non-ROS" dependency is equivalent to a 'Level N' package in terms of quality
+
+.. _Platform Support:
+
+6. **Platform Support:**
+
+   .. _6.i:
+
+   i. Must support all target platforms for the package's ecosystem.
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
 
@@ -169,181 +268,181 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
       - Level 3
       - Level 4
       - Level 5
-    * - 1.i
+    * - 1.i_
       - ✓
       - ✓
       - ✓
       - ●
       -
-    * - 1.ii
+    * - 1.ii_
       - ✓
       - ✓
       - ✓
       -
       -
-    * - 1.iii
-      - ✓
-      - ✓
-      - ●
-      -
-      -
-    * - 1.iv
-      - ✓
-      - ✓
-      - ✓
-      -
-      -
-    * - 1.v
-      - ✓
-      - ✓
-      - ✓
-      -
-      -
-    * - 1.vi
+    * - 1.iii_
       - ✓
       - ✓
       - ●
       -
       -
-    * - 2.i
-      - ✓
-      - ✓
-      - ✓
-      - ●
-      -
-    * - 2.ii
-      - ✓
-      - ✓
-      -
-      -
-      -
-    * - 2.iii
-      - ✓
-      -
-      -
-      -
-      -
-    * - 2.iv
+    * - 1.iv_
       - ✓
       - ✓
       - ✓
       -
       -
-    * - 2.v
-      - ✓
-      -
-      -
-      -
-      -
-    * - 3.i
-      - ✓
-      - ✓
-      -
-      -
-      -
-    * - 3.ii
-      - ✓
-      -
-      -
-      -
-      -
-    * - 3.iii
-      - ✓
-      - ✓
-      - ✓
-      - ✓
-      - ●
-    * - 3.iv
-      - ✓
+    * - 1.v_
       - ✓
       - ✓
       - ✓
       -
-    * - 3.v
+      -
+    * - 1.vi_
       - ✓
       - ✓
       - ●
       -
       -
-    * - 3.v.a
+    * - 2.i_
+      - ✓
+      - ✓
+      - ✓
+      - ●
+      -
+    * - 2.ii_
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 2.iii_
+      - ✓
+      -
+      -
+      -
+      -
+    * - 2.iv_
       - ✓
       - ✓
       - ✓
       -
       -
-    * - 3.v.b
+    * - 2.v_
+      - ✓
+      -
+      -
+      -
+      -
+    * - 3.i_
+      - ✓
+      - ✓
+      -
+      -
+      -
+    * - 3.ii_
+      - ✓
+      -
+      -
+      -
+      -
+    * - 3.iii_
+      - ✓
+      - ✓
+      - ✓
+      - ✓
+      - ●
+    * - 3.iv_
+      - ✓
+      - ✓
+      - ✓
+      - ✓
+      -
+    * - 3.v_
       - ✓
       - ✓
       - ●
       -
       -
-    * - 4.i
+    * - 3.v.a_
+      - ✓
+      - ✓
+      - ✓
+      -
+      -
+    * - 3.v.b_
+      - ✓
+      - ✓
+      - ●
+      -
+      -
+    * - 4.i_
       - ✓
       - ✓
       - ●
       - ●
       -
-    * - 4.ii
+    * - 4.ii_
       - ✓
       -
       -
       -
       -
-    * - 4.iii.a
+    * - 4.iii.a_
       - ✓
       - ✓
       -
       -
       -
-    * - 4.iii.b
+    * - 4.iii.b_
       - ✓
       -
       -
       -
       -
-    * - 4.iv.a
+    * - 4.iv.a_
       - ✓
       -
       -
       -
       -
-    * - 4.iv.b
+    * - 4.iv.b_
       - ✓
       -
       -
       -
       -
-    * - 4.v.a
+    * - 4.v.a_
       - ✓
       - ✓
       -
       -
       -
-    * - 4.v.b
+    * - 4.v.b_
       - ✓
       - ✓
       -
       -
       -
-    * - 5.i
+    * - 5.i_
       - ✓
       - ✓
       -
       -
       -
-    * - 5.ii
+    * - 5.ii_
       - ●
       - ●
       - ●
       -
       -
-    * - 5.iii
+    * - 5.iii_
       - ✓
       - ✓
       -
       -
       -
-    * - 6.i
+    * - 6.i_
       - ✓
       - ✓
       - ✓
@@ -463,47 +562,47 @@ Package Requirements
 
 Requirements to be considered a 'Level 2' package:
 
-#. **Version Policy:**
+1. **Version Policy:**
 
-   #. The same as 'Level 1' packages
+   i. The same as 'Level 1' packages
 
-#. **Change Control Process:**
+2. **Change Control Process:**
 
-   #. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
-   #. Must have confirmation of contributor origin (e.g. `DCO  <https://developercertificate.org/>`_, CLA, etc.)
-   #. Must have Continuous Integration (CI) policy for all change requests
+   i. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
+   ii. Must have confirmation of contributor origin (e.g. `DCO  <https://developercertificate.org/>`_, CLA, etc.)
+   iii. Must have Continuous Integration (CI) policy for all change requests
 
-#. **Documentation:**
+3. **Documentation:**
 
-   #. Must have documentation for each "feature" (e.g. for ``rclcpp``: create a node, publish a message, spin, etc.)
-   #. Must have a declared license or set of licenses
-   #. Must have a copyright statement in each source file
-   #. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
+   i. Must have documentation for each "feature" (e.g. for ``rclcpp``: create a node, publish a message, spin, etc.)
+   ii. Must have a declared license or set of licenses
+   iii. Must have a copyright statement in each source file
+   iv. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
-      #. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
-      #. *Must register with a centralized list of 'Level 2' packages, if one exists, to allow for peer review of the claim*
+       a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
+       b. *Must register with a centralized list of 'Level 2' packages, if one exists, to allow for peer review of the claim*
 
-#. **Testing:**
+4. **Testing:**
 
-   #. Must have system tests which cover all items in the "feature" documentation
-   #. Code Coverage:
+   i. Must have system tests which cover all items in the "feature" documentation
+   ii. Code Coverage:
 
-      #. *Must have code coverage tracking for the package*
+       a. *Must have code coverage tracking for the package*
 
-   #. Linters and Static Analysis
+   iii. Linters and Static Analysis
 
-      #. *Must have a code style and enforce it*
-      #. *Must use static analysis tools where applicable*
+        a. *Must have a code style and enforce it*
+        b. *Must use static analysis tools where applicable*
 
-#. **Dependencies:**
+5. **Dependencies:**
 
-   #. Must not have direct runtime "ROS" dependencies which are not 'Level 2' dependencies, but...
-   #. May have optional direct runtime "ROS" dependencies which are not 'Level 2', e.g. tracing or debugging features that can be disabled
-   #. Must have justification for why each direct runtime "non-ROS" dependency is equivalent to a 'Level 2' package in terms of quality
+   i. Must not have direct runtime "ROS" dependencies which are not 'Level 2' dependencies, but...
+   ii. May have optional direct runtime "ROS" dependencies which are not 'Level 2', e.g. tracing or debugging features that can be disabled
+   iii. Must have justification for why each direct runtime "non-ROS" dependency is equivalent to a 'Level 2' package in terms of quality
 
-#. **Platform Support:**
+6. **Platform Support:**
 
-   #. Must support all target platforms for the package's ecosystem.
+   i. Must support all target platforms for the package's ecosystem.
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
 
@@ -521,38 +620,38 @@ Package Requirements
 
 Requirements to be considered a 'Level 3' package:
 
-#. **Version Policy:**
+1. **Version Policy:**
 
-   #. The same as 'Level 1' packages, except:
+   i. The same as 'Level 1' packages, except:
 
-      #. *No public API needs to be explicitly declared, though this can make it harder to maintain API and ABI stability*
-      #. *No requirement to keep API/ABI stability within a stable ROS release, but it is still recommended*
+      a. *No public API needs to be explicitly declared, though this can make it harder to maintain API and ABI stability*
+      b. *No requirement to keep API/ABI stability within a stable ROS release, but it is still recommended*
 
-#. **Change Control Process:**
+2. **Change Control Process:**
 
-   #. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
-   #. Must have Continuous Integration (CI) policy for all change requests
+   i. Must have all code changes occur through a change request (e.g. pull request, merge request, etc.)
+   ii. Must have Continuous Integration (CI) policy for all change requests
 
-#. **Documentation:**
+3. **Documentation:**
 
-   #. Must have a declared license or set of licenses
-   #. Must have a copyright statement in each source file
-   #. May have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
+   i. Must have a declared license or set of licenses
+   ii. Must have a copyright statement in each source file
+   iii. May have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
-      #. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
-      #. *May register with a centralized list of 'Level 3' packages, if one exists, to allow for peer review of the claim*
+        a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
+        b. *May register with a centralized list of 'Level 3' packages, if one exists, to allow for peer review of the claim*
 
-#. **Testing:**
+4. **Testing:**
 
-   #. No explicit testing requirements, though covering some if not all of the features with tests is recommended
+   i. No explicit testing requirements, though covering some if not all of the features with tests is recommended
 
-#. **Dependencies:**
+5. **Dependencies:**
 
-   #. May have direct runtime "ROS" dependencies which are not 'Level 3' dependencies, but they should still be documented in the quality declaration
+   i. May have direct runtime "ROS" dependencies which are not 'Level 3' dependencies, but they should still be documented in the quality declaration
 
-#. **Platform Support:**
+6. **Platform Support:**
 
-   #. Must support all target platforms for the package's ecosystem.
+   i. Must support all target platforms for the package's ecosystem.
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
 
@@ -571,30 +670,30 @@ Package Requirements
 
 Requirements to be considered a 'Level 4' package:
 
-#. **Version Policy:**
+1. **Version Policy:**
 
-   #. No requirements, but having a policy is still recommended (e.g. ``semver``), even if the version is not yet stable (e.g. >= 1.0.0 for ``semver``)
+   i. No requirements, but having a policy is still recommended (e.g. ``semver``), even if the version is not yet stable (e.g. >= 1.0.0 for ``semver``)
 
-#. **Change Control Process:**
+2. **Change Control Process:**
 
-   #. No explicit change control process required, but still recommended
+   i. No explicit change control process required, but still recommended
 
-#. **Documentation:**
+3. **Documentation:**
 
-   #. Must have a declared license or set of licenses
-   #. Must have a copyright statement in each source file
+   i. Must have a declared license or set of licenses
+   ii. Must have a copyright statement in each source file
 
-#. **Testing:**
+4. **Testing:**
 
-   #. No explicit testing requirements, though covering some if not all of the features with tests is recommended
+   i. No explicit testing requirements, though covering some if not all of the features with tests is recommended
 
-#. **Dependencies:**
+5. **Dependencies:**
 
-   #. No restrictions
+   i. No restrictions
 
-#. **Platform Support:**
+6. **Platform Support:**
 
-   #. Must support all target platforms for the package's ecosystem.
+   i. Must support all target platforms for the package's ecosystem.
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
 
@@ -623,10 +722,12 @@ The `rcutils package's quality declaration <https://github.com/ros2/rcutils/pull
 
 .. update link when that draft is merged
 
+The following template is a suggestion; packages can choose to combine sub-items into one heading if applicable (e.g. [3.i]-[3.iv] combined into [3]).
+
 Quality Declaration Template
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: markdown
+.. code-block:: md
 
   This document is a declaration of software quality for the `<package name>` package, based on the guidelines in [REP-2004](https://www.ros.org/reps/rep-2004.html).
 
@@ -636,43 +737,61 @@ Quality Declaration Template
 
   Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level N in REP-2004](https://www.ros.org/reps/rep-2004.html).
 
-  ## Version Policy
+  ## Version Policy [1]
 
-  ### Version Scheme
+  ### Version Scheme [1.i]
 
-  ### API Stability Within a Released ROS Distribution
+  ### Version Stability [1.ii]
 
-  ### ABI Stability Within a Released ROS Distribution
+  ### Public API Declaration [1.iii]
 
-  ### Public API Declaration
+  ### API Stability Within a Released ROS Distribution [1.iv]/[1.vi]
 
-  ## Change Control Process
+  ### ABI Stability Within a Released ROS Distribution [1.v]/[1.vi]
 
-  ## Documentation
+  ## Change Control Process [2]
 
-  ### Feature Documentation
+  ### Change Requests [2.i]
 
-  ### Public API Documentation
+  ### Contributor Origin [2.ii]
 
-  ### License
+  ### Peer Review Policy [2.iii]
 
-  ### Copyright Statements
+  ### Continuous Integration [2.iv]
 
-  ## Testing
+  ### Documentation Policy [2.v]
 
-  ### Feature Testing
+  ## Documentation [3]
 
-  ### Public API Testing
+  ### Feature Documentation [3.i]
 
-  ### Coverage
+  ### Public API Documentation [3.ii]
 
-  ### Performance
+  ### License [3.iii]
 
-  ### Linters and Static Analysis
+  ### Copyright Statement [3.iv]
 
-  ## Dependencies
+  ## Testing [4]
 
-  ## Platform Support
+  ### Feature Testing [4.i]
+
+  ### Public API Testing [4.ii]
+
+  ### Coverage [4.iii]
+
+  ### Performance [4.iv]
+
+  ### Linters and Static Analysis [4.v]
+
+  ## Dependencies [5]
+
+  ### Direct Runtime ROS Dependencies [5.i]
+
+  ### Optional Direct Runtime ROS Dependencies [5.ii]
+
+  ### Direct Runtime non-ROS Dependency [5.iii]
+
+  ## Platform Support [6]
 
 References and Footnotes
 ========================
