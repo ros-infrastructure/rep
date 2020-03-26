@@ -104,11 +104,46 @@ For example, in Melodic it defaults to ``2``, but in Noetic it must be ``3``.
 Users building ROS from source will not have an existing ROS workspace set, so
 the variable won't be set, and conditional dependencies can't be evaluated
 when using ``rosdep`` to install them.
-To fix this, ``rosdep`` should set ``ROS_PYTHON_VERSION`` to the same version of
-Python used to invoke it.
-It will get this information using ``sys.version[0]``.
-In order to use a different Python version, ``ROS_PYTHON_VERSION`` must be set
-explicitly.
+To fix this, ``rosdep`` will set ``ROS_PYTHON_VERSION``.
+It must choose a Python version to match the ROS distro while allowing platforms
+that already use Python 3 to override it
+
+The choice is made using the following information:
+
+ * the command line option `--rosdistro`
+ * the environment vairable `ROS_DISTRO`
+ * the environment vairable `ROS_PYTHON_VERSION`
+ * the value `python_version` in the ROS distribution file [8]_
+ * the version of Python used to invoke `rosdep` via `sys.version[0]`
+
+If `--rosdistro` is set then the value of `python_version` in the ROS distro
+file is used.
+For the purpose of evaluating conditional dependencies, `ROS_PYTHON_VERSION`
+will be set to `python_version`, and `ROS_DISTRO` will be set to the value
+passed in via `--rosdistro`.
+This allows users who may be unaware they have an existing ROS workspace sourced
+to install dependencies for a different ROS distro.
+
+Otherwise, if `ROS_PYTHON_VERSION` is set then that value is used.
+The value of `ROS_DISTRO` is unchanged whether it is set or unset.
+This allows users to install dependencies for a ROS distro with a different
+Python version than the ROS distro targets, such as Arch Linux users using
+Python 3 for ROS Melodic.
+
+If `ROS_PYTHON_VERSION` is not set but `ROS_DISTRO` is then
+for the purpose of evaluating conditional dependencies `ROS_PYTHON_VERSION`
+will be set to the value of `python_version`.
+This makes sure `ROS_PYTHON_VERSION` dependencies get evaluated in a way that
+matches the desired distro.
+This case should not happen so long as the user has sourced a workspace with the
+`ros_environment` package, since that package sets both `ROS_DISTRO` and
+`ROS_PYTHON_VERSION`.
+
+Finally, if none of `--rosdistro`, `ROS_DISTRO` or `ROS_PYTHON_VERSION` are set
+then for the purpose of evaluating conditional dependencies `ROS_PYTHON_VERSION`
+will be set to `sys.version[0]`.
+This makes sure `ROS_PYTHON_VERSION` dependencies are not silently ignored,
+though there is a risk of installing the wrong packages.
 
 rosdep and pip packages
 '''''''''''''''''''''''
@@ -237,13 +272,15 @@ References
 .. [3] Planning future ROS 1 distributions
    (https://discourse.ros.org/t/planning-future-ros-1-distribution-s/6538)
 .. [4] REP-0003 Target Platforms
-   (http://ros.org/reps/rep-0003)
+   (http://ros.org/reps/rep-0003.html)
 .. [5] REP-0149 Package Manifest Format Three Specification
-   (http://ros.org/reps/rep-0149)
+   (http://ros.org/reps/rep-0149.html)
 .. [6] ROS Wiki - Python 2 and 3 compatible code
    (http://wiki.ros.org/Python_2_and_3_compatible_code)
 .. [7] PEP 394 The "Python" Command on Unix-Like Systems
    (https://www.Python.org/dev/peps/pep-0394/)
+.. [8] REP 153 ROS distribution files
+   (http://ros.org/reps/rep-0153.html)
 
 Copyright
 =========
