@@ -188,17 +188,16 @@ PEP 394 recommends distributed Python scripts to use either ``python2`` or
 The ``python`` command cannot be trusted to a specific Python version.
 On older ROS distros, scripts can continue to use ``python`` since they're known
 to work on those platforms.
-In preparation for Noetic, these shebang's should be rewritten to the specific
-version of Python supported, ``python3``.
-
-Packages using the same branch will need to conditionally rewrite the shebangs.
+These shebangs must be rewritten to the specific version of Python supported.
 Packages can use the CMake macro ``catkin_install_python()`` to install Python
 scripts with rewritten shebangs.
+It will create a relay script in the ``devel`` space with a rewritten shebang.
 
 The same issue appears in scripts that call the ``python`` command directly.
-If they are Python scripts, they should be modified to invoke ``sys.executable``.
-Otherwise, they should be edited to invoke the specific version of Python they
-require, or ``python$ROS_PYTHON_VERSION`` if the script works with both.
+If they are Python scripts, they should invoke ``sys.executable``.
+Otherwise, they should invoke the specific version of Python they
+require, which means templating the script to invoke the Python interpreter
+found when the package was built.
 
 Dependencies and package.xml
 ''''''''''''''''''''''''''''
