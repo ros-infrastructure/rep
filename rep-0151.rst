@@ -35,18 +35,14 @@ Therefore ROS 1 must move to Python 3.
 Context
 =======
 
-Different versions of Python can't be mixed within a single ROS distribution.
-A package using Python 3 can't import Python modules from a package built using
-Python 2.
-All ROS packages containing Python code need to support Python 3 before they can
-be released into Noetic.
-
 Past proposals for Python 3 support have assumed a ROS distro will need to
 support Python 2 and Python 3 at the same time.
 Since then it was decided the first ROS 1 distribution to support Python 3
 will be Noetic Ninjemys (May 2020) [3]_, and it will only support Python 3.
 This REP only describes the current proposal since the change in requirements
 has made past proposals obsolete.
+All ROS packages containing Python code need to support Python 3 before they can
+be released into Noetic.
 
 This proposal does not specify a minimum minor version for Python.
 The minimum version will be defined in REP 3 [4]_ together with all other
