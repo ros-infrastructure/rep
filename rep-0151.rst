@@ -154,14 +154,15 @@ invoke pip.
 Rosdep currently calls the command ``pip``.
 It might use Python 2 when using the Debian package ``python-pip``, but it could
 use Python 3 inside a venv.
+``rosdep`` should pick a version of pip that matches ``ROS_PYTHON_VERSION``
+regardless of wheter a Python virtual env is being used.
 
-``rosdep`` could default to ``sys.executable -m pip`` to use the same version of
-Python as rosdep, but a user building the ROS 1 bridge for Melodic is likely
-using the Debian package ``python3-rosdep``.
-To support this, rosdep should use ``python$ROS_PYTHON_VERSION -m pip``.
-Since ``rosdep`` sets ``ROS_PYTHON_VERSION`` for itself if unset, this will default
-to the same version of Python rosdep was run with.
-However, it will be overridden automatically when a ROS workspace is sourced.
+First ``rosdep`` should try the commands ``pip2`` or ``pip3`` since those are
+similar to the current usage of ``pip``.
+If those don't exist, and ``sys.version[0]`` is the same value as
+``ROS_PYTHON_VERSION`` then it should try ``sys.executable -m pip``.
+If that didn't work, then as a last resort it should try the commands
+``python2 -m pip`` or ``python3 -m pip``.
 
 ROS packages support for Python 3
 ---------------------------------
