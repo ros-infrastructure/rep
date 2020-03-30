@@ -107,8 +107,8 @@ that already use Python 3 to override it
 The choice is made using the following information:
 
  * the command line option ``--rosdistro``
- * the environment vairable ``ROS_DISTRO``
- * the environment vairable ``ROS_PYTHON_VERSION``
+ * the environment variable ``ROS_DISTRO``
+ * the environment variable ``ROS_PYTHON_VERSION``
  * the value ``python_version`` in the ROS distribution file [8]_
  * the version of Python used to invoke ``rosdep`` via ``sys.version[0]``
 
