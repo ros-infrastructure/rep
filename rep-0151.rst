@@ -222,20 +222,14 @@ Making Python fixes available to downstream packages
 ''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 Transitioning to Python 3 is expected to be a significant effort.
-Typically, ROS packages are tested using the ROS build farm; however, that
-will not be available until packages for the targeted Ubuntu distribution
-become available.
-Instead, a placeholder ``Noetic`` ``distribution.yaml`` will be made available in
-advance of the buildfarm availability.
-Maintainers should add ``source`` entries for their Noetic branches to this file
-to enable downstream users to use ``rosinstall_generator`` with the
+Maintainers should release packages with Python 3 fixes to Noetic as soon as
+possible, even if they intend to make breaking changes later.
+Maintainers should also add ``source`` entries for their Noetic branches to this
+file to enable downstream users to use ``rosinstall_generator`` with the
 ``--upstream-development`` flag to get Python 3 fixes.
-Instructions to build from source using Python 3 will be made available to
-the ROS community.
+Instructions to build from source using Python 3 have been made available to
+the ROS community [9]_.
 
-Once the build farm is available, maintainers should release packages with
-Python 3 fixes to Noetic as soon as possible, even if they intend to make
-breaking changes later.
 
 Organizing community effort
 ---------------------------
@@ -250,7 +244,8 @@ The presence of a ``source`` entry in the Noetic ``distribution.yaml`` should be
 taken to mean a package has started transitioning to Python 3.
 Community members can use the differences between this and the previous ROS
 distro's ``distribution.yaml`` as an indication of which packages would benefit
-the most from their contributions.
+the most from their contributions via the Blocked Releases [10]_ or Blocked
+Source Entries [11]_ pages.
 
 There are many ROS package maintainers in the community, and each has the
 responsibility of deciding how the packages they maintain should make the
@@ -277,6 +272,12 @@ References
    (https://www.Python.org/dev/peps/pep-0394/)
 .. [8] REP 153 ROS distribution files
    (http://ros.org/reps/rep-0153.html)
+.. [9] Transitioning to Python 3
+   (http://wiki.ros.org/UsingPython3/)
+.. [10] Noetic Blocked Releases
+   (http://repositories.ros.org/status_page/blocked_releases_noetic.html)
+.. [11] Noetic Blocked Source Entries
+   (http://repositories.ros.org/status_page/blocked_source_entries_noetic.html)
 
 Copyright
 =========
