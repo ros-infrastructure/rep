@@ -151,7 +151,7 @@ Rosdep currently calls the command ``pip``.
 It might use Python 2 when using the Debian package ``python-pip``, but it could
 use Python 3 inside a venv.
 ``rosdep`` should pick a version of pip that matches ``ROS_PYTHON_VERSION``
-regardless of wheter a Python virtual env is being used.
+regardless of whether a Python virtual env is being used.
 
 First ``rosdep`` will try the commands ``pip2`` or ``pip3`` since those are
 similar to the previous usage of ``pip``.
