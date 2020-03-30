@@ -1,0 +1,294 @@
+REP: 151
+Title: Python 3 Support
+Author: Dirk Thomas, Shane Loretz
+Status: Final
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 05-Aug-2019
+
+Outline
+=======
+
+#. Abstract_
+#. Motivation_
+#. Context_
+#. Proposal_
+#. References_
+#. Copyright_
+
+Abstract
+========
+
+This REP describes the path for switching from Python 2 to Python 3 in ROS 1.
+
+Motivation
+==========
+
+As described in the Python release schedule [1]_ Python 2.7 will only receive
+bugfix releases until 2020.
+As a consequence Ubuntu is trying to demote Python 2.7 into the `universe`
+repository [2]_.
+While it is unlikely that Python 2.7 will be removed from the archives entirely,
+it should not be relied on past its EOL date.
+Therefore ROS 1 must move to Python 3.
+
+Context
+=======
+
+Past proposals for Python 3 support have assumed a ROS distro will need to
+support Python 2 and Python 3 at the same time.
+Since then it was decided the first ROS 1 distribution to support Python 3
+will be Noetic Ninjemys (May 2020) [3]_, and it will only support Python 3.
+This REP only describes the current proposal since the change in requirements
+has made past proposals obsolete.
+All ROS packages containing Python code need to support Python 3 before they can
+be released into Noetic.
+
+This proposal does not specify a minimum minor version for Python.
+The minimum version will be defined in REP 3 [4]_ together with all other
+versions.
+
+Proposal
+========
+
+Python 3 support at the time of Noetic release means:
+
+* All ROS tooling supports creating a Python 3 only ROS distro
+* All ROS packages released to Noetic support Python 3
+
+The amount of work to transition to Python 3 is expected to be significant.
+The entire ROS community will need to share the workload.
+This effort should be started as soon as possible to reduce the risk of the
+Noetic release being delayed.
+
+Tooling support for Python 3
+----------------------------
+
+rosdep keys
+'''''''''''
+Some Python rosdep keys have ``<platform>_python3`` entries.
+This was an experiment at having a rosdep key conditionally evaluate to either
+a Python 2 or Python 3 system dependency.
+No new ``<platform>_python3`` entries should be added, and the entries should
+not be relied on.
+
+All existing Python rosdep keys including ``<platform>_python3`` entries will
+stay the same to avoid breaking unknown existing use cases.
+Even if a key refers to a Python 2 package on one platform and Python 3 on
+another, it should stay that way.
+
+For new Python keys, when a platform has separate Python 2 and Python 3 versions
+of a package, there should be a rosdep key for each.
+For example, consider the two keys ``python-catkin-pkg`` and ``python3-catkin-pkg``.
+The ``python-catkin-pkg`` key should resolve to a Python 2 dependency on any
+platform where one exists, while ``python3-catkin-pkg`` should only resolve to a
+Python 3 dependency.
+
+
+ROS_PYTHON_VERSION
+''''''''''''''''''
+
+``ROS_PYTHON_VERSION`` is an environment variable that is set to either ``2`` or
+``3`` to indicate the major version of Python supported by a ROS distro.
+The intent is to allow ``package.xml`` files to have conditional Python
+dependencies.
+
+It is set by the package ``ros_environment`` when sourcing a ROS workspace.
+The version set will be dictated by REP 3 [4]_.
+For example, in Melodic it defaults to ``2``, but in Noetic it must be ``3``.
+
+Users building ROS from source will not have an existing ROS workspace set, so
+the variable won't be set, and conditional dependencies can't be evaluated
+when using ``rosdep`` to install them.
+To fix this, ``rosdep`` will set ``ROS_PYTHON_VERSION``.
+It must choose a Python version to match the ROS distro while allowing platforms
+that already use Python 3 to override it
+
+The choice is made using the following information:
+
+ * the command line option ``--rosdistro``
+ * the environment variable ``ROS_DISTRO``
+ * the environment variable ``ROS_PYTHON_VERSION``
+ * the value ``python_version`` in the ROS distribution file [8]_
+ * the version of Python used to invoke ``rosdep`` via ``sys.version[0]``
+
+If ``--rosdistro`` is set then the value of ``python_version`` in the ROS distro
+file is used.
+For the purpose of evaluating conditional dependencies, ``ROS_PYTHON_VERSION``
+will be set to ``python_version``, and ``ROS_DISTRO`` will be set to the value
+passed in via ``--rosdistro``.
+This allows users who may be unaware they have an existing ROS workspace sourced
+to install dependencies for a different ROS distro.
+
+Otherwise, if ``ROS_PYTHON_VERSION`` is set then that value is used.
+The value of ``ROS_DISTRO`` is unchanged whether it is set or unset.
+This allows users to install dependencies for a ROS distro with a different
+Python version than the ROS distro targets, such as Arch Linux users using
+Python 3 for ROS Melodic.
+
+If ``ROS_PYTHON_VERSION`` is not set but ``ROS_DISTRO`` is then
+for the purpose of evaluating conditional dependencies ``ROS_PYTHON_VERSION``
+will be set to the value of ``python_version``.
+This makes sure ``ROS_PYTHON_VERSION`` dependencies get evaluated in a way that
+matches the desired distro.
+This case should not happen so long as the user has sourced a workspace with the
+``ros_environment`` package, since that package sets both ``ROS_DISTRO`` and
+``ROS_PYTHON_VERSION``.
+
+Finally, if none of ``--rosdistro``, ``ROS_DISTRO`` or ``ROS_PYTHON_VERSION`` are set
+then for the purpose of evaluating conditional dependencies ``ROS_PYTHON_VERSION``
+will be set to ``sys.version[0]``.
+This makes sure ``ROS_PYTHON_VERSION`` dependencies are not silently ignored,
+though there is a risk of installing the wrong packages.
+
+rosdep and pip packages
+'''''''''''''''''''''''
+Unlike Debian packages, keys that resolve to packages on PyPI may refer to
+either Python 2 or Python 3 dependencies.
+The version that gets downloaded depends on the version of Python used to
+invoke pip.
+Rosdep currently calls the command ``pip``.
+It might use Python 2 when using the Debian package ``python-pip``, but it could
+use Python 3 inside a venv.
+``rosdep`` should pick a version of pip that matches ``ROS_PYTHON_VERSION``
+regardless of whether a Python virtual env is being used.
+
+First ``rosdep`` will try the commands ``pip2`` or ``pip3`` since those are
+similar to the previous usage of ``pip``.
+If those don't exist and ``sys.version[0]`` is the same value as
+``ROS_PYTHON_VERSION`` then it will try ``sys.executable -m pip``.
+If that didn't work, then as a last resort it will try the commands
+``python2 -m pip`` or ``python3 -m pip``.
+
+ROS packages support for Python 3
+---------------------------------
+
+There are many ROS packages using Python that will need to be modified to
+support Python 3.
+Packages using different branches for different ROS distros can drop support
+for Python 2 in their Noetic branch.
+Packages which use the same branch in multiple ROS distros may need to support
+both Python 2 and Python 3 at the same time.
+This section describes what needs to be done in both cases.
+
+Shebangs and reliance on the Python command
+'''''''''''''''''''''''''''''''''''''''''''
+Python scripts on UNIX systems typically have shebang lines written as:
+
+.. code-block: bash
+
+    #!/usr/bin/env python
+
+PEP 394 recommends distributed Python scripts to use either ``python2`` or
+``python3`` [7]_.
+The ``python`` command cannot be trusted to a specific Python version.
+On older ROS distros, scripts can continue to use ``python`` since they're known
+to work on those platforms.
+These shebangs must be rewritten to the specific version of Python supported.
+Packages can use the CMake macro ``catkin_install_python()`` to install Python
+scripts with rewritten shebangs.
+It will create a relay script in the ``devel`` space with a rewritten shebang.
+
+The same issue appears in scripts that call the ``python`` command directly.
+If they are Python scripts, they should invoke ``sys.executable``.
+Otherwise, they should invoke the specific version of Python they
+require, which means templating the script to invoke the Python interpreter
+found when the package was built.
+
+Dependencies and package.xml
+''''''''''''''''''''''''''''
+
+On platforms where the target version of Python is 2, the package.xml of a ROS
+package must refer to Python 2 dependencies, and when the target Python
+version is 3 it must refer to Python 3 dependencies.
+Packages which release from different branches for each ROS distro can replace
+rosdep keys that resolve to Python 2 dependencies with ones that resolve to
+Python 3 equivalents.
+Packages using the same code base for multiple ROS distros should instead use
+conditional dependencies as described in REP 149 [5]_.
+
+.. code-block: xml
+
+    <depend condition="$ROS_PYTHON_VERSION == '2'">python-numpy</depend>
+    <depend condition="$ROS_PYTHON_VERSION == '3'">python3-numpy</depend>
+
+If ``ROS_PYTHON_VERSION`` is relied upon at build time, such as when using
+``catkin_install_python()`` to rewrite shebangs, then the package must declare a
+``<buildtool_depend>`` on ``ros_environment``.
+Any ROS package which uses ``ROS_PYTHON_VERSION`` in a script intended to be
+run at runtime should add an ``<exec_depend>`` tag for ``ros_environment``.
+
+Making Python fixes available to downstream packages
+''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Transitioning to Python 3 is expected to be a significant effort.
+Maintainers should release packages with Python 3 fixes to Noetic as soon as
+possible, even if they intend to make breaking changes later.
+Maintainers should also add ``source`` entries for their Noetic branches to this
+file to enable downstream users to use ``rosinstall_generator`` with the
+``--upstream-development`` flag to get Python 3 fixes.
+Instructions to build from source using Python 3 have been made available to
+the ROS community [9]_.
+
+
+Organizing community effort
+---------------------------
+
+In order to achieve this, prior to the Noetic release community members must
+be able to see:
+
+* which ROS packages already support Python 3
+* which ROS packages need help supporting Python 3
+
+The presence of a ``source`` entry in the Noetic ``distribution.yaml`` should be
+taken to mean a package has started transitioning to Python 3.
+Community members can use the differences between this and the previous ROS
+distro's ``distribution.yaml`` as an indication of which packages would benefit
+the most from their contributions via the Blocked Releases [10]_ or Blocked
+Source Entries [11]_ pages.
+
+There are many ROS package maintainers in the community, and each has the
+responsibility of deciding how the packages they maintain should make the
+transition to Python 3.
+On an individual repository level, community members are encouraged to open
+issues and pull requests with Python 3 fixes.
+
+References
+==========
+
+.. [1] PEP 373 Python 2.7 Release Schedule
+   (https://www.Python.org/dev/peps/pep-0373/)
+.. [2] Python2 to be demoted to universe
+   (https://bugs.launchpad.net/ubuntu/+source/swift/+bug/1817023)
+.. [3] Planning future ROS 1 distributions
+   (https://discourse.ros.org/t/planning-future-ros-1-distribution-s/6538)
+.. [4] REP-0003 Target Platforms
+   (http://ros.org/reps/rep-0003.html)
+.. [5] REP-0149 Package Manifest Format Three Specification
+   (http://ros.org/reps/rep-0149.html)
+.. [6] ROS Wiki - Python 2 and 3 compatible code
+   (http://wiki.ros.org/Python_2_and_3_compatible_code)
+.. [7] PEP 394 The "Python" Command on Unix-Like Systems
+   (https://www.Python.org/dev/peps/pep-0394/)
+.. [8] REP 153 ROS distribution files
+   (http://ros.org/reps/rep-0153.html)
+.. [9] Transitioning to Python 3
+   (http://wiki.ros.org/UsingPython3/)
+.. [10] Noetic Blocked Releases
+   (http://repositories.ros.org/status_page/blocked_releases_noetic.html)
+.. [11] Noetic Blocked Source Entries
+   (http://repositories.ros.org/status_page/blocked_source_entries_noetic.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
