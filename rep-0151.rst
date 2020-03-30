@@ -153,11 +153,11 @@ use Python 3 inside a venv.
 ``rosdep`` should pick a version of pip that matches ``ROS_PYTHON_VERSION``
 regardless of wheter a Python virtual env is being used.
 
-First ``rosdep`` should try the commands ``pip2`` or ``pip3`` since those are
-similar to the current usage of ``pip``.
-If those don't exist, and ``sys.version[0]`` is the same value as
-``ROS_PYTHON_VERSION`` then it should try ``sys.executable -m pip``.
-If that didn't work, then as a last resort it should try the commands
+First ``rosdep`` will try the commands ``pip2`` or ``pip3`` since those are
+similar to the previous usage of ``pip``.
+If those don't exist and ``sys.version[0]`` is the same value as
+``ROS_PYTHON_VERSION`` then it will try ``sys.executable -m pip``.
+If that didn't work, then as a last resort it will try the commands
 ``python2 -m pip`` or ``python3 -m pip``.
 
 ROS packages support for Python 3
