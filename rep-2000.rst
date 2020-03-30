@@ -397,7 +397,6 @@ Middleware Implementation Support:
 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 2        | All Platforms               | All Architectures                    |
-|                          |                     |               | except OpenEmbedded         |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
 |                          |                     |               | and OpenEmbedded            |                                      |
