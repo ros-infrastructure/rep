@@ -5,7 +5,7 @@ Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 21-Sep-2010
-Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017, 23-Oct-2017
+Post-History: 21-Sep-2010, 17-Jan-2011, 13-Jan-2015, 21-Sep-2015, 10-Jan-2017, 23-Oct-2017, 08-April-2020
 
 
 Abstract
@@ -342,6 +342,61 @@ Maintainers can choose to support even lower versions to also cover older ROS di
 Build System Support:
 
 - Same as Indigo
+
+Noetic Ninjemys (May 2020 - May 2025)
+--------------------------------------
+Required Support for:
+
+- Ubuntu Focal Fossa (20.04)
+
+Recommended Support for:
+
+- Debian Buster
+- Fedora 32
+
+Architectures Supported:
+
+- amd64
+- arm32
+- arm64
+
+Targeted Languages:
+
+- C++14
+- Python 3.8
+  - Testing against Python 3.7 is recommended for compatibility with Debian Buster.
+- Lisp SBCL 1.4.16
+
+Requirements:
+
++----------+------------------+----------------+-----------+
+| Package  |  Ubuntu Focal    | Debian Buster  | Fedora 32 |
++==========+==================+================+===========+
+|          | Required Support |    Recommended support     |
++----------+------------------+----------------+-----------+
+| Boost    |      1.71!       |    1.67        |   1.69!   |
++----------+------------------+----------------+-----------+
+| CMake    |      3.16.3!     |    3.13.4      |   3.17!   |
++----------+------------------+----------------+-----------+
+| Gazebo   |      11.x*       |    11.x*       |   10.1.0! |
++----------+------------------+----------------+-----------+
+| Ignition |      Citadel     |    Citadel     |   N/A     |
++----------+------------------+----------------+-----------+
+| Ogre     |      1.9!        |    1.9         |   1.9!    |
++----------+------------------+----------------+-----------+
+| OpenCV   |      4.2!        |    3.2         |   4.2     |
++----------+------------------+----------------+-----------+
+| PCL      |      1.10!       |    1.9.1       |   1.9.1!  |
++----------+------------------+----------------+-----------+
+| PyQt     |      5.14.1!     |    5.11.3      |   5.14.2! |
++----------+------------------+----------------+-----------+
+| Qt5      |      5.12.5!     |    5.11.3      |   5.13.2! |
++----------+------------------+----------------+-----------+
+
+" * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
+
+" ! " means that this package will be at least this version (since these distributions have not yet been released); this may change as those releases get closer.
+
 
 Motivation
 ==========
