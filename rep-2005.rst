@@ -1,5 +1,5 @@
 REP: 2005
-Title: ROS 2 Standard Library
+Title: ROS 2 Common Packages
 Author: Brian Gerkey <gerkey@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>
 Status: Active
 Type: Informational
@@ -11,7 +11,7 @@ Post-History:
 Abstract
 ========
 
-This REP describes a set of repositories which together form the standard library of ROS 2.
+This REP describes a set of repositories which together form the common packages of ROS 2.
 
 
 Motivation
@@ -23,7 +23,7 @@ This federated model makes it easy for developers to share their contributions w
 As a result the community size and overall project scope can scale up naturally and efficiently.
 
 But in exchange, it can be difficult in a federated ecosystem for users and developers to know, of all the available ROS 2 packages, which are integral to the project.
-With the curated list below we aim to provide community members with guidance regarding which parts of the ROS 2 ecosystem are widely used, actively maintained, and of high quality.
+With the curated list below we aim to provide community members with guidance regarding which parts of the ROS 2 ecosystem are widely used, actively maintained, and of sufficient quality to be relied upon.
 Furthermore, we encourage contributors to focus their efforts on items from this list.
 
 
@@ -39,19 +39,52 @@ The list below is curated to include repositories that are:
 
 We aim that all of these repositories are also:
 
-* actively maintained and following accepted software development processes, including code review and testing.
+* actively maintained and following accepted software development processes, including code review and testing; and
+* at Quality Level 3 or better, as defined in REP 2004.
+
+The list should be self-contained and exhaustive: if a package appears on the list, then all of its ROS 2 dependencies must also appear on the list (third-party or system dependencies should not be included).
 
 
 Change process
 ==============
 
 This content is maintained at GitHub in the [REP repo](https://github.com/ros-infrastructure/rep).
-To propose changes, such as adding or removing items, make a pull request to that repo.
-The ensuing public review and discussion will evaluate the change in light of the purpose and scope explained above, with the final merge decision being made by one of the REP maintainers.
+To propose changes, such as adding or removing items, make a pull request (PR) to that repo.
+The ensuing public review and discussion will evaluate the change in light of the purpose and scope explained above.
+The final merge decision on a given PR will be made by the ROS 2 Technical Steering Committee (TSC) by a simple voting process:
+
+* Each TSC member organization may vote on a PR by commenting with a score according to the [REP voting guidelines](https://www.ros.org/reps/rep-0010.html#voting-scores).
+* A TSC member may update their vote (e.g., following changes or discussion) with a new comment while the PR remains under review (i.e., before it has been merged); the new vote takes the place of the old one.
+* The PR will be merged if and when the sum of TSC member vote values is **>= 3** (votes of `+0` and `-0` are treated equally as 0 when computing the sum).
+* The PR will be declined if it becomes numerically impossible based on existing votes to meet the minimum vote threshold.
+* The proposer will be encouraged to withdraw a PR if after a significant amount the time the minimum vote threshold is still not met.
+
+For example, if a PR garners the following 6 votes from TSC members: `+1`, `+1`, `-1`, `+0`, `+1`, `+1`, then the sum would be 3 and the PR would be merged.
+
+The minimum vote threshold necessary to merge a PR may be changed by a majority vote of the TSC.
+
+
+Guidance on changes
+===================
+
+We wish for this list to grow steadily over time, but not to become an indiscriminate collection of all ROS 2 software.
+Our goal with this list is **curation**: we want to ensure that the contents are meaningful to the developer and user community.
+All else being equal, we prefer to include packages that:
+
+* have clear evidence of reuse (e.g., declared dependencies elsewhere in ROS 2, stars or forks at GitHub, public user testimonials); and/or
+* represent substantially new and important features that are reasonably expected to come into wide use but are not yet ready; and/or
+* meet a high quality standard as defined in REP 2004; and/or
+* are maintained by an organization or at least two individuals.
+
+We prefer not to include packages that meet none of these criteria.
 
 
 Content
 =======
+
+The common packages may vary among distros; unless otherwise annotated below, each package in the list is **available since Foxy Fitzroy**.
+When planning starts for a new distro, the package list from the previous distro will be copied in as a starting point.
+All items on the list for the next distro should already be released into the rolling distro; as a bootstrapping exception, items on the list for Foxy may take some time to be released.
 
 * Buildsystem, package index and tooling around
 
