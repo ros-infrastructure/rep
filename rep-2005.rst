@@ -73,7 +73,7 @@ All else being equal, we prefer to include packages that:
 
 * have clear evidence of reuse (e.g., declared dependencies elsewhere in ROS 2, stars or forks at GitHub, public user testimonials); and/or
 * represent substantially new and important features that are reasonably expected to come into wide use but are not yet ready; and/or
-* meet a high quality standard as defined in REP 2004; and/or
+* are demonstrably of high quality (e.g., via conformance with REP 2004); and/or
 * are maintained by an organization or at least two individuals.
 
 We prefer not to include packages that meet none of these criteria.
