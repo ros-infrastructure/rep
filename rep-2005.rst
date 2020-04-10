@@ -40,7 +40,8 @@ The list below is curated to include repositories that are:
 We aim that all of these repositories are also:
 
 * actively maintained and following accepted software development processes, including code review and testing; and
-* at Quality Level 3 or better, as defined in REP 2004.
+* at Quality Level 3 or better, as defined in REP 2004; and
+* are maintained by an organization or at least two individuals.
 
 The list should be self-contained and exhaustive: if a package appears on the list, then all of its ROS 2 dependencies must also appear on the list (third-party or system dependencies should not be included).
 
@@ -73,8 +74,7 @@ All else being equal, we prefer to include packages that:
 
 * have clear evidence of reuse (e.g., declared dependencies elsewhere in ROS 2, stars or forks at GitHub, public user testimonials); and/or
 * represent substantially new and important features that are reasonably expected to come into wide use but are not yet ready; and/or
-* are demonstrably of high quality (e.g., via conformance with REP 2004); and/or
-* are maintained by an organization or at least two individuals.
+* are demonstrably of high quality (e.g., via conformance with REP 2004).
 
 We prefer not to include packages that meet none of these criteria.
 
