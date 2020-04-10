@@ -634,7 +634,7 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 | Cyclone DDS |                                 0.5.1 (Eusebius)                                       |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
-|  Fast-RTPS  |                                      1.9.3                                             |
+|  Fast-RTPS  |                                      1.10.0                                            |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
