@@ -49,12 +49,12 @@ The list should be self-contained and exhaustive: if a package appears on the li
 Change process
 ==============
 
-This content is maintained at GitHub in the [REP repo](https://github.com/ros-infrastructure/rep).
+This content is maintained at GitHub in the `REP repo <https://github.com/ros-infrastructure/rep>`_.
 To propose changes, such as adding or removing items, make a pull request (PR) to that repo.
 The ensuing public review and discussion will evaluate the change in light of the purpose and scope explained above.
 The final merge decision on a given PR will be made by the ROS 2 Technical Steering Committee (TSC) by a simple voting process:
 
-* Each TSC member organization may vote on a PR by commenting with a score according to the [REP voting guidelines](https://www.ros.org/reps/rep-0010.html#voting-scores).
+* Each TSC member organization may vote on a PR by commenting with a score according to the `REP voting guidelines <https://www.ros.org/reps/rep-0010.html#voting-scores>`_.
 * A TSC member may update their vote (e.g., following changes or discussion) with a new comment while the PR remains under review (i.e., before it has been merged); the new vote takes the place of the old one.
 * The PR will be merged if and when the sum of TSC member vote values is **>= 3** (votes of `+0` and `-0` are treated equally as 0 when computing the sum).
 * The PR will be declined if it becomes numerically impossible based on existing votes to meet the minimum vote threshold.
