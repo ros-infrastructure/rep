@@ -11,7 +11,7 @@ Post-History:
 Abstract
 ========
 
-This REP describes a set of repositories which together form the common packages of ROS 2.
+This REP describes the common packages of ROS 2.
 
 
 Motivation
@@ -30,14 +30,14 @@ Furthermore, we encourage contributors to focus their efforts on items from this
 Scope
 =====
 
-The list below is curated to include repositories that are:
+The list below is curated to include packages that are:
 
 * open source (not proprietary);
 * connected to the ROS 2 project (not general purpose software, except when included with ROS 2-specific bindings);
 * broadly usable (not narrowly tailored for uncommon use cases); and
 * evidently used by a nontrivial part of the community.
 
-We aim that all of these repositories are also:
+We aim that all of these packages are also:
 
 * actively maintained and following accepted software development processes, including code review and testing; and
 * at Quality Level 3 or better, as defined in REP 2004; and
@@ -85,6 +85,8 @@ Content
 The common packages may vary among distros; unless otherwise annotated below, each package in the list is **available since Foxy Fitzroy**.
 When planning starts for a new distro, the package list from the previous distro will be copied in as a starting point.
 All items on the list for the next distro should already be released into the rolling distro; as a bootstrapping exception, items on the list for Foxy may take some time to be released.
+
+**TODO: expand the repositories below to individual packages**
 
 * Buildsystem, package index and tooling around
 
