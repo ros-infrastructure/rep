@@ -243,6 +243,12 @@ Requirements to be considered a 'Level 1' package:
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
 
+7. **Security**
+
+   .. _7.i:
+
+   i. Must have a declared Vulnerability Disclosure Policy and adhere to a response schedule for addressing security vulnerabilities
+
 If the above points are satisfied then a package can be considered 'Level 1'.
 Refer to the detailed description of the requirements below the chart for more information.
 
@@ -448,6 +454,12 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
       - ✓
       - ●
       -
+    * - 7.i_
+      - ✓
+      - ✓
+      - ✓
+      -
+      -
 
 Version Policy
 ^^^^^^^^^^^^^^
@@ -606,6 +618,10 @@ Requirements to be considered a 'Level 2' package:
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
 
+7. **Security**
+
+   i. Must have a declared Vulnerability Disclosure Policy and adhere to a response schedule for addressing security vulnerabilities
+
 If the above points are satisfied then a package can be considered 'Level 2'.
 Refer to the detailed description of the requirements following the Quality Level 1 section above for more information.
 
@@ -655,6 +671,10 @@ Requirements to be considered a 'Level 3' package:
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
 
+7. **Security**
+
+   i. Must have a declared Vulnerability Disclosure Policy and adhere to a response schedule for addressing security vulnerabilities
+
 If the above points are satisfied then a package can be considered 'Level 3'.
 Refer to the detailed description of the requirements following the Quality Level 1 section above for more information.
 
@@ -696,6 +716,10 @@ Requirements to be considered a 'Level 4' package:
    i. Must support all target platforms for the package's ecosystem.
 
       * For ROS 2 this means supporting all tier 1 platforms, as defined in `REP-2000 <https://www.ros.org/reps/rep-2000.html#support-tiers>`_
+
+7. **Security**
+
+   i. No restrictions
 
 Any package that does not claim to be 'Level 3' or higher is automatically 'Level 4'.
 Refer to the detailed description of the requirements following the Quality Level 1 section above for more information.
