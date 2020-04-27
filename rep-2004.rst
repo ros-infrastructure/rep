@@ -457,7 +457,7 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
     * - 7.i_
       - ✓
       - ✓
-      - ✓
+      - ●
       -
       -
 
