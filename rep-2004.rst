@@ -673,7 +673,7 @@ Requirements to be considered a 'Level 3' package:
 
 7. **Security**
 
-   i. Must have a declared Vulnerability Disclosure Policy and adhere to a response schedule for addressing security vulnerabilities
+   i. Should have a declared Vulnerability Disclosure Policy and adhere to a response schedule for addressing security vulnerabilities
 
 If the above points are satisfied then a package can be considered 'Level 3'.
 Refer to the detailed description of the requirements following the Quality Level 1 section above for more information.
