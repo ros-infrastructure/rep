@@ -817,6 +817,10 @@ Quality Declaration Template
 
   ## Platform Support [6]
 
+  ## Security [7]
+  
+  ### Vulnerability Disclosure Policy [7.i]
+
 References and Footnotes
 ========================
 
