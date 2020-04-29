@@ -59,7 +59,7 @@ This is the recommended layout for development is as follows:
         include/
         lib/
         share/
-        .catkin              --Marking the folder as an install space (the file is emtpy)
+        .catkin              --Marking the folder as an install space (the file is empty)
         env.bash
         setup.bash
         setup.sh
