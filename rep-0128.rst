@@ -37,7 +37,7 @@ This is the recommended layout for development is as follows:
           package.xml
         ...
         package_n/
-          CATKIN_IGNORE      --Optionally place this marker file to exclude package_n from being processed. Its file type (e.g. regular file, directory) and contents don't matter.
+          CATKIN_IGNORE      --Optionally place this marker file to exclude package_n from being processed. Its file type (e.g. regular file, directory) and contents don't matter. It may even be a dangling symlink.
           CMakeLists.txt
           package.xml
       build/                 --BUILD SPACE(this is where build system is invoked, not necessarily within workspace)
