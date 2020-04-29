@@ -167,7 +167,11 @@ Requirements to be considered a 'Level 1' package:
 
       .. _3.v.b:
 
-      b. *Must register with a centralized list of 'Level N' packages, if one exists, to allow for peer review of the claim*
+      b. *Should register with a centralized list of 'Level N' packages, if one exists, to allow for peer review of the claim*
+
+      .. _3.v.c:
+
+      c. *Must reference any 'Level N' lists the package belongs to, and/or any other peer review processes undergone*
 
 .. _Testing:
 
@@ -377,9 +381,15 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
       -
       -
     * - 3.v.b_
-      - ✓
-      - ✓
       - ●
+      - ●
+      - ●
+      -
+      -
+    * - 3.v.c_
+      - ✓
+      - ✓
+      - ✓
       -
       -
     * - 4.i_
@@ -507,11 +517,11 @@ Sometimes the justification will be a link to a policy documented in the package
 If there is additional evidence that these policies are being followed, that should be included as well, e.g. a link to the coverage statistics for the package to show that coverage is being tracked and maintained.
 Other times, justification will be an explanation as to why a requirement was not met or does not apply, e.g. if performance tests do not make sense for the package in question, it should be satisfactorily explained.
 
-There is no enforcement or checking of these claims, but instead it's just sufficient to present this information to potential users.
+There is no enforcement or checking of these claims, but instead it's sufficient to present this information to potential users.
 If the users feel that the justifications are insufficient or incorrect, they can open issues against the repository and resolve it with the maintainers.
 
-There should be one or more communal lists of 'Level 1' (and maybe 'Level 2' or 'Level 3') quality level packages.
-These lists should be modified via change requests (maybe a text document in a repository) so that there can be peer review.
+There should be one or more communal lists of 'Level 1' (and maybe 'Level 2' and 'Level 3') quality level packages for maintainers to register their packages with to seek peer review.
+These lists should be modified via change requests (maybe a text document in a repository).
 This REP will not prescribe how or where these lists should be hosted, but one possibility is an informational REP, continually updated and versioned with each new ROS distribution.
 
 Feature Testing and Code Coverage Policy
@@ -592,7 +602,8 @@ Requirements to be considered a 'Level 2' package:
    iv. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
        a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
-       b. *Must register with a centralized list of 'Level 2' packages, if one exists, to allow for peer review of the claim*
+       b. *Should register with a centralized list of 'Level 2' packages, if one exists, to allow for peer review of the claim*
+       c. *Must reference any 'Level 2' lists the package belongs to, and/or any other peer review processes undergone*
 
 4. **Testing:**
 
@@ -656,6 +667,7 @@ Requirements to be considered a 'Level 3' package:
 
         a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
         b. *May register with a centralized list of 'Level 3' packages, if one exists, to allow for peer review of the claim*
+        c. *Must reference any 'Level 3' lists the package belongs to, and/or any other peer review processes undergone*
 
 4. **Testing:**
 
@@ -795,6 +807,8 @@ Quality Declaration Template
 
   ### Copyright Statement [3.iv]
 
+  ### Lists and Peer Review [3.v.c]
+
   ## Testing [4]
 
   ### Feature Testing [4.i]
@@ -818,7 +832,7 @@ Quality Declaration Template
   ## Platform Support [6]
 
   ## Security [7]
-  
+
   ### Vulnerability Disclosure Policy [7.i]
 
 References and Footnotes
