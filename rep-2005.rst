@@ -143,11 +143,11 @@ All items on the list for the next distro should already be released into the ro
   * `ament_lint/ament_uncrustify <https://index.ros.org/p/ament_uncrustify/>`_
   * `ament_lint/ament_xmllint <https://index.ros.org/p/ament_xmllint/>`_
   * `ros_environment/ros_environment <https://index.ros.org/p/ros_environment/>`_
-  * `ros-infrastructure/bloom <https://github.com/ros-infrastructure/bloom>`_ **(UNMATCHED)**
-  * `ros-infrastructure/catkin_pkg <https://github.com/ros-infrastructure/catkin_pkg>`_ **(UNMATCHED)**
-  * `ros-infrastructure/rosdep <https://github.com/ros-infrastructure/rosdep>`_ **(UNMATCHED)**
-  * `ros-infrastructure/rosdistro <https://github.com/ros-infrastructure/rosdistro>`_ **(UNMATCHED)**
-  * `ros-infrastructure/ros_buildfarm <https://github.com/ros-infrastructure/ros_buildfarm>`_ **(UNMATCHED)**
+  * `ros-infrastructure/bloom <https://github.com/ros-infrastructure/bloom>`_ *(not a ROS package)*
+  * `ros-infrastructure/catkin_pkg <https://github.com/ros-infrastructure/catkin_pkg>`_ *(not a ROS package)*
+  * `ros-infrastructure/rosdep <https://github.com/ros-infrastructure/rosdep>`_ *(not a ROS package)*
+  * `ros-infrastructure/rosdistro <https://github.com/ros-infrastructure/rosdistro>`_ *(not a ROS package)*
+  * `ros-infrastructure/ros_buildfarm <https://github.com/ros-infrastructure/ros_buildfarm>`_ *(not a ROS package)*
   * `ament_cmake_ros/ament_cmake_ros <https://index.ros.org/p/ament_cmake_ros/>`_
   * `ament_cmake_ros/domain_coordinator <https://index.ros.org/p/domain_coordinator/>`_
 
@@ -319,36 +319,70 @@ All items on the list for the next distro should already be released into the ro
     * `laser_proc/laser_proc <https://index.ros.org/p/laser_proc/>`_
     * `depthimage_to_laserscan/depthimage_to_laserscan <https://index.ros.org/p/depthimage_to_laserscan/>`_
 
-  * `navigation2/costmap_queue <https://index.ros.org/p/costmap_queue/>`_
-  * `navigation2/dwb_core <https://index.ros.org/p/dwb_core/>`_
-  * `navigation2/dwb_critics <https://index.ros.org/p/dwb_critics/>`_
-  * `navigation2/dwb_msgs <https://index.ros.org/p/dwb_msgs/>`_
-  * `navigation2/dwb_plugins <https://index.ros.org/p/dwb_plugins/>`_
-  * `navigation2/nav2_amcl <https://index.ros.org/p/nav2_amcl/>`_
-  * `navigation2/nav2_behavior_tree <https://index.ros.org/p/nav2_behavior_tree/>`_
-  * `navigation2/nav2_bringup <https://index.ros.org/p/nav2_bringup/>`_
-  * `navigation2/nav2_bt_navigator <https://index.ros.org/p/nav2_bt_navigator/>`_
-  * `navigation2/nav2_common <https://index.ros.org/p/nav2_common/>`_
-  * `navigation2/nav2_controller <https://index.ros.org/p/nav2_controller/>`_
-  * `navigation2/nav2_core <https://index.ros.org/p/nav2_core/>`_
-  * `navigation2/nav2_costmap_2d <https://index.ros.org/p/nav2_costmap_2d/>`_
-  * `navigation2/nav2_dwb_controller <https://index.ros.org/p/nav2_dwb_controller/>`_
-  * `navigation2/nav2_gazebo_spawner <https://index.ros.org/p/nav2_gazebo_spawner/>`_
-  * `navigation2/nav2_lifecycle_manager <https://index.ros.org/p/nav2_lifecycle_manager/>`_
-  * `navigation2/nav2_map_server <https://index.ros.org/p/nav2_map_server/>`_
-  * `navigation2/nav2_msgs <https://index.ros.org/p/nav2_msgs/>`_
-  * `navigation2/nav2_navfn_planner <https://index.ros.org/p/nav2_navfn_planner/>`_
-  * `navigation2/nav2_planner <https://index.ros.org/p/nav2_planner/>`_
-  * `navigation2/nav2_recoveries <https://index.ros.org/p/nav2_recoveries/>`_
-  * `navigation2/nav2_rviz_plugins <https://index.ros.org/p/nav2_rviz_plugins/>`_
-  * `navigation2/nav2_system_tests <https://index.ros.org/p/nav2_system_tests/>`_
-  * `navigation2/nav2_util <https://index.ros.org/p/nav2_util/>`_
-  * `navigation2/nav2_voxel_grid <https://index.ros.org/p/nav2_voxel_grid/>`_
-  * `navigation2/nav2_waypoint_follower <https://index.ros.org/p/nav2_waypoint_follower/>`_
-  * `navigation2/nav_2d_msgs <https://index.ros.org/p/nav_2d_msgs/>`_
-  * `navigation2/nav_2d_utils <https://index.ros.org/p/nav_2d_utils/>`_
-  * `navigation2/navigation2 <https://index.ros.org/p/navigation2/>`_
-  * `ros-planning/moveit2 <https://github.com/ros-planning/moveit2>`_ **(UNMATCHED)**
+  * Navigation2
+
+    * `navigation2/costmap_queue <https://index.ros.org/p/costmap_queue/>`_
+    * `navigation2/dwb_core <https://index.ros.org/p/dwb_core/>`_
+    * `navigation2/dwb_critics <https://index.ros.org/p/dwb_critics/>`_
+    * `navigation2/dwb_msgs <https://index.ros.org/p/dwb_msgs/>`_
+    * `navigation2/dwb_plugins <https://index.ros.org/p/dwb_plugins/>`_
+    * `navigation2/nav2_amcl <https://index.ros.org/p/nav2_amcl/>`_
+    * `navigation2/nav2_behavior_tree <https://index.ros.org/p/nav2_behavior_tree/>`_
+    * `navigation2/nav2_bringup <https://index.ros.org/p/nav2_bringup/>`_
+    * `navigation2/nav2_bt_navigator <https://index.ros.org/p/nav2_bt_navigator/>`_
+    * `navigation2/nav2_common <https://index.ros.org/p/nav2_common/>`_
+    * `navigation2/nav2_controller <https://index.ros.org/p/nav2_controller/>`_
+    * `navigation2/nav2_core <https://index.ros.org/p/nav2_core/>`_
+    * `navigation2/nav2_costmap_2d <https://index.ros.org/p/nav2_costmap_2d/>`_
+    * `navigation2/nav2_dwb_controller <https://index.ros.org/p/nav2_dwb_controller/>`_
+    * `navigation2/nav2_gazebo_spawner <https://index.ros.org/p/nav2_gazebo_spawner/>`_
+    * `navigation2/nav2_lifecycle_manager <https://index.ros.org/p/nav2_lifecycle_manager/>`_
+    * `navigation2/nav2_map_server <https://index.ros.org/p/nav2_map_server/>`_
+    * `navigation2/nav2_msgs <https://index.ros.org/p/nav2_msgs/>`_
+    * `navigation2/nav2_navfn_planner <https://index.ros.org/p/nav2_navfn_planner/>`_
+    * `navigation2/nav2_planner <https://index.ros.org/p/nav2_planner/>`_
+    * `navigation2/nav2_recoveries <https://index.ros.org/p/nav2_recoveries/>`_
+    * `navigation2/nav2_rviz_plugins <https://index.ros.org/p/nav2_rviz_plugins/>`_
+    * `navigation2/nav2_system_tests <https://index.ros.org/p/nav2_system_tests/>`_
+    * `navigation2/nav2_util <https://index.ros.org/p/nav2_util/>`_
+    * `navigation2/nav2_voxel_grid <https://index.ros.org/p/nav2_voxel_grid/>`_
+    * `navigation2/nav2_waypoint_follower <https://index.ros.org/p/nav2_waypoint_follower/>`_
+    * `navigation2/nav_2d_msgs <https://index.ros.org/p/nav_2d_msgs/>`_
+    * `navigation2/nav_2d_utils <https://index.ros.org/p/nav_2d_utils/>`_
+    * `navigation2/navigation2 <https://index.ros.org/p/navigation2/>`_
+
+  * MoveIt2
+
+    * `moveit2/moveit_jog_arm <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_setup_assistant <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/run_moveit_cpp <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_core <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_occupancy_map_monitor <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_robot_interaction <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_warehouse <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_manipulation <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_move_group <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_planning <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_perception <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_visualization <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_benchmarks <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_planning_interface <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_fake_controller_manager <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_simple_controller_manager <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_plugins <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_ros_control_interface <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_planners_ompl <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_planners_trajopt <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_planners <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_chomp_optimizer_adapter <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/chomp_motion_planner <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_planners_chomp <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_commander <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_runtime <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_kinematics <https://github.com/ros-planning/moveit2/>`_
+
   * `interactive_markers/interactive_markers <https://index.ros.org/p/interactive_markers/>`_
   * `geometry2/examples_tf2_py <https://index.ros.org/p/examples_tf2_py/>`_
   * `geometry2/geometry2 <https://index.ros.org/p/geometry2/>`_
@@ -367,8 +401,8 @@ All items on the list for the next distro should already be released into the ro
   * `sros2/sros2 <https://index.ros.org/p/sros2/>`_
   * `sros2/sros2_cmake <https://index.ros.org/p/sros2_cmake/>`_
   * `teleop_twist_joy/teleop_twist_joy <https://index.ros.org/p/teleop_twist_joy/>`_
-  * `ubuntu-robotics/ament_nodl <https://github.com/ubuntu-robotics/ament_nodl>`_ **(UNMATCHED)**
-  * `ubuntu-robotics/nodl <https://github.com/ubuntu-robotics/nodl>`_ **(UNMATCHED)**
+  * `ubuntu-robotics/ament_nodl <https://github.com/ubuntu-robotics/ament_nodl>`_
+  * `ubuntu-robotics/nodl_python <https://github.com/ubuntu-robotics/nodl>`_
   * ROS Drivers
 
     * `joystick_drivers/joy <https://index.ros.org/p/joy/>`_
@@ -394,7 +428,7 @@ All items on the list for the next distro should already be released into the ro
     * `phidgets_drivers/phidgets_msgs <https://index.ros.org/p/phidgets_msgs/>`_
     * `phidgets_drivers/phidgets_spatial <https://index.ros.org/p/phidgets_spatial/>`_
     * `phidgets_drivers/phidgets_temperature <https://index.ros.org/p/phidgets_temperature/>`_
-    * `KumarRobotics/imu_vn_100 <https://github.com/KumarRobotics/imu_vn_100>`_ **(UNMATCHED)**
+    * `KumarRobotics/imu_vn_100 <https://github.com/KumarRobotics/imu_vn_100>`_
 
 * Documentation, Examples, Tutorials
 
@@ -417,7 +451,7 @@ All items on the list for the next distro should already be released into the ro
   * `demos/quality_of_service_demo_cpp <https://index.ros.org/p/quality_of_service_demo_cpp/>`_
   * `demos/quality_of_service_demo_py <https://index.ros.org/p/quality_of_service_demo_py/>`_
   * `demos/topic_monitor <https://index.ros.org/p/topic_monitor/>`_
-  * `ros2/design <https://github.com/ros2/design>`_ **(UNMATCHED)**
+  * `ros2/design <https://github.com/ros2/design>`_ *(not a ROS package)*
   * `examples/examples_rclcpp_minimal_action_client <https://index.ros.org/p/examples_rclcpp_minimal_action_client/>`_
   * `examples/examples_rclcpp_minimal_action_server <https://index.ros.org/p/examples_rclcpp_minimal_action_server/>`_
   * `examples/examples_rclcpp_minimal_client <https://index.ros.org/p/examples_rclcpp_minimal_client/>`_
@@ -434,8 +468,8 @@ All items on the list for the next distro should already be released into the ro
   * `examples/examples_rclpy_minimal_publisher <https://index.ros.org/p/examples_rclpy_minimal_publisher/>`_
   * `examples/examples_rclpy_minimal_service <https://index.ros.org/p/examples_rclpy_minimal_service/>`_
   * `examples/examples_rclpy_minimal_subscriber <https://index.ros.org/p/examples_rclpy_minimal_subscriber/>`_
-  * `ros2/ros_core_documentation <https://github.com/ros2/ros_core_documentation>`_ **(UNMATCHED)**
-  * `ros2/ros2_documentation <https://github.com/ros2/ros2_documentation>`_ **(UNMATCHED)**
+  * `ros2/ros_core_documentation <https://github.com/ros2/ros_core_documentation>`_ *(not a ROS package)*
+  * `ros2/ros2_documentation <https://github.com/ros2/ros2_documentation>`_ *(not a ROS package)*
 
 * Robot
 
@@ -484,8 +518,10 @@ All items on the list for the next distro should already be released into the ro
   * `rviz/rviz_rendering_tests <https://index.ros.org/p/rviz_rendering_tests/>`_
   * `rviz/rviz_visual_testing_framework <https://index.ros.org/p/rviz_visual_testing_framework/>`_
   * `cross_compile/cross_compile <https://github.com/ros-tooling/cross_compile>`_
-  * `ros-tooling/system_metrics_collector <https://github.com/ros-tooling/system_metrics_collector>`_ **(UNMATCHED)**
-  * `ApexAI/performance_test <https://gitlab.com/ApexAI/performance_test>`_ **(UNMATCHED)**
+  * `ros-tooling/system_metrics_collector <https://github.com/ros-tooling/system_metrics_collector>`_
+  * `ApexAI/performance_test <https://gitlab.com/ApexAI/performance_test>`_
+  * `ApexAI/performance_test_ros1_msgs <https://gitlab.com/ApexAI/performance_test>`_
+  * `ApexAI/performance_test_ros1_publisher <https://gitlab.com/ApexAI/performance_test>`_
   * RQt
 
     * `python_qt_binding/python_qt_binding <https://index.ros.org/p/python_qt_binding/>`_
