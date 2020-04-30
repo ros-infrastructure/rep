@@ -82,15 +82,6 @@ A new distribution_status semantic value of ``rolling`` will be added to the ros
 Rolling releases will be excluded from consideration in certain status pages (such as the blocked_releases_* pages) and considered differently from the active stable distributions.
 
 
-Additions to ros_buildfarm and bloom
-------------------------------------
-
-The ros_buildfarm [2]_ and bloom [3]_ projects will both require changes to allow bloom to be run on a ROS build farm.
-ros_buildfarm will require additional jobs that can re-run bloom unattended when the rolling release platforms change, or when dependencies that were previously unavailable have been made available.
-
-Bloom may require some changes to allow it to be run unattended with pre-selected answers to interactive questions.
-
-
 Managing build farm-writable release repositories
 -------------------------------------------------
 
