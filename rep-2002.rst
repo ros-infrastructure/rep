@@ -38,7 +38,7 @@ Releasing stable ROS distributions from a rolling release
 When a new stable release is being prepared, the rolling release will be used as a staging ground to prepare that release.
 Updates and new package releases made to the rolling release will be propagated automatically to the stable release.
 At an announced time prior to the official stable release, the stable distribution will be created and packages with successful builds on the rolling release will be automatically released via bloom into the stable release.
-Once the stable distribution has been created and the automatic bloom process has been run, changes to the rolling release may not be automatically propagated to the stable release.
+Once the stable distribution has been created and the automatic bloom process has been run, changes to the rolling release will not be automatically propagated to the stable release.
 If a package is prevented from being automatically released into the stable distribution due to a dependency being unavailable in the stable distribution, that package may be automatically re-bloomed when the dependency becomes available in the stable distribution.
 
 
