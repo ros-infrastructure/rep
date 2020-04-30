@@ -265,6 +265,8 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
 
 ● = recommended
 
+○ = optional
+
 .. list-table:: Quality Levels
     :widths: 5 10 10 10 10 10
     :header-rows: 1
@@ -371,7 +373,7 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
     * - 3.v_
       - ✓
       - ✓
-      - ●
+      - ○
       -
       -
     * - 3.v.a_
@@ -383,7 +385,7 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
     * - 3.v.b_
       - ●
       - ●
-      - ●
+      - ○
       -
       -
     * - 3.v.c_
@@ -447,9 +449,9 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
       -
       -
     * - 5.ii_
-      - ●
-      - ●
-      - ●
+      - ○
+      - ○
+      - ○
       -
       -
     * - 5.iii_
@@ -733,7 +735,7 @@ Requirements to be considered a 'Level 4' package:
 
    i. No restrictions
 
-Any package that does not claim to be 'Level 3' or higher is automatically 'Level 4'.
+Any package that does not claim to be 'Level 3' or higher quality is automatically 'Level 4'.
 Refer to the detailed description of the requirements following the Quality Level 1 section above for more information.
 
 Quality Level 5
