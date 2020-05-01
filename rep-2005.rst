@@ -167,8 +167,11 @@ All items on the list for the next distro should already be released into the ro
 
 * Utility functionality
 
+  * `ros2_tracing/ros2trace <https://index.ros.org/p/ros2trace/>`_
   * `ros2_tracing/tracetools <https://index.ros.org/p/tracetools/>`_
+  * `ros2_tracing/tracetools_launch <https://index.ros.org/p/tracetools_launch/>`_
   * `ros2_tracing/tracetools_read <https://index.ros.org/p/tracetools_read/>`_
+  * `ros2_tracing/tracetools_test <https://index.ros.org/p/tracetools_test/>`_
   * `ros2_tracing/tracetools_trace <https://index.ros.org/p/tracetools_trace/>`_
   * `osrf_pycommon/osrf_pycommon <https://index.ros.org/p/osrf_pycommon/>`_
   * `osrf_testing_tools_cpp/osrf_testing_tools_cpp <https://index.ros.org/p/osrf_testing_tools_cpp/>`_
