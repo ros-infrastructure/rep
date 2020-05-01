@@ -263,13 +263,6 @@ All items on the list for the next distro should already be released into the ro
     * `rosidl_typesupport_fastrtps/rosidl_typesupport_fastrtps_c <https://index.ros.org/p/rosidl_typesupport_fastrtps_c/>`_
     * `rosidl_typesupport_fastrtps/rosidl_typesupport_fastrtps_cpp <https://index.ros.org/p/rosidl_typesupport_fastrtps_cpp/>`_
 
-  * OpenSplice
-
-    * `rmw_opensplice/rmw_opensplice_cpp <https://index.ros.org/p/rmw_opensplice_cpp/>`_
-    * `rosidl_typesupport_opensplice/opensplice_cmake_module <https://index.ros.org/p/opensplice_cmake_module/>`_
-    * `rosidl_typesupport_opensplice/rosidl_typesupport_opensplice_c <https://index.ros.org/p/rosidl_typesupport_opensplice_c/>`_
-    * `rosidl_typesupport_opensplice/rosidl_typesupport_opensplice_cpp <https://index.ros.org/p/rosidl_typesupport_opensplice_cpp/>`_
-
 * Client libraries
 
   * `rcl/rcl <https://index.ros.org/p/rcl/>`_
