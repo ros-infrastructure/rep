@@ -367,13 +367,12 @@ Dashing Diademata (May 2019 - May 2021)
 Targeted platforms:
 
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-| Architecture | Ubuntu Bionic (18.04) | MacOS Sierra (10.12) | Windows 10 (VS2019)  | Debian Stretch (9) | OpenEmbedded  |
-|              |                       |                      |                      |                    | Thud (2.6) /  |
-|              |                       |                      |                      |                    | webOS OSE [s] |
+| Architecture | Ubuntu Bionic (18.04) | MacOS Sierra (10.12) | Windows 10 (VS2019)  | Debian Stretch (9) | OpenEmbedded /|
+|              |                       |                      |                      |                    | webOS OSE     |
 +==============+=======================+======================+======================+====================+===============+
 |    amd64     |   Tier 1 [d][a][s]    |     Tier 1 [a][s]    |    Tier 1 [a][s]     |     Tier 3 [s]     |               |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |               |
+|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
 |    arm32     |     Tier 2 [a][s]     |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
@@ -418,9 +417,9 @@ Dependency Requirements:
 +-------------+-------------------------------------------------+------------------------------------+
 |             |                 Required Support                |        Recommended Support         |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Stretch | OpenEmbedded Thud |
+| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Stretch |   OpenEmbedded**  |
 +=============+================+===============+================+================+===================+
-| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.7.2     |       3.12.2      |
+| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.7.2     | 3.16.1 / 3.12.2***|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | EmPY        |                                      3.3.2                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -428,15 +427,15 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Ogre        |                                      1.10*                       |        N/A        |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2*      |        3.2.0      |
+| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2*      |  4.1.0 / 3.2.0*** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.0j    | 1.1.1b / 1.0.2r***|
+| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.0j    | 1.1.1d / 1.1.1b***|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.8.0*    |        1.9.0      |
+| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.8.0*    |        1.9.4      |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.5.3     |        3.7.2      |
+| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.5.3     |  3.8.2 / 3.7.5*** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.7.1     | 5.11.3 / 5.6.3*** |
+| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.7.1     | 5.14.1 / 5.12.5***|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |                              |         **Linux only**         |                                    |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -456,6 +455,9 @@ Dependency Requirements:
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
 " ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
+The versions shown for OpenEmbedded are those provided by the 3.1 Dunfell release series; the versions provided by the other supported release series are listed here: https://github.com/ros/meta-ros/wiki/Package-Version-Differences .
+Note that the OpenEmbedded releases series for which a ROS distro has support will change during its support time frame, as per the OpenEmbedded support policy shown here: https://github.com/ros/meta-ros/wiki/Policies#openembedded-release-series-support .
+However, it will always be supported by least one stable OpenEmbedded release series.
 
 " \*** " webOS OSE provides this different version.
 
@@ -484,13 +486,12 @@ Eloquent Elusor (November 2019 - November 2020)
 Targeted platforms:
 
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-| Architecture | Ubuntu Bionic (18.04) | MacOS Mojave (10.14) | Windows 10 (VS2019)  | Debian Buster (10) | OpenEmbedded  |
-|              |                       |                      |                      |                    | Thud (2.6) /  |
-|              |                       |                      |                      |                    | webOS OSE [s] |
+| Architecture | Ubuntu Bionic (18.04) | MacOS Mojave (10.14) | Windows 10 (VS2019)  | Debian Buster (10) | OpenEmbedded /|
+|              |                       |                      |                      |                    | webOS OSE     |
 +==============+=======================+======================+======================+====================+===============+
 |    amd64     |   Tier 1 [d][a][s]    |     Tier 1 [a][s]    |    Tier 1 [a][s]     |     Tier 3 [s]     |               |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |               |
+|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
 |    arm32     |     Tier 2 [a][s]     |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
@@ -535,9 +536,9 @@ Dependency Requirements:
 +-------------+-------------------------------------------------+------------------------------------+
 |             |                        Required Support         |        Recommended Support         |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Buster  | OpenEmbedded Thud |
+| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Buster  |  OpenEmbedded**   |
 +=============+================+===============+================+================+===================+
-| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.13.4    |       3.12.2      |
+| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.13.4    |3.16.1 / 3.12.2****|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | EmPY        |                                      3.3.2                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -545,15 +546,15 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Ogre        |                                      1.10*                       |        N/A        |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2.0     |        3.2.0      |
+| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2.0     | 4.1.0 / 3.2.0**** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.1c    |1.1.1b / 1.0.2r****|
+| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.1c    |1.1.1d / 1.1.1b****|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.9.0     |        1.9.0      |
+| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.9.0     |        1.9.4      |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.7.3     |        3.7.2      |
+| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.7.3     | 3.8.2 / 3.7.5**** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.11.3    | 5.11.3 / 5.6.3****|
+| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.11.3    |5.14.1 / 5.12.5****|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |                              |         **Linux only**                                              |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -573,6 +574,9 @@ Dependency Requirements:
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
 " ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
+The versions shown for OpenEmbedded are those provided by the 3.1 Dunfell release series; the versions provided by the other supported release series are listed here: https://github.com/ros/meta-ros/wiki/Package-Version-Differences .
+Note that the OpenEmbedded releases series for which a ROS distro has support will change during its support time frame, as per the OpenEmbedded support policy shown here: https://github.com/ros/meta-ros/wiki/Policies#openembedded-release-series-support .
+However, it will always be supported by least one stable OpenEmbedded release series.
 
 " \*** " It is anticipated that this will be increased to Connext DDS 6.0.0 pending migration patches [7]_.
 
@@ -587,6 +591,7 @@ Package manager use for dependencies:
 - Ubuntu, Debian: apt
 - MacOS: Homebrew, pip
 - Windows: Chocolatey, pip
+- OpenEmbedded: opkg
 
 
 Build System Support:
