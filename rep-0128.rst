@@ -25,7 +25,7 @@ communicating about the code layout of a specific installation.
 Recommended Layout
 ==================
 
-This is the recommended layout for development is as follows:
+The recommended layout for development is as follows:
 
 ::
 
