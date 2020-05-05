@@ -155,7 +155,7 @@ Requirements to be considered a 'Level 1' package:
 
    .. _3.iv:
 
-   iv. Must have a copyright statement in each source file
+   iv. Must state copyrights within the project and attribute all authors
 
    .. _3.v:
 
@@ -600,7 +600,7 @@ Requirements to be considered a 'Level 2' package:
 
    i. Must have documentation for each "feature" (e.g. for ``rclcpp``: create a node, publish a message, spin, etc.)
    ii. Must have a declared license or set of licenses
-   iii. Must have a copyright statement in each source file
+   iii. Must state copyrights within the project and attribute all authors
    iv. Must have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
        a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
@@ -664,7 +664,7 @@ Requirements to be considered a 'Level 3' package:
 3. **Documentation:**
 
    i. Must have a declared license or set of licenses
-   ii. Must have a copyright statement in each source file
+   ii. Must state copyrights within the project and attribute all authors
    iii. May have a "quality declaration" document, which declares the quality level and justifies how the package meets each of the requirements
 
         a. *Must have a section in the repository's ``README`` which contains the "quality declaration" or links to it*
@@ -715,7 +715,7 @@ Requirements to be considered a 'Level 4' package:
 3. **Documentation:**
 
    i. Must have a declared license or set of licenses
-   ii. Must have a copyright statement in each source file
+   ii. Must state copyrights within the project and attribute all authors
 
 4. **Testing:**
 
