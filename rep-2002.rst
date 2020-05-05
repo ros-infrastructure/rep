@@ -32,14 +32,30 @@ During the pre-release phase for stable ROS distributions releases in the rollin
 Release process
 ===============
 
+Automated release migration tool
+--------------------------------
+
+To make a new rosdistro, target, from an existing rosdistro, source. An automated migration tool is available to to avoid manual labor.
+
+A snaphot of the source distro will be captured, most likely a git commit-ish.
+The release manager should then setup the target rosdistro with all the appropriate configurations, such as target platforms and architectures.
+The tool will then iterate through all packages in the snapshot of the source rosdistro and attempt to automatically run bloom release on the package at the specific version in the snapshot.
+If it fails the maintainer will be needed to resolve any issues.
+The tool will continue skipping that package and all downstream packages.
+
+If the process gets interrupted the migration tool can be rerun with the same source snapshot and target rosdistro.
+The migration tool will skip any package already in the target rosdistro.
+The rerun is valuable in cases when a maintainer has resolved an an issue and many more downstream packages are unblocked, as well as if the operation gets interrupted.
+
+After the snapshot is taken maintainers must make releases for both the source rosdistro and target rosdistro as develoment is considered forked.
+
+
 Releasing stable ROS distributions from a rolling release
 ---------------------------------------------------------
 
-When a new stable release is being prepared, the rolling release will be used as a staging ground to prepare that release.
-Updates and new package releases made to the rolling release will be propagated automatically to the stable release.
-At an announced time prior to the official stable release, the stable distribution will be created and packages with successful builds on the rolling release will be automatically released via bloom into the stable release.
-Once the stable distribution has been created and the automatic bloom process has been run, changes to the rolling release will not be automatically propagated to the stable release.
-If a package is prevented from being automatically released into the stable distribution due to a dependency being unavailable in the stable distribution, that package may be automatically re-bloomed when the dependency becomes available in the stable distribution.
+Prior to formally starting development for the next stable release, the rolling release will be used as a staging ground for new content.
+At an announced time prior to start the official stable release, a snapshot of the rolling release will be created and will be used to boostrap the next stable release development process.
+This will be automated by the migration tool outlined above.
 
 
 Updating the rolling release platforms
@@ -48,7 +64,10 @@ Updating the rolling release platforms
 The rolling release is intended to remain available indefinitely and so will not be retired or reach end-of-support status without an update to this REP and the ROS distribution release process.
 However, this does mean that platform changes during the life of the rolling distribution are going to occur and the rolling release may target platforms that are themselves unstable or in a pre-release state.
 When a platform change is coming, the intended date of change will be announced ahead of time.
-Once the platforms have been updated, everything currently in the rolling release will be automatically re-released via bloom to target the updated release platforms.
+
+The platform change is a unique invocation of the migration tool where the source and target rosdistro will be the same.
+To do this the person managing the migration will take the snapshot of the source rosdistro and then clear it's contents as well as updating the targetget platforms.
+After which the migration tool can be invoked with the target and source rosdistro as the same, because the source rosdistro will be leveraging the snapshot.
 
 
 Bootstrapping the rolling release
