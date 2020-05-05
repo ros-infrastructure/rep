@@ -39,13 +39,13 @@ To make a new rosdistro, target, from an existing rosdistro, source. An automate
 
 A snaphot of the source distro will be captured, most likely a git commit-ish.
 The release manager should then setup the target rosdistro with all the appropriate configurations, such as target platforms and architectures.
-The tool will then iterate through all packages in the snapshot of the source rosdistro and attempt to automatically run bloom release on the package at the specific version in the snapshot.
+The tool will then iterate through all repositories in the snapshot of the source rosdistro and attempt to automatically run bloom release on the package at the specific version in the snapshot.
 If it fails the maintainer will be needed to resolve any issues.
-The tool will continue skipping that package and all downstream packages.
+The tool will continue skipping that package and all downstream repositories.
 
 If the process gets interrupted the migration tool can be rerun with the same source snapshot and target rosdistro.
 The migration tool will skip any package already in the target rosdistro.
-The rerun is valuable in cases when a maintainer has resolved an an issue and many more downstream packages are unblocked, as well as if the operation gets interrupted.
+The rerun is valuable in cases when a maintainer has resolved an an issue and many more downstream repositories are unblocked, as well as if the operation gets interrupted.
 
 After the snapshot is taken maintainers must make releases for both the source rosdistro and target rosdistro as develoment is considered forked.
 
