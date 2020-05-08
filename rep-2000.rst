@@ -553,7 +553,7 @@ Foxy Fitzroy (May 2020 - May 2023)
 Targeted platforms:
 
 +--------------+-----------------------+-------------------------+----------------------+--------------------+---------------+
-| Architecture | Ubuntu Focal (20.04)  | MacOS Catalina (10.15)* | Windows 10 (VS2019)  | Debian Buster (10) | OpenEmbedded /|
+| Architecture | Ubuntu Focal (20.04)  | MacOS Mojave (10.14)    | Windows 10 (VS2019)  | Debian Buster (10) | OpenEmbedded /|
 |              |                       |                         |                      |                    | webOS OSE     |
 +==============+=======================+=========================+======================+====================+===============+
 |    amd64     |   Tier 1 [d][a][s]    |     Tier 1 [a][s]       |    Tier 1 [a][s]     |     Tier 3 [s]     |               |
@@ -562,8 +562,6 @@ Targeted platforms:
 +--------------+-----------------------+-------------------------+----------------------+--------------------+---------------+
 |    arm32     |     Tier 2 [d][a][s]  |                         |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+-------------------------+----------------------+--------------------+---------------+
-
-" * " Tentatively
 
 The following indicators show what delivery mechanisms are available for each platform.
 
