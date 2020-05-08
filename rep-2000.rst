@@ -628,7 +628,7 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 |                                **RMW DDS Milddleware Providers**                                     |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
-| Connext DDS |                              5.3.1***           |               N/A                    |
+| Connext DDS |                              5.3.1              |               N/A                    |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 | Cyclone DDS |                                 0.5.1 (Eusebius)                                       |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
@@ -641,8 +641,6 @@ Dependency Requirements:
 The versions shown for OpenEmbedded are those provided by the 3.1 Dunfell release series; the versions provided by the other supported release series are listed here: https://github.com/ros/meta-ros/wiki/Package-Version-Differences .
 Note that the OpenEmbedded releases series for which a ROS distro has support will change during its support time frame, as per the OpenEmbedded support policy shown here: https://github.com/ros/meta-ros/wiki/Policies#openembedded-release-series-support .
 However, it will always be supported by least one stable OpenEmbedded release series.
-
-" \*** " This may be increased to Connext DDS 6.0.0 pending contributions [7]_.
 
 " \**** " webOS OSE provides this different version.
 
