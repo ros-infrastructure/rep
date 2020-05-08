@@ -484,6 +484,24 @@ All items on the list for the next distro should already be released into the ro
   * `gazebo_ros_pkgs/gazebo_plugins <https://index.ros.org/p/gazebo_plugins/>`_
   * `gazebo_ros_pkgs/gazebo_ros <https://index.ros.org/p/gazebo_ros/>`_
   * `gazebo_ros_pkgs/gazebo_ros_pkgs <https://index.ros.org/p/gazebo_ros_pkgs/>`_
+  * `ignitionrobotics/ros_ign <https://github.com/ignitionrobotics/ros_ign/>`_
+  * `ignitionrobotics/ros_ign_bridge <https://github.com/ignitionrobotics/ros_ign/>`_
+  * `ignitionrobotics/ros_ign_gazebo <https://github.com/ignitionrobotics/ros_ign/>`_
+  * `ignitionrobotics/ros_ign_gazebo_demos <https://github.com/ignitionrobotics/ros_ign/>`_
+  * `ignitionrobotics/ros_ign_image <https://github.com/ignitionrobotics/ros_ign/>`_
+  * `ignitionrobotics/ros_ign_point_cloud <https://github.com/ignitionrobotics/ros_ign/>`_
+  * `cyberbotics/webots_ros2 <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_abb <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_core <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_demos <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_desktop <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_epuck <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_examples <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_importer <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_msgs <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_tiago <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_universal_robot <https://github.com/cyberbotics/webots_ros2/>`_
+  * `cyberbotics/webots_ros2_ur_e_description <https://github.com/cyberbotics/webots_ros2/>`_
   * `ros1_bridge/ros1_bridge <https://index.ros.org/p/ros1_bridge/>`_
   * `ros2cli/ros2action <https://index.ros.org/p/ros2action/>`_
   * `ros2cli/ros2cli <https://index.ros.org/p/ros2cli/>`_
