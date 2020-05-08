@@ -484,6 +484,8 @@ All items on the list for the next distro should already be released into the ro
   * `gazebo_ros_pkgs/gazebo_plugins <https://index.ros.org/p/gazebo_plugins/>`_
   * `gazebo_ros_pkgs/gazebo_ros <https://index.ros.org/p/gazebo_ros/>`_
   * `gazebo_ros_pkgs/gazebo_ros_pkgs <https://index.ros.org/p/gazebo_ros_pkgs/>`_
+  * `osrf/ros_ign <https://github.com/osrf/ros_ign/>`_
+  * `cyberbotics/webots_ros2 <https://github.com/cyberbotics/webots_ros2>`_
   * `ros1_bridge/ros1_bridge <https://index.ros.org/p/ros1_bridge/>`_
   * `ros2cli/ros2action <https://index.ros.org/p/ros2action/>`_
   * `ros2cli/ros2cli <https://index.ros.org/p/ros2cli/>`_
