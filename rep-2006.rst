@@ -3,7 +3,7 @@ Title: ROS 2 Vulnerability Disclosure Policy
 Author: ROS 2 Security Working Group, Chris Lalancette <clalancette@openrobotics.org>
 Status: Active
 Type: Informational
-Content-TYpe: text/x-rst
+Content-Type: text/x-rst
 Created: 12-May-2020
 Post-History:
 
