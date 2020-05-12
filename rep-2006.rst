@@ -33,7 +33,7 @@ We will work with you on a best-effort basis to help connect you with the respon
 How to submit a vulnerability
 =============================
 
-Please submit vulnerability reports by emailing security@ros2.org, preferably in English.
+Please submit vulnerability reports by emailing security@openrobotics.org, preferably in English.
 This is a private list of security officers who can help verify the bug report and develop and release a fix.
 The more information provided about the bug, the easier it will be to fix.
 If you already have a fix, please include it with your report.
@@ -63,7 +63,7 @@ Open Robotics strongly supports security research into ROS software and seeks to
 Open Robotics will not engage in legal action against individuals who act in good faith to identify, report and fix vulnerabilities in ROS, so long as they operate in accordance with any applicable laws as well as this policy.
 Unauthorized research or testing against operating robotic systems is in violation of this policy and strongly discouraged due to potential health and human safety concerns.
 
-If at any time you have concerns about whether your activities are consistent with this policy, please contact us at security@ros2.org.
+If at any time you have concerns about whether your activities are consistent with this policy, please contact us at security@openrobotics.org.
 
 Copyright
 =========
