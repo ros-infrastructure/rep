@@ -41,6 +41,7 @@ We may ask to exchange PGP keys to discuss sensitive details about the vulnerabi
 
 Include any plans you may have to disclose details about the vulnerability.
 In order to protect our users, we ask that you not publicly discuss the vulnerability until at least 90 days have passed or the fix is published.
+The group handling the report will also follow this timeline.
 If you do not wish to be acknowledged in the release communications please indicate so when you submit the vulnerability.
 
 What to expect in response to a vulnerability disclosure

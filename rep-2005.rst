@@ -46,6 +46,14 @@ We aim that all of these packages are also:
 The list should be self-contained and exhaustive: if a package appears on the list, then all of its ROS 2 dependencies must also appear on the list (third-party or system dependencies should not be included).
 
 
+Security Reporting
+==================
+
+Maintainers of the packages below are expected to respond to security vulnerability reports in a timely matter as outlined in `REP-2006 <https://www.ros.org/reps/rep-2006.html>`_.
+The maintainers listed in the package.xml will be privately contacted with security vulnerability reports.
+This is to ensure that the security vulnerability is not disclosed before the timeline laid out in REP-2006.
+
+
 Change process
 ==============
 
