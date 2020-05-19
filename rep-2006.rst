@@ -61,7 +61,7 @@ Safe Harbor
 ===========
 
 Open Robotics strongly supports security research into ROS software and seeks to encourage that research.
-Open Robotics will not engage in legal action against individuals who act in good faith to identify, report and fix vulnerabilities in ROS, so long as they operate in accordance with any applicable laws as well as this policy.
+Open Robotics will not engage in legal action against individuals who act in good faith to identify, report and fix vulnerabilities in ROS, so long as they operate in accordance with any applicable laws or this policy.
 Unauthorized research or testing against operating robotic systems is in violation of this policy and strongly discouraged due to potential health and human safety concerns.
 
 If at any time you have concerns about whether your activities are consistent with this policy, please contact us at security@openrobotics.org.
