@@ -28,7 +28,7 @@ The Vulnerability Disclosure Program outlined here covers all code within the RO
 
 The ROS Security Working Group may also be able to assist you with reporting vulnerabilities which are not in scope of this policy but which are related to ROS or more generally to robotics.
 An increasing number of companies are bringing ROS-based products to market, and during this growth period we anticipate vulnerabilities to be identified in products before vendors have an established vulnerability reporting program.
-We will work with you on a best-effort basis to help connect you with the responsible vendor.
+We will work with you on a best-effort basis to help connect you with responsible parties best suited to address your concerns.
 
 How to submit a vulnerability
 =============================
