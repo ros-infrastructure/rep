@@ -400,6 +400,7 @@ All items on the list for the next distro should already be released into the ro
   * `message_filters/message_filters <https://index.ros.org/p/message_filters/>`_
   * `sros2/sros2 <https://index.ros.org/p/sros2/>`_
   * `sros2/sros2_cmake <https://index.ros.org/p/sros2_cmake/>`_
+  * `stevemacenski/slam_toolbox <https://github.com/SteveMacenski/slam_toolbox/>`_
   * `teleop_twist_joy/teleop_twist_joy <https://index.ros.org/p/teleop_twist_joy/>`_
   * `ubuntu-robotics/ament_nodl <https://github.com/ubuntu-robotics/ament_nodl>`_
   * `ubuntu-robotics/nodl_python <https://github.com/ubuntu-robotics/nodl>`_
