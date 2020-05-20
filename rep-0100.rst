@@ -91,7 +91,7 @@ Libraries and Utilities
 ros_release stack
 -----------------
 
-ros_release is an existing ROS stack used to for libraries and scripts
+ros_release is an existing ROS stack used for libraries and scripts
 related to releasing and installing ROS stacks.  Two Python modules
 from roslib will be moved into it as new packages.
 
