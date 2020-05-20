@@ -51,7 +51,7 @@ Motivation
 This REP covers three separate topics which are described in the following
 subsections.
 
-A source tree containing a conformant ``package.xml`` file in its root
+A source tree described by a conformant ``package.xml`` file in its root
 directory is called a "**ROS package**," regardless of whether it uses or is
 used by ROS.
 When unambiguous from context, this may simply be referred to as a
