@@ -65,7 +65,7 @@ However, this does mean that platform changes during the life of the rolling dis
 When a platform change is coming, the intended date of change will be announced ahead of time.
 
 The platform change is a unique invocation of the migration tool where the source and target rosdistro will be the same.
-To do this the person managing the migration will take the snapshot of the source rosdistro and then clear it's contents as well as updating the target platforms.
+To do this the person managing the migration will take the snapshot of the source rosdistro and then clear its contents, as well as updating the target platforms.
 After which the migration tool can be invoked with the target and source rosdistro as the same, because the source rosdistro will be leveraging the snapshot.
 
 
