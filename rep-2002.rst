@@ -72,7 +72,7 @@ After which the migration tool can be invoked with the target and source rosdist
 Bootstrapping the rolling release
 ---------------------------------
 
-The initial creation of the rolling rosdistro will use the rolling release tools "in reverse" to create the rolling release from the May 2020 ROS 2 Foxy Fitzroy release.
+The initial creation of the rolling rosdistro will use the rolling release tools "in reverse" to create the rolling release from the June 2020 ROS 2 Foxy Fitzroy release.
 Package maintainers may then continue to release into either or both Foxy and the rolling release distribution independently.
 
 
