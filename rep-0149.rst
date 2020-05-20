@@ -1,5 +1,5 @@
 REP: 149
-Title: Package Manifest Format Three Specification
+Title: ROS Package Manifest Format Three Specification
 Author: Dirk Thomas
 Status: Final
 Type: Standards Track
@@ -50,6 +50,12 @@ Motivation
 
 This REP covers three separate topics which are described in the following
 subsections.
+
+A source tree containing a conformant ``package.xml`` file in its root
+directory is called a "**ROS package**," regardless of whether it uses or is
+used by ROS.
+When unambiguous from context, this may simply be referred to as a
+"**package**".
 
 Dependency groups
 -----------------
