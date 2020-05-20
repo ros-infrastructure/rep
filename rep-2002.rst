@@ -35,7 +35,7 @@ Release process
 Automated release migration tool
 --------------------------------
 
-To make a new rosdistro, target, from an existing rosdistro, source. An automated migration tool is available to to reduce manual labor.
+To make a new rosdistro, target, from an existing rosdistro, source, an automated migration tool is available to reduce manual labor.
 
 A snaphot of the source distro will be captured, most likely a git commit-ish.
 The release manager should then setup the target rosdistro with all the appropriate configurations, such as target platforms and architectures.
