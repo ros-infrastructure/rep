@@ -44,7 +44,7 @@ If it fails, the package maintainer will be needed to resolve any issues.
 
 If the process gets interrupted the migration tool can be rerun with the same source snapshot and target rosdistro.
 The migration tool will skip any package already in the target rosdistro.
-The rerun is valuable in cases when a maintainer has resolved an an issue and many more downstream repositories are unblocked, as well as if the operation gets interrupted.
+The rerun is valuable in cases when a maintainer has resolved an issue and many more downstream repositories are unblocked, as well as if the operation gets interrupted.
 
 After the snapshot is taken maintainers must make releases for both the source rosdistro and target rosdistro as develoment is considered forked.
 
