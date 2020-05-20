@@ -82,11 +82,17 @@ Recommendations for package maintainers
 Versioning between rolling and stable distributions
 ---------------------------------------------------
 
-When a new stable release is created, the ROS core team strongly recommends that the next release made into the rolling release bump at least the minor version number.
-For example if the version of a package in both the rolling and current stable distribution is ``1.2.3`` and there are new changes that are targeting the rolling distribution only, bump the version to at least ``1.3.0``.
-This allows the patch release of the ``1.2.x`` series to be used for any future changes targeting only the stable distribution.
-Even if no changes are planned it is still a good idea to leave room for unanticipated fixes.
-The alternative is that version numbers may get confusing as the rolling distribution contains ``1.2.4`` but ``1.2.5`` is released only into the stable distribution as a fix on ``1.2.3``.
+When releasing changes compatible with both the stable and the rolling distributions, it's recommended to release the change into both the stable and rolling release keeping the same version number.
+If the stable and rolling distribtions have already diverged, it's recommended to backport just the compatible change to the stable distribution and include it in a new patch release.
+
+When releasing changes that are not compatible with the stable distribution, it's recommended to bump the major or minor version number rather than just the patch version number.
+This allows future patch releases in the stable distribution to be made without re-using or interleaving version numbers between distributions.
+
+For example if the version of a package in both the rolling and current stable distribution is ``1.2.3``:
+
+- A bug fix that is compatible with the stable distribution can be released as ``1.2.4`` into both the stable and rolling distributions.
+- A feature that is not available or compatible with the stable distribution can be released as ``1.3.0`` into the rolling distribution.
+- A bug fix that affects both the stable and rolling distributions can be released into the rolling distribution as ``1.3.1`` and then backported to the ``1.2`` release channel as ``1.2.5``.
 
 
 Implementation
