@@ -50,6 +50,7 @@ What to expect in response to a vulnerability disclosure
 Expect a timely response to your notification, normally within two business days, during which time we will triage your vulnerability report.
 
 After we have evaluated the vulnerability we will send you our risk assessment and, where applicable, the anticipated time to publish an update.
+Where appropriate, we will coordinate and assign a vulnerability ID with an industry-standard vulnerability database such as CVE.
 We will aim at being as transparent as possible about timelines and any issues or challenges which may impact the scheduled fix.
 
 Should the vulnerability have a widespread impact that requires coordinated disclosure, we may, at our discretion, choose to engage a neutral third party such as CERT/CC or ICS-CERT to support coordination efforts.
