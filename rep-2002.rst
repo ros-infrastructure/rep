@@ -1,0 +1,150 @@
+REP: 2002
+Title: ROS 2 Rolling Release
+Author: Steven! Ragnarok <steven@openrobotics.org>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 05-Sep-2019
+Post-History: 05-Sep-2019, 03-Oct-2019, 18-Oct-2019
+
+
+Abstract
+========
+
+This REP describes a rolling ROS 2 distribution which will serve as the target for ongoing development of ROS 2.
+It also describes how future releases of ROS 2 may be produced by taking a snapshot of the rolling distribution to produce the next fixed release of ROS 2. 
+
+
+Motivation
+==========
+
+Create a rolling ROS distribution to serve as the foundation for subsequent stable ROS distributions in order to reduce the workload of Open Robotics staff and individual package maintainers when bootstrapping new ROS releases.
+
+
+Support status
+==============
+
+The rolling release itself will not be considered a supported platform.
+Distribution syncs will be performed on a regular cadence just like stable distributions but regressions may not block a rolling release sync.
+During the pre-release phase for stable ROS distributions releases in the rolling distribution may be blocked or held back in order to conform to the support requirements of the upcoming stable release.
+
+
+Release process
+===============
+
+Automated release migration tool
+--------------------------------
+
+To make a new rosdistro, target, from an existing rosdistro, source, an automated migration tool is available to reduce manual labor.
+
+A snaphot of the source distro will be captured, most likely a git commit-ish.
+The release manager should then setup the target rosdistro with all the appropriate configurations, such as target platforms and architectures.
+The tool will then iterate through all repositories in the snapshot of the source rosdistro and attempt to automatically run bloom release on the package at the specific version in the snapshot.
+If it fails, the package maintainer will be needed to resolve any issues.
+
+If the process gets interrupted the migration tool can be rerun with the same source snapshot and target rosdistro.
+The migration tool will skip any package already in the target rosdistro.
+The rerun is valuable in cases when a maintainer has resolved an issue and many more downstream repositories are unblocked, as well as if the operation gets interrupted.
+
+After the snapshot is taken maintainers must make releases for both the source rosdistro and target rosdistro as develoment is considered forked.
+
+
+Releasing stable ROS distributions from a rolling release
+---------------------------------------------------------
+
+Prior to formally starting development for the next stable release, the rolling release will be used as a staging ground for new content.
+At an announced time prior to start the official stable release, a snapshot of the rolling release will be created and will be used to boostrap the next stable release development process.
+This will be automated by the migration tool outlined above.
+
+
+Updating the rolling release platforms
+--------------------------------------
+
+The rolling release is intended to remain available indefinitely and so will not be retired or reach end-of-support status without an update to this REP and the ROS distribution release process.
+However, this does mean that platform changes during the life of the rolling distribution are going to occur and the rolling release may target platforms that are themselves unstable or in a pre-release state.
+When a platform change is coming, the intended date of change will be announced ahead of time.
+
+The platform change is a unique invocation of the migration tool where the source and target rosdistro will be the same.
+To do this the person managing the migration will take the snapshot of the source rosdistro and then clear its contents, as well as updating the target platforms.
+After which the migration tool can be invoked with the target and source rosdistro as the same, because the source rosdistro will be leveraging the snapshot.
+
+
+Bootstrapping the rolling release
+---------------------------------
+
+The initial creation of the rolling rosdistro will use the rolling release tools "in reverse" to create the rolling release from the June 2020 ROS 2 Foxy Fitzroy release.
+Package maintainers may then continue to release into either or both Foxy and the rolling release distribution independently.
+
+
+Recommendations for package maintainers
+=======================================
+
+Versioning between rolling and stable distributions
+---------------------------------------------------
+
+When releasing changes compatible with both the stable and the rolling distributions, it's recommended to release the change into both the stable and rolling release keeping the same version number.
+If the stable and rolling distribtions have already diverged, it's recommended to backport just the compatible change to the stable distribution and include it in a new patch release.
+
+When releasing changes that are not compatible with the stable distribution, it's recommended to bump the major or minor version number rather than just the patch version number.
+This allows future patch releases in the stable distribution to be made without re-using or interleaving version numbers between distributions.
+
+For example if the version of a package in both the rolling and current stable distribution is ``1.2.3``:
+
+- A bug fix that is compatible with the stable distribution can be released as ``1.2.4`` into both the stable and rolling distributions.
+- A feature that is not available or compatible with the stable distribution can be released as ``1.3.0`` into the rolling distribution.
+- A bug fix that affects both the stable and rolling distributions can be released into the rolling distribution as ``1.3.1`` and then backported to the ``1.2`` release channel as ``1.2.5``.
+
+
+Implementation
+==============
+
+
+Changes to rosdistro distribution files
+---------------------------------------
+
+A new distribution_status semantic value of ``rolling`` will be added to the rosdistro index v4 format specified in REP-153 [1]_.
+Rolling releases will be excluded from consideration in certain status pages (such as the blocked_releases_* pages) and considered differently from the active stable distributions.
+
+
+Managing build farm-writable release repositories
+-------------------------------------------------
+
+In order to allow bloom to be run in an automated fashion the release repository must be writeable by Open Robotics automation tools or staff.
+Therefore release repositories used by the rolling release distribution must be hosted in a standard location such as the ros-gbp or ros2-gbp organizations on GitHub.
+Release repositories outside the standard location will be forked to the standard location.
+Administrative access to release repositories will be granted to package mantainers for regular releases.
+
+
+References
+==========
+
+.. [1] REP 153: ROS distribution files
+   (http://www.ros.org/reps/rep-0153.html)
+
+.. [2] ros_buildfarm repository
+   (https://github.com/ros-infrastructure/ros_buildfarm)
+
+.. [3] bloom repository
+   (https://github.com/ros-infrastructure/bloom)
+
+.. [4] Time for reviewing ROS distro release cycle on Discourse
+   (https://discourse.ros.org/t/time-for-reviewing-ros-distro-release-cycle/2744/3)
+
+.. [5] Proposed changes to the ROS releases discussion on Discourse
+   (https://discourse.ros.org/t/proposed-changes-to-the-ros-releases/4736)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
