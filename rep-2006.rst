@@ -40,7 +40,7 @@ If you already have a fix, please include it with your report.
 We may ask to exchange PGP keys to discuss sensitive details about the vulnerability which may include proof-of-concept code, an impact assessment, recommended remediation steps or other information that will help us find and fix the problem.
 
 Include any plans you may have to disclose details about the vulnerability.
-In order to protect our users, unless otherwise agreed by both parties, we ask that you not publicly discuss the vulnerability until at least 90 days have passed or the fix is published.
+In order to protect our users, unless otherwise agreed by both parties, we ask that you not publicly discuss the vulnerability until at least 90 days have passed from the initial contact with us or the fix is published.
 The group handling the report will also follow this timeline.
 If you do not wish to be acknowledged in the release communications please indicate so when you submit the vulnerability.
 
