@@ -1,6 +1,6 @@
 REP: 119
 Title: Specification for TurtleBot Compatible Platforms
-Author: Melonee Wise and Tully Foote
+Author: Melonee Wise, Tully Foote
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
