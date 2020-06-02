@@ -13,7 +13,7 @@ Abstract
 
 This REP describes a set of categories meant to convey the quality or maturity of packages in the ROS ecosystem.
 Inclusion in a category, or quality level, is based on the policies to which a package adheres.
-The categories address version, change control, documentation, testing, dependency and platform support policies.
+The categories address policies about things including version, change control, documentation, testing, dependencies, platform support and others.
 
 Motivation
 ==========
@@ -25,6 +25,19 @@ Package maintainers are responsible for establishing processes and documenting h
 With the help of documented policies, package consumers can better evaluate whether a package or its dependencies meet the standards for use in their projects.
 
 By providing these rough goals for package maintainers to strive towards, the categories will also encourage better quality across the ROS ecosystem.
+
+Antigoals
+^^^^^^^^^
+
+This REP does not aim to dictate how maintainers meet each of the expectations for each quality level, instead they are allowed to come up with their own policies or follow an existing set of guidelines for achieving these quality levels, for example by using a reference implementation like the one in the "Reference Implementation" subsection below.
+For this reason, some of the requirements for each quality level are intentionally generic, avoiding specific recommendations like which tools to use or what specific thresholds should be.
+
+Additionally, this REP does not aim to enforce adherence to the polices documented by package maintainers.
+Instead it recommends the creation of peer reviewed lists of packages, where maintainers can take their quality declaration (see below) and have their peers verify that it matches what is stated.
+Also, it avoids trying to enforce these things because it cannot be done in an automated fashion in all cases, and requirements that are skipped or altered with justifications (again, see below) require evaluation by the consumer to see if that is acceptable.
+
+The outcome of this REP should be that maintainers have looked at each requirement, thought about how they address each, adjust their policies if needed, and then document their policies and justifications.
+The goal being to improve documentation of these policies and improve communication of these quality characteristics between maintainers to consumers.
 
 Specification
 =============
