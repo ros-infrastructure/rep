@@ -185,8 +185,8 @@ Hardware Requirements
 
 * Odometry is expected to be accurate within 1% after calibration in both linear and angular movement.  
 
-Software Requiremets
-''''''''''''''''''''
+Software Requirements
+'''''''''''''''''''''
 
 * URDF description of the robot
 
