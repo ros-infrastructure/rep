@@ -116,6 +116,7 @@ Index file
       * ``active``: A distribution which has been released and is actively
         being supported
       * ``end-of-life``: A distribution which has reached its end of life
+      * ``rolling``: A rolling distribution as described by REP 2002 [8]_
 
     * distribution_type: an optional string describing the type of the ROS
       distribution.
@@ -244,6 +245,7 @@ References
 .. [6] bloom PR to support v4 https://github.com/ros-infrastructure/bloom/pull/493
 .. [7] Second patch to python-rosdistro:
   https://github.com/ros-infrastructure/rosdistro/pull/147
+.. [8] REP 2002: http://www.ros.org/reps/rep-2002.html
 
 
 Copyright
