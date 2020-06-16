@@ -7,8 +7,6 @@ Content-Type: text/x-rst
 Created: 18-Dec-2013
 Post-History: 18-Dec-2013
 
-.. contents::
-
 Abstract
 ========
 This REP specifies a set of files which define ROS distributions and

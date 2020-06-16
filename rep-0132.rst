@@ -7,8 +7,6 @@ Content-Type: text/x-rst
 Created: 22-Jan-2013
 Post-History: 10-April-2013
 
-.. contents::
-
 Abstract
 ========
 This REP describes incorporating package changelogs (i.e. a list of changes made to the package in each release) as part of the package source tree rather than being maintained separately on the ROS wiki. This is to address shortcomings with maintaining a separate changelog list.

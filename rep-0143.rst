@@ -7,9 +7,6 @@ Content-Type: text/x-rst
 Created: 01-Sep-2014
 Post-History: 25-Nov-2014
 
-
-.. contents::
-
 Abstract
 ========
 This REP updates the specification of the ROS distribution files facilitated in

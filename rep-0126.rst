@@ -7,21 +7,6 @@ Content-Type: text/x-rst
 Created: 10-Feb-2012
 Post-History: 20-Feb-2012
 
-Table of Contents
-=================
-
-#. Abstract_
-#. Background_
-#. Specification_
-#. Motivation_
-#. Rationale_
-#. Concerns_
-#. ReferenceImplementation_
-#. References_
-#. Copyright_
-
-.. _Abstract:
-
 Abstract
 ========
 
@@ -33,8 +18,6 @@ Note: the elements specified in this REP will only affect the tools
 used together with rosbuild packages: namely *rosinstall* and
 *rosws*. Newer tools like *wstool* intended to be used with catkin
 packages are not affected by these elements and will ignore them.
-
-.. _Background:
 
 Background
 ==========
@@ -124,8 +107,6 @@ environments. rosinstall generated setup files aim to enable a
 quick transistion between environments (and distros) by sourcing
 a given setup.sh.
 
-.. _Specification:
-
 Specification
 =============
 
@@ -156,9 +137,6 @@ And the local ``setup.sh`` will look like this::
 
   . /opt/ros/fuerte/setup.sh
   export ROS_PACKAGE_PATH=bar:...:/opt/ros/fuerte/share/ros:foo
-
-
-.. _Motivation:
 
 Motivation
 ==========
@@ -210,8 +188,6 @@ to use.
 This REP declares therefore a necessary amendment to rosinstall 
 to get and to store the location of a distro setup.sh file to be 
 used for generation of environment setup.sh files.
-
-.. _Rationale:
 
 Rationale
 =========
@@ -305,8 +281,6 @@ used both for getting the location of the setup file from a
 remote .rosinstall file as well as storing the information 
 in a local .rosinstall file. C.2. and C.3. seemed to lack in 
 transparency.
-
-.. _Concerns:
 
 Concerns
 ========
@@ -404,8 +378,6 @@ Reference implementation
 
 A reference implementation is the last version of rosinstall in the
 source repository. [4]_
-
-.. _References:
 
 References
 ==========
