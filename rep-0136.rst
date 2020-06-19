@@ -7,8 +7,6 @@ Content-Type: text/x-rst
 Created: 15-Feb-2013
 Post-History: 7-March-2013
 
-.. contents::
-
 Abstract
 ========
 This REP forms the recommendation for how to handle releases of third party, non catkin packages using the ROS community release infrastructure. Specifically, this REP aims to provide a recommendation on how to release a third party package into a ROS distribution, in the event that the third party package cannot be released in a ROS distribution agnostic manner.
