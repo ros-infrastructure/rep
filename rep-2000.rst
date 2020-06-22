@@ -715,6 +715,13 @@ Build System Support:
 - cmake
 - setuptools
 
+Rolling Ridley (June 2020 - Ongoing)
+------------------------------------
+
+Rolling Ridley is a rolling development distribution of ROS 2 as described in REP-2000 [8]_.
+
+The target platform for Rolling Ridley will update as new upstream distributions are selected for ROS 2 development.
+As of June 2020, Rolling Ridley targets the same platforms as ROS 2 Foxy Fitzroy.
 
 
 Motivation
@@ -746,6 +753,8 @@ References and Footnotes
    (https://github.com/ros2/ros2/blob/master/ros2.repos)
 .. [7] Connext DDS 6.0.0 Support
    (https://github.com/ros2/rmw_connext/issues/375)
+.. [8] REP 2002
+   (http://www.ros.org/reps/rep-2002.html)
 
 Copyright
 =========
