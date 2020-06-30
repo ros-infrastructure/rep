@@ -95,7 +95,7 @@ It provides all commonly used libraries as well as visualization tools and tutor
                  examples, joystick_drivers, laser_geometry,
                  navigation_msgs, pcl_conversions, realtime_support,
                  resource_retriever, rviz, teleop_twist_joy,
-                 teleop_twist_keyboard, tlsf, vision_opencv]
+                 teleop_twist_keyboard, tlsf, turtlesim, vision_opencv]
 
 
 Institution-specific and robot-specific
