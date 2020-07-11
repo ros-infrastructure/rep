@@ -631,10 +631,10 @@ Middleware Implementation Support:
 +==========================+=====================+===============+=============================+======================================+
 |  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms               | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 |  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
 |                          |                     |               | and OpenEmbedded            |                                      |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
