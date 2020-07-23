@@ -13,7 +13,7 @@ Abstract
 
 This REP describes a set of categories meant to convey the quality or maturity of packages in the ROS ecosystem.
 Inclusion in a category, or quality level, is based on the policies to which a package adheres.
-The categories address policies about things including version, change control, documentation, testing, dependencies, platform support and others.
+The categories address policies about versioning, change control, documentation, testing, dependencies, platform support and security.
 
 Motivation
 ==========
