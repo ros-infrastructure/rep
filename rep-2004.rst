@@ -24,7 +24,7 @@ Package maintainers can use these guidelines to establish and document their own
 
 Consumers can use the guidelines in the REP, as well as the corresponding policies defined by maintainers, to set expectations on package quality and better evaluate whether a package or its dependencies meet the standards of use in their projects.
 
-The outcome of this REP should be that maintainers who want to evaluate their packages' quality have looked at each guideline, thought about how their practices address each, adjusted their policies if needed, and then documented their policies and justifications. 
+The outcome of this REP should be that maintainers who want to evaluate their packages' quality have looked at each guideline, thought about how their policies address each, adjusted their policies if needed, and then documented their policies and justifications. 
 
 In turn, the documentation of policies and communication of quality characteristics between maintainers and consumers will improve.
 By setting these goals and expectations for maintainers and consumers, respectively, the guidelines will also encourage better quality across the ROS ecosystem.
