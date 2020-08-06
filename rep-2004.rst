@@ -13,18 +13,42 @@ Abstract
 
 This REP describes a set of categories meant to convey the quality or maturity of packages in the ROS ecosystem.
 Inclusion in a category, or quality level, is based on the policies to which a package adheres.
-The categories address version, change control, documentation, testing, dependency and platform support policies.
+The categories address policies about versioning, change control, documentation, testing, dependencies, platform support and security.
 
 Motivation
 ==========
 
-The purpose of this REP is to provide standard guidelines regarding package quality, for both maintainers and consumers.
+The purpose of this REP is to provide standard guidelines for evaluating package quality, for both maintainers and consumers.
 
-The categories are meant to set quality expectations for package consumers, not to enforce quality rules on maintainers.
-Package maintainers are responsible for establishing processes and documenting how their package's policies achieve a certain quality level.
-With the help of documented policies, package consumers can better evaluate whether a package or its dependencies meet the standards for use in their projects.
+Package maintainers can use these guidelines to establish and document their own specific policies addressing how their packages achieve certain quality levels.
 
-By providing these rough goals for package maintainers to strive towards, the categories will also encourage better quality across the ROS ecosystem.
+Consumers can use the guidelines in the REP, as well as the corresponding policies defined by maintainers, to set expectations on package quality and better evaluate whether a package or its dependencies meet the standards of use in their projects.
+
+The outcome of this REP should be that maintainers who want to evaluate their packages' quality have looked at each guideline, thought about how their policies address each, adjusted their policies if needed, and then documented their policies and justifications. 
+
+In turn, the documentation of policies and communication of quality characteristics between maintainers and consumers will improve.
+By setting these goals and expectations for maintainers and consumers, respectively, the guidelines will also encourage better quality across the ROS ecosystem.
+
+Antigoals
+^^^^^^^^^
+
+The motivation behind this REP does not include:
+
+* Enforcing quality levels on maintainers
+
+  * No maintainer is required to abide by any of the guidelines in this REP
+
+* Dictating policy implementation specifics necessary to achieve a quality level
+
+  * Maintainers can come up with their own policies or follow an existing set of guidelines for achieving these quality levels; see `Reference Implementation`_ for examples of existing guidelines
+  * Policy requirements (which tools to use, specific thresholds, etc.) are *intentionally generic*
+
+* Enforcing the community to approve of policies documented by package maintainers
+
+  * Policies that are skipped or altered with justifications require evaluation by the consumer to see if that reasoning is acceptable for their standards of use
+  * Enforcement cannot, therefore, be done in an automated fashion in all cases
+  * Instead, peer reviewed lists of packages, where maintainers can take their `quality declaration <#reference-implementation>`_ and have their peers verify that their claims/justifications are truthful/reasonable, respectively, can be created 
+
 
 Specification
 =============
@@ -756,9 +780,7 @@ Reference Implementation
 
 The `ROS 2 Developer Guide <https://index.ros.org/doc/ros2/Contributing/Developer-Guide/>`_ describes the policies we implement to achieve Quality Level 1 for ROS Core packages.
 
-The `rcutils package's quality declaration <https://github.com/ros2/rcutils/pull/202/files>`_ is one example of the conditions of this REP in practice on a non-trivial package.
-
-.. update link when that draft is merged
+The `rcutils package's quality declaration <https://github.com/ros2/rcutils/blob/4157542d6320091cef715115d587625fd926500b/QUALITY_DECLARATION.md>`_ is one example of the conditions of this REP in practice on a non-trivial package.
 
 The following template is a suggestion; packages can choose to combine sub-items into one heading if applicable (e.g. [3.i]-[3.iv] combined into [3]).
 
