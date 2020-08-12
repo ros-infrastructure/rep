@@ -301,6 +301,9 @@ Architectures Supported:
 
 Binary Package Support:
 
+Not all patform and architectures get binary packages.
+Binary packages are built until the platform reaches its EOL date.
+
 +----------+---------------+----------------+----------------+-----------+
 | Arch     | Ubuntu Artful | Ubuntu Bionic  | Debian Stretch | Fedora 28 |
 +==========+===============+================+================+===========+
@@ -373,6 +376,9 @@ Architectures Supported:
 - arm64
 
 Binary Package Support:
+
+Not all patform and architectures get binary packages.
+Binary packages are built until the platform reaches its EOL date.
 
 +----------+---------------+----------------+-----------+
 | Arch     | Ubuntu Focal  | Debian Buster  | Fedora 32 |
