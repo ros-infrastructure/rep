@@ -302,7 +302,7 @@ Architectures Supported:
 Binary Package Availabilty:
 
 +----------+---------------+----------------+----------------+-----------+
-| Platform | Ubuntu Artful | Ubuntu Bionic  | Debian Stretch | Fedora 28 |
+| Arch     | Ubuntu Artful | Ubuntu Bionic  | Debian Stretch | Fedora 28 |
 +==========+===============+================+================+===========+
 | amd64    | Until Jul '18 | Until May '23  | Until Jun '22  |           |
 +----------+---------------+----------------+----------------+-----------+
@@ -375,7 +375,7 @@ Architectures Supported:
 Binary Package Availabilty:
 
 +----------+---------------+----------------+-----------+
-| Platform | Ubuntu Focal  | Debian Buster  | Fedora 32 |
+| Arch     | Ubuntu Focal  | Debian Buster  | Fedora 32 |
 +==========+===============+================+===========+
 | amd64    | Until May '25 | Until Jun '24  |           |
 +----------+---------------+----------------+-----------+
