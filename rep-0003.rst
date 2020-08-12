@@ -301,7 +301,7 @@ Architectures Supported:
 
 Binary Package Support:
 
-Not all patform and architectures get binary packages.
+Not all platforms and architectures get binary packages.
 Binary packages are built until the platform reaches its EOL date.
 
 +----------+---------------+----------------+----------------+-----------+
@@ -377,7 +377,7 @@ Architectures Supported:
 
 Binary Package Support:
 
-Not all patform and architectures get binary packages.
+Not all platforms and architectures get binary packages.
 Binary packages are built until the platform reaches its EOL date.
 
 +----------+---------------+----------------+-----------+
