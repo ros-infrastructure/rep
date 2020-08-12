@@ -299,7 +299,7 @@ Architectures Supported:
 - arm32
 - arm64
 
-Binary Package Availabilty:
+Binary Package Support:
 
 +----------+---------------+----------------+----------------+-----------+
 | Arch     | Ubuntu Artful | Ubuntu Bionic  | Debian Stretch | Fedora 28 |
@@ -372,7 +372,7 @@ Architectures Supported:
 - arm32
 - arm64
 
-Binary Package Availabilty:
+Binary Package Support:
 
 +----------+---------------+----------------+-----------+
 | Arch     | Ubuntu Focal  | Debian Buster  | Fedora 32 |
