@@ -307,9 +307,9 @@ Binary packages are built until the platform reaches its EOL date.
 +----------+---------------+----------------+----------------+-----------+
 | Arch     | Ubuntu Artful | Ubuntu Bionic  | Debian Stretch | Fedora 28 |
 +==========+===============+================+================+===========+
-| amd64    | Until Jul '18 | Until Apr '23  | Until Jun '22  |           |
+| amd64    | Until Jul '18 | Until Apr '23  | Until Jul '20  |           |
 +----------+---------------+----------------+----------------+-----------+
-| arm64    |               | Until Apr '23  | Until Jun '22  |           |
+| arm64    |               | Until Apr '23  | Until Jul '20  |           |
 +----------+---------------+----------------+----------------+-----------+
 | arm32    |               | Until Apr '23  |                |           |
 +----------+---------------+----------------+----------------+-----------+
@@ -383,12 +383,15 @@ Binary packages are built until the platform reaches its EOL date.
 +----------+---------------+----------------+-----------+
 | Arch     | Ubuntu Focal  | Debian Buster  | Fedora 32 |
 +==========+===============+================+===========+
-| amd64    | Until Apr '25 | Until Jun '24  |           |
+| amd64    | Until Apr '25 | Until ??? '22  |           |
 +----------+---------------+----------------+-----------+
-| arm64    | Until Apr '25 | Until Jun '24  |           |
+| arm64    | Until Apr '25 | Until ??? '22  |           |
 +----------+---------------+----------------+-----------+
 | arm32    | Until Apr '25 |                |           |
 +----------+---------------+----------------+-----------+
+
+???: Buster's EOL date has not been decided yet https://wiki.debian.org/DebianReleases
+
 
 Targeted Languages:
 
