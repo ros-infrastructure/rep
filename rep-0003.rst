@@ -392,7 +392,6 @@ Binary packages are built until the platform reaches its EOL date.
 
 ???: Buster's EOL date has not been decided yet https://wiki.debian.org/DebianReleases
 
-
 Targeted Languages:
 
 - C++14
