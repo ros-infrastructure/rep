@@ -299,6 +299,21 @@ Architectures Supported:
 - arm32
 - arm64
 
+Binary Package Support:
+
+Not all platforms and architectures get binary packages.
+Binary packages are built until the platform reaches its EOL date.
+
++----------+---------------+----------------+----------------+-----------+
+| Arch     | Ubuntu Artful | Ubuntu Bionic  | Debian Stretch | Fedora 28 |
++==========+===============+================+================+===========+
+| amd64    | Until Jul '18 | Until Apr '23  | Until Jul '20  |           |
++----------+---------------+----------------+----------------+-----------+
+| arm64    |               | Until Apr '23  | Until Jul '20  |           |
++----------+---------------+----------------+----------------+-----------+
+| arm32    |               | Until Apr '23  |                |           |
++----------+---------------+----------------+----------------+-----------+
+
 Targeted Languages:
 
 - C++14
@@ -359,6 +374,23 @@ Architectures Supported:
 - amd64
 - arm32
 - arm64
+
+Binary Package Support:
+
+Not all platforms and architectures get binary packages.
+Binary packages are built until the platform reaches its EOL date.
+
++----------+---------------+----------------+-----------+
+| Arch     | Ubuntu Focal  | Debian Buster  | Fedora 32 |
++==========+===============+================+===========+
+| amd64    | Until Apr '25 | Until ??? '22  |           |
++----------+---------------+----------------+-----------+
+| arm64    | Until Apr '25 | Until ??? '22  |           |
++----------+---------------+----------------+-----------+
+| arm32    | Until Apr '25 |                |           |
++----------+---------------+----------------+-----------+
+
+???: Buster's EOL date has not been decided yet https://wiki.debian.org/DebianReleases
 
 Targeted Languages:
 
