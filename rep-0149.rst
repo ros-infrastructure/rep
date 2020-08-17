@@ -607,7 +607,7 @@ Attributes
   * comparison operators: `==`, `!=`, `<`, `<=`, `>`, `>=`
   * variable names which start with a `$` sign and are followed by
     alphanumerics and underscores
-  * literals which can only contain alphanumerics, undercsores and dashes
+  * literals which can only contain alphanumerics, underscores and dashes
   * arbitrary whitespaces between these tokens
 
  An expression syntactically correct by the previous definition will be
