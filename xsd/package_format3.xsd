@@ -32,7 +32,7 @@
         <xs:attribute name="condition" use="optional">
           <xs:simpleType>
             <xs:restriction base="xs:token">
-              <xs:pattern value="[$A-Za-z0-9_\s&lt;&gt;!=()-]*"/>
+              <xs:pattern value="[$A-Za-z0-9_\s&quot;'&lt;&gt;!=()-]*"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:attribute>
