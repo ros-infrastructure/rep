@@ -391,6 +391,7 @@ All items on the list for the next distro should already be released into the ro
     * `moveit2/moveit <https://github.com/ros-planning/moveit2/>`_
     * `moveit2/moveit_kinematics <https://github.com/ros-planning/moveit2/>`_
 
+  * `cra-ros-pkg/robot_localization <https://github.com/cra-ros-pkg/robot_localization/>`_
   * `interactive_markers/interactive_markers <https://index.ros.org/p/interactive_markers/>`_
   * `geometry2/examples_tf2_py <https://index.ros.org/p/examples_tf2_py/>`_
   * `geometry2/geometry2 <https://index.ros.org/p/geometry2/>`_
