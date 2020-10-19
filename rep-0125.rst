@@ -447,15 +447,15 @@ References
 .. [2] sources.list man page
    (http://manpages.debian.net/cgi-bin/man.cgi?query=sources.list&sektion=5&apropos=0&manpath=Debian+Sid&locale=en)
 .. [3] REP 111: Multiple Package Manager Support for Rosdep
-   (http://ros.org/reps/rep-0111.html)
+   (https://ros.org/reps/rep-0111.html)
 .. [4] rosdep YAML format
    (http://ros.org/doc/independent/api/rosdep/html/rosdep_yaml_format.html)
 .. [5] REP 122: FHS layout for ROS installation
-   (http://ros.org/reps/rep-0122.html) 
+   (https://ros.org/reps/rep-0122.html) 
 .. [6] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
-   (http://ros.org/reps/rep-0123.html) 
+   (https://ros.org/reps/rep-0123.html) 
 .. [7] REP 3: Target Platforms
-   (http://ros.org/reps/rep-0003.html) 
+   (https://ros.org/reps/rep-0003.html) 
 
 
 Copyright

@@ -1,6 +1,6 @@
 REP: 102
 Title: ROS Install Target
-Author: Brian Gerkey <gerkey@willowgarage.com>
+Author: Brian Gerkey <gerkey@openrobotics.org>
 Status: Withdrawn
 Type: Standards Track
 Content-Type: text/x-rst

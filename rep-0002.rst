@@ -148,10 +148,10 @@ References and Footnotes
 ========================
 
 .. [1] REP 1, REP Purpose and Guidelines
-   (http://ros.org/reps/rep-0001.html)
+   (https://ros.org/reps/rep-0001.html)
    
 .. [2] REP 10, Voting Guidelines
-   (http://ros.org/reps/rep-0010.html)
+   (https://ros.org/reps/rep-0010.html)
 
 
 Copyright

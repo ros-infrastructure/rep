@@ -386,7 +386,7 @@ This is a recently standardized message which is much more broadly applicable th
 
 
 Vehicle Status
--------------
+--------------
 Drones could have different configurations or types as well as define failsafes, engine failures or hardware in the loop setup. These are the fields proposed for this message
 
 * Datatype: ``proposed_aerial_msgs/VehicleStatus`` (proposed)

@@ -1,19 +1,68 @@
 REP: 2000
-Title: ROS 2 Target Platforms
-Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>
+Title: ROS 2 Releases and Target Platforms
+Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
-Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May-2019, 29-Aug-2019
+Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May-2019, 29-Aug-2019, 25-Feb-2020
 
 
 Abstract
 ========
 
-This REP defines target platforms for each ROS 2 Distribution Release.
+This REP defines the timeline for future ROS 2 releases as well as the targeted platforms for each specific one.
 We define platforms to include both operating system releases (e.g. Ubuntu Xenial (16.04 LTS)) as well as major language releases (e.g. Python 3.5).
 The target platforms represent the set on which all core stacks are expected to work.
 Exceptions can be made for stacks that are intentionally platform-specific.
+
+Release Schedule
+================
+
+Note: the following applies to ROS 2 releases *after* Foxy Fitzroy.
+Before, releases were made more frequently but with shorter support due to the fact that many foundational parts of ROS 2 were still heavily iterated on.
+
+TL;DR ROS 2 release schedule post Foxy:
+* May 2021: G Turtle: non-LTS release, supported for 1.5 years
+* May 2022: H Turtle: LTS release, supported for 5 years
+* May 2023: I Turtle: non-LTS release, supported for 1.5 years
+* May 2024: J Turtle: LTS release, supported for 5 years
+* and so on, alternating annually between LTS and non-LTS releases
+
+Frequency
+---------
+
+New ROS 2 releases are published in a time based fashion **every 12 months**.
+The rationale is that a shorter cycle (like 6 months) results in a significant overhead and many active releases at the same time (assuming they have the same support length).
+On the other hand a longer cycle (like 2 years) is too long for users to wait for new features to be available in a ROS 2 release.
+
+Targeted Platforms
+------------------
+
+Since regular Ubuntu releases are only supported for 9 months ROS 2 is not targeting those.
+A single ROS 2 distribution only **targets one Ubuntu LTS**.
+The rationale is that supporting two LTS versions - which means 2-year-different versions of upstream dependencies - is a tremendous overhead and sometimes even impossible.
+
+Since macOS (or at least brew) as well as Windows are rolling platforms we aim to support the latest version available at the time of a ROS 2 distribution release.
+For Debian we also aim to target the latest stable version though if that version is two years behind the Ubuntu version that might not be possible.
+
+Support
+-------
+
+LTS releases
+~~~~~~~~~~~~
+
+Since Ubuntu LTS releases come with **5 years** of standard support we aim to match the same duration.
+In even years new ROS 2 releases happen shortly (a month) after the Ubuntu LTS has been released (some time in May).
+The ROS 2 release will be supported until the end of the standard support of the Ubuntu LTS release which is 4 years and 11 months from the ROS 2 release date.
+
+Non-LTS Releases
+~~~~~~~~~~~~~~~~
+
+If every ROS 2 release would have that support we would end up with 5 active releases at the same time which would pose a significant maintenance effort.
+To lower that effort while still providing releases more frequently than every two years in odd years a non-LTS ROS release is being published.
+It will target the same Ubuntu LTS as the previous ROS LTS release but is only supported for **1.5 years**.
+The duration will overlap with the next ROS LTS release by 6 months to provide a long enough transition window.
+We are aware that significantly fewer users will adopt a non-LTS ROS release but think that at least for now it will be worth having to land new features and make them available to users in the time between two LTS releases.
 
 Support Tiers
 =============
@@ -279,7 +328,7 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
 | PCL         |     1.8.1      |     N/A       |     N/A        |       1.7.2       |        1.8.0        |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
-|                                **RMW DDS Milddleware Providers**                                        |
+|                                **RMW DDS Middleware Providers**                                         |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
 | Connext DDS |                              5.3.1                                  |         N/A         |
 +-------------+----------------+---------------+----------------+-------------------+---------------------+
@@ -318,13 +367,12 @@ Dashing Diademata (May 2019 - May 2021)
 Targeted platforms:
 
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-| Architecture | Ubuntu Bionic (18.04) | MacOS Sierra (10.12) | Windows 10 (VS2019)  | Debian Stretch (9) | OpenEmbedded  |
-|              |                       |                      |                      |                    | Thud (2.6) /  |
-|              |                       |                      |                      |                    | webOS OSE [s] |
+| Architecture | Ubuntu Bionic (18.04) | MacOS Sierra (10.12) | Windows 10 (VS2019)  | Debian Stretch (9) | OpenEmbedded /|
+|              |                       |                      |                      |                    | webOS OSE     |
 +==============+=======================+======================+======================+====================+===============+
 |    amd64     |   Tier 1 [d][a][s]    |     Tier 1 [a][s]    |    Tier 1 [a][s]     |     Tier 3 [s]     |               |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |               |
+|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
 |    arm32     |     Tier 2 [a][s]     |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
@@ -348,7 +396,6 @@ Middleware Implementation Support:
 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 2        | All Platforms               | All Architectures                    |
-|                          |                     |               | except OpenEmbedded         |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_opensplice_cpp       | ADLink OpenSplice   | Tier 2        | All Platforms except Debian | All Architectures                    |
 |                          |                     |               | and OpenEmbedded            |                                      |
@@ -370,9 +417,9 @@ Dependency Requirements:
 +-------------+-------------------------------------------------+------------------------------------+
 |             |                 Required Support                |        Recommended Support         |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Stretch | OpenEmbedded Thud |
+| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Stretch |   OpenEmbedded**  |
 +=============+================+===============+================+================+===================+
-| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.7.2     |       3.12.2      |
+| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.7.2     | 3.16.1 / 3.12.2***|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | EmPY        |                                      3.3.2                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -380,25 +427,25 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Ogre        |                                      1.10*                       |        N/A        |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2*      |        3.2.0      |
+| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2*      |  4.1.0 / 3.2.0*** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.0j    | 1.1.1b / 1.0.2r***|
+| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.0j    | 1.1.1d / 1.1.1b***|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.8.0*    |        1.9.0      |
+| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.8.0*    |        1.9.4      |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.5.3     |        3.7.2      |
+| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.5.3     |  3.8.2 / 3.7.5*** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.7.1     | 5.11.3 / 5.6.3*** |
+| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.7.1     | 5.14.1 / 5.12.5***|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |                              |         **Linux only**         |                                    |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | PCL         |     1.8.1      |     N/A       |     N/A        |      1.8.0     |        1.8.1      |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-|                                **RMW DDS Milddleware Providers**                                   |
+|                                **RMW DDS Middleware Providers**                                    |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Connext DDS |                      5.3.1                      |               N/A                  |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
+| Cyclone DDS |                                 0.5.1 (Eusebius)                                     |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |  Fast-RTPS  |                                      1.8.0                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -408,6 +455,9 @@ Dependency Requirements:
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
 " ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
+The versions shown for OpenEmbedded are those provided by the 3.1 Dunfell release series; the versions provided by the other supported release series are listed here: https://github.com/ros/meta-ros/wiki/Package-Version-Differences .
+Note that the OpenEmbedded releases series for which a ROS distro has support will change during its support time frame, as per the OpenEmbedded support policy shown here: https://github.com/ros/meta-ros/wiki/Policies#openembedded-release-series-support .
+However, it will always be supported by least one stable OpenEmbedded release series.
 
 " \*** " webOS OSE provides this different version.
 
@@ -436,13 +486,12 @@ Eloquent Elusor (November 2019 - November 2020)
 Targeted platforms:
 
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-| Architecture | Ubuntu Bionic (18.04) | MacOS Mojave (10.14) | Windows 10 (VS2019)  | Debian Buster (10) | OpenEmbedded  |
-|              |                       |                      |                      |                    | Thud (2.6) /  |
-|              |                       |                      |                      |                    | webOS OSE [s] |
+| Architecture | Ubuntu Bionic (18.04) | MacOS Mojave (10.14) | Windows 10 (VS2019)  | Debian Buster (10) | OpenEmbedded /|
+|              |                       |                      |                      |                    | webOS OSE     |
 +==============+=======================+======================+======================+====================+===============+
 |    amd64     |   Tier 1 [d][a][s]    |     Tier 1 [a][s]    |    Tier 1 [a][s]     |     Tier 3 [s]     |               |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
-|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |               |
+|    arm64     |   Tier 1 [d][a][s]    |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
 |    arm32     |     Tier 2 [a][s]     |                      |                      |     Tier 3 [s]     |   Tier 3 [s]  |
 +--------------+-----------------------+----------------------+----------------------+--------------------+---------------+
@@ -487,9 +536,9 @@ Dependency Requirements:
 +-------------+-------------------------------------------------+------------------------------------+
 |             |                        Required Support         |        Recommended Support         |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Buster  | OpenEmbedded Thud |
+| Package     | Ubuntu  Bionic |     MacOS**   |   Windows 10** | Debian Buster  |  OpenEmbedded**   |
 +=============+================+===============+================+================+===================+
-| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.13.4    |       3.12.2      |
+| CMake       |     3.10.2     |     3.14.4    |     3.14.4     |      3.13.4    |3.16.1 / 3.12.2****|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | EmPY        |                                      3.3.2                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -497,25 +546,25 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Ogre        |                                      1.10*                       |        N/A        |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2.0     |        3.2.0      |
+| OpenCV      |     3.2.0      |     4.1.0     |     3.4.6*     |      3.2.0     | 4.1.0 / 3.2.0**** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.1c    |1.1.1b / 1.0.2r****|
+| OpenSSL     |     1.1.0g     |     1.0.2r    |     1.0.2r     |      1.1.1c    |1.1.1d / 1.1.1b****|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.9.0     |        1.9.0      |
+| Poco        |     1.8.0      |     1.9.0     |     1.8.0*     |      1.9.0     |        1.9.4      |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.7.3     |        3.7.2      |
+| Python      |     3.6.5      |     3.7.3     |     3.7.3      |      3.7.3     | 3.8.2 / 3.7.5**** |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.11.3    | 5.11.3 / 5.6.3****|
+| Qt          |     5.9.5      |     5.12.3    |     5.10.0     |      5.11.3    |5.14.1 / 5.12.5****|
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |                              |         **Linux only**                                              |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | PCL         |     1.8.1      |     N/A       |     N/A        |      1.9.1     |        1.8.1      |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-|                                **RMW DDS Milddleware Providers**                                   |
+|                                **RMW DDS Middleware Providers**                                    |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 | Connext DDS |                              5.3.1***           |               N/A                  |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
-| Cyclone DDS |                                 0.5.0 (Eusebius)                                     |
+| Cyclone DDS |                                 0.5.1 (Eusebius)                                     |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
 |  Fast-RTPS  |                                      1.9.0                                           |
 +-------------+----------------+---------------+----------------+----------------+-------------------+
@@ -525,6 +574,9 @@ Dependency Requirements:
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
 " ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
+The versions shown for OpenEmbedded are those provided by the 3.1 Dunfell release series; the versions provided by the other supported release series are listed here: https://github.com/ros/meta-ros/wiki/Package-Version-Differences .
+Note that the OpenEmbedded releases series for which a ROS distro has support will change during its support time frame, as per the OpenEmbedded support policy shown here: https://github.com/ros/meta-ros/wiki/Policies#openembedded-release-series-support .
+However, it will always be supported by least one stable OpenEmbedded release series.
 
 " \*** " It is anticipated that this will be increased to Connext DDS 6.0.0 pending migration patches [7]_.
 
@@ -539,6 +591,7 @@ Package manager use for dependencies:
 - Ubuntu, Debian: apt
 - MacOS: Homebrew, pip
 - Windows: Chocolatey, pip
+- OpenEmbedded: opkg
 
 
 Build System Support:
@@ -546,6 +599,129 @@ Build System Support:
 - ament_cmake
 - cmake
 - setuptools
+
+Foxy Fitzroy (May 2020 - May 2023)
+----------------------------------
+
+Targeted platforms:
+
++--------------+-----------------------+-------------------------+----------------------+--------------------+---------------+
+| Architecture | Ubuntu Focal (20.04)  | MacOS Mojave (10.14)    | Windows 10 (VS2019)  | Debian Buster (10) | OpenEmbedded /|
+|              |                       |                         |                      |                    | webOS OSE     |
++==============+=======================+=========================+======================+====================+===============+
+|    amd64     |   Tier 1 [d][a][s]    |     Tier 1 [a][s]       |    Tier 1 [a][s]     |     Tier 3 [s]     |               |
++--------------+-----------------------+-------------------------+----------------------+--------------------+---------------+
+|    arm64     |   Tier 1 [d][a][s]    |                         |                      |     Tier 3 [s]     |   Tier 3 [s]  |
++--------------+-----------------------+-------------------------+----------------------+--------------------+---------------+
+|    arm32     |     Tier 3 [s]        |                         |                      |     Tier 3 [s]     |   Tier 3 [s]  |
++--------------+-----------------------+-------------------------+----------------------+--------------------+---------------+
+
+The following indicators show what delivery mechanisms are available for each platform.
+
+" [d] " Debian packages will be provided for this platform for packages submitted to the rosdistro.
+
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Eloquent ROS 2 repos file [6]_.
+
+" [s] " Compilation from source.
+
+Middleware Implementation Support:
+
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                        |
++==========================+=====================+===============+=============================+======================================+
+|  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+|  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
+|                          |                     |               | and OpenEmbedded            |                                      |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms               | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
++--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+
+Middleware implementation support is dependent upon the platform support tier.
+For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
+
+Minimum language requirements:
+
+- C++14
+- Python 3.7
+
+
+Dependency Requirements:
+
++-------------+-------------------------------------------------+--------------------------------------+
+|             |                        Required Support         |        Recommended Support           |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Package     |  Ubuntu Focal  |     MacOS**   |   Windows 10** | Debian Buster  | OpenEmbedded**      |
++=============+================+===============+================+================+=====================+
+| CMake       |     3.16.3     |     3.14.4    |     3.14.4     |      3.13.4    | 3.16.1 / 3.12.2**** |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| EmPY        |                                      3.3.2                                             |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Gazebo      |     11.0.0*    |     11.0.0    |      N/A       |      11.0.0*   |        N/A          |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Ignition    |             Citadel*           |      N/A       |     Citadel*   |        N/A          |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Ogre        |                                      1.10*                       |        N/A          |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| OpenCV      |     4.2.0      |     4.2.0     |     3.4.6*     |      3.2.0     |  4.1.0 / 3.2.0****  |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| OpenSSL     |     1.1.1d     |     1.1.1f    |     1.1.1f     |      1.1.1d    | 1.1.1d / 1.1.1b**** |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Poco        |     1.9.2      |     1.9.0     |     1.8.0*     |      1.9.0     |        1.9.4        |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Python      |     3.8.0      |     3.8.2     |     3.8.0      |      3.7.3     |  3.8.2 / 3.7.5****  |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Qt          |     5.12.5     |     5.12.3    |     5.10.0     |      5.11.3    | 5.14.1 / 5.12.5**** |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+|                              |         **Linux only**                                                |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| PCL         |     1.10.0     |     N/A       |     N/A        |      1.9.1     |       1.10.0        |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+|                                **RMW DDS Middleware Providers**                                      |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Connext DDS |                              5.3.1              |               N/A                    |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Cyclone DDS |                                      0.6.x                                             |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+|  Fast-RTPS  |                                      2.0.x                                             |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+
+" * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
+
+" ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
+The versions shown for OpenEmbedded are those provided by the 3.1 Dunfell release series; the versions provided by the other supported release series are listed here: https://github.com/ros/meta-ros/wiki/Package-Version-Differences .
+Note that the OpenEmbedded releases series for which a ROS distro has support will change during its support time frame, as per the OpenEmbedded support policy shown here: https://github.com/ros/meta-ros/wiki/Policies#openembedded-release-series-support .
+However, it will always be supported by least one stable OpenEmbedded release series.
+
+" \**** " webOS OSE provides this different version.
+
+This document only captures the version at the first release of a ROS distribution and will not be updated as the dependencies move forward.
+These versions are thus a low watermark.
+
+
+Package manager use for dependencies:
+
+- Ubuntu, Debian: apt
+- MacOS: Homebrew, pip
+- Windows: Chocolatey, pip
+- OpenEmbedded: opkg
+
+
+Build System Support:
+
+- ament_cmake
+- cmake
+- setuptools
+
+Rolling Ridley (June 2020 - Ongoing)
+------------------------------------
+
+Rolling Ridley is a rolling development distribution of ROS 2 as described in REP-2000 [8]_.
+
+The target platform for Rolling Ridley will update as new upstream distributions are selected for ROS 2 development.
+As of June 2020, Rolling Ridley targets the same platforms as ROS 2 Foxy Fitzroy.
 
 
 Motivation
@@ -575,8 +751,10 @@ References and Footnotes
    (https://github.com/ros2/ros2/blob/dashing/ros2.repos)
 .. [6] Eloquent ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/master/ros2.repos)
-.. [7] Connext DDS 6.0.0 Migration
-   (https://github.com/ros2/rmw_connext/pull/351)
+.. [7] Connext DDS 6.0.0 Support
+   (https://github.com/ros2/rmw_connext/issues/375)
+.. [8] REP 2002
+   (http://www.ros.org/reps/rep-2002.html)
 
 Copyright
 =========

@@ -1,6 +1,6 @@
 REP: 119
 Title: Specification for TurtleBot Compatible Platforms
-Author: Melonee Wise and Tully Foote
+Author: Melonee Wise, Tully Foote
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
@@ -185,8 +185,8 @@ Hardware Requirements
 
 * Odometry is expected to be accurate within 1% after calibration in both linear and angular movement.  
 
-Software Requiremets
-''''''''''''''''''''
+Software Requirements
+'''''''''''''''''''''
 
 * URDF description of the robot
 

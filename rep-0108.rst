@@ -383,7 +383,7 @@ References
 .. [1] rosdistro
    (http://ros.org/wiki/rosdistro)
 .. [2] REP 100
-   (http://ros.org/reps/rep-0100.html)
+   (https://ros.org/reps/rep-0100.html)
 
    
 Copyright

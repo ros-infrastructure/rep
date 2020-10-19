@@ -25,7 +25,7 @@ communicating about the code layout of a specific installation.
 Recommended Layout
 ==================
 
-This is the recommended layout for development is as follows:
+The recommended layout for development is as follows:
 
 ::
 
@@ -37,7 +37,7 @@ This is the recommended layout for development is as follows:
           package.xml
         ...
         package_n/
-          CATKIN_IGNORE      --Optionally place this empty marker file to exclude package_n from being processed
+          CATKIN_IGNORE      --Optionally place this marker file to exclude package_n from being processed. Its file type (e.g. regular file, directory) and contents don't matter. It may even be a dangling symlink.
           CMakeLists.txt
           package.xml
       build/                 --BUILD SPACE(this is where build system is invoked, not necessarily within workspace)
@@ -59,7 +59,7 @@ This is the recommended layout for development is as follows:
         include/
         lib/
         share/
-        .catkin              --Marking the folder as an install space (the file is emtpy)
+        .catkin              --Marking the folder as an install space (the file is empty)
         env.bash
         setup.bash
         setup.sh
@@ -288,7 +288,7 @@ References
 ==========
 
 .. [1] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
-   (http://ros.org/reps/rep-0001.html)
+   (https://ros.org/reps/rep-0001.html)
 
 
 Copyright

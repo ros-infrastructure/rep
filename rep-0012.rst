@@ -432,7 +432,7 @@ Hyperlink targets begin with two periods and a space (the "explicit
 markup start"), followed by a leading underscore, the reference text,
 a colon, and the URL (absolute or relative)::
 
-    .. _ROS web site: http://ros.org/
+    .. _ROS web site: https://ros.org/
 
 The reference text and the target text must match (although the match
 is case-insensitive and ignores differences in whitespace).  Note that
@@ -483,12 +483,12 @@ followed by the footnote body.  For example::
     ==========
 
     .. [2] REP 1, "REP Purpose and Guidelines", Conley
-       (http://ros.org/reps/rep-0001.html)
+       (https://ros.org/reps/rep-0001.html)
 
 If you decide to provide an explicit URL for a REP, please use this as
 the URL template::
 
-    http://ros.org/reps/rep-xxxx.html
+    https://ros.org/reps/rep-xxxx.html
 
 REP numbers in URLs must be padded with zeros from the left, so as to
 be exactly 4 characters wide, however REP numbers in the text are
@@ -509,7 +509,7 @@ other characters are allowed).  For example::
 
     .. [#REP-1] REP 1, "REP Purpose and Guidelines", Warsaw, Hylton
 
-       http://ros.org/reps/rep-0001.html
+       https://ros.org/reps/rep-0001.html
 
 Footnotes and footnote references will be numbered automatically, and
 the numbers will always match.  Once a REP is finalized, auto-numbered
@@ -644,10 +644,10 @@ References
 ==========
 
 .. [1] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
-   (http://ros.org/reps/rep-0001.html)
+   (https://ros.org/reps/rep-0001.html)
 
 .. [2] REP 9, Sample Plaintext REP Template, Warsaw
-   (http://ros.org/reps/pep-0009.html)
+   (https://ros.org/reps/pep-0009.html)
 
 
 Copyright

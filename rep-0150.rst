@@ -65,7 +65,7 @@ It may not contain any GUI dependencies.
 ::
 
  - ros_core:
-      packages: [catkin, cmake_modules, class_loader, common_msgs, gencpp,
+      packages: [catkin, class_loader, cmake_modules, common_msgs, gencpp,
                  geneus, genlisp, genmsg, gennodejs, genpy, message_generation,
                  message_runtime, pluginlib, ros, ros_comm,
                  rosbag_migration_rule, rosconsole, rosconsole_bridge,
@@ -138,15 +138,16 @@ mobile robots, though they are not specific to a particular robot.
 The `desktop` variant is more minimal and only provides the stacks in
 the `robot` variant, plus visualization and debugging tools.
 Both of these variants contain tutorials for the stacks they provide.
-In ROS Noetic `desktop` is extended to include `actionlib_tools`.
+
+\* In ROS Noetic `desktop` is extended to include `actionlib_tools`.
 
 ::
 
   - desktop:
       extends: [robot, viz]
-      packages: [actionlib_tools(Noetic and newer), angles, common_tutorials,
-                 geometry_tutorials, ros_tutorials, roslint, urdf_tutorial,
-                 visualization_tutorials]
+      packages: [\*actionlib_tools, angles, common_tutorials,
+                 geometry_tutorials, joint_state_publisher_gui, ros_tutorials,
+                 roslint, urdf_tutorial, visualization_tutorials]
   - desktop_full:
       extends: [desktop, perception, simulators]
       packages: [urdf_sim_tutorial]
@@ -179,7 +180,7 @@ References
    (http://www.ros.org/reps/rep-0108.html)
 
 .. [2] REP 127: Specification of package manifest format
-   (http://ros.org/reps/rep-0127.html)
+   (https://ros.org/reps/rep-0127.html)
 
 .. [3] REP 131: Groovy Variants
    (http://www.ros.org/reps/rep-0131.html)

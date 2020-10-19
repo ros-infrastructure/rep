@@ -447,7 +447,7 @@ References and Footnotes
    https://github.com/ros-infrastructure/rep/commits/master
 
 .. [2] REP 12, Sample reStructuredText REP Template
-   (http://ros.org/reps/rep-0012.html)
+   (https://ros.org/reps/rep-0012.html)
 
 .. _issue tracker:
    https://github.com/ros-infrastructure/rep/issues

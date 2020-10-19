@@ -444,21 +444,21 @@ References
 .. [3] ROS Manifest XML Tags Reference
    (http://ros.org/doc/independent/api/rospkg/html/manifest_xml.html)
 .. [4] REP 109: Unary Stacks
-   (http://ros.org/reps/rep-0109.html)
+   (https://ros.org/reps/rep-0109.html)
 .. [5] REP 102: ROS Install Target
-   (http://ros.org/reps/rep-0102.html) 
+   (https://ros.org/reps/rep-0102.html) 
 .. [6] ROS Fuerte Migration Guide
    (http://ros.org/wiki/fuerte/Migration)
 .. [7] REP 124: Changes to roslaunch and rosrun for REP 122 and catkin build system
-   (http://ros.org/reps/rep-0124.html)
+   (https://ros.org/reps/rep-0124.html)
 .. [8] Filesystem Hierarchy Standard 2.3
    (http://www.pathname.com/fhs/pub/fhs-2.3.pdf)
 .. [9] REP 123: ROS_ETC_DIR, ROS_DISTRO environment variables and ROS_ROOT changes
-   (http://ros.org/reps/rep-0123.html) 
+   (https://ros.org/reps/rep-0123.html) 
 .. [10] Catkin build system documentation
    (http://ros.org/wiki/catkin)
 .. [11] REP 127: Specification of package manifest format
-   (http://ros.org/reps/rep-0127.html) 
+   (https://ros.org/reps/rep-0127.html) 
 
 Copyright
 =========

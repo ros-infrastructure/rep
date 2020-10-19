@@ -1,6 +1,6 @@
 REP: 133
 Title: Separation of build environment and source tree tools
-Author: Tully Foote <tfoote@openrobotics.org>, Dirk Thomas, Thibault Kruse <kruset@in.tum.de>, William Woodall <wwoodall@willowgarage.com>
+Author: Tully Foote <tfoote@openrobotics.org>, Dirk Thomas, Thibault Kruse <kruset@in.tum.de>, William Woodall <william@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
@@ -627,7 +627,7 @@ References and Footnotes
   (https://github.com/ros/catkin/issues/249)
 
 .. [4] REP 110, SCM-like rosinstall command structure
-   (http://ros.org/reps/rep-0012.html)
+   (https://ros.org/reps/rep-0012.html)
 
 Copyright
 =========
