@@ -145,7 +145,7 @@ Both of these variants contain tutorials for the stacks they provide.
 
   - desktop:
       extends: [robot, viz]
-      packages: [\*actionlib_tools, angles, common_tutorials,
+      packages: [*actionlib_tools, angles, common_tutorials,
                  geometry_tutorials, joint_state_publisher_gui, ros_tutorials,
                  roslint, urdf_tutorial, visualization_tutorials]
   - desktop_full:
