@@ -583,27 +583,19 @@ All items on the list for the next distro should already be released into the ro
 
     * `micro-ROS/benchmarking <https://github.com/micro-ROS/benchmarking>`_
     * `micro-ROS/docker <https://github.com/micro-ROS/docker>`_
-    * `micro-ROS/drive_base <https://github.com/micro-ROS/drive_base>`_
     * `micro-ROS/freertos_apps <https://github.com/micro-ROS/freertos_apps>`_
     * `micro-ROS/micro_ros_arduino <https://github.com/micro-ROS/micro_ros_arduino>`_
     * `micro-ROS/micro_ros_espidf_component <https://github.com/micro-ROS/micro_ros_espidf_component>`_
     * `micro-ROS/micro_ros_setup <https://github.com/micro-ROS/micro_ros_setup>`_
     * `micro-ROS/micro_ros_zephyr_module <https://github.com/micro-ROS/micro_ros_zephyr_module>`_
-    * `micro-ROS/micro-ROS_crazyflie_demo <https://github.com/micro-ROS/micro-ROS_crazyflie_demo>`_
-    * `micro-ROS/micro-ROS_kobuki_demo <https://github.com/micro-ROS/micro-ROS_kobuki_demo>`_
-    * `micro-ROS/micro-ROS_moveit2_demo <https://github.com/micro-ROS/micro-ROS_moveit2_demo>`_
-    * `micro-ROS/micro-ROS_openmanipulator_demo <https://github.com/micro-ROS/micro-ROS_openmanipulator_demo>`_
-    * `micro-ROS/micro-ROS_sensors_demo <https://github.com/micro-ROS/micro-ROS_sensors_demo>`_
     * `micro-ROS/micro-ROS-Agent <https://github.com/micro-ROS/micro-ROS-Agent>`_
     * `micro-ROS/micro-ROS-bridge_RPI <https://github.com/micro-ROS/micro-ROS-bridge_RPI>`_
-    * `micro-ROS/micro-ROS-demos <https://github.com/micro-ROS/micro-ROS-demos>`_
     * `micro-ROS/nuttx_apps <https://github.com/micro-ROS/nuttx_apps>`_
     * `micro-ROS/nuttx_kconfig_vendor <https://github.com/micro-ROS/nuttx_kconfig_vendor>`_
     * `micro-ROS/rmw-microxrcedds <https://github.com/micro-ROS/rmw-microxrcedds>`_
     * `micro-ROS/rosidl_typesupport_microxrcedds <https://github.com/micro-ROS/rosidl_typesupport_microxrcedds>`_
     * `micro-ROS/system_modes <https://index.ros.org/p/system_modes/>`_
     * `micro-ROS/zephyr_apps <https://github.com/micro-ROS/zephyr_apps>`_
-    * `eProsima/crazyflie-micro-xrce-dds <https://github.com/eProsima/crazyflie-micro-xrce-dds>`_
     * `eProsima/Micro-XRCE-DDS <https://github.com/eProsima/Micro-XRCE-DDS>`_
     * `eProsima/Micro-XRCE-DDS-Agent <https://github.com/eProsima/Micro-XRCE-DDS-Agent>`_
     * `eProsima/Micro-XRCE-DDS-Client <https://github.com/eProsima/Micro-XRCE-DDS-Client>`_
