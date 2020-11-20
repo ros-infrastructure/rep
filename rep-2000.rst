@@ -744,14 +744,14 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                        |
 +==========================+=====================+===============+=============================+======================================+
-| rmw_fastrtps_cpp         | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
+| rmw_fastrtps_cpp         | eProsima Fast-DDS   | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_connext_cpp          | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
 |                          |                     |               | and OpenEmbedded            |                                      |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS   | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 
 Middleware implementation support is dependent upon the platform support tier.
@@ -800,7 +800,7 @@ Dependency Requirements:
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 | Cyclone DDS |                                      0.6.x                                             |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
-| Fast-RTPS   |                                      2.0.x                                             |
+| Fast-DDS    |                                      2.0.x                                             |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
