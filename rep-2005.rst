@@ -358,6 +358,7 @@ All items on the list for the next distro should already be released into the ro
     * `navigation2/nav_2d_msgs <https://index.ros.org/p/nav_2d_msgs/>`_
     * `navigation2/nav_2d_utils <https://index.ros.org/p/nav_2d_utils/>`_
     * `navigation2/navigation2 <https://index.ros.org/p/navigation2/>`_
+    * `navigation.ros.org <https://github.com/ros-planning/navigation.ros.org/>`_
 
   * MoveIt2
 
