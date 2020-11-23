@@ -273,6 +273,14 @@ All items on the list for the next distro should already be released into the ro
     * `rosidl_typesupport_fastrtps/rosidl_typesupport_fastrtps_c <https://index.ros.org/p/rosidl_typesupport_fastrtps_c/>`_
     * `rosidl_typesupport_fastrtps/rosidl_typesupport_fastrtps_cpp <https://index.ros.org/p/rosidl_typesupport_fastrtps_cpp/>`_
 
+  * Micro XRCE-DDS
+
+    * `eProsima/Micro-CDR <https://github.com/eProsima/Micro-CDR>`_
+    * `eProsima/Micro-XRCE-DDS <https://github.com/eProsima/Micro-XRCE-DDS>`_	
+    * `eProsima/Micro-XRCE-DDS-Agent <https://github.com/eProsima/Micro-XRCE-DDS-Agent>`_	
+    * `eProsima/Micro-XRCE-DDS-Client <https://github.com/eProsima/Micro-XRCE-DDS-Client>`_	
+    * `eProsima/Micro-XRCE-DDS-Gen <https://github.com/eProsima/Micro-XRCE-DDS-Gen>`_	
+
 * Client libraries
 
   * `rcl/rcl <https://index.ros.org/p/rcl/>`_
