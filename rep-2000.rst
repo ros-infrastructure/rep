@@ -22,6 +22,7 @@ Note: the following applies to ROS 2 releases *after* Foxy Fitzroy.
 Before, releases were made more frequently but with shorter support due to the fact that many foundational parts of ROS 2 were still heavily iterated on.
 
 TL;DR ROS 2 release schedule post Foxy:
+
 * May 2021: G Turtle: non-LTS release, supported for 1.5 years
 * May 2022: H Turtle: LTS release, supported for 5 years
 * May 2023: I Turtle: non-LTS release, supported for 1.5 years
