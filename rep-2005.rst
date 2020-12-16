@@ -545,7 +545,7 @@ All items on the list for the next distro should already be released into the ro
   * `rviz/rviz_rendering <https://index.ros.org/p/rviz_rendering/>`_
   * `rviz/rviz_rendering_tests <https://index.ros.org/p/rviz_rendering_tests/>`_
   * `rviz/rviz_visual_testing_framework <https://index.ros.org/p/rviz_visual_testing_framework/>`_
-  * `cross_compile/cross_compile <https://github.com/ros-tooling/cross_compile>`_
+  * `ros-tooling/cross_compile <https://github.com/ros-tooling/cross_compile>`_
   * `ros-tooling/system_metrics_collector <https://github.com/ros-tooling/system_metrics_collector>`_
   * `ApexAI/performance_test <https://gitlab.com/ApexAI/performance_test>`_
   * `ApexAI/performance_test_ros1_msgs <https://gitlab.com/ApexAI/performance_test>`_
