@@ -287,6 +287,8 @@ All items on the list for the next distro should already be released into the ro
   * `rclcpp/rclcpp_components <https://index.ros.org/p/rclcpp_components/>`_
   * `rclcpp/rclcpp_lifecycle <https://index.ros.org/p/rclcpp_lifecycle/>`_
   * `rclpy/rclpy <https://index.ros.org/p/rclpy/>`_
+  * `rclc/rclc <https://index.ros.org/p/rclc/>`_
+  * `rclc/rclc_lifecycle <https://index.ros.org/p/rclc_lifecycle/>`_
 
 * Orchestration
 
