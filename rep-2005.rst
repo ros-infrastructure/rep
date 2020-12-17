@@ -439,6 +439,7 @@ All items on the list for the next distro should already be released into the ro
     * `phidgets_drivers/phidgets_spatial <https://index.ros.org/p/phidgets_spatial/>`_
     * `phidgets_drivers/phidgets_temperature <https://index.ros.org/p/phidgets_temperature/>`_
     * `KumarRobotics/imu_vn_100 <https://github.com/KumarRobotics/imu_vn_100>`_
+    * `ros-drivers/ros2_ouster_drivers <https://github.com/ros-drivers/ros2_ouster_drivers>`_
 
 * Documentation, Examples, Tutorials
 
