@@ -580,20 +580,10 @@ All items on the list for the next distro should already be released into the ro
 
   * micro-ROS
 
-    * `micro-ROS/benchmarking <https://github.com/micro-ROS/benchmarking>`_
-    * `micro-ROS/docker <https://github.com/micro-ROS/docker>`_
-    * `micro-ROS/freertos_apps <https://github.com/micro-ROS/freertos_apps>`_
     * `micro-ROS/micro_ros_arduino <https://github.com/micro-ROS/micro_ros_arduino>`_
-    * `micro-ROS/micro_ros_espidf_component <https://github.com/micro-ROS/micro_ros_espidf_component>`_
-    * `micro-ROS/micro_ros_setup <https://github.com/micro-ROS/micro_ros_setup>`_
-    * `micro-ROS/micro_ros_zephyr_module <https://github.com/micro-ROS/micro_ros_zephyr_module>`_
     * `micro-ROS/micro-ROS-Agent <https://github.com/micro-ROS/micro-ROS-Agent>`_
-    * `micro-ROS/nuttx_apps <https://github.com/micro-ROS/nuttx_apps>`_
-    * `micro-ROS/nuttx_kconfig_vendor <https://github.com/micro-ROS/nuttx_kconfig_vendor>`_
     * `micro-ROS/rmw-microxrcedds <https://github.com/micro-ROS/rmw-microxrcedds>`_
     * `micro-ROS/rosidl_typesupport_microxrcedds <https://github.com/micro-ROS/rosidl_typesupport_microxrcedds>`_
-    * `micro-ROS/system_modes <https://index.ros.org/p/system_modes/>`_
-    * `micro-ROS/zephyr_apps <https://github.com/micro-ROS/zephyr_apps>`_
 
 
 Copyright
