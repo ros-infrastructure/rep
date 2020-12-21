@@ -588,6 +588,13 @@ All items on the list for the next distro should already be released into the ro
     * `rqt_tf_tree/rqt_tf_tree <https://index.ros.org/p/rqt_tf_tree/>`_
     * `rqt_topic/rqt_topic <https://index.ros.org/p/rqt_topic/>`_
 
+  * micro-ROS
+
+    * `micro-ROS/micro_ros_arduino <https://github.com/micro-ROS/micro_ros_arduino>`_
+    * `micro-ROS/micro-ROS-Agent <https://github.com/micro-ROS/micro-ROS-Agent>`_
+    * `micro-ROS/rmw-microxrcedds <https://github.com/micro-ROS/rmw-microxrcedds>`_
+    * `micro-ROS/rosidl_typesupport_microxrcedds <https://github.com/micro-ROS/rosidl_typesupport_microxrcedds>`_
+
 
 Copyright
 =========
