@@ -819,8 +819,8 @@ These versions are thus a low watermark.
 Package manager use for dependencies:
 
 - Ubuntu, Debian: apt
-- MacOS: Homebrew, pip
 - Windows: Chocolatey, pip
+- MacOS: Homebrew, pip
 - OpenEmbedded: opkg
 
 
