@@ -716,7 +716,7 @@ Build System Support:
 - setuptools
 
 Galactic Geochelone (May 2021 - May 2022)
-----------------------------------
+-----------------------------------------
 
 Targeted platforms:
 
