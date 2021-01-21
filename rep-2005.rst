@@ -194,6 +194,7 @@ All items on the list for the next distro should already be released into the ro
   * `rcpputils/rcpputils <https://index.ros.org/p/rcpputils/>`_
   * `ros_testing/ros2test <https://index.ros.org/p/ros2test/>`_
   * `ros_testing/ros_testing <https://index.ros.org/p/ros_testing/>`_
+  * `ros-tooling/libstatistics_collector <https://index.ros.org/p/libstatistics_collector/>`_
 
 * ROS interface pipeline
 
