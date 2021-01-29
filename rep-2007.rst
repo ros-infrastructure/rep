@@ -1,5 +1,5 @@
 REP: 2007
-Title: Type Masquerading
+Title: Adapting C++ Types
 Author: Audrow Nash <audrow@openrobotics.org>
 Status: Active
 Type: Standard
@@ -13,7 +13,7 @@ Abstract
 
   A short (~200 word) description of the technical issue being addressed.
 
-This REP suggests a new feature for ROS 2's C++ client library that makes it easier to convert between ROS 2 interfaces and common C++ data structures, such as ``std::string`` and ``cv::Mat``.
+This REP suggests a new feature for ROS 2's C++ client library that makes it easier to convert between ROS 2 interfaces and custom C++ data structures, such as ``std::string`` and ``cv::Mat``.
 
 
 Motivation
@@ -24,51 +24,58 @@ Motivation
 The primary reason for this change is to improve the developer's experience working with ROS 2.
 Currently, a developer often has to write code to convert a ROS interface into another data structure for use.
 This can be trivial, in the case accessing the ``data`` field in ``std_msgs::msg::String``;
-or more involved such when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type (`here <https://github.com/ros2/demos/blob/11e00ecf7eec25320f950227531119940496d615/image_tools/src/cam2image.cpp#L277-L291>`_).
+or more involved such when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
 Such conversions are additional work for the programmer and are potential sources of errors.
-This work seeks to provide a 
+
+Terminology
+===========
+
+.. glossary::
+     Custom type (in code, ``CustomType``)
+       A data structure that *is not* a ROS 2 interface, such as ``std::string`` or ``cv::Mat``.
+     ROS type (in code, ``RosType``)
+       A data structure that *is* a ROS 2 interface, such as ``std_msgs::msg::String`` or ``sensor_msgs::msg::Image``.
 
 Specification
 =============
 
   The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current ROS client libraries, if applicable (roscpp, rospy, roslisp, etc...).
 
-While the term of this REP is still selected, the general structure can be thought of as follows, using ``TypeMasquerade`` in this case.
+There are different tiers of expressivity in the syntax for type adaptation, including both explicit to implicit forms.
+The explicit forms require the custom type and the ROS type to be specified; while the implicit form makes an assumption about the ROS type based on the custom type.
+The explicit forms could be used to clearly communicate what is happening, which may be useful in examples or tutorials, or may be used depending on the preferences of the developer.
+While the implicit, and most concise, form will primarily be used for its convenience (although it lacks some of the functionality of the explicit forms).
 
-  template<class From, class To>
-  struct TypeMapping
-  {
-    // This is where the conversion would occur
-  };
+Below are examples of different syntaxes for type adaptation.
+In these examples and using the terminology above, ``std::string`` would be considered the custom type and the ROS interface ``std_msgs::msg::String`` would be considered the ROS type.
+Note that for every publisher created in the examples below, a ``std::string`` type variable (the custom type) would be adapted to be published on the ROS network as a ``std_msgs::msg::String`` (the ROS type).
 
-  template<class From>
-  struct TypeMasquerade {
-    template<class To>
-    using as = TypeMapping<From, To>;
-  };
+.. code-block:: cpp
 
-Where there are four different tiers of how type masquerading could be expressed.
+   // Explicit Form 1: Most explicit
+   using MsgT = rclcpp::TypeAdapt<std::string>::to<std_msgs::msg::String>;
+   rclcpp::Publisher<MsgT>::SharedPtr publisher1_;
 
-The most explicit, could look like this::
+The most explicit form could be shortened in the following to ways:
 
-  using MsgT = rclcpp::TypeMasquerade<std_msgs::msg::String>::as<std::string>;
-  rclcpp::Publisher<MsgT>::SharedPtr publisher_;
+.. code-block:: cpp
 
-You would use this if you want it to be clear what is happening (maybe examples or depending on the preferences of the developer), or you might use it when `std::string` could map to more than one ROS type and you need to select which one to use.
+   // Explicit Form 2
+   rclcpp::Publisher<TypeAdapt<std::string, std_msgs::msg::String>>::SharedPtr publisher2_;
 
-We could have a short form of this that takes two arguments::
+   // Explicit Form 3
+   rclcpp::Publisher<std::string, std_msgs::msg::String>::SharedPtr publisher_3;
 
-  rclcpp::Publisher<TypeMapping<std_msgs::msg::String, std::string>>::SharedPtr publisher_;
+Note that the 3rd explicit form may be prohibitively complicated to implement since there are multiple template arguments already for publishers and subscribers.
 
-Or this, but it might be prohibitively complicated to implement since there are multiple template arguments already for Publisher/Subscription::
+The final shorthand, performs an implicit type adaptation with the custom type ``std::string`` which will be adapted to the ROS type``std_msgs::msg::String``:
 
-  rclcpp::Publisher<std_msgs::msg::String, std::string>::SharedPtr publisher_;
+.. code-block:: cpp
 
-Or you can be implicit::
+   // Implicit Form
+   rclcpp::Publisher<std::string>::SharedPtr publisher_4;
 
-  rclcpp::Publisher<std::string>::SharedPtr publisher_;
-
-If ``std::string`` has multiple types it could represent then this has to error.
+In this final form, if ``std::string`` has multiple types it could represent, then an error will be raised during compilation.
 
 
 Rationale
@@ -76,105 +83,122 @@ Rationale
 
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
-  The rationale should provide evidence of consensus within the community and discuss important objections or concerns raised during discussion.
+Selecting a term
+----------------
 
-Putting it in ``rclcpp``
-------------------------
+There are various terms that may be suitable for type adapting feature described.
+In selecting a term,  
 
-It is thought that this should be put in the C++ client library for the following reasons:
+:High priority:
 
-* Take advantage of C++'s templating system
+* Clearly communicate the described feature
+* Clearly communicate the order of custom type and ROS type arguments
 
-Picking a term
----------------
+:Low priority:
 
-Goals
-"""""
+* The custom type should be the first argument so that
+  * the custom type is the first argument in both the explicit and implicit syntax
+  * the custom type is read first, for convenience 
+* The syntax reads well
 
-High priority:
-* Clearly communicate the that one type of term
-* Clearly communicate the order of the ROS and C++ arguments
+Candidate terms
+^^^^^^^^^^^^^^^
 
-Low priority:
-* The C++ type should be on the left, so it is seen first
-* The order of the arguments shouldn't change in the two argument or one argument form
+Several possible terms were considered.
+Here is a brief summary of the discussion around different terms.
 
-Candidates
+Masquerade
 """"""""""
 
-"Masquerade" and "Facade" are the two terms that have been discussed at length. Some pros and cons for these terms are as follows:
+There is some precident for using masquerade in similar settings, IP Masquerading in the Linux kernel [2]_ for example.
+"Masquerade" is also a verb, which may make it easier to discuss among developers.
+However, it was thought that "Masquerade" would be a confusing word for non-English and non-French speakers.
+One disadvantage of "Masquerade" is that there is ambiguity in its usage.
+For example,
 
-+------------+--------------------------------------------------------------+--------------------------------------------+
-| **Term**   | **Pros**                                                     | **Cons**                                   |
-+------------+--------------------------------------------------------------+--------------------------------------------+
-| Masquerade | * Seems to be a common computer science concept,             | * An uncommon word that may be hard for    |
-|            |   for example <IP Masquerading in the Linux kernel           |   non-English and non-French speakers      |
-|            |   <http://linuxdocs.org/HOWTOs/IP-Masquerade-HOWTO-2.html>`_ |                                            |
-|            | * It is a verb, which perhaps makes it easier to discuss     |                                            |
-+------------+--------------------------------------------------------------+--------------------------------------------+
-| Facade     | * Seems to be a common programming concept for extending     | * Isn't a verb, so perhaps this will make  |
-|            |   object oriented behavior [4]_                              |   it harder to talk about in discussions   |
-|            | * Seems to be in the public vernacular                       |                                            |
-|            | * More correct in an object oriented sense                   |                                            |
-+------------+--------------------------------------------------------------+--------------------------------------------+
+.. code-block:: cpp
 
-We can also consider the anticipated usage for each of these terms:
+   Masquerade<std_msgs::msg::String>::as<std::string>
 
-+------------+----------------------------------------------------------+
-| **Term**   | **Usage**                                                |
-+------------+----------------------------------------------------------+
-| Masquerade | ::                                                       |
-|            |                                                          |
-|            |   Masquerade<std_msgs::msg::String>::as<std::string>     |
-|            |                                                          |
-|            | or                                                       |
-|            |                                                          |
-|            | ::                                                       |
-|            |                                                          |
-|            |   Masquerade<std::string>::as<std_msgs::msg::String>     |
-+------------+----------------------------------------------------------+
-| Facade     | ::                                                       |
-|            |                                                          |
-|            |   Facade<std::string>::instead_of<std_msgs::msg::String> |
-+------------+----------------------------------------------------------+
+and
 
-A major disadvantage of "Masquerade" is that it is not clear which of the two usages is more correct.
-Given a different perspective, both make sense.
-This confusion may result in frustration on the part of the ROS 2 developer:
+.. code-block:: cpp
+
+   Masquerade<std::string>::as<std_msgs::msg::String>   
+
+both seem to make sense.
+This ambiguity may result in frustration on the part of the ROS 2 developer:
+
 * frequently having to refer back to documentation
 * possibly opaque error messages
 
-While "Facade" does seem to be clearerd in terms of arguments, it has been pointed out the ``::instead_of`` syntax doesn't read well.
-In addition, the "Facade pattern" [4]_ seems to be more about simplifying an interface, where as in our case, we are proposing to convert one data type to another behind the scenes.
+Facade
+^^^^^^
+
+"Facade" seems to be a more common English word than "masquerade".
+It also is commonly used as a design pattern in object oriented programming.
+However, the "Facade pattern" is typically used to simplify a complex interface [3]_, which is not the major feature being proposed here.
+
+It was thought to use "Facade" in the following form:
+
+.. code-block:: cpp
+
+   Facade<std::string>::instead_of<std_msgs::msg::String>
 
 
-Alternative choices
-"""""""""""""""""""
+Adapt
+^^^^^
 
-Other possible suggestions (ranked by Audrow's opinion, with best at the top):
-* ``TypeAdapter<CppType>::to<RosType>``, follows Adapter pattern [6]_ - also most consistent with [3]_
-* ``TypeWrapper<CppType>::to<RosType>``
-* ``TypeMap<CppType>::to<RosType>``
-* ``TypeUse<CppType>::instead_of<RosType>``
-* ``TypeAccept<CppType>::as<RosType>``
-* ``TypeConvert<RosType>::to<CppType>``
+"Adapt" is certainly a common English word, and the "Adapter pattern" is a common design pattern for adjusting an interface [4]_, which matches well with the feature being suggested here.
+Also, using "Adapt" is consistent with the documentation of a similar feature in ROS 1 (i.e., "Adapting C++ Types" [5]_).
 
-Suggested but discarded
-* Disguise: Discarded in favor of "Facade"
-* Decorate: Refers to the decorator pattern, which is not quite what we're doing here as our operations will occur at compile time, not run-time
-* Mask: Overloaded as a computer science term [5]_
+"Adapt" also has the advantage of being a verb and of being related to the noun "Adapter".
+This flexiblity may make it easier for developers to discuss its use.
 
-Prepending the word "Type"
-""""""""""""""""""""""""""
+"Adapt" could be used in the following syntax:
+
+.. code-block:: cpp
+
+   Adapt<std::string>::to<std_msgs::msg::String>
+
+Additional terms considered
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Here is a brief listing of additional terms that were considered and why they were not selected:
+
+:Convert: Passed in favor of "Adapt", which expresses a similar idea and has a common design pattern.
+
+:Decorate: Passed in favor of "Fascade", which seems to be more common.
+
+:Mask: Overloaded as a computer science term [6]_
+
+:Map: Expresses the idea well, but has a lot of meanings in math and programming.
+
+:Use: Possibly confusing with C++'s ``using`` keyword; also not terribly descriptive.
+
+:Wrap: Passed in favor of "Adapt", which seems to be more common.
+
+
+Prepending the selected term with "Type"
+----------------------------------------
 
 Most of the terms being considered refer to a general design pattern and, thus, may be used in other ROS features.
-To reduce ambiguity, prefixing the term with "Type" would make its usage clearer and help avoid name collisions.
+To reduce ambiguity, prefixing the term with "Type" would make its usage clearer and help avoid name collisions and should make it easier for developers to find documentation.
 
+
+Adding this feature in ``rclcpp``
+---------------------------------
+
+Placing this feature in ROS 2's C client library, ``rcl``, would allow this feature to be used in other client libraries, such as ``rclcpp`` and ``rclpy``.
+However, it is not clear that the difficulty of implementing this feature in ``rcl`` is worth the benefit to other client libraries.
+Placing this feature in ``rclcpp``, ROS 2's C++ client library, would allow implementation to take advantage of C++'s standard template library.
 
 Backwards Compatibility
 =======================
 
   All REPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The REP must explain how the author proposes to deal with these incompatibilities. REP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+
+The proposed feature adds new functionality while not modifying existing functionality.
 
 
 Reference Implementation
@@ -184,24 +208,29 @@ Reference Implementation
 
   The final implementation must include test code and documentation.
 
-  An example usage of references [1]_.
-
+TK.
 
 References
 ==========
 
-.. [1] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
-   (https://ros.org/reps/rep-0001.html)
-.. [2] Masquerade, Merriam-Webster
-   (https://www.merriam-webster.com/dictionary/masquerade)
-.. [3] Adapting C++ Types
-   (http://wiki.ros.org/roscpp/Overview/MessagesSerializationAndAdaptingTypes#Adapting_C.2B-.2B-_Types)
-.. [4] Facade Pattern
+.. [1] ``cam2image.cpp`` demo 
+   (https://github.com/ros2/demos/blob/11e00ecf7eec25320f950227531119940496d615/image_tools/src/cam2image.cpp#L277-L291)
+
+.. [2] IP Masquerading in the Linux Kernel
+   (http://linuxdocs.org/HOWTOs/IP-Masquerade-HOWTO-2.html)
+
+.. [3] Facade Pattern
    (https://en.wikipedia.org/wiki/Facade_pattern)
-.. [5] Masking (computing)
-   (https://en.wikipedia.org/wiki/Mask_(computing))
-.. [6] Adapter pattern
+
+.. [4] Adapter pattern
    (https://en.wikipedia.org/wiki/Adapter_pattern)
+
+.. [5] Adapting C++ Types
+   (http://wiki.ros.org/roscpp/Overview/MessagesSerializationAndAdaptingTypes#Adapting_C.2B-.2B-_Types)
+
+.. [6] Masking (computing)
+   (https://en.wikipedia.org/wiki/Mask_(computing))
+
 
 Copyright
 =========
