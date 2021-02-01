@@ -13,7 +13,7 @@ Abstract
 
   A short (~200 word) description of the technical issue being addressed.
 
-This REP suggests a new feature for ROS 2's C++ client library that makes it easier to convert between ROS 2 interfaces and custom C++ data structures, such as ``std::string`` and ``cv::Mat``.
+This REP proposes an extension to publishers and subscribers in `rclcpp` to make it easier to convert between ROS 2 interfaces and custom C++ data structures.
 
 
 Motivation
