@@ -1,7 +1,7 @@
 REP: 2007
 Title: Adapting C++ Types
 Author: Audrow Nash <audrow@openrobotics.org>
-Status: Active
+Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 28-Jan-2020
