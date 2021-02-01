@@ -22,7 +22,7 @@ Motivation
   The motivation is critical for REPs that want to change the ROS APIs. It should clearly explain why the existing API specification is inadequate to address the problem that the REP solves. REP submissions without sufficient motivation may be rejected outright.
 
 The primary reason for this change is to improve the developer's experience working with ROS 2.
-Currently, a developer often has to write code to convert a ROS interface into another data structure for use.
+Currently, developers often write code to convert a ROS interface into another custom data structure for use in their programs.
 This can be trivial, in the case accessing the ``data`` field in ``std_msgs::msg::String``;
 or more involved such when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
 Such conversions are additional work for the programmer and are potential sources of errors.
@@ -42,13 +42,14 @@ Specification
   The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current ROS client libraries, if applicable (roscpp, rospy, roslisp, etc...).
 
 There are different tiers of expressivity in the syntax for type adaptation, including both explicit to implicit forms.
-The explicit forms require the custom type and the ROS type to be specified; while the implicit form makes an assumption about the ROS type based on the custom type.
-The explicit forms could be used to clearly communicate what is happening, which may be useful in examples or tutorials, or may be used depending on the preferences of the developer.
+The explicit forms require the custom type and the ROS type to be specified; 
+while the implicit form makes an assumption about the ROS type based on the custom type.
+The explicit forms may be used to clearly communicate what is happening, which could be useful in examples or tutorials, or may be used depending on the preferences of the developer.
 While the implicit, and most concise, form will primarily be used for its convenience (although it lacks some of the functionality of the explicit forms).
 
 Below are examples of different syntaxes for type adaptation.
-In these examples and using the terminology above, ``std::string`` would be considered the custom type and the ROS interface ``std_msgs::msg::String`` would be considered the ROS type.
-Note that for every publisher created in the examples below, a ``std::string`` type variable (the custom type) would be adapted to be published on the ROS network as a ``std_msgs::msg::String`` (the ROS type).
+In these examples and using the terminology above, ``std::string`` will be considered the custom type and the ROS interface ``std_msgs::msg::String`` will be considered the ROS type.
+Note that, for every publisher created in the examples below, a ``std::string`` type variable (the custom type) would be adapted to be published on the ROS network as a ``std_msgs::msg::String`` (the ROS type).
 
 .. code-block:: cpp
 
@@ -68,14 +69,14 @@ The most explicit form could be shortened in the following to ways:
 
 Note that the 3rd explicit form may be prohibitively complicated to implement since there are multiple template arguments already for publishers and subscribers.
 
-The final shorthand, performs an implicit type adaptation with the custom type ``std::string`` which will be adapted to the ROS type``std_msgs::msg::String``:
+The final shorthand performs an implicit type adaptation with the custom type ``std::string`` which will be adapted to the ROS type``std_msgs::msg::String``:
 
 .. code-block:: cpp
 
    // Implicit Form
    rclcpp::Publisher<std::string>::SharedPtr publisher_4;
 
-In this final form, if ``std::string`` has multiple types it could represent, then an error will be raised during compilation.
+In this final form, if the custom type (``std::string``) has multiple ROS types that it could represent, then an error will be raised during compilation.
 
 
 Rationale
@@ -170,7 +171,7 @@ Here is a brief listing of additional terms that were considered and why they we
 
 :Decorate: Passed in favor of "Fascade", which seems to be more common.
 
-:Mask: Overloaded as a computer science term [6]_
+:Mask: Overloaded as a computer science term [6]_.
 
 :Map: Expresses the idea well, but has a lot of meanings in math and programming.
 
@@ -182,8 +183,9 @@ Here is a brief listing of additional terms that were considered and why they we
 Prepending the selected term with "Type"
 ----------------------------------------
 
-Most of the terms being considered refer to a general design pattern and, thus, may be used in other ROS features.
-To reduce ambiguity, prefixing the term with "Type" would make its usage clearer and help avoid name collisions and should make it easier for developers to find documentation.
+Most of the terms being considered refer to general design patterns and, thus, using just the pattern's name may cause naming collisions or confusion as those design patterns may be used in other parts of the ROS codebase. 
+To reduce ambiguity, prefixing the term selected with "Type" would make its usage clearer and help avoid name collisions;
+it should also make it easier for developers to find relevant documentation.
 
 
 Adding this feature in ``rclcpp``
@@ -191,7 +193,9 @@ Adding this feature in ``rclcpp``
 
 Placing this feature in ROS 2's C client library, ``rcl``, would allow this feature to be used in other client libraries, such as ``rclcpp`` and ``rclpy``.
 However, it is not clear that the difficulty of implementing this feature in ``rcl`` is worth the benefit to other client libraries.
-Placing this feature in ``rclcpp``, ROS 2's C++ client library, would allow implementation to take advantage of C++'s standard template library.
+The primary client library that is expected to use this feature is ROS 2's C++ client library, ``rclcpp``.
+Placing this feature in ``rclcpp`` would allow implementation to take advantage of C++'s standard template library, and thus, speed up development.
+
 
 Backwards Compatibility
 =======================
