@@ -50,7 +50,7 @@ Note that, for every publisher created in the examples below, a ``std::string`` 
 
    // Explicit Form 1: Most explicit
    using MsgT = rclcpp::AdaptType<std::string>::to<std_msgs::msg::String>;
-   auto pub = std::make_shared<rclcpp::Publisher<MsgT>>();
+   auto pub1 = std::make_shared<rclcpp::Publisher<MsgT>>();
 
 The most explicit form could be shortened in the following to ways:
 
@@ -58,10 +58,10 @@ The most explicit form could be shortened in the following to ways:
 
    // Explicit Form 2
    using MsgT = rclcpp::AdaptType<std::string, std_msgs::msg::String>;
-   auto pub = std::make_shared<rclcpp::Publisher<MsgT>>();
+   auto pub2 = std::make_shared<rclcpp::Publisher<MsgT>>();
 
    // Explicit Form 3
-   auto pub = std::make_shared<rclcpp::Publisher<std::string, std_msgs::msg::String>>();
+   auto pub3 = std::make_shared<rclcpp::Publisher<std::string, std_msgs::msg::String>>();
 
 Note that the 3rd explicit form may be prohibitively complicated to implement since there are multiple template arguments already for publishers and subscribers.
 
@@ -70,7 +70,7 @@ The final shorthand performs an implicit type adaptation with the custom type ``
 .. code-block:: cpp
 
    // Implicit Form
-   auto pub = std::make_shared<rclcpp::Publisher<std::string>>();
+   auto pub4 = std::make_shared<rclcpp::Publisher<std::string>>();
 
 In this final form, if the custom type (``std::string``) has multiple ROS types that it could represent, then an error will be raised during compilation.
 
