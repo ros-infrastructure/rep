@@ -55,17 +55,18 @@ Note that, for every publisher created in the examples below, a ``std::string`` 
 
    // Explicit Form 1: Most explicit
    using MsgT = rclcpp::AdaptType<std::string>::to<std_msgs::msg::String>;
-   rclcpp::Publisher<MsgT>::SharedPtr publisher1_;
+   auto pub = std::make_shared<rclcpp::Publisher<MsgT>>();
 
 The most explicit form could be shortened in the following to ways:
 
 .. code-block:: cpp
 
    // Explicit Form 2
-   rclcpp::Publisher<AdaptType<std::string, std_msgs::msg::String>>::SharedPtr publisher2_;
+   using MsgT = rclcpp::AdaptType<std::string, std_msgs::msg::String>;
+   auto pub = std::make_shared<rclcpp::Publisher<MsgT>>();
 
    // Explicit Form 3
-   rclcpp::Publisher<std::string, std_msgs::msg::String>::SharedPtr publisher_3;
+   auto pub = std::make_shared<rclcpp::Publisher<std::string, std_msgs::msg::String>>();
 
 Note that the 3rd explicit form may be prohibitively complicated to implement since there are multiple template arguments already for publishers and subscribers.
 
@@ -74,7 +75,7 @@ The final shorthand performs an implicit type adaptation with the custom type ``
 .. code-block:: cpp
 
    // Implicit Form
-   rclcpp::Publisher<std::string>::SharedPtr publisher_4;
+   auto pub = std::make_shared<rclcpp::Publisher<std::string>>();
 
 In this final form, if the custom type (``std::string``) has multiple ROS types that it could represent, then an error will be raised during compilation.
 
