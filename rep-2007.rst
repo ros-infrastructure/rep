@@ -11,15 +11,11 @@ Post-History: 28-Jan-2020
 Abstract
 ========
 
-  A short (~200 word) description of the technical issue being addressed.
-
 This REP proposes an extension to publishers and subscribers in `rclcpp` to make it easier to convert between ROS 2 interfaces and custom C++ data structures.
 
 
 Motivation
 ==========
-
-  The motivation is critical for REPs that want to change the ROS APIs. It should clearly explain why the existing API specification is inadequate to address the problem that the REP solves. REP submissions without sufficient motivation may be rejected outright.
 
 The primary reason for this change is to improve the developer's experience working with ROS 2.
 Currently, developers often write code to convert a ROS interface into another custom data structure for use in their programs.
@@ -36,10 +32,9 @@ Terminology
      ROS type (in code, ``RosType``)
        A data structure that *is* a ROS 2 interface, such as ``std_msgs::msg::String`` or ``sensor_msgs::msg::Image``.
 
+
 Specification
 =============
-
-  The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current ROS client libraries, if applicable (roscpp, rospy, roslisp, etc...).
 
 There are different tiers of expressivity in the syntax for type adaptation, including both explicit to implicit forms.
 The explicit forms require the custom type and the ROS type to be specified; 
@@ -82,8 +77,6 @@ In this final form, if the custom type (``std::string``) has multiple ROS types 
 
 Rationale
 =========
-
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
 Selecting a term
 ----------------
@@ -201,19 +194,14 @@ Placing this feature in ``rclcpp`` would allow implementation to take advantage 
 Backwards Compatibility
 =======================
 
-  All REPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The REP must explain how the author proposes to deal with these incompatibilities. REP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
 The proposed feature adds new functionality while not modifying existing functionality.
 
 
 Reference Implementation
 ========================
 
-  The reference implementation must be completed before any REP is given status "Final", but it need not be completed before the REP is accepted. It is better to finish the specification and rationale first and reach consensus on it before writing code.
-
-  The final implementation must include test code and documentation.
-
 The current reference implementation is a work in progress and can be found `here <https://repl.it/@ros2/TypeMasquerading#audrow_main.cpp>`_.
+
 
 References
 ==========
