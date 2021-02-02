@@ -23,6 +23,11 @@ This can be trivial, in the case accessing the ``data`` field in ``std_msgs::msg
 or more involved such when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
 Such conversions are additional work for the programmer and are potential sources of errors.
 
+An additional reason for this change is performance.
+This interface will allow us to define methods for serializing directly to the user requested type, and/or using that type in intra-process communication without ever converting it.
+Whereas without this feature, even to send a ``cv::Mat`` from one publisher to a subscription in the same process would require converting it to a ``sensor_msgs::msg::Image`` first and then back again to cv::Mat.
+
+
 Terminology
 ===========
 
