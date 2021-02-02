@@ -54,7 +54,7 @@ Note that, for every publisher created in the examples below, a ``std::string`` 
 .. code-block:: cpp
 
    // Explicit Form 1: Most explicit
-   using MsgT = rclcpp::TypeAdapt<std::string>::to<std_msgs::msg::String>;
+   using MsgT = rclcpp::AdaptType<std::string>::to<std_msgs::msg::String>;
    rclcpp::Publisher<MsgT>::SharedPtr publisher1_;
 
 The most explicit form could be shortened in the following to ways:
@@ -62,7 +62,7 @@ The most explicit form could be shortened in the following to ways:
 .. code-block:: cpp
 
    // Explicit Form 2
-   rclcpp::Publisher<TypeAdapt<std::string, std_msgs::msg::String>>::SharedPtr publisher2_;
+   rclcpp::Publisher<AdaptType<std::string, std_msgs::msg::String>>::SharedPtr publisher2_;
 
    // Explicit Form 3
    rclcpp::Publisher<std::string, std_msgs::msg::String>::SharedPtr publisher_3;
@@ -180,11 +180,11 @@ Here is a brief listing of additional terms that were considered and why they we
 :Wrap: Passed in favor of "Adapt", which seems to be more common.
 
 
-Prepending the selected term with "Type"
-----------------------------------------
+Including "Type" in the name
+----------------------------
 
 Most of the terms being considered refer to general design patterns and, thus, using just the pattern's name may cause naming collisions or confusion as those design patterns may be used in other parts of the ROS codebase. 
-To reduce ambiguity, prefixing the term selected with "Type" would make its usage clearer and help avoid name collisions;
+To reduce ambiguity, including the term selected with "Type" would make its usage clearer and help avoid name collisions;
 it should also make it easier for developers to find relevant documentation.
 
 
