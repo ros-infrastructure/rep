@@ -212,7 +212,7 @@ Reference Implementation
 
   The final implementation must include test code and documentation.
 
-TK.
+The current reference implementation is a work in progress and can be found `here <https://repl.it/@ros2/TypeMasquerading#audrow_main.cpp>`_.
 
 References
 ==========
