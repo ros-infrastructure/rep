@@ -60,7 +60,7 @@ a. Set the package maintainer section in the ``package.xml`` file as follows.
 b. Post a message to the `ROS Discourse Release Category <http://discourse.ros.org/c/release>`_ indicating that package is now orphaned.
    Wait for response from someone in the ROS Orphaned Package Maintainer team.
 
-c. Add admin permission of both source and release repository to who respond from in the ROS Orphaned Package Maintainers team.
+c. Add admin permission of both source and release repository to whomever responded from the ROS Orphaned Package Maintainers team.
 
 1-B. Orphaning a package by users
 ---------------------------------
