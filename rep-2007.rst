@@ -57,7 +57,7 @@ Note that, for every publisher created in the examples below, a ``std::string`` 
    using MsgT = rclcpp::AdaptType<std::string>::to<std_msgs::msg::String>;
    auto pub1 = std::make_shared<rclcpp::Publisher<MsgT>>();
 
-The most explicit form could be shortened in the following to ways:
+The most explicit form could be shortened in the following ways:
 
 .. code-block:: cpp
 
@@ -110,7 +110,7 @@ Here is a brief summary of the discussion around different terms.
 Masquerade
 """"""""""
 
-There is some precident for using masquerade in similar settings, IP Masquerading in the Linux kernel [2]_ for example.
+There is some precedent for using masquerade in similar settings, IP Masquerading in the Linux kernel [2]_ for example.
 "Masquerade" is also a verb, which may make it easier to discuss among developers.
 However, it was thought that "Masquerade" would be a confusing word for non-English and non-French speakers.
 One disadvantage of "Masquerade" is that there is ambiguity in its usage.
