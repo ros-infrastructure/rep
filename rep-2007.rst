@@ -25,7 +25,7 @@ Such conversions are additional work for the programmer and are potential source
 
 An additional reason for this change is performance.
 This interface will allow us to define methods for serializing directly to the user requested type, and/or using that type in intra-process communication without ever converting it.
-Whereas without this feature, even to send a ``cv::Mat`` from one publisher to a subscription in the same process would require converting it to a ``sensor_msgs::msg::Image`` first and then back again to cv::Mat.
+Whereas without this feature, even to send a ``cv::Mat`` from one publisher to a subscription in the same process would require converting it to a ``sensor_msgs::msg::Image`` first and then back again to ``cv::Mat``.
 
 
 Terminology
