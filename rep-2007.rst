@@ -41,43 +41,140 @@ Terminology
 Specification
 =============
 
-There are different tiers of expressivity in the syntax for type adaptation, including both explicit to implicit forms.
-The explicit forms require the custom type and the ROS type to be specified; 
-while the implicit form makes an assumption about the ROS type based on the custom type.
-The explicit forms may be used to clearly communicate what is happening, which could be useful in examples or tutorials, or may be used depending on the preferences of the developer.
-While the implicit, and most concise, form will primarily be used for its convenience (although it lacks some of the functionality of the explicit forms).
+Defining a Type Adapter
+-----------------------
 
-Below are examples of different syntaxes for type adaptation.
-In these examples and using the terminology above, ``std::string`` will be considered the custom type and the ROS interface ``std_msgs::msg::String`` will be considered the ROS type.
-Note that, for every publisher created in the examples below, a ``std::string`` type variable (the custom type) would be adapted to be published on the ROS network as a ``std_msgs::msg::String`` (the ROS type).
+In order to adapt a custom type to a ROS type, the user must create a template specialization of this structure for the custom type.
+In that specialization they must:
 
-.. code-block:: cpp
+- change ``is_specialized`` to ``std::true_type``,
+- specify the custom type with ``using custom_type = ...``,
+- specify the ROS type with ``using ros_message_type = ...``,
+- provide static convert functions with the signatures:
+   - ``static void convert_to_ros(const custom_type &, ros_message_type &)``,
+   - ``static void convert_to_custom(const ros_message_type &, custom_type &)``
 
-   // Explicit Form 1: Most explicit
-   using MsgT = rclcpp::AdaptType<std::string>::to<std_msgs::msg::String>;
-   auto pub1 = std::make_shared<rclcpp::Publisher<MsgT>>();
+The convert functions must convert from one type to the other.
 
-The most explicit form could be shortened in the following ways:
-
-.. code-block:: cpp
-
-   // Explicit Form 2
-   using MsgT = rclcpp::AdaptType<std::string, std_msgs::msg::String>;
-   auto pub2 = std::make_shared<rclcpp::Publisher<MsgT>>();
-
-   // Explicit Form 3
-   auto pub3 = std::make_shared<rclcpp::Publisher<std::string, std_msgs::msg::String>>();
-
-Note that the 3rd explicit form may be prohibitively complicated to implement since there are multiple template arguments already for publishers and subscribers.
-
-The final shorthand performs an implicit type adaptation with the custom type ``std::string`` which will be adapted to the ROS type``std_msgs::msg::String``:
+For example, here is a theoretical example for adapting ``std::string`` to the ``std_msgs::msg::String`` ROS message type:
 
 .. code-block:: cpp
 
-   // Implicit Form
-   auto pub4 = std::make_shared<rclcpp::Publisher<std::string>>();
+   template<>
+   struct rclcpp::TypeAdapter<
+      std::string,
+      std_msgs::msg::String
+   >
+   {
+     using is_specialized = std::true_type;
+     using custom_type = std::string;
+     using ros_message_type = std_msgs::msg::String;
 
-In this final form, if the custom type (``std::string``) has multiple ROS types that it could represent, then an error will be raised during compilation.
+     static
+     void
+     convert_to_ros_message(
+       const custom_type & source,
+       ros_message_type & destination)
+     {
+       destination.data = source;
+     }
+
+     static
+     void
+     convert_to_custom(
+       const ros_message_type & source,
+       custom_type & destination)
+     {
+       destination = source.data;
+     }
+   };
+
+Type Adaptation in Topics
+-------------------------
+
+The adapter can then be used when creating a publisher or subscription, e.g.:
+
+.. code-block:: cpp
+
+   using MyAdaptedType = TypeAdapter<std::string, std_msgs::msg::String>;
+   auto pub = node->create_publisher<MyAdaptedType>("topic", 10);
+   auto sub = node->create_subscription<MyAdaptedType>(
+     "topic",
+     10,
+     [](const std::string & msg) {...});
+
+You can also be more declarative by using the ``adapt_type::as`` metafunctions, which are a bit less ambiguous to read:
+
+.. code-block:: cpp
+
+   using AdaptedType = rclcpp::adapt_type<std::string>::as<std_msgs::msg::String>;
+   auto pub = node->create_publisher<AdaptedType>(...);
+
+If you wish, you may associate a custom type with a single ROS message type, allowing you to be a bit more brief when creating entities, e.g.:
+
+.. code-block:: cpp
+
+   // First you must declare the association, this is similar to how you
+   // would avoid using the namespace in C++ by doing `using std::vector;`.
+   RCLCPP_USING_CUSTOM_TYPE_AS_ROS_MESSAGE_TYPE(std::string, std_msgs::msg::String);
+
+   // Then you can create things with just the custom type, and the ROS
+   // message type is implied based on the previous statement.
+   auto pub = node->create_publisher<std::string>(...);
+
+Type Adaptation in Services
+---------------------------
+
+Type adaptation can be used with a client and service by creating a ``struct`` that defines a type adapter for the request and the response. For example:
+
+.. code-block:: cpp
+
+   using MyAdaptedRequestType = TypeAdapter<std::string, std_msgs::msg::String>;
+   using MyAdaptedResponseType = TypeAdapter<bool, std_msgs::msg::Bool>;
+
+   struct MyServiceTypeAdapter {
+      using Request = MyAdaptedRequestType;
+      using Response = MyAdaptedResponseType;
+   };
+
+   auto client = node->create_client<MyServiceTypeAdapter>("service");
+   auto service = node->create_service<MyServiceTypeAdapter>(
+     "service",
+     [](const std::string & request) {...});
+
+Similarly, either the request or response can be adapted:
+
+.. code-block:: cpp
+
+   using MyAdaptedRequestType = TypeAdapter<bool, std_msgs::msg::Bool>;
+
+   struct MySetBoolTypeAdapter {
+      using Request = MyAdaptedRequestType;
+      using Response = std_srvs::srv::SetBool::Response;
+   };
+
+Type Adaptation in Actions
+--------------------------
+
+Similar to services, type adaptation can be used with action clients and action services by creating a ``struct`` that defines a type adapter for the request, feedback, and result.
+As with services, the ROS type for a request, feedback, or result can be specified for use in this structure as well.
+
+.. code-block:: cpp
+
+   struct MyActionTypeAdapter {
+      using Goal = MyAdaptedGoalType;
+      using Feedback = MyAdaptedFeedbackType;
+      using Result = MyAdaptedResultType;
+   };
+
+   auto node = rclcpp::Node::make_shared("action_node");
+   auto action_client = rclcpp_action::create_client<MyActionTypeAdapter>(node, "action");
+   auto action_server = rclcpp_action::create_server<MyActionTypeAdapter>(
+     node,
+     "action",
+     handle_goal,
+     handle_cancel,
+     handle_accepted);
 
 
 Rationale
