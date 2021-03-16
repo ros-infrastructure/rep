@@ -306,9 +306,27 @@ Adding this feature in ``rclcpp``
 ---------------------------------
 
 Placing this feature in ROS 2's C client library, ``rcl``, would allow this feature to be used in other client libraries, such as ``rclcpp`` and ``rclpy``.
-However, it is not clear that the difficulty of implementing this feature in ``rcl`` is worth the benefit to other client libraries.
-The primary client library that is expected to use this feature is ROS 2's C++ client library, ``rclcpp``.
-Placing this feature in ``rclcpp`` would allow implementation to take advantage of C++'s standard template library, and thus, speed up development.
+However, we believe that the concrete benefits for C++ currently outweigh the potential benefits for existing or theoretical client libraries in other languages.
+For example, placing this feature in ``rclcpp`` allows us to avoid type erasure (which would be necessary to place this functionality into ``rcl``) and to use ownership mechanics (unique and shared pointer) to ensure it is safely implemented.
+Another added advantage of placing this feature in ``rclcpp`` is that it reduce the number of function calls and calls that potentially are to functions in separate shared libraries.
+
+Perhaps we can support a form of this feature in other languages in ``rcl`` or ``rmw in the future.
+One challenge in doing this is that it may require custom type support, which may be middleware specific.
+This possibility will be further explored in the future.
+
+On the Location for Specifying the Type Adapter
+-----------------------------------------------
+
+In addition to being more convenient, specifying a type adapted type for the publisher at instantiation rather than in ``Publisher::publish`` allows the intra process system to be primed to expect a custom type.
+Similarly, it is preferable to specify the adapted type at instantiation for subscriptions, service clients, service servers, action clients, and action servers.
+
+Comparison to ROS 1's Type Adaptation
+-------------------------------------
+
+Although intended to be similar in functionality, the proposed feature and ROS 1's type adaptation support [5]_ have a few important differences:
+* This feature will support both convert and (de)serialize functions, and require at least one or the other, but also allow both. The reason for this is that convert is superior for intra-process communication and the (de)serialization functions are better for inter-process communication.
+* This feature will also require the user to write less code when creating an adapter, as compared to the ROS 1 implementation.
+* An advantage of following the ROS 1 approach is that an extra copy can be avoided; although it is likely much more challenging to implement this feature the ROS 1 way because of the middleware.
 
 
 Backwards Compatibility
