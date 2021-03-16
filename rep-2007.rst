@@ -122,6 +122,22 @@ If you wish, you may associate a custom type with a single ROS message type, all
    // message type is implied based on the previous statement.
    auto pub = node->create_publisher<std::string>(...);
 
+Note that it is also possible to use a ROS type with a publisher or subscriber that has been specialized to use a custom message, e.g.:
+
+.. code-block:: cpp
+
+   using AdaptedType = rclcpp::adapt_type<std::string>::as<std_msgs::msg::String>;
+   auto pub = node->create_publisher<AdaptedType>(...);
+
+   // Publish a std::string
+   std::string custom_msg = "My std::string"
+   pub->publish(custom_msg);
+
+   // Publish a std_msgs::msg::String;
+   auto ros_msg = std_msgs::msg::String();
+   ros_msg.data = "My std_msgs::msg::String";
+   pub->publish(ros_msg);
+
 Type Adaptation in Services
 ---------------------------
 
