@@ -243,27 +243,27 @@ It was thought to use "Facade" in the following form:
    Facade<std::string>::instead_of<std_msgs::msg::String>
 
 
-Adapt
-^^^^^
+Adapter
+^^^^^^^
 
-"Adapt" is certainly a common English word, and the "Adapter pattern" is a common design pattern for adjusting an interface [4]_, which matches well with the feature being suggested here.
-Also, using "Adapt" is consistent with the documentation of a similar feature in ROS 1 (i.e., "Adapting C++ Types" [5]_).
+"Adapter" is certainly a common English word, and the "Adapter pattern" is a common design pattern for adjusting an interface [4]_, which matches well with the feature being suggested here.
+Also, using "Adapter" is consistent with the documentation of a similar feature in ROS 1 (i.e., "Adapting C++ Types" [5]_).
 
-"Adapt" also has the advantage of being a verb and of being related to the noun "Adapter".
+"Adapter" also has the advantage of being a noun and of being related to the verb "Adapt".
 This flexiblity may make it easier for developers to discuss its use.
 
-"Adapt" could be used in the following syntax:
+"Adapter" could be used in the following syntax:
 
 .. code-block:: cpp
 
-   Adapt<std::string>::to<std_msgs::msg::String>
+   TypeAdapter<std::string>::as<std_msgs::msg::String>
 
 Additional terms considered
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Here is a brief listing of additional terms that were considered and why they were not selected:
 
-:Convert: Passed in favor of "Adapt", which expresses a similar idea and has a common design pattern.
+:Convert: Passed in favor of "Adapter", which expresses a similar idea and has a common design pattern.
 
 :Decorate: Passed in favor of "Fascade", which seems to be more common.
 
@@ -283,6 +283,8 @@ Most of the terms being considered refer to general design patterns and, thus, u
 To reduce ambiguity, including the term selected with "Type" would make its usage clearer and help avoid name collisions;
 it should also make it easier for developers to find relevant documentation.
 
+If the word "Type" should be appended or prepended to the selected term will largely be a matter of how it reads.
+For example, "TypeAdapter" is perhaps more natural than "AdapterType".
 
 Adding this feature in ``rclcpp``
 ---------------------------------
