@@ -266,7 +266,7 @@ Adapter
 Also, using "Adapter" is consistent with the documentation of a similar feature in ROS 1 (i.e., "Adapting C++ Types" [5]_).
 
 "Adapter" also has the advantage of being a noun and of being related to the verb "Adapt".
-This flexiblity may make it easier for developers to discuss its use.
+This flexibility may make it easier for developers to discuss its use.
 
 "Adapter" could be used in the following syntax:
 
