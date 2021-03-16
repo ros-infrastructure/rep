@@ -1,5 +1,5 @@
 REP: 2007
-Title: Adapting C++ Types
+Title: Type Adaptation Feature
 Author: Audrow Nash <audrow@openrobotics.org>
 Status: Draft
 Type: Standards Track
@@ -11,7 +11,7 @@ Post-History: 28-Jan-2020
 Abstract
 ========
 
-This REP proposes an extension to the creation of Publishers and Subscriptions in `rclcpp` to make it easier to convert between ROS 2 interfaces and custom C++ data structures.
+This REP proposes an extension to `rclcpp` that will make it easier to convert between ROS types and custom, user-defined types for topics, services, and action services.
 
 
 Motivation
