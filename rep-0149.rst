@@ -478,7 +478,7 @@ Most common open-source licenses are described on the
 
 Commonly used license strings:
 
- - Apache 2.0
+ - Apache-2.0
  - BSD
  - Boost Software License
  - GPLv2
