@@ -590,6 +590,11 @@ All items on the list for the next distro should already be released into the ro
     * `rqt_srv/rqt_srv <https://index.ros.org/p/rqt_srv/>`_
     * `rqt_tf_tree/rqt_tf_tree <https://index.ros.org/p/rqt_tf_tree/>`_
     * `rqt_topic/rqt_topic <https://index.ros.org/p/rqt_topic/>`_
+  * CI tools
+
+    * `ros-tooling/action-ros-ci <https://github.com/ros-tooling/action-ros-ci>`_ *(not a ROS package)*
+    * `ros-tooling/action-ros-lint <https://github.com/ros-tooling/action-ros-lint>`_ *(not a ROS package)*
+    * `ros-tooling/setup-ros <https://github.com/ros-tooling/setup-ros>`_ *(not a ROS package)*
 
   * micro-ROS
 
