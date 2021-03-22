@@ -11,7 +11,7 @@ Post-History: 28-Jan-2020
 Abstract
 ========
 
-This REP proposes an extension to `rclcpp` that will make it easier to convert between ROS types and custom, user-defined types for topics, services, and action services.
+This REP proposes an extension to `rclcpp` that will make it easier to convert between ROS types and custom, user-defined types for Topics, Services, and Actions.
 
 
 Motivation
@@ -305,19 +305,19 @@ For example, "TypeAdapter" is perhaps more natural than "AdapterType".
 Adding this feature in ``rclcpp``
 ---------------------------------
 
-Placing this feature in ROS 2's C client library, ``rcl``, would allow this feature to be used in other client libraries, such as ``rclcpp`` and ``rclpy``.
+Placing this feature in ROS 2's client support library, ``rcl``, would allow this feature to be used in other client libraries, such as ``rclcpp`` and ``rclpy``.
 However, we believe that the concrete benefits for C++ currently outweigh the potential benefits for existing or theoretical client libraries in other languages.
 For example, placing this feature in ``rclcpp`` allows us to avoid type erasure (which would be necessary to place this functionality into ``rcl``) and to use ownership mechanics (unique and shared pointer) to ensure it is safely implemented.
 Another added advantage of placing this feature in ``rclcpp`` is that it reduce the number of function calls and calls that potentially are to functions in separate shared libraries.
 
-Perhaps we can support a form of this feature in other languages in ``rcl`` or ``rmw in the future.
+Perhaps we can support a form of this feature in other languages in ``rcl`` or ``rmw`` in the future.
 One challenge in doing this is that it may require custom type support, which may be middleware specific.
 This possibility will be further explored in the future.
 
 On the Location for Specifying the Type Adapter
 -----------------------------------------------
 
-In addition to being more convenient, specifying a type adapted type for the publisher at instantiation rather than in ``Publisher::publish`` allows the intra process system to be primed to expect a custom type.
+It was suggested that we only template the ``Publisher::publish`` method, but in addition to being more convenient, specifying a type adapter for the publisher at instantiation rather than in ``Publisher::publish`` allows the intra process system to be setup to expect a custom type.
 Similarly, it is preferable to specify the adapted type at instantiation for subscriptions, service clients, service servers, action clients, and action servers.
 
 Comparison to ROS 1's Type Adaptation
