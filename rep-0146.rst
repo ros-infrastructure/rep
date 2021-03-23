@@ -1,0 +1,72 @@
+REP: 146
+Title: ROS Robot Parameter Naming Convention
+Author: Kei Okada <k-okada@jsk.t.u-tokyo.ac.jp>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 31-Jly-2015
+Post-History:
+
+Abstract
+========
+
+This REP aims to define best practices for robot-related ROS parameters
+for use in robot-agnostic packages.
+
+
+Motivation
+==========
+
+As the number of ROS-supported robots increases, we will write
+robot-agnostic packages, but still they need robot-specific
+information, such as calibration parameters.
+
+The `robot_description` parameter is an example of a widely shared naming convention
+among the ROS community. This REP proposes similar conventions for robot-specific information to be stored on the
+parameter server, helping applications that use these parameters to more easily run on a greater range of platforms.
+
+Specifications
+==============
+
+Parameters
+----------
+
+robot_description
+'''''''''''''''''
+
+`robot_description` stores robot kinematics / geometry information using
+the URDF format.
+
+
+robot_type
+''''''''''
+The `robot_type` should capture the name of the class of robot in a way that a user would understand the scope of the robot. If it's a commercial product it is recommended to use the production model name. For example 'pr2' in PR2 robot case [1], 'pepper' in Pepper robot case and 'fetch' in Fetch robot cases.
+
+
+robot_name
+''''''''''
+
+`robot_name` stores the robot's unique name. It should be set to make sure that this robot instance is unique on the system, in same way that computers are recommended to have unique hostnames. For the case of PR2 robot, the default robot name is 'robot' [1], but other individuals have named 'james', 'gutsy' etc...
+
+
+Examples
+========
+
+
+Example behaviors::
+
+    $ rosparam get robot_name
+    olive
+    $ rosparam get robot_type
+    pepper
+
+References
+==========
+
+.. [1] PR2 robot.yaml
+   (https://github.com/pr2-debs/pr2-core/blob/master/root/etc/ros/robot.yaml)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
