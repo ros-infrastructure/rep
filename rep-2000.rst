@@ -725,7 +725,7 @@ Targeted platforms:
 | Architecture | Ubuntu Focal     | Windows 10    | MacOS Mojave | RHEL 8           | Debian Bullseye | OpenEmbedded / |
 |              | (20.04)          | (VS2019)      | (10.14)      |                  | (11)            | webOS OSE      |
 +==============+==================+===============+==============+==================+=================+================+
-|    amd64     | Tier 1 [d][a][s] | Tier 1 [a][s] |  Tier 3 [s]  | Tier 2 [d][a][s] |   Tier 3 [s]    |                |
+|    amd64     | Tier 1 [d][a][s] | Tier 1 [a][s] |  Tier 2 [s]  | Tier 2 [d][a][s] |   Tier 3 [s]    |                |
 +--------------+------------------+---------------+--------------+------------------+-----------------+----------------+
 |    arm64     | Tier 1 [d][a][s] |               |              |                  |   Tier 3 [s]    |   Tier 3 [s]   |
 +--------------+------------------+---------------+--------------+------------------+-----------------+----------------+
@@ -749,7 +749,7 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+-------------------+
 | rmw_fastrtps_cpp         | eProsima Fast-DDS   | Tier 1        | All Platforms               | All Architectures |
 +--------------------------+---------------------+---------------+-----------------------------+-------------------+
-| rmw_connext_cpp          | RTI Connext         | Tier 1        | All Platforms except RHEL,  | All Architectures |
+| rmw_connextdds           | RTI Connext         | Tier 1        | All Platforms except RHEL,  | All Architectures |
 |                          |                     |               | Debian, and OpenEmbedded    | except arm64      |
 +--------------------------+---------------------+---------------+-----------------------------+-------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS   | Tier 2        | All Platforms               | All Architectures |
@@ -797,7 +797,7 @@ Dependency Requirements:
 +-------------+----------------+----------------+---------------+----------+------------------+---------------------+
 | Cyclone DDS |                                          0.7.x (Coquette)                                           |
 +-------------+----------------+----------------+---------------+----------+------------------+---------------------+
-| Fast-DDS    |                                                2.1.x                                                |
+| Fast-DDS    |                                                2.3.x                                                |
 +-------------+----------------+----------------+---------------+----------+------------------+---------------------+
 | Connext DDS |                      5.3.1                      |                        N/A                        |
 +-------------+----------------+----------------+---------------+----------+------------------+---------------------+
@@ -836,7 +836,7 @@ Rolling Ridley (June 2020 - Ongoing)
 Rolling Ridley is a rolling development distribution of ROS 2 as described in REP-2002 [8]_.
 
 The target platform for Rolling Ridley will update as new upstream distributions are selected for ROS 2 development.
-As of June 2020, Rolling Ridley targets the same platforms as ROS 2 Foxy Fitzroy.
+As of March 2021, Rolling Ridley targets the same platforms as ROS 2 Galactic Geochelone.
 
 
 Motivation
