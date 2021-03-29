@@ -749,7 +749,7 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 | rmw_fastrtps_cpp         | eProsima Fast-DDS   | Tier 1        | All Platforms               | All Architectures              |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
-| rmw_connext_cpp          | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64 |
+| rmw_connextdds           | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64 |
 |                          |                     |               | and OpenEmbedded            |                                |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS   | Tier 2        | All Platforms               | All Architectures              |
