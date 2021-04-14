@@ -245,7 +245,7 @@ This ambiguity may result in frustration on the part of the ROS 2 developer:
 * possibly opaque error messages
 
 Facade
-^^^^^^
+""""""
 
 "Facade" seems to be a more common English word than "masquerade".
 It also is commonly used as a design pattern in object oriented programming.
@@ -259,7 +259,7 @@ It was thought to use "Facade" in the following form:
 
 
 Adapter
-^^^^^^^
+"""""""
 
 "Adapter" is certainly a common English word, and the "Adapter pattern" is a common design pattern for adjusting an interface [4]_, which matches well with the feature being suggested here.
 Also, using "Adapter" is consistent with the documentation of a similar feature in ROS 1 (i.e., "Adapting C++ Types" [5]_).
@@ -274,7 +274,7 @@ This flexibility may make it easier for developers to discuss its use.
    TypeAdapter<std::string>::as<std_msgs::msg::String>
 
 Additional terms considered
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""
 
 Here is a brief listing of additional terms that were considered and why they were not selected:
 
