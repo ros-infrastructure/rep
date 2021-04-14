@@ -334,10 +334,12 @@ Backwards Compatibility
 The proposed feature adds new functionality while not modifying existing functionality.
 
 
-Reference Implementation
-========================
 
-The current reference implementation is a work in progress and can be found `here <https://repl.it/@ros2/TypeMasquerading#audrow_main.cpp>`_.
+Feature Progress
+================
+
+The pull request `ros2/rclcpp#1557 <https://github.com/ros2/rclcpp/pull/1557>`_ implements the API for publishers and subscribers with the exception of the ``as`` syntax for defining a ``TypeAdapter`` specialization.
+Note that this pull request does not avoid converting the data during intraprocess communication.
 
 
 References
