@@ -31,10 +31,9 @@ Whereas without this feature, even to send a ``cv::Mat`` from one publisher to a
 Terminology
 ===========
 
-.. glossary::
-     Custom type (in code, ``CustomType``)
-       A data structure that *is not* a ROS 2 interface, such as ``std::string`` or ``cv::Mat``.
-     ROS type (in code, ``RosType``)
+:Custom type (in code, ``CustomType``):
+        A data structure that *is not* a ROS 2 interface, such as ``std::string`` or ``cv::Mat``.
+:ROS type (in code, ``RosType``):
        A data structure that *is* a ROS 2 interface, such as ``std_msgs::msg::String`` or ``sensor_msgs::msg::Image``.
 
 
