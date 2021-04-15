@@ -323,6 +323,7 @@ Comparison to ROS 1's Type Adaptation
 -------------------------------------
 
 Although intended to be similar in functionality, the proposed feature and ROS 1's type adaptation support [5]_ have a few important differences:
+
 * This feature will support both convert and (de)serialize functions, and require at least one or the other, but also allow both. The reason for this is that convert is superior for intra-process communication and the (de)serialization functions are better for inter-process communication.
 * This feature will also require the user to write less code when creating an adapter, as compared to the ROS 1 implementation.
 * An advantage of following the ROS 1 approach is that an extra copy can be avoided; although it is likely much more challenging to implement this feature the ROS 1 way because of the middleware.
