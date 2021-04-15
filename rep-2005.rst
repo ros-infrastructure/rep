@@ -361,7 +361,9 @@ All items on the list for the next distro should already be released into the ro
     * `navigation2/nav2_navfn_planner <https://index.ros.org/p/nav2_navfn_planner/>`_
     * `navigation2/nav2_planner <https://index.ros.org/p/nav2_planner/>`_
     * `navigation2/nav2_recoveries <https://index.ros.org/p/nav2_recoveries/>`_
+    * `navigation2/nav2_regulated_pure_pursuit_controller <https://index.ros.org/p/nav2_regulated_pure_pursuit_controller/>`_
     * `navigation2/nav2_rviz_plugins <https://index.ros.org/p/nav2_rviz_plugins/>`_
+    * `navigation2/nav2_smac_planner <https://index.ros.org/p/nav2_smac_planner/>`_
     * `navigation2/nav2_system_tests <https://index.ros.org/p/nav2_system_tests/>`_
     * `navigation2/nav2_util <https://index.ros.org/p/nav2_util/>`_
     * `navigation2/nav2_voxel_grid <https://index.ros.org/p/nav2_voxel_grid/>`_
