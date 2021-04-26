@@ -175,7 +175,7 @@ Shebangs and reliance on the Python command
 '''''''''''''''''''''''''''''''''''''''''''
 Python scripts on UNIX systems typically have shebang lines written as:
 
-  .. code-block:: python
+.. code-block:: bash
 
     #!/usr/bin/env python
 
