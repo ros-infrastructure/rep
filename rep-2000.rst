@@ -716,8 +716,8 @@ Build System Support:
 - cmake
 - setuptools
 
-Galactic Geochelone (May 2021 - May 2022)
------------------------------------------
+Galactic Geochelone (May 2021 - November 2022)
+----------------------------------------------
 
 Targeted platforms:
 
