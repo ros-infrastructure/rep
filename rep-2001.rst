@@ -93,7 +93,7 @@ It provides all commonly used libraries as well as visualization tools and tutor
       extends: [ros_base]
       packages: [angles, demos, depthimage_to_laserscan, example_interfaces,
                  examples, joystick_drivers, laser_geometry,
-                 navigation_msgs, pcl_conversions, realtime_support,
+                 navigation_msgs, pcl_conversions, rclc, realtime_support,
                  resource_retriever, rviz, teleop_twist_joy,
                  teleop_twist_keyboard, tlsf, turtlesim, vision_opencv]
 
