@@ -53,16 +53,24 @@ It may not contain any GUI dependencies.
  - ros_core:
       packages: [ament_cmake, ament_cmake_ros, ament_index, ament_lint,
                  ament_package, class_loader, common_interfaces,
-                 console_bridge, googletest, launch, libyaml_vendor,
-                 osrf_pycommon, osrf_testing_tools_cpp, pluginlib,
-                 poco_vendor, rcl, rcl_interfaces, rclcpp, rclpy,
-                 rcutils, rmw, rmw_implementation, ros2cli, rosidl,
-                 rosidl_dds, rosidl_defaults, rosidl_python, rosidl_typesupport,
-                 ros_environment, sros2, tinyxml2_vendor, uncrustify]
+                 console_bridge_vendor, google_benchmark_vendor, googletest,
+                 launch, launch_ros, libstatistics_collector, libyaml_vendor,
+                 mimick_vendor, osrf_pycommon, osrf_testing_tools_cpp,
+                 performance_test_fixture, pluginlib, pybind11_vendor,
+                 python_cmake_module, rcl, rclcpp, rcl_interfaces, rcl_logging,
+                 rclpy, rcpputils, rcutils, rmw, rmw_dds_common,
+                 rmw_implementation, ros2cli, ros2cli_common_extensions,
+                 ros2_tracing, ros_environment, rosidl, rosidl_defaults,
+                 rosidl_python, rosidl_runtime_py, rosidl_typesupport,
+                 ros_testing, rpyutils, spdlog_vendor, sros2,
+                 test_interface_files, tinyxml2_vendor, uncrustify_vendor,
+                 unique_identifier_msgs]
       And at least one of the following rmw_implementation:
-      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
-      - Connext: [rmw_connext, rosidl_typesupport_connext]
-      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+      - Cyclone DDS: [cyclonedds, iceoryx, rmw_cyclonedds]
+      - Connext: [Fast-CDR, Fast-DDS, foonathan_memory_vendor, rmw_connextdds,
+                  rosidl_typesupport_fastrtps]
+      - Fast-DDS: [Fast-CDR, Fast-DDS, foonathan_memory_vendor, rmw_fastrtps,
+                   rosidl_typesupport_fastrtps]
 
 
 ROS Base
@@ -76,9 +84,10 @@ It may not contain any GUI dependencies.
 
   - ros_base:
       extends: [ros_core]
-      packages: [geometry2, kdl_parser, orocos_kinematics_dynamics,
-                 robot_state_publisher, tinyxml_vendor, urdf, urdfdom,
-                 urdfdom_headers]
+      packages: [eigen3_cmake_module, geometry2, kdl_parser, message_filters,
+                 orocos_kinematics_dynamics, rclcpp, robot_state_publisher,
+                 rosbag2, tinyxml_vendor, urdf, urdfdom, urdfdom_headers,
+                 yaml_cpp_vendor]
 
 
 Desktop variants
@@ -92,10 +101,15 @@ It provides all commonly used libraries as well as visualization tools and tutor
   - desktop:
       extends: [ros_base]
       packages: [angles, demos, depthimage_to_laserscan, example_interfaces,
-                 examples, joystick_drivers, laser_geometry,
-                 navigation_msgs, pcl_conversions, realtime_support,
-                 resource_retriever, rviz, teleop_twist_joy,
-                 teleop_twist_keyboard, tlsf, turtlesim, vision_opencv]
+                 examples, image_common, interactive_markers, joystick_drivers,
+                 laser_geometry, navigation_msgs, pcl_msgs, perception_pcl,
+                 python_qt_binding, qt_gui_core, realtime_support,
+                 resource_retriever, ros_tutorials, rqt, rqt_action, rqt_bag,
+                 rqt_common_plugins, rqt_console, rqt_graph, rqt_image_view,
+                 rqt_msg, rqt_plot, rqt_publisher, rqt_py_console,
+                 rqt_reconfigure, rqt_service_caller, rqt_shell, rqt_srv,
+                 rqt_top, rqt_topic, rviz, tango_icons_vendor, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, vision_opencv]
 
 
 Institution-specific and robot-specific
