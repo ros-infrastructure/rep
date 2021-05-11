@@ -20,12 +20,12 @@ Motivation
 The primary reason for this change is to improve the developer's experience working with ROS 2.
 Currently, developers often write code to convert a ROS interface into another custom data structure for use in their programs.
 This can be trivial, in the case accessing the ``data`` field in ``std_msgs::msg::String``;
-or more involved such when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
+or more involved such as when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
 Such conversions are additional work for the programmer and are potential sources of errors.
 
 An additional reason for this change is performance.
 This interface will allow us to define methods for serializing directly to the user requested type, and/or using that type in intra-process communication without ever converting it.
-Whereas without this feature, even to send a ``cv::Mat`` from one publisher to a subscription in the same process would require converting it to a ``sensor_msgs::msg::Image`` first and then back again to ``cv::Mat``.
+Whereas without this feature, even to send a ``cv::Mat`` (or a data structure containing a ``cv::Mat``) from one publisher to a subscription in the same process would require converting it to a ``sensor_msgs::msg::Image`` first and then back again to ``cv::Mat``.
 
 
 Terminology
@@ -50,7 +50,7 @@ In that specialization they must:
 - specify the custom type with ``using custom_type = ...``,
 - specify the ROS type with ``using ros_message_type = ...``,
 - provide static convert functions with the signatures:
-   - ``static void convert_to_ros(const custom_type &, ros_message_type &)``,
+   - ``static void convert_to_ros_message(const custom_type &, ros_message_type &)``,
    - ``static void convert_to_custom(const ros_message_type &, custom_type &)``
 
 The convert functions must convert from one type to the other.
@@ -133,7 +133,7 @@ Note that it is also possible to use a ROS type with a publisher or subscriber t
    pub->publish(custom_msg);
 
    // Publish a std_msgs::msg::String;
-   auto ros_msg = std_msgs::msg::String();
+   std_msgs::msg::String ros_msg;
    ros_msg.data = "My std_msgs::msg::String";
    pub->publish(ros_msg);
 
