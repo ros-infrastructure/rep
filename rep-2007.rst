@@ -339,8 +339,19 @@ The proposed feature adds new functionality while not modifying existing functio
 Feature Progress
 ================
 
-The pull request `ros2/rclcpp#1557 <https://github.com/ros2/rclcpp/pull/1557>`_ implements the API for publishers and subscribers with the exception of the ``as`` syntax for defining a ``TypeAdapter`` specialization.
-Note that this pull request does not avoid converting the data during intraprocess communication.
+The type adaptation API has been implemented for publishers and subscribers (`ros2/rclcpp#1557 <https://github.com/ros2/rclcpp/pull/1557>`_). 
+Examples 
+(`ros2/examples#300 <https://github.com/ros2/examples/pull/300>`_)
+and demos 
+(`ros2/demos#482 <https://github.com/ros2/demos/pull/482>`_)
+for using type adaptation have also been created.
+
+There are several other features specified in this REP that have not been implemented. You can check the issues below to see the state of the reference implementation.
+
+* integrate into intra-process manager (`ros2/rclcpp#1664 <https://github.com/ros2/rclcpp/issues/1664>`_)
+* support serialize/deserialize functions in addition to the convert functions (`ros2/rclcpp#1665 <https://github.com/ros2/rclcpp/issues/1665>`_)
+* support services (`ros2/rclcpp#1666 <https://github.com/ros2/rclcpp/issues/1666>`_)
+* support actions (`ros2/rclcpp#1667 <https://github.com/ros2/rclcpp/issues/1667>`_)
 
 
 References
