@@ -1,11 +1,11 @@
 REP: 2007
 Title: Type Adaptation Feature
-Author: Audrow Nash <audrow@openrobotics.org>
-Status: Draft
+Author: Audrow Nash <audrow@openrobotics.org>, William Woodall <william@openrobotics.org>
+Status: Accepted
 Type: Standards Track
 Content-Type: text/x-rst
-Created: 28-Jan-2020
-Post-History: 28-Jan-2020
+Created: 28-Jan-2021
+Post-History:
 
 
 Abstract
