@@ -124,8 +124,8 @@ def fixanchor(current, match):
         rfcnum = int(match.group('rfcnum'))
         link = RFCURL % rfcnum
     if link:
-        return '<a href="%s">%s</a>' % (html.escape(link, quote=False), html.escape(text, quote=False))
-    return html.escape(match.group(0), quote=False)  # really slow, but it works...
+        return '<a href="%s">%s</a>' % (html.escape(link), html.escape(text))
+    return html.escape(match.group(0))  # really slow, but it works...
 
 
 NON_MASKED_EMAILS = [
@@ -246,18 +246,18 @@ def fixfile(inpath, input_lines, outfile):
                                       time.localtime(os.stat(inpath)[8]))
             try:
                 url = REPGITURL % int(rep)
-                v = '<a href="%s">%s</a> ' % (url, html.escape(date, quote=False))
+                v = '<a href="%s">%s</a> ' % (url, html.escape(date))
             except ValueError as error:
                 v = date
         elif k.lower() in ('content-type',):
             url = REPURL % 9
             rep_type = v or 'text/plain'
-            v = '<a href="%s">%s</a> ' % (url, html.escape(rep_type, quote=False))
+            v = '<a href="%s">%s</a> ' % (url, html.escape(rep_type))
         else:
-            v = html.escape(v, quote=False)
+            v = html.escape(v)
         print(('  <tr class="field"><th class="field-name">%s:&nbsp;</th>' +
                '<td class="field-body">%s</td></tr>') %
-              (html.escape(k, quote=False), v), file=outfile)
+              (html.escape(k), v), file=outfile)
     print('</table>', file=outfile)
     print('</div>', file=outfile)
     print('<hr />', file=outfile)
