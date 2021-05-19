@@ -9,14 +9,14 @@ on:
 jobs:
     build:
       name: run rep tests
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-20.04
 
       steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{matrix.python}}
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: 3.8
       - name: Install dependencies
         run: |
           python -m pip install docutils xmlschema
