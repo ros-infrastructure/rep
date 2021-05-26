@@ -1,0 +1,392 @@
+REP: 2007
+Title: Type Adaptation Feature
+Author: Audrow Nash <audrow@openrobotics.org>, William Woodall <william@openrobotics.org>
+Status: Accepted
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 28-Jan-2021
+Post-History:
+
+
+Abstract
+========
+
+This REP proposes an extension to `rclcpp` that will make it easier to convert between ROS types and custom, user-defined types for Topics, Services, and Actions.
+
+
+Motivation
+==========
+
+The primary reason for this change is to improve the developer's experience working with ROS 2.
+Currently, developers often write code to convert a ROS interface into another custom data structure for use in their programs.
+This can be trivial, in the case accessing the ``data`` field in ``std_msgs::msg::String``;
+or more involved such as when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
+Such conversions are additional work for the programmer and are potential sources of errors.
+
+An additional reason for this change is performance.
+This interface will allow us to define methods for serializing directly to the user requested type, and/or using that type in intra-process communication without ever converting it.
+Whereas without this feature, even to send a ``cv::Mat`` (or a data structure containing a ``cv::Mat``) from one publisher to a subscription in the same process would require converting it to a ``sensor_msgs::msg::Image`` first and then back again to ``cv::Mat``.
+
+
+Terminology
+===========
+
+:Custom type (in code, ``CustomType``):
+        A data structure that *is not* a ROS 2 interface, such as ``std::string`` or ``cv::Mat``.
+:ROS type (in code, ``RosType``):
+       A data structure that *is* a ROS 2 interface, such as ``std_msgs::msg::String`` or ``sensor_msgs::msg::Image``.
+
+
+Specification
+=============
+
+Defining a Type Adapter
+-----------------------
+
+In order to adapt a custom type to a ROS type, the user must create a template specialization of this structure for the custom type.
+In that specialization they must:
+
+- change ``is_specialized`` to ``std::true_type``,
+- specify the custom type with ``using custom_type = ...``,
+- specify the ROS type with ``using ros_message_type = ...``,
+- provide static convert functions with the signatures:
+   - ``static void convert_to_ros_message(const custom_type &, ros_message_type &)``,
+   - ``static void convert_to_custom(const ros_message_type &, custom_type &)``
+
+The convert functions must convert from one type to the other.
+
+For example, here is a theoretical example for adapting ``std::string`` to the ``std_msgs::msg::String`` ROS message type:
+
+.. code-block:: cpp
+
+   template<>
+   struct rclcpp::TypeAdapter<
+      std::string,
+      std_msgs::msg::String
+   >
+   {
+     using is_specialized = std::true_type;
+     using custom_type = std::string;
+     using ros_message_type = std_msgs::msg::String;
+
+     static
+     void
+     convert_to_ros_message(
+       const custom_type & source,
+       ros_message_type & destination)
+     {
+       destination.data = source;
+     }
+
+     static
+     void
+     convert_to_custom(
+       const ros_message_type & source,
+       custom_type & destination)
+     {
+       destination = source.data;
+     }
+   };
+
+Type Adaptation in Topics
+-------------------------
+
+The adapter can then be used when creating a publisher or subscription, e.g.:
+
+.. code-block:: cpp
+
+   using MyAdaptedType = TypeAdapter<std::string, std_msgs::msg::String>;
+   auto pub = node->create_publisher<MyAdaptedType>("topic", 10);
+   auto sub = node->create_subscription<MyAdaptedType>(
+     "topic",
+     10,
+     [](const std::string & msg) {...});
+
+You can also be more declarative by using the ``adapt_type::as`` metafunctions, which are a bit less ambiguous to read:
+
+.. code-block:: cpp
+
+   using AdaptedType = rclcpp::adapt_type<std::string>::as<std_msgs::msg::String>;
+   auto pub = node->create_publisher<AdaptedType>(...);
+
+If you wish, you may associate a custom type with a single ROS message type, allowing you to be a bit more brief when creating entities, e.g.:
+
+.. code-block:: cpp
+
+   // First you must declare the association, this is similar to how you
+   // would avoid using the namespace in C++ by doing `using std::vector;`.
+   RCLCPP_USING_CUSTOM_TYPE_AS_ROS_MESSAGE_TYPE(std::string, std_msgs::msg::String);
+
+   // Then you can create things with just the custom type, and the ROS
+   // message type is implied based on the previous statement.
+   auto pub = node->create_publisher<std::string>(...);
+
+Note that it is also possible to use a ROS type with a publisher or subscriber that has been specialized to use a custom message, e.g.:
+
+.. code-block:: cpp
+
+   using AdaptedType = rclcpp::adapt_type<std::string>::as<std_msgs::msg::String>;
+   auto pub = node->create_publisher<AdaptedType>(...);
+
+   // Publish a std::string
+   std::string custom_msg = "My std::string"
+   pub->publish(custom_msg);
+
+   // Publish a std_msgs::msg::String;
+   std_msgs::msg::String ros_msg;
+   ros_msg.data = "My std_msgs::msg::String";
+   pub->publish(ros_msg);
+
+Type Adaptation in Services
+---------------------------
+
+Type adaptation can be used with a client and service by creating a ``struct`` that defines a type adapter for the request and the response. For example:
+
+.. code-block:: cpp
+
+   using MyAdaptedRequestType = TypeAdapter<std::string, std_msgs::msg::String>;
+   using MyAdaptedResponseType = TypeAdapter<bool, std_msgs::msg::Bool>;
+
+   struct MyServiceTypeAdapter {
+      using Request = MyAdaptedRequestType;
+      using Response = MyAdaptedResponseType;
+   };
+
+   auto client = node->create_client<MyServiceTypeAdapter>("service");
+   auto service = node->create_service<MyServiceTypeAdapter>(
+     "service",
+     [](const std::string & request) {...});
+
+Similarly, either the request or response can be adapted:
+
+.. code-block:: cpp
+
+   using MyAdaptedRequestType = TypeAdapter<bool, std_msgs::msg::Bool>;
+
+   struct MySetBoolTypeAdapter {
+      using Request = MyAdaptedRequestType;
+      using Response = std_srvs::srv::SetBool::Response;
+   };
+
+Type Adaptation in Actions
+--------------------------
+
+Similar to services, type adaptation can be used with action clients and action services by creating a ``struct`` that defines a type adapter for the request, feedback, and result.
+As with services, the ROS type for a request, feedback, or result can be specified for use in this structure as well.
+
+.. code-block:: cpp
+
+   struct MyActionTypeAdapter {
+      using Goal = MyAdaptedGoalType;
+      using Feedback = MyAdaptedFeedbackType;
+      using Result = MyAdaptedResultType;
+   };
+
+   auto node = rclcpp::Node::make_shared("action_node");
+   auto action_client = rclcpp_action::create_client<MyActionTypeAdapter>(node, "action");
+   auto action_server = rclcpp_action::create_server<MyActionTypeAdapter>(
+     node,
+     "action",
+     handle_goal,
+     handle_cancel,
+     handle_accepted);
+
+
+Rationale
+=========
+
+Selecting a term
+----------------
+
+There are various terms that may be suitable for type adapting feature described.
+In selecting a term,  
+
+:High priority:
+
+* Clearly communicate the described feature
+* Clearly communicate the order of custom type and ROS type arguments
+
+:Low priority:
+
+* The custom type should be the first argument so that
+  * the custom type is the first argument in both the explicit and implicit syntax
+  * the custom type is read first, for convenience 
+* The syntax reads well
+
+Candidate terms
+^^^^^^^^^^^^^^^
+
+Several possible terms were considered.
+Here is a brief summary of the discussion around different terms.
+
+Masquerade
+""""""""""
+
+There is some precedent for using masquerade in similar settings, IP Masquerading in the Linux kernel [2]_ for example.
+"Masquerade" is also a verb, which may make it easier to discuss among developers.
+However, it was thought that "Masquerade" would be a confusing word for non-English and non-French speakers.
+One disadvantage of "Masquerade" is that there is ambiguity in its usage.
+For example,
+
+.. code-block:: cpp
+
+   Masquerade<std_msgs::msg::String>::as<std::string>
+
+and
+
+.. code-block:: cpp
+
+   Masquerade<std::string>::as<std_msgs::msg::String>   
+
+both seem to make sense.
+This ambiguity may result in frustration on the part of the ROS 2 developer:
+
+* frequently having to refer back to documentation
+* possibly opaque error messages
+
+Facade
+""""""
+
+"Facade" seems to be a more common English word than "masquerade".
+It also is commonly used as a design pattern in object oriented programming.
+However, the "Facade pattern" is typically used to simplify a complex interface [3]_, which is not the major feature being proposed here.
+
+It was thought to use "Facade" in the following form:
+
+.. code-block:: cpp
+
+   Facade<std::string>::instead_of<std_msgs::msg::String>
+
+
+Adapter
+"""""""
+
+"Adapter" is certainly a common English word, and the "Adapter pattern" is a common design pattern for adjusting an interface [4]_, which matches well with the feature being suggested here.
+Also, using "Adapter" is consistent with the documentation of a similar feature in ROS 1 (i.e., "Adapting C++ Types" [5]_).
+
+"Adapter" also has the advantage of being a noun and of being related to the verb "Adapt".
+This flexibility may make it easier for developers to discuss its use.
+
+"Adapter" could be used in the following syntax:
+
+.. code-block:: cpp
+
+   TypeAdapter<std::string>::as<std_msgs::msg::String>
+
+Additional terms considered
+"""""""""""""""""""""""""""
+
+Here is a brief listing of additional terms that were considered and why they were not selected:
+
+:Convert: Passed in favor of "Adapter", which expresses a similar idea and has a common design pattern.
+
+:Decorate: Passed in favor of "Fascade", which seems to be more common.
+
+:Mask: Overloaded as a computer science term [6]_.
+
+:Map: Expresses the idea well, but has a lot of meanings in math and programming.
+
+:Use: Possibly confusing with C++'s ``using`` keyword; also not terribly descriptive.
+
+:Wrap: Passed in favor of "Adapt", which seems to be more common.
+
+
+Including "Type" in the name
+----------------------------
+
+Most of the terms being considered refer to general design patterns and, thus, using just the pattern's name may cause naming collisions or confusion as those design patterns may be used in other parts of the ROS codebase. 
+To reduce ambiguity, including the term selected with "Type" would make its usage clearer and help avoid name collisions;
+it should also make it easier for developers to find relevant documentation.
+
+If the word "Type" should be appended or prepended to the selected term will largely be a matter of how it reads.
+For example, "TypeAdapter" is perhaps more natural than "AdapterType".
+
+Adding this feature in ``rclcpp``
+---------------------------------
+
+Placing this feature in ROS 2's client support library, ``rcl``, would allow this feature to be used in other client libraries, such as ``rclcpp`` and ``rclpy``.
+However, we believe that the concrete benefits for C++ currently outweigh the potential benefits for existing or theoretical client libraries in other languages.
+For example, placing this feature in ``rclcpp`` allows us to avoid type erasure (which would be necessary to place this functionality into ``rcl``) and to use ownership mechanics (unique and shared pointer) to ensure it is safely implemented.
+Another added advantage of placing this feature in ``rclcpp`` is that it reduce the number of function calls and calls that potentially are to functions in separate shared libraries.
+
+Perhaps we can support a form of this feature in other languages in ``rcl`` or ``rmw`` in the future.
+One challenge in doing this is that it may require custom type support, which may be middleware specific.
+This possibility will be further explored in the future.
+
+On the Location for Specifying the Type Adapter
+-----------------------------------------------
+
+It was suggested that we only template the ``Publisher::publish`` method, but in addition to being more convenient, specifying a type adapter for the publisher at instantiation rather than in ``Publisher::publish`` allows the intra process system to be setup to expect a custom type.
+Similarly, it is preferable to specify the adapted type at instantiation for subscriptions, service clients, service servers, action clients, and action servers.
+
+Comparison to ROS 1's Type Adaptation
+-------------------------------------
+
+Although intended to be similar in functionality, the proposed feature and ROS 1's type adaptation support [5]_ have a few important differences:
+
+* This feature will support both convert and (de)serialize functions, and require at least one or the other, but also allow both. The reason for this is that convert is superior for intra-process communication and the (de)serialization functions are better for inter-process communication.
+* This feature will also require the user to write less code when creating an adapter, as compared to the ROS 1 implementation.
+* An advantage of following the ROS 1 approach is that an extra copy can be avoided; although it is likely much more challenging to implement this feature the ROS 1 way because of the middleware.
+
+
+Backwards Compatibility
+=======================
+
+The proposed feature adds new functionality while not modifying existing functionality.
+
+
+
+Feature Progress
+================
+
+The type adaptation API has been implemented for publishers and subscribers (`ros2/rclcpp#1557 <https://github.com/ros2/rclcpp/pull/1557>`_). 
+Examples 
+(`ros2/examples#300 <https://github.com/ros2/examples/pull/300>`_)
+and demos 
+(`ros2/demos#482 <https://github.com/ros2/demos/pull/482>`_)
+for using type adaptation have also been created.
+
+There are several other features specified in this REP that have not been implemented. You can check the issues below to see the state of the reference implementation.
+
+* integrate into intra-process manager (`ros2/rclcpp#1664 <https://github.com/ros2/rclcpp/issues/1664>`_)
+* support serialize/deserialize functions in addition to the convert functions (`ros2/rclcpp#1665 <https://github.com/ros2/rclcpp/issues/1665>`_)
+* support services (`ros2/rclcpp#1666 <https://github.com/ros2/rclcpp/issues/1666>`_)
+* support actions (`ros2/rclcpp#1667 <https://github.com/ros2/rclcpp/issues/1667>`_)
+
+
+References
+==========
+
+.. [1] ``cam2image.cpp`` demo 
+   (https://github.com/ros2/demos/blob/11e00ecf7eec25320f950227531119940496d615/image_tools/src/cam2image.cpp#L277-L291)
+
+.. [2] IP Masquerading in the Linux Kernel
+   (http://linuxdocs.org/HOWTOs/IP-Masquerade-HOWTO-2.html)
+
+.. [3] Facade Pattern
+   (https://en.wikipedia.org/wiki/Facade_pattern)
+
+.. [4] Adapter pattern
+   (https://en.wikipedia.org/wiki/Adapter_pattern)
+
+.. [5] Adapting C++ Types
+   (http://wiki.ros.org/roscpp/Overview/MessagesSerializationAndAdaptingTypes#Adapting_C.2B-.2B-_Types)
+
+.. [6] Masking (computing)
+   (https://en.wikipedia.org/wiki/Mask_(computing))
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
