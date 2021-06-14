@@ -153,6 +153,7 @@ All items on the list for the next distro should already be released into the ro
   * `ros_environment/ros_environment <https://index.ros.org/p/ros_environment/>`_
   * `ros-infrastructure/bloom <https://github.com/ros-infrastructure/bloom>`_ *(not a ROS package)*
   * `ros-infrastructure/catkin_pkg <https://github.com/ros-infrastructure/catkin_pkg>`_ *(not a ROS package)*
+  * `ros-infrastructure/rep <https://github.com/ros-infrastructure/rep>`_ *(not a ROS package)*
   * `ros-infrastructure/rosdep <https://github.com/ros-infrastructure/rosdep>`_ *(not a ROS package)*
   * `ros-infrastructure/rosdistro <https://github.com/ros-infrastructure/rosdistro>`_ *(not a ROS package)*
   * `ros-infrastructure/ros_buildfarm <https://github.com/ros-infrastructure/ros_buildfarm>`_ *(not a ROS package)*
