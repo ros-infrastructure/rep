@@ -299,6 +299,7 @@ All items on the list for the next distro should already be released into the ro
   * `rclpy/rclpy <https://index.ros.org/p/rclpy/>`_
   * `rclc/rclc <https://index.ros.org/p/rclc/>`_
   * `rclc/rclc_lifecycle <https://index.ros.org/p/rclc_lifecycle/>`_
+  * `rclc/rclc_parameter <https://index.ros.org/p/rclc_parameter/>`_
 
 * Orchestration
 
