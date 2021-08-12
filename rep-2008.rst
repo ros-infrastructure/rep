@@ -1,0 +1,778 @@
+REP: 2008
+Title: ROS 2 Hardware Acceleration Architecture and Conventions
+Author: Víctor Mayoral-Vilches <victorma@xilinx.com>
+Status: Active
+Type: Informational
+Content-Type: text/x-rst
+Created: 10-Aug-2021
+Post-History: 10-Aug-2021
+
+
+Abstract
+========
+
+This REP describes the architectural pillars and conventions required to introduce hardware acceleration in ROS 2 in a scalable and technology-agnostic manner. A set of categories meant to classify supported hardware acceleration solutions is provided. Inclusion in a category is based on the fulfillment of the hardware acceleration capabilities.
+
+
+Motivation
+==========
+
+With the decline of Moore’s Law, hardware acceleration has proven itself as the answer for achieving higher performance gains in robotics [1]_. By creating specialized compute architectures that rely on specific hardware (i.e. through FPGAs or GPUs), hardware acceleration empowers faster robots, with reduced computation times (real fast, as opposed to real-time), lower power consumption and more deterministic behaviours. The core idea is that instead of following the traditional control-driven approach for software development in robotics, a mixed control- and data-driven one allows to design custom compute architectures that further exploit parallelism. To do so, we need to integrate in the ROS 2 ecosystem external frameworks, tools and libraries that facilitate creating parallel compute architectures.
+
+The purpose of this REP is to provide standard guidelines for how to use hardware acceleration in combination with ROS 2. These guidelines are realized in the form of a series of ROS 2 packages that integrate these external resources and provide a ROS 2-centric open architecture for hardware acceleration.
+
+The architecture proposed extends the ROS 2 build system (``ament``), the ROS 2 build tools (``colcon``) and add a new firmware pillar to simplify the production and deployment of acceleration kernels. The architecture is agnostic to the computing target (i.e. considers support for edge, workstation, data center or cloud targets), technology-agnostic (considers initial support for FPGAs and GPUs), application-agnostic and modular, which enhances portability to new hardware solutions and other silicon vendors. The core components of the architecture are disclosed under an Apache 2.0 license, available and maintained at the `ROS 2 Hardware Acceleration Working Group GitHub organization <https://github.com/ros-acceleration/>`_. 
+
+Value for stakeholders:
+
+- Package maintainers can use these guidelines to integrate hardware acceleration capabilities in their ROS 2 packages.
+
+- Consumers can use the guidelines in the REP, as well as the corresponding category of each hardware solution, to set expectations on the hardware acceleration capabilities that could be obtained from each vendor's hardware solution. 
+
+- Silicon vendors and solution manufacturers can use these guidelines to connect their firmware and technologies to the ROS 2 ecosystem, obtaining direct support for hardware acceleration in all ROS 2 packages that support it.
+
+
+The outcome of this REP should be that maintainers who want to leverage hardware acceleration in their packages, can do so with consistent guidelines and with support across multiple technologies (FPGAs and GPUs) by following the conventions set. This way, maintainers will be able to create ROS 2 packages with support for hardware acceleration that can run across hardware acceleration technologies, including FPGAs and GPUs.
+
+In turn, the documentation of categories and hardware acceleration capabilities will improve.
+The guidelines in here provide a ROS 2-centric open architecture for hardware acceleration, which silicon vendors can decide to adopt when engaging with the ROS 2 community.
+
+
+Antigoals
+^^^^^^^^^
+
+The motivation behind this REP does not include:
+
+* Dictating policy implementation specifics on maintainers to achieve hardware acceleration
+
+  * Policy requirements (which framework to use, specific C++ preprocessor instructions, etc.) are *intentionally generic* and to remain technology-agnostic (from a hardware acceleration perspective).
+  * Maintainers can come up with their own policies depending on the technology targeted (FPGAs, GPUs, etc.) and framework used (``HLS``, ``ROCm``, ``CUDA``, etc).
+  
+
+* Enforcing specific hardware solutions on maintainers
+
+  * No maintainer is required to target any specific hardware solution by any of the guidelines in this REP.
+  * Instead, maintainers are free to choose among any of the supported technologies and hardware solutions.
+
+
+Architecture pillars
+====================
+
+:: 
+
+       ROS 2 stack                    Hardware Acceleration Architecture @ ROS 2 stack
+
+    +-------------+             +---------------------------+
+    |             |             |   acceleration_examples   |
+    | user land   |  +-------------------+-----------+----------------+--------------------------------+
+    |             |  |       Drivers     |     Libraries              |           Cloud                |
+    +-------------+  +--------------+----+---------+-----------------------------------+---------------+
+    |             |  |   ament_sol1 | ament_soln   |                  |  accel_fw_sol1 | accel_fw_soln |
+    |             |  +--------------+--------------+------------------+----------------+---------------+
+    |  tooling    |  |     ament_acceleration   | colcon_acceleration |       acceleration_firmware    |
+    |             |  +---------------------------------------------------------------------------------+
+    |             |  |      build system        |   meta build        |            firmware            |
+    +-------------+  +--------------------------+---------------------+--------------------------------+
+    |     rcl     |             ^                      ^                            ^
+    +-------------+             |                      |                            |
+    |     rmw     |             |                      |                            |
+    +-------------+             |                      |                            |
+    | rmw_adapter |          Pillar I              Pillar II                    Pillar III
+    +-------------+
+    
+
+
+.. _pillarI:
+
+Pillar I - Extensions to ament
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The first pillar represents extensions of the ``ament`` ROS 2 build system. These CMake extensions help achieve the objective of simplifying the creation of acceleration kernels. By providing an experience and a syntax similar to other ROS 2 libraries targeting CPUs, maintainers will be able to integrate kernels into their packages easily. The ``ament_acceleration`` ROS 2 package abstracts the build system extensions from technology-specific frameworks and software platforms. This allows to easily support hardware acceleration across FPGAs and GPUs while using the same syntax, simplifying the work of maintainers. The code listing below provides an example that instructs the ``CMakeLists.txt`` file of a ROS 2 package to build a ``vadd`` kernel with the corresponding sources and configuration:
+
+::
+
+    acceleration_kernel(
+      NAME vadd
+      FILE src/vadd.cpp
+      INCLUDE
+        include
+      TARGET kv260
+    )
+
+
+Under the hood, each specialization of ``ament_acceleration`` should rely on the corresponding technology libraries to enable it. For example, `ament_vitis <https://github.com/ros-acceleration/ament_vitis/>`_ relies on Vitis Unified Software Platform and on the Xilinx Runtime (XRT) library to generate acceleration kernels and facilitate OpenCL communication between the application code and the kernels. Vitis and XRT are completely hidden from the robotics engineer, simplifying the creation of kernels through simple CMake macros. The same kernel expressed with ``ament_vitis`` is presented below: 
+
+
+::
+
+    vitis_acceleration_kernel(
+      NAME vadd
+      FILE src/vadd.cpp
+      CONFIG src/kv260.cfg
+      INCLUDE
+        include
+      TYPE
+        sw_emu
+        # hw_emu
+        # hw
+      PACKAGE
+    )
+
+
+
+While ``ament_acceleration`` CMake macros are preferred and will be encouraged, maintainers are free to choose among the CMake macros available. After all, it'll be hard to define a generic set of macros that fits all use cases across technologies.
+
+Through ``ament_acceleration`` and technology-specific specializations (like ``ament_vitis``), the ROS 2 build system is automatically enhanced to support producing  acceleration kernel and related artifacts as part of the build process when invoking ``colcon build``. To facilitate the work of maintainers, this additional functionality is configurable through ``mixins`` that can be added to the build step of a ROS 2 workspace, triggering all the hardware acceleration logic only when appropriate (e.g. when ``--mixin kv260`` is appended to the build effort, it'll trigger the build of kernels targeting the KV260 hardware solution). For a reference implementation of these enhacements, refer to `ament_vitis <https://github.com/ros-acceleration/ament_vitis/>`_.
+
+
+.. _pillarII:
+
+Pillar II - Extensions to colcon
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The second pillar extends the ``colcon`` ROS 2 meta built tools to integrate hardware acceleration flows into the ROS 2 CLI tooling and allow to manage it. Examples of these extensions include emulation capabilities to speed-up the development process and/or facilitate it without access to the real hardware, or raw image production tools, which are convenient when packing together acceleration kernels for embedded targets. These extensions are implemented by the `colcon_acceleration <https://github.com/ros-acceleration/colcon_acceleration/>`_ ROS 2 package. On a preliminary implementation, these extensions are provided the following ``colcon acceleration`` subverbs:
+
+::
+
+    colcon acceleration subverbs:
+      board                 Report the board supported in the deployed firmware
+      emulation             Manage hardware emulation capabilities
+      hls                   Vitis HLS capabilities management extension
+      hypervisor            Configure the Xen hypervisor
+      linux                 Configure the Linux kernel
+      list                  List supported firmware for hardware acceleration
+      mkinitramfs           Creates compressed cpio initramfs (ramdisks) from raw image
+      mount                 Mount raw images
+      package               Packages workspace with kernels for distribution
+      platform              Report the platform enabled in the deployed firmware
+      select                Select an existing firmware and default to it.
+      umount                Umount raw images
+      v++                   Vitis v++ compiler wrapper
+      version               Report version of the tool
+
+
+Using the ``list`` and ``select`` subverbs, it's possible to inspect and configure the different hardware acceleration solutions. The rest of the subverbs allow to manage hardware acceleration artifacts and platforms in a simplified manner.
+
+In turn, the list of subverbs will improve and grow to cover other technology solutions.
+
+
+.. _pillarIII:
+
+Pillar III - firmware
+^^^^^^^^^^^^^^^^^^^^^
+
+The third pillar is firmware. Represented by the abstract ``acceleration_firmware`` package, it is meant to provide firmware artifacts for each supported technology so that the kernels can be compiled against them, simplifying the process for consumers and maintainers, and further aligning with the ROS typical development flow. 
+
+Each ROS 2 workspace can have one or multiple firmware packages deployed. The selection of the active firmware in the workspace is performed by the ``colcon acceleration select`` subverb (pillarII_). To get a technology solution aligned with this REP's architecture, each vendor should provide and maintain an ``acceleration_firmware_<solution>`` package specialization that delivers the corresponding artifacts in line with its supported categories_ and capabilities_. Firmware artifacts should be deployed at ``<ros2_workspace_path>/acceleration/firmware/<solution>`` and be ready to be used by the ROS 2 build system extensions at (pillarI_) . For a reference implementation of specialized vendor firmware package, see `acceleration_firmware_kv260 <https://github.com/ros-acceleration/acceleration_firmware_kv260>`_. 
+
+By splitting vendors across packages with a common front-end (``acceleration_firmware``), consumers and maintainers can easily switch between hardware acceleration solutions and 
+
+
+
+.. _specification:
+
+Specification
+=============
+
+To drive the creation, maintenance and testing of acceleration kernels in ROS 2 packages that are agnostic to the computing target (i.e. consider support for edge, workstation, data center or cloud targets) and technology-agnostic (considers initial support for FPGAs and GPUs), this REP builds on top of open standards. Particularly, ``OpenCL 1.2`` ([2]_, [3]_) is encouraged for a well established standardized interoperability between the host-side (CPU) and the acceleration kernel. Unless stated otherwise, the hardware acceleration terminology used in this document follows the OpenCL nomenclature for hardware acceleration.
+
+A ROS 2 package supports hardware acceleration if it provides support for at least one of the *supported hardware acceleration solutions* that comply with this REP.
+
+A hardware acceleration solution from a given vendor is *supported* if it at least has a `Compatible` category.
+
+
+.. _Kernel Levels:
+
+Kernel levels in ROS 2
+^^^^^^^^^^^^^^^^^^^^^^^
+To favour modularity, organize kernels and allow robotics architects to select only those accelerators needed to meet the requirements of their application, acceleration kernels in ROS 2 will be classified in 3 levels according to the ROS layer/underlayer they impact:
+
+.. _Level I kernels:
+
+- *Level 1* - **ROS 2 applications and libraries**: This group corresponds with acceleration kernels that speed-up OSI L7 applications or libraries on top of ROS 2. Any computation on top of ROS 2 is a good a candidate for this category. Examples include selected components in the navigation, manipulation, perception or control stacks.
+
+.. _Level II kernels:
+
+- *Level 2* - **ROS 2 core packages**: This includes kernels that accelerate or offload OSI L7 ROS 2 core components and tools to a dedicated acceleration solution (e.g. an FPGA). Namely, we consider ``rclcpp``, ``rcl``, ``rmw``, and the corresponding ``rmw_adapters`` for each supported communication middleware. Examples includes ROS 2 executors for more deterministic behaviours [4]_, or complete hardware offloaded ROS 2 Nodes [5]_.
+
+.. _Level III kernels:
+
+- *Level 3* - **ROS 2 underlayers**: Groups together all accelerators below the ROS 2 core layers belonging to OSI L2-L7, including the communication middleware (e.g. DDS). Examples of such accelerators include a complete or partial DDS implementation, an offloaded networking stack or a data link layer for real-time deterministic, low latency and high throughput interactions.
+
+Hardware acceleration solutions complying with this REP should aspire to support multiple kernel levels in ROS 2 to maximize consumer experience.
+
+.. _benchmarking:
+
+Benchmarking
+^^^^^^^^^^^^
+Benchmarking is the act of running a computer program to assess its relative performance. In the context of hardware acceleration, it's fundamental to assess the relative performance of an acceleration kernel versus its CPU scalar computing baseline. Similarly, benchmarking helps comparing acceleration kernels across hardware acceleration technology solution (e.g. FPGA_A vs FPGA_B or FPGA_A vs GPU_A, etc.) and across kernel implementations (within the same hardware acceleration technology solution).
+
+There're different types of benchmarking approaches. The following diagram depicts the most popular inspired by [6]_:
+
+::
+
+             Probe      Probe
+             +            +
+             |            |
+    +--------|------------|-------+     +-----------------------------+
+    |        |            |       |     |                             |
+    |     +--|------------|-+     |     |                             |
+    |     |  v            v |     |     |        - latency   <--------------+ Probe
+    |     |                 |     |     |        - throughput<--------------+ Probe
+    |     |     Function    |     |     |        - memory    <--------------+ Probe
+    |     |                 |     |     |        - CPU       <--------------+ Probe
+    |     +-----------------+     |     |                             |
+    |      System under test      |     |       System under test     |
+    +-----------------------------+     +-----------------------------+
+
+
+              Functional                            Non-functional
+
+
+    +-------------+                     +----------------------------+
+    | Test App.   |                     |  +-----------------------+ |
+    |  + +  +  +  |                     |  |    Application        | |
+    +--|-|--|--|--+---------------+     |  |                   <------------+ Probe
+    |  | |  |  |                  |     |  +-----------------------+ |
+    |  v v  v  v                  |     |                            |
+    |     Probes                  |     |                      <------------+ Probe
+    |                             |     |                            |
+    |       System under test     |     |   System under test        |
+    |                             |     |                      <------------+ Probe
+    |                             |     |                            |
+    |                             |     |                            |
+    +-----------------------------+     +----------------------------+
+
+
+             Black-Box                            Grey-box
+
+
+In addition, the following aspects should be considered when benchmarking acceleration kernels in ROS 2:
+
+- `embedded`: Benchmarks should run in embedded *easily*
+- `ROS 2-native`: Benchmarks should consider the particularities of ROS 2 and its computational graph. If necessary, they should instrument the communications middleware and its underlying layers.
+- `intra-process, inter-process and intra-network`: Measures conducted should consider communication within a process in the same SoC, between processes in an SoC and between different SoCs connected in the same network (intra-network). *Inter-network measures are beyond the scope of this REP*.
+- `compute substrate-agnostic`: benchmarks should be able to run on different hardware acceleration technology solutions. For that purpose, a CPU-centric framework (as opposed to an acceleration technology-specific framework) for benchmarking and/or tracing is the ideal choice.
+- `automated`: benchmarks and related source code should be designed with automation in mind. Once ready, creating a benchmark and producing results should be (ideally) a fully automated process.
+- `hardware farm mindset`: benchmarks will be conducted on hardware embedded platforms sitting in a farm-like environment (redundancy of tests, multiple SoCs/boards) with the intent of validating and comparing different technologies.
+
+Accounting for all of this, in this REP, we adopt a grey-box and non-functional benchmarking approach for hardware acceleration that allows to evaluate the relative performance of accelerated ROS 2 individual nodes and complete computational graphs. To realize it in a technology agnostic-manner, we select the Linux Tracing Toolkit next generation (`LTTng <https://lttng.org/>`_) which will be used for tracing and benchmarking. 
+
+Differences between tracing and benchmarking
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tracing and benchmarking can be defined as follows:
+
+- `tracing`: a technique used to understand what goes on in a running software system.
+- `benchmarking`: a method of comparing the performance of various systems by running a common test.
+
+From these definitions, inherently one can determine that both benchmarking and tracing are connected in the sense that the test/benchmark will use a series of measurements for comparison. These measurements will come from tracing probes. In other words, tracing will collect data that will then be fed into a benchmark program for comparison.
+
+
+.. _acceleration examples:
+
+Acceleration examples
+^^^^^^^^^^^^^^^^^^^^^
+
+For the sake of illustrating maintainers and consumers how to build their own acceleration kernels and guarantee interoperability across technologies, a ROS 2 meta-package named `acceleration_examples <https://github.com/ros-acceleration/acceleration_examples>`_ will be maintained and made available. This meta-package will contain various packages with simple common acceleration examples. Each one of these examples should support all hardware acceleration solutions complying with this REP.
+
+In turn, a CI system will be set to build periodically and for every commit the meta-package.
+
+.. _capabilities:
+
+Capabilities
+^^^^^^^^^^^^
+
+The following list describes the hardware acceleration capabilities that hardware acceleration vendors must consider when connecting their firmware and technology solutions to the ROS 2 ecosystem.
+
+.. _Kernel Levels Capabilities:
+
+1. **Kernel Levels:**
+
+   .. _1.i:
+
+   i. Must provide at least one package producing `Level I kernels`_ 
+
+   .. _1.ii:
+
+   ii. Must provide at least one package producing `Level II kernels`_ 
+
+   .. _1.iii:
+
+   iii. Must provide at least one package producing `Level III kernels`_ 
+
+
+.. _Build System Enhancements:
+
+2. **Build System Enhancements:**
+
+   .. _2.i:
+
+   i. Must have an ``ament_<technology>`` (e.g. ``ament_vitis``) package that integrates technology-specific frameworks and software platforms into the ROS 2 build system through a series of CMake macros that maintainers can use to generate acceleration kernels from their `CMakeLists.txt` files.
+
+   .. _2.ii:
+
+   ii. Must extend the generic ``ament_acceleration`` CMake macros to support the corresponding technology-specific frameworks and software platforms with appropriate defaults.
+
+
+.. _Build Tools Enhancements:
+
+3. **Build Tools Enhancements:**
+
+  .. _3.i:
+
+  i. Must provide tools for hardware emulation (e.g. via QEMU) that emulate the hardware acceleration solution
+
+  .. _3.ii:
+
+  ii. Must provide tools for hardware emulation (e.g. via QEMU) that simulate the hardware acceleration solution (to speed-up development and facilitate debugging)
+
+  .. _3.iii:
+
+  iii. Must provide tools for managing (mount, umount, deploy, etc.) raw disk images or any other binary format necessary by the acceleration technology solution.
+
+  .. _3.iv:
+
+  iv. (*only applicable to edge/embedded computing targets*) Must provide tools for deploying custom Linux kernels, with at least two default options: a vanilla kernel and a fully preemptible one (`PREEMPT_RT` patches).
+
+    .. _3.iv.a:
+
+    a. *Must provide modern Linux kernels (5.4.0+)*
+
+    .. _3.iv.b:
+
+    b. *Must provide modern Linux LTS kernels (5.10.0)*
+
+
+  .. _3.v:
+
+  v. (*only applicable to edge/embedded computing targets*) Must provide tools for deploying a hypervisor (e.g. Xen) for mixed critical applications in the resulting raw images.
+
+    .. _3.v.a:
+
+    a. *Must provide tools for enabling the deployment of hypervisor Virtual Machines (VMs) without a control domain (e.g. dom0less VMs in Xen)*
+
+    .. _3.v.b:
+
+    b. *Must provide tools for enabling the deployment of guest VMs (e.g. domUs in Xen) in a secondary non-volatile storage system (e.g. a raw image partition).*
+
+    .. _3.v.c:
+
+    c. *Must provide tools for enabling the deployment of the control domain VM (e.g. dom0 in Xen) in a secondary non-volatile storage system (e.g. a raw image partition).*
+
+    .. _3.v.d:
+
+    d. *Must provide tools for enabling the deployment VMs without a control domain (e.g. dom0less VMs in Xen) in a secondary non-volatile storage system (e.g. a raw image partition).*
+
+  .. _3.vi:
+
+  vi. (*only applicable to edge/embedded computing targets*) Must provide tools for network booting.
+
+    .. _3.vi.a:
+
+    a. *Must provide tools for network booting the kernel, device tree blob and boot script artifacts (by chainloading or similar)*
+
+    .. _3.vi.b:
+
+    b. *Must provide tools for network booting the root file system*
+
+    .. _3.vi.c:
+
+    c. *Must provide tools for network booting multiple embedded solutions (i.e. creating a proper folder structure to maintain boot artifacts)*
+
+    .. _3.vi.d:
+
+    d. *Must provide tools for network booting securely exchanging secure SSH keys to each one of embedded solutions*
+
+    .. _3.vi.e:
+
+    e. *Must provide tools for flashing into secondary storage all the network boot artifacts (kernel, device tree, boot scripts, rootfs, etc.). This should leave the embedded solution fully functional and aligned with the corresponding artifacts just flashed.*
+
+  
+.. _benchmarking_capability:
+
+4. **Benchmarking:**
+
+    .. _4.i:
+
+    i. Must provide tools to assess the relative performance of an acceleration kernel in an isolated manner
+    
+    .. _4.ii:
+
+    ii. Must provide tools to assess the relative performance of an acceleration kernel alongside a ROS 2 computational graph by following benchmarking_
+
+
+.. _Documentation:
+
+5. **Documentation:**
+
+   .. _5.i:
+
+   i. Must have in-code documentation for each subverb "feature" (e.g. for ``list``: List supported firmware for hardware acceleration)
+
+
+
+.. _Testing and CI:
+
+6. **Testing and CI:**
+
+   .. _6.i:
+
+   i. Must run (and pass, often) CI tests for `acceleration examples`_.
+
+
+
+.. _categories:
+
+Categories
+^^^^^^^^^^
+
+There are 4 hardware acceleration categories below which will classify hardware acceleration solutions and technologies, each roughly summarized as:
+
+* Category **Official**:
+
+  * Highest level of support, backed by a vendor
+  * Hardware acceleration solution compliant with this REP and fully integrated in  the ROS 2 ecosystem. 
+  * Developer tools available to facilitate the development process.
+  * All `acceleration examples`_ should run on the hardware acceleration solution.
+  * Acceleration kernels available for multiple `Kernel Levels`_, with at least `Level I kernels`_.
+
+* Category **Community**:
+
+  * Community-level support
+  * Hardware acceleration solution compliant with only a subset of this REP.
+  * A subset of the developer tools available.
+  * Acceleration kernels available for at least `Level I kernels`_.
+
+* Category **Compatible**:
+
+  * Interoperability demonstrated.
+  * Hardware acceleration solution compliant with a lesser subset of this REP.
+  * Some developer tools available.
+  * Acceleration kernels available for at least `Level I kernels`_.
+
+* Category **Non-compatible**:
+
+  * Default category
+
+While each category will have different capabilities, it's always possible to overachieve in certain capabilities, even if other capabilities prevent a package from moving up to the next category level.
+
+
+Category Comparison Chart
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' requirements' numbering scheme above.
+
+✓ = required
+
+● = recommended
+
+○ = optional
+
+.. list-table:: Categories
+    :widths: 7 7 7 7 7
+    :header-rows: 1
+    :stub-columns: 1
+    :align: left
+
+
+    * -
+      - Official
+      - Community
+      - Compatible
+      - Non-compatible
+    * - Kernel Levels
+      - 
+      - 
+      - 
+      - 
+    * - `1.i`_
+      - ✓
+      - ✓
+      - ✓
+      - 
+    * - 1.ii_
+      - ●
+      - ●
+      - ○
+      -
+    * - 1.iii_
+      - ●
+      - ○
+      - ○
+      -
+    * - Build System
+      - 
+      - 
+      - 
+      -     
+    * - 2.i_
+      - ✓
+      - ✓
+      - ✓
+      - 
+    * - 2.ii_
+      - ●
+      - ●
+      - ○
+      -
+    * - Build Tools
+      - 
+      - 
+      - 
+      -     
+    * - 3.i_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.ii_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.iii_
+      - ✓
+      - ✓
+      - ●
+      - 
+    * - 3.iv_
+      - ✓
+      - ✓
+      - ○
+      -
+    * - 3.iv.a_
+      - ✓
+      - ●
+      - ○
+      -
+    * - 3.iv.b_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.v_
+      - ✓
+      - ●
+      - ○
+      -
+    * - 3.v.a_
+      - ✓
+      - ●
+      - ○
+      -
+    * - 3.v.b_
+      - ✓
+      - ●
+      - ○
+      -
+    * - 3.v.c_
+      - ✓
+      - ●
+      - ○
+      -
+    * - 3.v.d_
+      - ✓
+      - ●
+      - ○
+      -
+    * - 3.vi_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.vi.a_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.vi.b_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.vi.c_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.vi.d_
+      - ●
+      - ●
+      - ○
+      -
+    * - 3.vi.e_
+      - ●
+      - ●
+      - ○
+      -
+    * - Benchmarking
+      - 
+      - 
+      - 
+      -     
+    * - 4.i_
+      - ●
+      - ●
+      - ○
+      -
+    * - 4.ii_
+      - ●
+      - ●
+      - ○
+      -
+    * - Documentation
+      - 
+      - 
+      - 
+      -     
+    * - 5.i_
+      - ✓
+      - ✓
+      - ●
+      - 
+    * - Testing and CI
+      - 
+      - 
+      - 
+      -     
+    * - 6.i_
+      - ✓
+      - ●
+      - ○
+      - 
+
+
+
+Reference Implementation and recommendations
+============================================
+
+Reference implementations complying with this REP and extending the ROS 2 build system and tools for hardware acceleration are available at the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_. This includes also the abstraction layer ``ament_acceleration`` and firmware from vendor specializalizations like `ament_vitis <https://github.com/ros-acceleration/ament_vitis/>`_.
+
+For additional implementations and recommendations, check out the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_.
+
+
+
+.. _labels for maintainers:
+
+Labels for maintainers
+^^^^^^^^^^^^^^^^^^^^^^
+Maintainers are encouraged to mark their packages including hardware acceleration with a label that indicates so, for each one of the hardware acceleration technology solutions they support. This REP proposes that such indication takes the following shape:
+
+.. image:: https://img.shields.io/badge/hardware_acceleration-KV260-ec1c24.svg
+
+which can be created with:
+
+::
+
+    https://img.shields.io/badge/hardware_acceleration-<technology-solution>-ec1c24.svg
+
+    e.g. to deliver the result above 
+        https://img.shields.io/badge/hardware_acceleration-KV260-ec1c24.svg 
+
+
+Template for Maintainers
+^^^^^^^^^^^^^^^^^^^^^^^^
+Besides indicating the acceleration solutions supported by a given package through `labels for maintainers`_, maintainers are encouraged to also add additional information of the acceleration kernels the package to provide consumers with a quick intuition of the added value of using hardware acceleration. 
+
+The following **Markdown** table provides an example of such additional information for the `accelerated_vadd_publisher <https://github.com/ros-acceleration/acceleration_examples/tree/main/accelerated_vadd_publisher>`_ that ships within `acceleration examples`_.
+
+
+::
+  
+  ### Hardware acceleration
+
+  | Kernel     | Description |   Acceleration factor | Technology | CPU baseline | Acceleration measurement |
+  |------------|-------------|-----------------------|------------|--------------|--------------------------|
+  | [`vadd`](https://github.com/ros-acceleration/acceleration_examples/blob/main/accelerated_vadd_publisher/src/vadd.cpp)  |  An offloaded version of the trivial [vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/vadd_publisher) ROS 2 publisher which adds two inputs to a vector in a loop and publishes them at 10 Hz. Vector add operations are offloaded into to the FPGA. The offloading operation into the FPGA allows the publisher to go from 2 Hz to 6 Hz but still misses its target (10 Hz)  |      3    |  KV260 |  2 Hz (measured with `ros2 topic hz` | 6 Hz `ros2 topic hz` |
+
+
+In case it's a meta-package, and there're several packages with one or multipole kernels, the following format can be used instead:
+
+::
+
+  ### Hardware acceleration
+
+  | Package | Kernel     | Description |   Acceleration factor | Technology | CPU baseline | Acceleration measurement |
+  |---------|------------|-------------|-----------------------|------------|--------------|--------------------------|
+  | [accelerated_vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/accelerated_vadd_publisher) | [`vadd`](https://github.com/ros-acceleration/acceleration_examples/blob/main/accelerated_vadd_publisher/src/vadd.cpp)  |  An offloaded version of the trivial [vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/vadd_publisher) ROS 2 publisher which adds two inputs to a vector in a loop and publishes them at 10 Hz. Vector add operations are offloaded into to the FPGA. The offloading operation into the FPGA allows the publisher to go from 2 Hz to 6 Hz but still misses its target (10 Hz)  |      3    |  KV260 |  2 Hz (measured with `ros2 topic hz` | 6 Hz `ros2 topic hz` |
+  | [faster_vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/faster_vadd_publisher) | [`vadd`](https://github.com/ros-acceleration/acceleration_examples/blob/main/faster_vadd_publisher/src/vadd.cpp)  |  An accelerated version of the trivial [vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/vadd_publisher) ROS 2 publisher which adds two inputs to a vector in a loop and publishes them at 10 Hz. Vector add operations are offloaded into to the FPGA. The acceleration and optimizations of the dataflow allows the publisher to go from 2 Hz to 10 Hz, meeting its target |      5    |  KV260 |  2 Hz (measured with `ros2 topic hz` | 10 Hz `ros2 topic hz` |
+
+
+This REP encourages maintainers to report the impact of hardware acceleration. Each maintainer is free to customize the reporting template.
+
+Template for Vendors
+^^^^^^^^^^^^^^^^^^^^
+Silicon vendors and solution manufacturers can help set the expectations of the level of support their hardware acceleration technology provides in alignment with this REP by providing a template in the README.md files of their ``firmware`` and/or ``ament`` extensions. Doing so will facilitate the process for consumers and maintainers.
+
+The following template provides an example in **Markdown** syntax:
+
+::
+
+  | Capability | Status | 
+  |------------|--------|
+  | **`1.` Kernel Levels** | |
+  | [`1.i` level I kernels](https://ros.org/reps/rep-2008.html#i) | ✓ |
+  | [`1.ii` level II kernels](https://ros.org/reps/rep-2008.html#ii) | :warning: (see [this](https://github.com/Lien182/ReconROS)) |
+  | [`1.iii` level III kernels](https://ros.org/reps/rep-2008.html#iii) |  |
+  | **`2.` Build System** | |
+  | [`2.i` ament extensions](https://ros.org/reps/rep-2008.html#id13) | ✓ |
+  | [`2.ii` `ament_acceleration` support](https://ros.org/reps/rep-2008.html#id14) | |
+  | **`3`. Build Tools** | |
+  | [`3.i` hardware emulation (`hw_emu`) ](https://ros.org/reps/rep-2008.html#id15) |  |
+  | [`3.ii` hardware emulation (`sw_emu`)](https://ros.org/reps/rep-2008.html#id16) | ✓ |
+  | [`3.iii` image tooling](https://ros.org/reps/rep-2008.html#id17) | ✓ |
+  | [`3.iv` Linux kernel ](https://ros.org/reps/rep-2008.html#iv) | ✓ |
+  | [`3.iv.a` modern Linux kernel](https://ros.org/reps/rep-2008.html#iv-a) | ✓ |
+  | [`3.iv.b` LTS Linux kernel](https://ros.org/reps/rep-2008.html#iv-b) | |
+  | [`3.v` hypervisor ](https://ros.org/reps/rep-2008.html#v) | ✓ |
+  | [`3.v.a` no control domain VMs](https://ros.org/reps/rep-2008.html#v-a) | ✓ |
+  | [`3.v.b` guest VMs in disk](https://ros.org/reps/rep-2008.html#v-b) | ✓ |
+  | [`3.v.c` control domain in disk](https://ros.org/reps/rep-2008.html#v-c) | ✓  |
+  | [`3.v.d` no control domain VMs in disk](https://ros.org/reps/rep-2008.html#v-d) | |
+  | [`3.vi` network booting ](https://ros.org/reps/rep-2008.html#vi) | |
+  | [`3.vi.a` boot artifacts ](https://ros.org/reps/rep-2008.html#vi-a) | |
+  | [`3.vi.b` rootfs ](https://ros.org/reps/rep-2008.html#vi-b) | |
+  | [`3.vi.c` multi-network boot](https://ros.org/reps/rep-2008.html#vi-c) | |
+  | [`3.vi.d` secure network booting](https://ros.org/reps/rep-2008.html#vi-d) | |
+  | [`3.vi.e` save in disk network boot](https://ros.org/reps/rep-2008.html#vi-e) | |
+  | **`4.` Benchmarking** | |
+  | [`4.i` kernel benchmarking](https://ros.org/reps/rep-2008.html#id18) | ✓ |
+  | [`4.ii` ROS 2 acceleration benchmarking](https://ros.org/reps/rep-2008.html#id19) | |
+  | **`5.` Documentation** | |
+  | [`5.i` in-code documentation](https://ros.org/reps/rep-2008.html#id20) | ✓ |
+  | **`6.` Testing and CI** | |
+  | [`6.i` `acceleration_examples` ](https://ros.org/reps/rep-2008.html#id21) | ✓ |
+
+
+
+
+
+References and Footnotes
+========================
+
+.. [1] Z. Wan, B. Yu, T. Y. Li, J. Tang, Y. Zhu, Y. Wang, A. Raychowdhury, and S. Liu, “A survey of fpga-based robotic computing,” IEEE Circuits and Systems Magazine, vol. 21, no. 2, pp. 48–74, 2021.
+
+
+.. [2] OpenCL 1.2 API and C Language Specification (November 14, 2012). 
+   https://www.khronos.org/registry/OpenCL/specs/opencl-1.2.pdf
+
+
+.. [3] OpenCL 1.2 Reference Pages.
+   https://www.khronos.org/registry/OpenCL/sdk/1.2/docs/man/xhtml/
+
+
+.. [4] Y. Yang and T. Azumi, “Exploring real-time executor on ros 2,” in 2020 IEEE International Conference on Embedded Software and Systems (ICESS). IEEE, 2020, pp. 1–8.
+
+
+.. [5] C. Lienen and M. Platzner, “Design of distributed reconfigurable robotics systems with reconros,” 2021.
+   https://arxiv.org/pdf/2107.07208.pdf
+
+
+.. [6] A. Pemmaiah​, D. Pangercic, D. Aggarwal, K. Neumann, K. Marcey, "Performance Testing in ROS 2". 
+   https://drive.google.com/file/d/15nX80RK6aS8abZvQAOnMNUEgh7px9V5S/view
+
+
+
+Copyright
+=========
+
+This document is placed in the public domain or under the CC0-1.0-Universal license, whichever is more permissive.
