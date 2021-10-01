@@ -162,7 +162,7 @@ The third pillar is firmware. Represented by the abstract ``acceleration_firmwar
 
 Each ROS 2 workspace can have one or multiple firmware packages deployed. The selection of the active firmware in the workspace is performed by the ``colcon acceleration select`` subverb (pillarII_). To get a technology solution aligned with this REP's architecture, each vendor should provide and maintain an ``acceleration_firmware_<solution>`` package specialization that delivers the corresponding artifacts in line with its supported categories_ and capabilities_. Firmware artifacts should be deployed at ``<ros2_workspace_path>/acceleration/firmware/<solution>`` and be ready to be used by the ROS 2 build system extensions at (pillarI_) . For a reference implementation of specialized vendor firmware package, see `acceleration_firmware_kv260 <https://github.com/ros-acceleration/acceleration_firmware_kv260>`_. 
 
-By splitting vendors across packages with a common front-end (``acceleration_firmware``), consumers and maintainers can easily switch between hardware acceleration solutions and 
+By splitting vendors across packages with a common front-end (``acceleration_firmware``), consumers and maintainers can easily switch between hardware acceleration solutions.
 
 
 
