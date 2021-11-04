@@ -1,0 +1,71 @@
+REP: 2008
+Title: Type Negotiation Feature
+Author: Audrow Nash <audrow@openrobotics.org>, Chris Lalancette <clalancette@openrobotics.org>, Gonzalo de Pedro <gonzalodepedro@ekumenlabs.com>, William Woodall <william@openrobotics.org>
+Status: Accepted
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 04-Nov-2021
+Post-History:
+
+Abstract
+========
+
+To come.
+
+
+Motivation
+==========
+
+To come.
+
+
+Terminology
+===========
+
+To come.
+
+
+Specification
+=============
+
+To come.
+
+
+Rationale
+=========
+
+To come.
+
+
+Backwards Compatibility
+=======================
+
+The proposed feature adds new functionality while not modifying existing functionality.
+
+
+Feature Progress
+================
+
+To come.
+
+
+References
+==========
+
+To come.
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
