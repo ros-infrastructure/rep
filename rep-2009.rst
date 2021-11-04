@@ -16,7 +16,15 @@ To come.
 Motivation
 ==========
 
-To come.
+The primary reason for this change is to allow nodes to publish different types of messages that better allow the system to optimize its behavior.
+For example, a subscriber may be more efficient with one image format (say, YUV420) than another (say, ARGB888).
+What's more, the optimal message type to publish may change over time, if say, a different part of the ROS 2 network becomes active to accomplish a different task.
+Perhaps the node with the original subscriber is no longer needed so the node goes into an idle mode, and another node with a different subscriber would prefer images in ARGB888, over YUV420, for resource reasons.
+Currently, this behavior could be accomplished with ROS 2 nodes or lifecycle nodes, however doing so would require a significant amount of work for the programmer and are potential sources of errors.
+
+An additional reason for this change is that it can improve developer experience by giving the developer more flexibility in how they interface with different nodes.
+The result of which is that they may need to spend less time writing code to convert a message type into the one message type accepted by the node they're using; instead the node may support additional types, so they may not need to preform any conversion.
+This may reduce the number of errors in the user's code, as well as it may allow them to prototype more efficiently, as they may not have to write as much code to perform conversions.
 
 
 Terminology
