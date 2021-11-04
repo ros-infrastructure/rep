@@ -36,10 +36,16 @@ To come.
 Specification
 =============
 
-Defining Type Negotiation
--------------------------
+Defining a Publisher or Subscriber that Performs Type Negotiation
+-----------------------------------------------------------------
 
+In order to have publishers and subscribers negotiate which ROS message type is sent, the user must specify the following for each publisher and subscriber:
 
+- the supported message types, and
+- (optionally) a prioritized list of the supported message types
+
+This is in addition to the standard arguments required for a publisher or subscriber, such as topic, quality of service, and queue size.
+Each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
 
 
 Rationale
