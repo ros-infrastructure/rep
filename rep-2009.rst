@@ -1,4 +1,4 @@
-REP: 2008
+REP: 2009
 Title: Type Negotiation Feature
 Author: Audrow Nash <audrow@openrobotics.org>, Chris Lalancette <clalancette@openrobotics.org>, Gonzalo de Pedro <gonzalodepedro@ekumenlabs.com>, William Woodall <william@openrobotics.org>
 Status: Accepted
@@ -28,7 +28,10 @@ To come.
 Specification
 =============
 
-To come.
+Defining Type Negotiation
+-------------------------
+
+
 
 
 Rationale
