@@ -41,17 +41,72 @@ Defining a Publisher or Subscriber that Performs Type Negotiation
 
 In order to have publishers and subscribers negotiate which ROS message type is sent, the user must specify the following for each publisher and subscriber:
 
-- the supported message types, and
-- (optionally) a prioritized list of the supported message types
+- the supported message types and
+- (optionally) a prioritized list of the supported message types.
 
 This is in addition to the standard arguments required for a publisher or subscriber, such as topic, quality of service, and queue size.
-Each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
+Also, each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
+
+The reason that the prioritized list is optional is that a publisher or subscriber may not have strong preferences but may support multiple types.
+In this case, the types it supports will be considered as well as the preference of other nodes it communicates with.
+
+Negotiation Algorithm
+---------------------
+
+In negotiating preferences, it has been decided that publishers make the ultimate decision of what type to send.
+To accomplish this, a publisher seeks to know the supported types and preferences of each subscriber that receives messages from it.
+After receiving all of the subscribers supported types and preferences, the publisher considers all of the supported types and preferences, including its own supported types and preferences.
+The first step in this comparison is to compare the supported types available.
+Specifically, we are looking to see what types are supported for all of the subscribers.
+In the case that no single format can be accepted by all subscribers, more than one message type will have to be published.
+If this occurs, a warning will be made visible to the user, as it may be undesirable to have such a large memory footprint.
+In either case, a minimal set of supported types will be obtained.
+
+After identifying a minimal set of supported message types, the priorities of each type for each subscriber and the publisher will considered.
+If there is a tie in priority for two supported types, the publisher will use its preferences to break the tie.
+
+Once the message types have been prioritized the publisher(s) will be created.
+In the case that one message type doesn't satisfy the supported types for all of the subscribers, additional publishers will be created.
+
+It is also possible that the graph of active nodes changes during runtime.
+If this occurs, the publishers and subscribers will renegotiate their types, if anything has changed for them.
+
+A high-level view of this algorithm can be seen below.
+
+.. code-block:: python
+
+    # Gather supported types and preferences
+    supported_types = get_supported_types([pub, sub_1, sub_2, ..., sub_m])
+    preferences = get_preferences([pub, sub_1, sub_2, ..., sub_m])
+
+    # Find common message types that are supported by the publisher and subscribers
+    common_supported_types = find_common_supported_types(supported_types)
+
+    # Prioritize the common message types
+    selected_message_types = prioritize_types(common_supported_types, preferences)
+
+    # Create publishers now that the message type has been negotiated.
+    create_negotiated_publishers(topic, selected_message_types)
 
 
 Rationale
 =========
 
-To come.
+Having the Publisher Pick the Message Type
+------------------------------------------
+
+Consider a network with ``m`` publishers and ``n`` subscribers, where ``m`` and ``n`` are positive integers.
+Also imagine that there are at least two publishers that are publishing on the same topic.
+In this case, it is possible to have each of these publishers consider the other publishers in their decision of what message type to send.
+
+It is also true that loops in the network may occur.
+For example, imagine nodes ``A``, ``B``, and ``C``.
+``A`` sends a message to ``B``, and ``B`` sends a message to ``C``.
+This gets more complicated if ``A`` also sends a message to ``C``.
+
+In both of the above cases, it is much more challenging to find the best message type than the simple strategy detailed in a previous section.
+It was thought that the simpler approach described above in the specifications gets us almost all the way there, while being much simpler to implement.
+In addition, if it turns out to be necessary, the simpler approach can always be replaced by a better method for getting the optimal solution in future work.
 
 
 Backwards Compatibility
