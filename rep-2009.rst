@@ -137,7 +137,8 @@ This case depends on how the voting is done.
                   ?
    N_1(x, y, z) ----> N_2(z, y, x)
 
-We propose a simple voting scheme where every node has a priority that corresponds to its position (using zero as the first index).
+There may be different ways to prioritize preferences.
+One example is simple voting scheme where every node has a priority that corresponds to its position (using zero as the first index), and the publisher breaks ties with its preference.
 
 .. math::
 
