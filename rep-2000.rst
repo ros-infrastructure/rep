@@ -916,10 +916,7 @@ Dependency Requirements:
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
-" ** " Rolling distributions will see multiple version changes of these dependencies during their lifetime.
-The versions shown for OpenEmbedded are those provided by the 3.1 Dunfell release series; the versions provided by the other supported release series are listed here: https://github.com/ros/meta-ros/wiki/Package-Version-Differences .
-Note that the OpenEmbedded releases series for which a ROS distro has support will change during its support time frame, as per the OpenEmbedded support policy shown here: https://github.com/ros/meta-ros/wiki/Policies#openembedded-release-series-support .
-However, it will always be supported by least one stable OpenEmbedded release series.
+" ** " means that the dependency may see multiple version changes, because the dependency uses a package manager that continually updates the dependency without a stable API.
 
 " \**** " webOS OSE provides this different version.
 
