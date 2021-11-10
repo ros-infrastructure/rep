@@ -350,6 +350,10 @@ ROS Core
                  ros2run, ros2service, ros2srv, ros2topic,
                  ros_environment, rosidl_default_generators,
                  rosidl_default_runtime, sros2, sros2_cmake]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
 
 
 ROS Base
@@ -425,8 +429,8 @@ ROS Core
                  sros2, sros2_cmake]
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - CycloneDDS: [cyclonedds, rmw_cyclonedds]
       - Connext: [rmw_connext, rosidl_typesupport_connext]
-      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
 
 
 ROS Base
@@ -501,8 +505,8 @@ ROS Core
                  rosidl_default_runtime, sros2, sros2_cmake]
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
-      - Connext: [rmw_connext, rosidl_typesupport_connext]
-      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+      - CycloneDDS: [cyclonedds, rmw_cyclonedds]
+      - Connext: [rmw_connextdds, rosidl_typesupport_connext]
 
 
 ROS Base
@@ -577,8 +581,8 @@ ROS Core
                  rosidl_default_runtime, sros2, sros2_cmake]
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
-      - Connext: [rmw_connext, rosidl_typesupport_connext]
-      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+      - CycloneDDS: [cyclonedds, rmw_cyclonedds]
+      - Connext: [rmw_connextdds, rosidl_typesupport_connext]
 
 
 ROS Base
