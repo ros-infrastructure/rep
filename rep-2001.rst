@@ -42,6 +42,7 @@ We define three main entry points for ROS users.
  * ros_core: The `ros_core` variants composes the core communication protocols.
    It may not contain any GUI dependencies.
 
+
 Institution-specific and robot-specific
 ---------------------------------------
 
