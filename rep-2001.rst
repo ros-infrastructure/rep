@@ -11,7 +11,7 @@ Post-History: 17-Sep-2018, 15-Mar-2019
 Abstract
 ========
 
-This REP describes the variants for the ROS Bouncy release and for releases that follow until otherwise replaced by a similar update REP.
+This REP describes the variants for ROS 2 releases.
 
 
 Motivation
