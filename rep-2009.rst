@@ -106,36 +106,52 @@ More practically, ``N_1`` is publishing ``x``, and ``N_2`` is subscribing to a t
             x
    N_1(x) ----> N_2(x)
 
+In some examples below we will reason about which message type should be chosen.
+In such cases, ``??`` will be used to denote that we are not sure of the message type just yet.
+
+Simple examples
+^^^^^^^^^^^^^^^
+
 We can now use this notation to reason about the agreed upon message type in several different scenarios.
 There are several cases that are clear.
 
 .. code-block::
 
-                  x
-         N_1(x) ----> N_2(x, y)
+   (1a)
+                    x
+           N_1(x) ----> N_2(x, y)
 
-                  y
-         N_1(y) ----> N_2(x, y)
+   (1b)
+                    y
+           N_1(y) ----> N_2(x, y)
 
-                  x
-      N_1(x, y) ----> N_2(x)
+   (1c)
+                    x
+        N_1(x, y) ----> N_2(x)
 
-                  y
-      N_1(x, y) ----> N_2(y)
+   (1d)
+                    y
+        N_1(x, y) ----> N_2(y)
 
-                  x
-   N_1(x, y, z) ----> N_2(x, a, b)
+   (1e)
+                    x
+     N_1(x, y, z) ----> N_2(x, a, b)
 
-                  x
-   N_1(x, y, z) ----> N_2(a, b, x)
+   (1f)
+                    x
+     N_1(x, y, z) ----> N_2(a, b, x)
+
+A case that depends on how priorities are calculated
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 And several cases that may depend on the implementation.
 This case depends on how the voting is done.
 
 .. code-block::
 
-                  ?
-   N_1(x, y, z) ----> N_2(z, y, x)
+   (2a-1)
+                   ??
+     N_1(x, y, z) ----> N_2(z, y, x)
 
 There may be different ways to prioritize preferences.
 One example is simple voting scheme where every node has a priority that corresponds to its position (using zero as the first index), and the publisher breaks ties with its preference.
@@ -149,105 +165,148 @@ And for node ``2`` the priority for ``z``, ``y``, and ``x`` is ``1/1``, ``1/2``,
 This means that ``x`` and ``z`` have the same priority of ``4/3`` between nodes ``1`` and ``2``, and ``y`` has the same priority of ``1`` between nodes ``1`` and ``2``.
 Since it is a tie between ``x`` and ``z``, the agreed upon message type is ``x``, since the publishers preference breaks ties, and the publisher, node ``1`` prefers type ``x``.
 
+.. code-block::
+
+   (2a-2)
+                    x
+     N_1(x, y, z) ----> N_2(z, y, x)
+
+Publishing to multiple nodes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 There are also the cases where there are more than two nodes.
 
 In the following case, ``N_3`` has the limiting supported type, ``y``, so ``N_1`` will publish ``y``, despite the fact that both ``N_1`` and ``N_2`` prefer ``x``.
 
 .. code-block::
 
-               y
-   N_1(x, y) -------> N_2(x, y)
-                  |
-                  |-> N_3(y)
+   (3a)
+                 y
+     N_1(x, y) -------> N_2(x, y)
+                    |
+                    |-> N_3(y)
 
 In the following case, the two nodes receiving data from ``N_1`` both require different message types.
 Thus, ``N_1`` will publish two different message types, ``x`` and ``y``.
 
 .. code-block::
 
-               x
-   N_1(x, y) ----> N_2(x)
-           |
-           |   y
-           |-----> N_3(y)
+   (3a)
+                 x
+     N_1(x, y) ----> N_2(x)
+             |
+             |   y
+             |-----> N_3(y)
 
-There can also be nodes in series.
-To solve nodes in series, an additional notation is required, since the message type will be propagated through the series starting with the terminal nodes.
-The steps will be denoted with numbers and unresolved types will be denoted with ``?``.
-Different cases will be separated by three dashes (``---``).
-
-.. code-block::
-
-   1)              ?            x
-       N_1(x, y) ----> N_2(x) ----> N_3(a, x)
-
-   2)              x            x
-       N_1(x, y) ----> N_2(x) ----> N_3(a, x)
-
-   ---
-
-   1)              ?               z
-       N_1(x, y) ----> N_2(y, z) ----> N_3(z)
-
-   2)              y               z
-       N_1(x, y) ----> N_2(y, z) ----> N_3(z)
-
-
-Superposition in negotiating message types
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Negotiating types for nodes in series
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
-          |-------------------------
-          |                        |
-          |                        v
-   N_1(x, y) ----> N_2(y, z) ----> N_3(y)
+   (4a-1)
+                 ?            x
+     N_1(x, y) ----> N_2(x) ----> N_3(a, x)
+
+   (4a-2)
+                 x            x
+      N_1(x, y) ----> N_2(x) ----> N_3(a, x)
+
+   (4b-1)
+                  ?               z
+      N_1(x, y) ----> N_2(y, z) ----> N_3(z)
+
+   (4b-1)
+                  y               z
+      N_1(x, y) ----> N_2(y, z) ----> N_3(z)
+
+
+Superposition for negotiating in loops
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this case, we will use ``??`` to mean that the message type is unknown.
+Note that we have two message types potentially coming from node ``1`` since it has two subscribers.
+
+.. code-block::
+
+   (5a-1)
+                ??
+            |-------------------------
+            |                        |
+            |   ??              ??   v
+     N_1(x, y) ----> N_2(y, z) ----> N_3(y)
 
 In this case, the above system can be thought using superposition, that is, solving the problem in parts.
 
 .. code-block::
 
-               y
-   N_2(y, z) ----> N_3(y)
+   (5a-2)
+                 y
+     N_2(y, z) ----> N_3(y)
 
 and
 
 .. code-block::
 
-               y
-   N_1(x, y) -------> N_2(y, z)
-                  |
-                  |-> N_3(y)
+   (5a-3)
+                 y
+     N_1(x, y) -------> N_2(y, z)
+                    |
+                    |-> N_3(y)
 
 Thus we get that both node 1 and node 2 will be publishing ``y``.
+
+.. code-block::
+
+   (5a-4)
+                   y
+               |----------------------
+               |                     |
+               |                y    v
+     N_1(x, y) ----> N_2(y, z) ----> N_3(y)
+
+A suboptimal solution from superposition in loops
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There is also the case, where the solution by superposition yields two different message types for the subscriber.
 This is unfortunate, but it is not possible to find a better solution without having the publishing nodes coordinate.
 
 .. code-block::
 
-       |-------------------------
-       |                        |
-       |                        v
-   N_1(x) ----> N_2(z, x) ----> N_3(z, x)
+   (5b-1)
+              ?
+         |-------------------------
+         |                        |
+         |    ?               ?   v
+     N_1(x) ----> N_2(z, x) ----> N_3(z, x)
 
 The above system can be decomposed into the following steps.
 
 .. code-block::
 
-               z
-   N_2(z, x) ----> N_3(z, x)
+   (5b-2)
+                 z
+     N_2(z, x) ----> N_3(z, x)
 
 and
 
 .. code-block::
 
-               x
-   N_1(x) -------> N_2(z, x)
-               |
-               |-> N_3(z, x)
+   (5b-3)
+                 x
+     N_1(x) -------> N_2(z, x)
+                 |
+                 |-> N_3(z, x)
 
 If the publishers in node 1 and 2 were able to coordinate, they would have realized that ``x`` is the only solution that allows node 3 to have one subscriber message type.
+
+.. code-block::
+
+   (5b-4)
+               x
+            |----------------------
+            |                     |
+            |                 z   v
+     N_1(x) ----> N_2(z, x) ----> N_3(z, x)
 
 
 Rationale
