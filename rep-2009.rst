@@ -198,28 +198,6 @@ Thus, ``N_1`` will publish two different message types, ``x`` and ``y``.
              |   y
              |-----> N_3(y)
 
-Negotiating types for nodes in series
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block::
-
-   (4a-1)
-                 ?            x
-     N_1(x, y) ----> N_2(x) ----> N_3(a, x)
-
-   (4a-2)
-                 x            x
-      N_1(x, y) ----> N_2(x) ----> N_3(a, x)
-
-   (4b-1)
-                  ?               z
-      N_1(x, y) ----> N_2(y, z) ----> N_3(z)
-
-   (4b-1)
-                  y               z
-      N_1(x, y) ----> N_2(y, z) ----> N_3(z)
-
-
 Superposition for negotiating in loops
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -228,7 +206,7 @@ Note that we have two message types potentially coming from node ``1`` since it 
 
 .. code-block::
 
-   (5a-1)
+   (4a-1)
                 ??
             |-------------------------
             |                        |
@@ -239,7 +217,7 @@ In this case, the above system can be thought using superposition, that is, solv
 
 .. code-block::
 
-   (5a-2)
+   (4a-2)
                  y
      N_2(y, z) ----> N_3(y)
 
@@ -247,7 +225,7 @@ and
 
 .. code-block::
 
-   (5a-3)
+   (4a-3)
                  y
      N_1(x, y) -------> N_2(y, z)
                     |
@@ -257,22 +235,19 @@ Thus we get that both node 1 and node 2 will be publishing ``y``.
 
 .. code-block::
 
-   (5a-4)
+   (4a-4)
                    y
                |----------------------
                |                     |
                |                y    v
      N_1(x, y) ----> N_2(y, z) ----> N_3(y)
 
-A suboptimal solution from superposition in loops
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 There is also the case, where the solution by superposition yields two different message types for the subscriber.
-This is unfortunate, but it is not possible to find a better solution without having the publishing nodes coordinate.
+This is unfortunate, and could be solved by having the publishing nodes coordinate or by having nodes that delay their revealing their preferences as discussed below.
 
 .. code-block::
 
-   (5b-1)
+   (4b-1)
               ?
          |-------------------------
          |                        |
@@ -283,7 +258,7 @@ The above system can be decomposed into the following steps.
 
 .. code-block::
 
-   (5b-2)
+   (4b-2)
                  z
      N_2(z, x) ----> N_3(z, x)
 
@@ -291,7 +266,7 @@ and
 
 .. code-block::
 
-   (5b-3)
+   (4b-3)
                  x
      N_1(x) -------> N_2(z, x)
                  |
@@ -301,12 +276,89 @@ If the publishers in node 1 and 2 were able to coordinate, they would have reali
 
 .. code-block::
 
-   (5b-4)
+   (4b-4)
                x
             |----------------------
             |                     |
             |                 z   v
      N_1(x) ----> N_2(z, x) ----> N_3(z, x)
+
+Nodes that delay revealing their preferences
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It may be the case that a node with both publishers and subscribers would like to wait to reveal its subscribers preferences until its publisher knows what message type it will be using.
+
+To discuss this, we'll have to use additional notation.
+
+Let ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})`` be a node ``p`` thats publishers and subscribers support ``x``, ``y``, and ``z`` message types, as given by the first argument.
+Then let the second argument be a dictionary that maps each message type to an ordered preference.
+This dictionary is used to determine the preference of node ``p``'s subscriber.
+
+As a shorthand in figures, we'll define a node that differs its preference beforehand and add an asterisk to separate it from other nodes. For example:
+
+.. code-block::
+
+    N_p*(x, y, z) := N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
+or
+
+.. code-block::
+
+    N_p* := N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
+
+Also, note that regular nodes with the standard notation (e.g., ``N_n(x, y, z)``, with no ``*``) readily reveal their preferences, which is to say that they don't delay revealing their preferences until their publisher has determined its message type.
+
+.. code-block::
+
+    N_2*(x, y, z) := N_2([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
+
+   (5a)
+                    y                   y
+     N_1(x, y, z) ----> N_2*(x, y, z) ----> N_3(y, z, x)
+
+This approach can also be useful in the problems solved above with superposition.
+In the case below, node ``2`` will cause node ``1`` wait to pick its preference until it has determined its message type.
+
+.. code-block::
+
+    N_2*(x, y, z) := N_2([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
+
+   (5b)
+                     y
+                  |--------------------------
+                  |                         |
+                  |                     y   v
+     N_1(x, y, z) ----> N_2*(x, y, z) ----> N_3(y, z, x)
+
+It is possible with this method to have a deadlock.
+In the following case all nodes will delay their preference indefinitely.
+In this case, the only way out will be a timeout.
+
+.. code-block::
+
+    N_1* := N_1([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
+    N_2* := N_1*
+    N_3* := N_1*
+
+   (5c)
+
+       -- N_3* <--
+       |         |
+       v         |
+     N_1* ----> N_2*
+
+Notice, however, that the deadlock is fixed by one node readily revealing its preferences.
+
+.. code-block::
+
+    N_1* := N_1([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
+    N_2* := N_1*
+
+   (5c)
+
+       -- N_3(x, y, z) <--
+     x |                 |
+       v    x          x |
+     N_1* ----> N_2* -----
 
 
 Rationale
