@@ -412,6 +412,24 @@ For this reason, nodes will have the ability to reveal their preferences or to d
 For a node to delay revealing its preferences, there is additional configuration that must occur, so the default behavior will be that nodes reveal their preferences readily.
 
 
+To Take a Centralized or Decentralized Approach
+-----------------------------------------------
+
+To come.
+
+
+Extending Lifecycle Nodes
+-------------------------
+
+To come.
+
+
+Putting this Implementation in ``rclcpp`` or ``rcl``
+----------------------------------------------------
+
+To come.
+
+
 Backwards Compatibility
 =======================
 
