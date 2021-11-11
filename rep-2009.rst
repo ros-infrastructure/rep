@@ -329,6 +329,18 @@ It was thought that the simpler approach described above in the specifications g
 In addition, if it turns out to be necessary, the simpler approach can always be replaced by a better method for getting the optimal solution in future work.
 
 
+Using Different Topics or the Same Topic For Different Message Types
+--------------------------------------------------------------------
+
+If a publisher can publish ``ARGB888`` or ``YUV420`` images, should the images be published on namespaced topics or to the topic directly?
+Specifically, say that it has been negotiated the the publisher should publish ``ARG888`` on the topic ``/image``, should the images be published on ``/image/ARGB888`` or ``/image``?
+Using ``/image/ARGB888`` removes ambiguity, but could make it hard to work with other nodes that do not negotiate their message types that are also on the network.
+While ``/image`` is cleaner, but may lead to confusion when a single topic is used for multiple message types.
+``/image`` also makes it more difficult for the user to use topics published by nodes that do not perform type negotiation, which actually may be desirable: it will reduce the chance that the user builds a pipeline for one message type but then receives another message type on the same topic.
+
+Since the ``<topic>/<message type>`` format removes ambiguity and makes it harder to use negotiated nodes inappropriately, we will use the ``<topic>/<message type>`` format for all topics.
+
+
 Backwards Compatibility
 =======================
 
