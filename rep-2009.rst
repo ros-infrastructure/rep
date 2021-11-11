@@ -341,6 +341,20 @@ While ``/image`` is cleaner, but may lead to confusion when a single topic is us
 Since the ``<topic>/<message type>`` format removes ambiguity and makes it harder to use negotiated nodes inappropriately, we will use the ``<topic>/<message type>`` format for all topics.
 
 
+Delaying Revealing Preferences Until the Publisher's Message Type is Known
+--------------------------------------------------------------------------
+
+In some cases, it may be desirable for a node that has both publishers and subscribers to delay revealing its preference until the publisher's message type is known.
+This may be because data the subscriber receives may be used in the message that is ultimately published.
+
+One danger in this behavior is that there may be a loop in which all nodes are delaying revealing their preferences.
+A simple solution and the one proposed is to use a timeout to prevent this from happening.
+
+If there is a case that there is a valid loop, then at least one of the nodes must reveal its preferences.
+For this reason, nodes will have the ability to reveal their preferences or to delay revealing them.
+For a node to delay revealing its preferences, there is additional configuration that must occur, so the default behavior will be that nodes reveal their preferences readily.
+
+
 Backwards Compatibility
 =======================
 
