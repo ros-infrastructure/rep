@@ -507,7 +507,7 @@ ROS Core
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
       - CycloneDDS: [cyclonedds, rmw_cyclonedds]
-      - Connext: [rmw_connextdds, rosidl_typesupport_connext]
+      - Connext: [rmw_connextdds]
 
 
 ROS Base
@@ -583,7 +583,7 @@ ROS Core
       And at least one of the following rmw_implementation:
       - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
       - CycloneDDS: [cyclonedds, rmw_cyclonedds]
-      - Connext: [rmw_connextdds, rosidl_typesupport_connext]
+      - Connext: [rmw_connextdds]
 
 
 ROS Base
