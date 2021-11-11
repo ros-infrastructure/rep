@@ -1,17 +1,17 @@
 REP: 2001
-Title: ROS Bouncy and Newer Variants
+Title: ROS 2 Variants
 Author: Tully Foote <tfoote@openrobotics.org>, Mikael Arguedas <mikael@openrobotics.org>, Ruffin White <roxfoxpox@gmail.com>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 16-Jul-2018
-Post-History: 17-Sep-2018, 15-Mar-2019
+Post-History: 17-Sep-2018, 15-Mar-2019, 10-Nov-2021
 
 
 Abstract
 ========
 
-This REP describes the variants for the ROS Bouncy release and for releases that follow until otherwise replaced by a similar update REP.
+This REP describes the variants for ROS 2 releases.
 
 
 Motivation
@@ -35,71 +35,16 @@ End-user entry points
 
 We define three main entry points for ROS users.
 
- * desktop (recommended)
- * ros_base
- * ros_core
-
-Variants
---------
-
-ROS Core
-''''''''
-
-The `ros_core` variants composes the core communication protocols.
-It may not contain any GUI dependencies.
-
-::
-
- - ros_core:
-      packages: [ament_cmake, ament_cmake_ros, ament_index, ament_lint,
-                 ament_package, class_loader, common_interfaces,
-                 console_bridge, googletest, launch, libyaml_vendor,
-                 osrf_pycommon, osrf_testing_tools_cpp, pluginlib,
-                 poco_vendor, rcl, rcl_interfaces, rclcpp, rclpy,
-                 rcutils, rmw, rmw_implementation, ros2cli, rosidl,
-                 rosidl_dds, rosidl_defaults, rosidl_python, rosidl_typesupport,
-                 ros_environment, sros2, tinyxml2_vendor, uncrustify]
-      And at least one of the following rmw_implementation:
-      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
-      - Connext: [rmw_connext, rosidl_typesupport_connext]
-      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
-
-
-ROS Base
-''''''''
-
-The `ros_base` metapackage composes the `ros_core` metapackage with
-commonly used libraries.
-It may not contain any GUI dependencies.
-
-::
-
-  - ros_base:
-      extends: [ros_core]
-      packages: [geometry2, kdl_parser, orocos_kinematics_dynamics,
-                 robot_state_publisher, tinyxml_vendor, urdf, urdfdom,
-                 urdfdom_headers]
-
-
-Desktop variants
-''''''''''''''''
-
-The `desktop` metapackage is the main entry point for users.
-It provides all commonly used libraries as well as visualization tools and tutorials.
-
-::
-
-  - desktop:
-      extends: [ros_base]
-      packages: [angles, demos, depthimage_to_laserscan, example_interfaces,
-                 examples, joystick_drivers, laser_geometry,
-                 navigation_msgs, pcl_conversions, realtime_support,
-                 resource_retriever, rviz, teleop_twist_joy,
-                 teleop_twist_keyboard, tlsf, turtlesim, vision_opencv]
+ * desktop (recommended): The `desktop` metapackage is the main entry point for users.
+   It provides all commonly used libraries as well as visualization tools and tutorials.
+ * ros_base: The `ros_base` metapackage composes the `ros_core` metapackage with commonly used libraries.
+   It may not contain any GUI dependencies.
+ * ros_core: The `ros_core` variants composes the core communication protocols.
+   It may not contain any GUI dependencies.
 
 
 Institution-specific and robot-specific
-'''''''''''''''''''''''''''''''''''''''
+---------------------------------------
 
 Please see REP 108 [1]_ for discussion of institution-specific
 metapackages.
@@ -110,6 +55,584 @@ institution or robot name.
 
 An institution is not required to provide a metapackage, they are
 mainly provided for convenience and identity.
+
+
+Variants
+--------
+
+Ardent Apalone (December 2017 - December 2018)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 pluginlib, rcl_lifecycle, rclcpp, rclcpp_lifecycle,
+                 rclpy, ros2msg, ros2node, ros2pkg, ros2run,
+                 ros2service, ros2srv, ros2topic, ros_environment,
+                 rosidl_default_generators, rosidl_default_runtime]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [kdl_parser, robot_state_publisher, tf2, tf2_eigen,
+                 tf2_geometry_msgs, tf2_ros, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [composition, demo_nodes_cpp, demo_nodes_cpp_native,
+                 demo_nodes_py, depthimage_to_laserscan,
+                 dummy_map_server, dummy_robot_bringup,
+                 dummy_sensors, examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, rviz2,
+                 rviz_default_plugins, sros2, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor]
+
+
+Bouncy Bolson (June 2018 - June 2019)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 pluginlib, rcl_lifecycle, rclcpp, rclcpp_lifecycle,
+                 rclpy, ros2launch, ros2lifecycle, ros2msg,
+                 ros2node, ros2param, ros2pkg, ros2run, ros2service,
+                 ros2srv, ros2topic, ros_environment,
+                 rosidl_default_generators, rosidl_default_runtime]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [kdl_parser, robot_state_publisher, tf2, tf2_eigen,
+                 tf2_geometry_msgs, tf2_ros, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [angles, composition, demo_nodes_cpp,
+                 demo_nodes_cpp_native, demo_nodes_py,
+                 depthimage_to_laserscan, dummy_map_server,
+                 dummy_robot_bringup, dummy_sensors,
+                 examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, rviz2,
+                 rviz_default_plugins, sros2, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor]
+
+
+Crystal Clemmys (December 2018 - December 2019)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 pluginlib, rcl_lifecycle, rclcpp, rclcpp_lifecycle,
+                 rclpy, ros2launch, ros2lifecycle, ros2msg,
+                 ros2multicast, ros2node, ros2param, ros2pkg,
+                 ros2run, ros2service, ros2srv, ros2topic,
+                 ros_environment, rosidl_default_generators,
+                 rosidl_default_runtime]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [kdl_parser, robot_state_publisher, tf2, tf2_eigen,
+                 tf2_geometry_msgs, tf2_ros, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [angles, composition, demo_nodes_cpp,
+                 demo_nodes_cpp_native, demo_nodes_py,
+                 depthimage_to_laserscan, dummy_map_server,
+                 dummy_robot_bringup, dummy_sensors,
+                 examples_rclcpp_minimal_action_client,
+                 examples_rclcpp_minimal_action_server,
+                 examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, rviz2,
+                 rviz_default_plugins, sros2, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor]
+
+
+Dashing Diademata (May 2019 - May 2021)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 pluginlib, rcl_lifecycle, rclcpp, rclcpp_lifecycle,
+                 rclpy, ros2action, ros2component, ros2launch,
+                 ros2lifecycle, ros2msg, ros2multicast, ros2node,
+                 ros2param, ros2pkg, ros2run, ros2service, ros2srv,
+                 ros2topic, ros_environment,
+                 rosidl_default_generators, rosidl_default_runtime,
+                 sros2, sros2_cmake]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [kdl_parser, robot_state_publisher, tf2, tf2_eigen,
+                 tf2_geometry_msgs, tf2_kdl, tf2_ros, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [action_tutorials, angles, composition,
+                 demo_nodes_cpp, demo_nodes_cpp_native,
+                 demo_nodes_py, depthimage_to_laserscan,
+                 dummy_map_server, dummy_robot_bringup,
+                 dummy_sensors,
+                 examples_rclcpp_minimal_action_client,
+                 examples_rclcpp_minimal_action_server,
+                 examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_action_client,
+                 examples_rclpy_minimal_action_server,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, pendulum_msgs,
+                 quality_of_service_demo_cpp,
+                 quality_of_service_demo_py, rqt_common_plugins,
+                 rviz2, rviz_default_plugins, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor, turtlesim]
+
+
+Eloquent Elusor (November 2019 - November 2020)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 pluginlib, rcl_lifecycle, rclcpp, rclcpp_lifecycle,
+                 rclpy, ros2action, ros2component, ros2doctor,
+                 ros2interface, ros2launch, ros2lifecycle, ros2msg,
+                 ros2multicast, ros2node, ros2param, ros2pkg,
+                 ros2run, ros2service, ros2srv, ros2topic,
+                 ros_environment, rosidl_default_generators,
+                 rosidl_default_runtime, sros2, sros2_cmake]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+      - Opensplice: [rmw_opensplice, rosidl_typesupport_opensplice]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [geometry2, kdl_parser, robot_state_publisher, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [action_tutorials_cpp, action_tutorials_interfaces,
+                 action_tutorials_py, angles, composition,
+                 demo_nodes_cpp, demo_nodes_cpp_native,
+                 demo_nodes_py, depthimage_to_laserscan,
+                 dummy_map_server, dummy_robot_bringup,
+                 dummy_sensors,
+                 examples_rclcpp_minimal_action_client,
+                 examples_rclcpp_minimal_action_server,
+                 examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_action_client,
+                 examples_rclpy_minimal_action_server,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, pendulum_msgs,
+                 quality_of_service_demo_cpp,
+                 quality_of_service_demo_py, rqt_common_plugins,
+                 rviz2, rviz_default_plugins, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor, turtlesim]
+
+
+Foxy Fitzroy (May 2020 - May 2023)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 launch, launch_ros, launch_testing,
+                 launch_testing_ament_cmake, launch_testing_ros,
+                 launch_xml, launch_yaml, pluginlib, rcl_lifecycle,
+                 rclcpp, rclcpp_lifecycle, rclpy, ros2action,
+                 ros2component, ros2doctor, ros2interface,
+                 ros2launch, ros2lifecycle, ros2multicast, ros2node,
+                 ros2param, ros2pkg, ros2run, ros2service,
+                 ros2topic, ros_environment,
+                 rosidl_default_generators, rosidl_default_runtime,
+                 sros2, sros2_cmake]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - CycloneDDS: [cyclonedds, rmw_cyclonedds]
+      - Connext: [rmw_connext, rosidl_typesupport_connext]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [geometry2, kdl_parser, robot_state_publisher,
+                 rosbag2, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [action_tutorials_cpp, action_tutorials_interfaces,
+                 action_tutorials_py, angles, composition,
+                 demo_nodes_cpp, demo_nodes_cpp_native,
+                 demo_nodes_py, depthimage_to_laserscan,
+                 dummy_map_server, dummy_robot_bringup,
+                 dummy_sensors,
+                 examples_rclcpp_minimal_action_client,
+                 examples_rclcpp_minimal_action_server,
+                 examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclcpp_multithreaded_executor,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_action_client,
+                 examples_rclpy_minimal_action_server,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, pendulum_msgs,
+                 quality_of_service_demo_cpp,
+                 quality_of_service_demo_py, rqt_common_plugins,
+                 rviz2, rviz_default_plugins, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor, turtlesim]
+
+
+Galactic Geochelone (May 2021 - November 2022)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 launch, launch_ros, launch_testing,
+                 launch_testing_ament_cmake, launch_testing_ros,
+                 launch_xml, launch_yaml, pluginlib, rcl_lifecycle,
+                 rclcpp, rclcpp_lifecycle, rclpy,
+                 ros2cli_common_extensions, ros2launch,
+                 ros_environment, rosidl_default_generators,
+                 rosidl_default_runtime, sros2, sros2_cmake]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - CycloneDDS: [cyclonedds, rmw_cyclonedds]
+      - Connext: [rmw_connextdds]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [geometry2, kdl_parser, robot_state_publisher,
+                 rosbag2, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [action_tutorials_cpp, action_tutorials_interfaces,
+                 action_tutorials_py, angles, composition,
+                 demo_nodes_cpp, demo_nodes_cpp_native,
+                 demo_nodes_py, depthimage_to_laserscan,
+                 dummy_map_server, dummy_robot_bringup,
+                 dummy_sensors,
+                 examples_rclcpp_minimal_action_client,
+                 examples_rclcpp_minimal_action_server,
+                 examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclcpp_multithreaded_executor,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_action_client,
+                 examples_rclpy_minimal_action_server,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, pendulum_msgs,
+                 quality_of_service_demo_cpp,
+                 quality_of_service_demo_py, rqt_common_plugins,
+                 rviz2, rviz_default_plugins, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor, turtlesim]
+
+
+Rolling Ridley (June 2020 - Ongoing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Core
+""""""""
+
+::
+
+  - ros_core:
+      packages: [ament_cmake, ament_cmake_auto, ament_cmake_gmock,
+                 ament_cmake_gtest, ament_cmake_pytest,
+                 ament_cmake_ros, ament_index_cpp,
+                 ament_index_python, ament_lint_auto,
+                 ament_lint_common, class_loader, common_interfaces,
+                 launch, launch_ros, launch_testing,
+                 launch_testing_ament_cmake, launch_testing_ros,
+                 launch_xml, launch_yaml, pluginlib, rcl_lifecycle,
+                 rclcpp, rclcpp_lifecycle, rclpy,
+                 ros2cli_common_extensions, ros2launch,
+                 ros_environment, rosidl_default_generators,
+                 rosidl_default_runtime, sros2, sros2_cmake]
+      And at least one of the following rmw_implementation:
+      - Fast-RTPS: [Fast-CDR, Fast-RTPS, rmw_fastrtps]
+      - CycloneDDS: [cyclonedds, rmw_cyclonedds]
+      - Connext: [rmw_connextdds]
+
+
+ROS Base
+""""""""
+
+::
+
+  - ros_base:
+      extends:  [ros_core]
+      packages: [geometry2, kdl_parser, robot_state_publisher,
+                 rosbag2, urdf]
+
+
+Desktop
+"""""""
+
+::
+
+  - desktop:
+      extends:  [ros_base]
+      packages: [action_tutorials_cpp, action_tutorials_interfaces,
+                 action_tutorials_py, angles, composition,
+                 demo_nodes_cpp, demo_nodes_cpp_native,
+                 demo_nodes_py, depthimage_to_laserscan,
+                 dummy_map_server, dummy_robot_bringup,
+                 dummy_sensors,
+                 examples_rclcpp_minimal_action_client,
+                 examples_rclcpp_minimal_action_server,
+                 examples_rclcpp_minimal_client,
+                 examples_rclcpp_minimal_composition,
+                 examples_rclcpp_minimal_publisher,
+                 examples_rclcpp_minimal_service,
+                 examples_rclcpp_minimal_subscriber,
+                 examples_rclcpp_minimal_timer,
+                 examples_rclcpp_multithreaded_executor,
+                 examples_rclpy_executors,
+                 examples_rclpy_minimal_action_client,
+                 examples_rclpy_minimal_action_server,
+                 examples_rclpy_minimal_client,
+                 examples_rclpy_minimal_publisher,
+                 examples_rclpy_minimal_service,
+                 examples_rclpy_minimal_subscriber, image_tools,
+                 intra_process_demo, joy, lifecycle, logging_demo,
+                 pcl_conversions, pendulum_control, pendulum_msgs,
+                 quality_of_service_demo_cpp,
+                 quality_of_service_demo_py, rqt_common_plugins,
+                 rviz2, rviz_default_plugins, teleop_twist_joy,
+                 teleop_twist_keyboard, tlsf, tlsf_cpp,
+                 topic_monitor, turtlesim]
 
 
 References
