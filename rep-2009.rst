@@ -39,16 +39,21 @@ Specification
 Defining a Publisher or Subscriber that Performs Type Negotiation
 -----------------------------------------------------------------
 
-In order to have publishers and subscribers negotiate which ROS message type is sent, the user must specify the following for each publisher and subscriber:
+In order to have publishers and subscribers negotiate which ROS message type is sent, the user must
 
-- the supported message types and
-- (optionally) a prioritized list of the supported message types.
+- specify the supported message types and,
+- (optionally) provide a prioritization of the supported message types.
 
 This is in addition to the standard arguments required for a publisher or subscriber, such as topic, quality of service, and queue size.
 Also, each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
 
-The reason that the prioritized list is optional is that a publisher or subscriber may not have strong preferences but may support multiple types.
+The reason that argument that prioritizes the message types is optional is that a publisher or subscriber may not have strong preferences but may support multiple types.
 In this case, the types it supports will be considered as well as the preference of other nodes it communicates with.
+
+Also note that the way of prioritizing the various message types can come in two forms:
+
+- A list where message types are ordered by preference.
+- A dictionary for nodes with both publishers and subscribers that want to delay publishing their subscribers preferences until their publisher has resolved its message type. This dictionary can be thought of as a list of preferences, where the list chosen depends on the publisher's message type.
 
 Negotiation Algorithm
 ---------------------
