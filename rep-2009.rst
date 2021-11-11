@@ -304,6 +304,7 @@ As a shorthand in figures, we'll define a node that differs its preference befor
 .. code-block::
 
     N_p*(x, y, z) := N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
+
 or
 
 .. code-block::
