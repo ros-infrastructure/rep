@@ -832,6 +832,10 @@ Build System Support:
 Humble Hawksbill (May 2022 - May 2027)
 --------------------------------------
 
+.. note::
+
+  This section is subject to change until the `Humble freeze on April 4, 2022 <https://docs.ros.org/en/rolling/Releases/Release-Humble-Hawksbill.html#release-timeline>`_.
+
 Targeted platforms:
 
 +--------------+------------------+---------------+------------------+------------+-----------------+----------------+
