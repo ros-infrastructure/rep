@@ -500,6 +500,31 @@ All items on the list for the next distro should already be released into the ro
   * `urdf/urdf <https://index.ros.org/p/urdf/>`_
   * `urdfdom/urdfdom <https://index.ros.org/p/urdfdom/>`_
 
+* Web
+
+  * `foxglove/ros1 <https://github.com/foxglove/ros1>`_
+  * `foxglove/ros2 <https://github.com/foxglove/ros2>`_
+  * `foxglove/rosbag <https://github.com/foxglove/rosbag>`_
+  * `foxglove/rosbag2 <https://github.com/foxglove/rosbag2>`_
+  * `foxglove/rosbag2-node <https://github.com/foxglove/rosbag2-node>`_
+  * `foxglove/rosbag2-web <https://github.com/foxglove/rosbag2-web>`_
+  * `foxglove/rosmsg <https://github.com/foxglove/rosmsg>`_
+  * `foxglove/rosmsg-serialization <https://github.com/foxglove/rosmsg-serialization>`_
+  * `foxglove/rosmsg2-serialization <https://github.com/foxglove/rosmsg2-serialization>`_
+  * `foxglove/rostime <https://github.com/foxglove/rostime>`_
+  * `foxglove/rtps <https://github.com/foxglove/rtps>`_
+  * `RobotWebTools/rclnodejs <https://github.com/RobotWebTools/rclnodejs>`_
+  * `RobotWebTools/ros2djs <https://github.com/RobotWebTools/ros2djs>`_
+  * `RobotWebTools/ros3djs <https://github.com/RobotWebTools/ros3djs>`_
+  * `RobotWebTools/roslibjs <https://github.com/RobotWebTools/roslibjs>`_
+  * `rosbridge_suite/rosapi <https://index.ros.org/p/rosapi/>`_
+  * `rosbridge_suite/rosapi_msgs <https://index.ros.org/p/rosapi_msgs/>`_
+  * `rosbridge_suite/rosbridge_library <https://index.ros.org/p/rosbridge_library/>`_
+  * `rosbridge_suite/rosbridge_msgs <https://index.ros.org/p/rosbridge_msgs/>`_
+  * `rosbridge_suite/rosbridge_server <https://index.ros.org/p/rosbridge_server/>`_
+  * `rosbridge_suite/rosbridge_suite <https://index.ros.org/p/rosbridge_suite/>`_
+  * `rosbridge_suite/rosbridge_test_msgs <https://index.ros.org/p/rosbridge_test_msgs/>`_
+
 * Tools
 
   * `gazebo_ros_pkgs/gazebo_dev <https://index.ros.org/p/gazebo_dev/>`_
