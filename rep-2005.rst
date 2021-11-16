@@ -374,35 +374,34 @@ All items on the list for the next distro should already be released into the ro
 
   * MoveIt2
 
-    * `moveit2/moveit_jog_arm <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_setup_assistant <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/run_moveit_cpp <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_core <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_occupancy_map_monitor <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_robot_interaction <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_warehouse <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_manipulation <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_move_group <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_planning <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_perception <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_visualization <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_benchmarks <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_planning_interface <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_fake_controller_manager <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_simple_controller_manager <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_plugins <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_ros_control_interface <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_planners_ompl <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_planners_trajopt <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_planners <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_chomp_optimizer_adapter <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/chomp_motion_planner <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_planners_chomp <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_commander <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_runtime <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit <https://github.com/ros-planning/moveit2/>`_
-    * `moveit2/moveit_kinematics <https://github.com/ros-planning/moveit2/>`_
+    * `moveit2/moveit_servo <https://index.ros.org/p/moveit_servo/>`_
+    * `moveit2/moveit_setup_assistant <https://index.ros.org/p/moveit_setup_assistant/>`_
+    * `moveit2/run_moveit_cpp <https://index.ros.org/p/run_moveit_cpp/>`_
+    * `moveit2/moveit_core <https://index.ros.org/p/moveit_core/>`_
+    * `moveit2/moveit_ros_occupancy_map_monitor <https://index.ros.org/p/moveit_ros_occupancy_map_monitor/>`_
+    * `moveit2/moveit_ros_robot_interaction <https://index.ros.org/p/moveit_ros_robot_interaction/>`_
+    * `moveit2/moveit_ros_warehouse <https://index.ros.org/p/moveit_ros_warehouse/>`_
+    * `moveit2/moveit_ros_manipulation <https://index.ros.org/p/moveit_ros_manipulation/>`_
+    * `moveit2/moveit_ros_move_group <https://index.ros.org/p/moveit_ros_move_group/>`_
+    * `moveit2/moveit_ros <https://index.ros.org/p/moveit_ros/>`_
+    * `moveit2/moveit_ros_planning <https://index.ros.org/p/moveit_ros_planning/>`_
+    * `moveit2/moveit_ros_perception <https://index.ros.org/p/moveit_ros_perception/>`_
+    * `moveit2/moveit_ros_visualization <https://index.ros.org/p/moveit_ros_visualization/>`_
+    * `moveit2/moveit_ros_benchmarks <https://index.ros.org/p/moveit_ros_benchmarks//>`_
+    * `moveit2/moveit_ros_planning_interface <https://index.ros.org/p/moveit_ros_planning_interface/>`_
+    * `moveit2/moveit_simple_controller_manager <https://index.ros.org/p/moveit_simple_controller_manager/>`_
+    * `moveit2/moveit_plugins <https://index.ros.org/p/moveit_plugins/>`_
+    * `moveit2/moveit_ros_control_interface <https://index.ros.org/p/moveit_ros_control_interface/>`_
+    * `moveit2/moveit_planners_ompl <https://index.ros.org/p/moveit_planners_ompl/>`_
+    * `moveit2/moveit_planners <https://index.ros.org/p/moveit_planners/>`_
+    * `moveit2/moveit_chomp_optimizer_adapter <https://index.ros.org/p/moveit_chomp_optimizer_adapter/>`_
+    * `moveit2/chomp_motion_planner <https://index.ros.org/p/chomp_motion_planner/>`_
+    * `moveit2/moveit_planners_chomp <https://index.ros.org/p/moveit_planners_chomp/>`_
+    * `moveit2/moveit_commander <https://index.ros.org/p/moveit_commander/>`_
+    * `moveit2/moveit_runtime <https://index.ros.org/p/moveit_runtime/>`_
+    * `moveit2/moveit <https://index.ros.org/p/moveit/>`_
+    * `moveit2/moveit_kinematics <https://index.ros.org/p/moveit_kinematics/>`_
+    * `moveit2/pilz_industrial_motion_planner <https://index.ros.org/p/pilz_industrial_motion_planner/>`_
 
   * `cra-ros-pkg/robot_localization <https://github.com/cra-ros-pkg/robot_localization/>`_
   * `interactive_markers/interactive_markers <https://index.ros.org/p/interactive_markers/>`_
