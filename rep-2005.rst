@@ -500,6 +500,20 @@ All items on the list for the next distro should already be released into the ro
   * `urdf/urdf <https://index.ros.org/p/urdf/>`_
   * `urdfdom/urdfdom <https://index.ros.org/p/urdfdom/>`_
 
+* Web
+
+  * `RobotWebTools/rclnodejs <https://github.com/RobotWebTools/rclnodejs>`_
+  * `RobotWebTools/ros2djs <https://github.com/RobotWebTools/ros2djs>`_
+  * `RobotWebTools/ros3djs <https://github.com/RobotWebTools/ros3djs>`_
+  * `RobotWebTools/roslibjs <https://github.com/RobotWebTools/roslibjs>`_
+  * `rosbridge_suite/rosapi <https://index.ros.org/p/rosapi/>`_
+  * `rosbridge_suite/rosapi_msgs <https://index.ros.org/p/rosapi_msgs/>`_
+  * `rosbridge_suite/rosbridge_library <https://index.ros.org/p/rosbridge_library/>`_
+  * `rosbridge_suite/rosbridge_msgs <https://index.ros.org/p/rosbridge_msgs/>`_
+  * `rosbridge_suite/rosbridge_server <https://index.ros.org/p/rosbridge_server/>`_
+  * `rosbridge_suite/rosbridge_suite <https://index.ros.org/p/rosbridge_suite/>`_
+  * `rosbridge_suite/rosbridge_test_msgs <https://index.ros.org/p/rosbridge_test_msgs/>`_
+
 * Tools
 
   * `gazebo_ros_pkgs/gazebo_dev <https://index.ros.org/p/gazebo_dev/>`_
