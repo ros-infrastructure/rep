@@ -1,10 +1,10 @@
 REP: 2000
 Title: ROS 2 Releases and Target Platforms
-Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>
+Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>, Audrow Nash <audrow@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
-Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May-2019, 29-Aug-2019, 25-Feb-2020
+Created: 10-Apr-2018, 24-Apr-2018, 21-May-2018, 10-Dec-2018, 20-May-2019, 21-May-2019, 29-Aug-2019, 25-Feb-2020, 18-Nov-2021
 
 
 Abstract
