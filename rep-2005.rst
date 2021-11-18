@@ -389,10 +389,12 @@ All items on the list for the next distro should already be released into the ro
     * `moveit2/moveit_ros_visualization <https://index.ros.org/p/moveit_ros_visualization/>`_
     * `moveit2/moveit_ros_benchmarks <https://index.ros.org/p/moveit_ros_benchmarks//>`_
     * `moveit2/moveit_ros_planning_interface <https://index.ros.org/p/moveit_ros_planning_interface/>`_
+    * `moveit2/moveit_fake_controller_manager <https://github.com/ros-planning/moveit2/>`_
     * `moveit2/moveit_simple_controller_manager <https://index.ros.org/p/moveit_simple_controller_manager/>`_
     * `moveit2/moveit_plugins <https://index.ros.org/p/moveit_plugins/>`_
     * `moveit2/moveit_ros_control_interface <https://index.ros.org/p/moveit_ros_control_interface/>`_
     * `moveit2/moveit_planners_ompl <https://index.ros.org/p/moveit_planners_ompl/>`_
+    * `moveit2/moveit_planners_trajopt <https://github.com/ros-planning/moveit2/>`_
     * `moveit2/moveit_planners <https://index.ros.org/p/moveit_planners/>`_
     * `moveit2/moveit_chomp_optimizer_adapter <https://index.ros.org/p/moveit_chomp_optimizer_adapter/>`_
     * `moveit2/chomp_motion_planner <https://index.ros.org/p/chomp_motion_planner/>`_
@@ -401,7 +403,6 @@ All items on the list for the next distro should already be released into the ro
     * `moveit2/moveit_runtime <https://index.ros.org/p/moveit_runtime/>`_
     * `moveit2/moveit <https://index.ros.org/p/moveit/>`_
     * `moveit2/moveit_kinematics <https://index.ros.org/p/moveit_kinematics/>`_
-    * `moveit2/pilz_industrial_motion_planner <https://index.ros.org/p/pilz_industrial_motion_planner/>`_
 
   * `cra-ros-pkg/robot_localization <https://github.com/cra-ros-pkg/robot_localization/>`_
   * `interactive_markers/interactive_markers <https://index.ros.org/p/interactive_markers/>`_
