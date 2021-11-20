@@ -23,7 +23,7 @@ Perhaps the node with the original subscriber is no longer needed so the node go
 Currently, this behavior could be accomplished with ROS 2 nodes or lifecycle nodes, however doing so would require a significant amount of work for the programmer and are potential sources of errors.
 
 An additional reason for this change is that it can improve developer experience by giving the developer more flexibility in how they interface with different nodes.
-The result of which is that they may need to spend less time writing code to convert a message type into the one message type accepted by the node they're using; instead the node may support additional types, so they may not need to preform any conversion.
+The result of which is that they may need to spend less time writing code to convert a message type into the one message type accepted by the node they're using; instead the node may support additional types, so they may not need to perform any conversion.
 This may reduce the number of errors in the user's code, as well as it may allow them to prototype more efficiently, as they may not have to write as much code to perform conversions.
 
 
@@ -45,12 +45,12 @@ In order to have publishers and subscribers negotiate which ROS message type is 
 - (optionally) provide a prioritization of the supported message types.
 
 This is in addition to the standard arguments required for a publisher or subscriber, such as topic, quality of service, and queue size.
-Also, each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
+Each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
 
 The reason that argument that prioritizes the message types is optional is that a publisher or subscriber may not have strong preferences but may support multiple types.
 In this case, the types it supports will be considered as well as the preference of other nodes it communicates with.
 
-Also note that the way of prioritizing the various message types can come in two forms:
+The way of prioritizing the various message types can come in two forms:
 
 - A list where message types are ordered by preference.
 - A dictionary for nodes with both publishers and subscribers that want to delay publishing their subscribers preferences until their publisher has resolved its message type. This dictionary can be thought of as a list of preferences, where the list chosen depends on the publisher's message type.
@@ -61,7 +61,7 @@ Negotiation Algorithm
 In negotiating preferences, it has been decided that publishers make the ultimate decision of what type to send.
 To accomplish this, a publisher seeks to know the supported types and preferences of each subscriber that receives messages from it.
 After receiving all of the subscribers supported types and preferences, the publisher considers all of the supported types and preferences, including its own supported types and preferences.
-The first step in this comparison is to compare the supported types available.
+The first step in the negotiation is to compare the supported types available.
 Specifically, we are looking to see what types are supported for all of the subscribers.
 In the case that no single format can be accepted by all subscribers, more than one message type will have to be published.
 If this occurs, a warning will be made visible to the user, as it may be undesirable to have such a large memory footprint.
@@ -196,7 +196,7 @@ Thus, ``N_1`` will publish two different message types, ``x`` and ``y``.
 
 .. code-block::
 
-   (3a)
+   (3b)
                  x
      N_1(x, y) ----> N_2(x)
              |
