@@ -10,31 +10,34 @@ Post-History:
 Abstract
 ========
 
-To come.
+This REP proposes an extension to ROS 2 Lifecycle Nodes that will make it possible to negotiate the message types used by publishers and subscribers.
 
 
 Motivation
 ==========
 
 The primary reason for this change is to allow nodes to publish different types of messages that better allow the system to optimize its behavior.
-For example, a subscriber may be more efficient with one image format (say, YUV420) than another (say, ARGB888).
+For example, a publisher or subscriber may be more efficient with one image format (say, YUV420) than another (say, ARGB888).
 What's more, the optimal message type to publish may change over time, if say, a different part of the ROS 2 network becomes active to accomplish a different task.
 Perhaps the node with the original subscriber is no longer needed so the node goes into an idle mode, and another node with a different subscriber would prefer images in ARGB888, over YUV420, for resource reasons.
 Currently, this behavior could be accomplished with ROS 2 nodes or lifecycle nodes, however doing so would require a significant amount of work for the programmer and are potential sources of errors.
 
-An additional reason for this change is that it can improve developer experience by giving the developer more flexibility in how they interface with different nodes.
+A second reason for this change is that it can improve developer experience by giving the developer more flexibility in how they interface with different nodes.
 The result of which is that they may need to spend less time writing code to convert a message type into the one message type accepted by the node they're using; instead the node may support additional types, so they may not need to perform any conversion.
 This may reduce the number of errors in the user's code, as well as it may allow them to prototype more efficiently, as they may not have to write as much code to perform conversions.
 
-
-Terminology
-===========
-
-To come.
+The final reason for this change is that it will enable vendors of hardware accelerators to provide the most efficient operations.
+That is, it may be the case that a node can do hardware-accelerated operations on a YUV420 image, but (slower) CPU conversions on a ARGB8888 image.
+In that case, the hardware vendor's node would mark a preference on YUV420 since that uses the hardware more efficiently.
 
 
 Specification
 =============
+
+Extending Lifecycle Nodes
+-------------------------
+
+This work is extends Lifecycle Nodes, so that we can control how and when publishers and subscribers are created.
 
 Defining a Publisher or Subscriber that Performs Type Negotiation
 -----------------------------------------------------------------
@@ -42,13 +45,10 @@ Defining a Publisher or Subscriber that Performs Type Negotiation
 In order to have publishers and subscribers negotiate which ROS message type is sent, the user must
 
 - specify the supported message types and,
-- (optionally) provide a prioritization of the supported message types.
+- provide a prioritization of the supported message types.
 
 This is in addition to the standard arguments required for a publisher or subscriber, such as topic, quality of service, and queue size.
 Each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
-
-The reason that argument that prioritizes the message types is optional is that a publisher or subscriber may not have strong preferences but may support multiple types.
-In this case, the types it supports will be considered as well as the preference of other nodes it communicates with.
 
 The way of prioritizing the various message types can come in two forms:
 
@@ -58,7 +58,7 @@ The way of prioritizing the various message types can come in two forms:
 Negotiation Algorithm
 ---------------------
 
-In negotiating preferences, it has been decided that publishers make the ultimate decision of what type to send.
+In negotiating preferences, it has been decided that publishers make the ultimate decision of what type to send (this design choice is discussed in more detail in the "Rationale" section).
 To accomplish this, a publisher seeks to know the supported types and preferences of each subscriber that receives messages from it.
 After receiving all of the subscribers supported types and preferences, the publisher considers all of the supported types and preferences, including its own supported types and preferences.
 The first step in the negotiation is to compare the supported types available.
@@ -90,6 +90,8 @@ A high-level view of this algorithm can be seen below.
     # Prioritize the common message types
     selected_message_types = prioritize_types(common_supported_types, preferences)
 
+    # Let the subscribers know what message type will be used
+    send_selected_message_type_back_to_subscribers(selected_message_types)
     # Create publishers now that the message type has been negotiated.
     create_negotiated_publishers(topic, selected_message_types)
 
@@ -109,7 +111,7 @@ More practically, ``N_1`` is publishing ``x``, and ``N_2`` is subscribing to a t
 .. code-block::
 
             x
-   N_1(x) ----> N_2(x)
+   N_1(x) ----> N_2(x, y)
 
 In some examples below we will reason about which message type should be chosen.
 In such cases, ``??`` will be used to denote that we are not sure of the message type just yet.
@@ -123,26 +125,22 @@ There are several cases that are clear.
 .. code-block::
 
    (1a)
-                    x
-           N_1(x) ----> N_2(x, y)
-
-   (1b)
                     y
            N_1(y) ----> N_2(x, y)
 
-   (1c)
+   (1b)
                     x
         N_1(x, y) ----> N_2(x)
 
-   (1d)
+   (1c)
                     y
         N_1(x, y) ----> N_2(y)
 
-   (1e)
+   (1d)
                     x
      N_1(x, y, z) ----> N_2(x, a, b)
 
-   (1f)
+   (1e)
                     x
      N_1(x, y, z) ----> N_2(a, b, x)
 
@@ -359,7 +357,7 @@ Notice, however, that the deadlock is fixed by one node readily revealing its pr
     N_1* := N_1([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})
     N_2* := N_1*
 
-   (5c)
+   (5d)
 
        -- N_3(x, y, z) <--
      x |                 |
@@ -392,7 +390,9 @@ Using Different Topics or the Same Topic For Different Message Types
 
 If a publisher can publish ``ARGB888`` or ``YUV420`` images, should the images be published on namespaced topics or to the topic directly?
 Specifically, say that it has been negotiated the the publisher should publish ``ARG888`` on the topic ``/image``, should the images be published on ``/image/ARGB888`` or ``/image``?
+In either case, the topics should support following remapping rules.
 Using ``/image/ARGB888`` removes ambiguity, but could make it hard to work with other nodes that do not negotiate their message types that are also on the network.
+It also will be harder to use with remapping rules.
 While ``/image`` is cleaner, but may lead to confusion when a single topic is used for multiple message types.
 ``/image`` also makes it more difficult for the user to use topics published by nodes that do not perform type negotiation, which actually may be desirable: it will reduce the chance that the user builds a pipeline for one message type but then receives another message type on the same topic.
 
