@@ -1,12 +1,12 @@
 REP: 111
 Title: Multiple Package Manager Support for Rosdep
-Author: Tully Foote, Dirk Thomas
+Author: Tully Foote, Dirk Thomas, Scott K Logan
 Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 28-June-2011
 ROS-Version: 1.6
-Post-History: 30-Jun-2011, 24-Jan-2018
+Post-History: 30-Jun-2011, 24-Jan-2018, 12-Nov-2021
 
 
 Abstract
@@ -337,6 +337,21 @@ PACKAGE_ARGUMENT:
         wheezy: [some-name]
 
 
+Wildcard OS_NAME
+----------------
+
+Some package managers are supported and function on more than one platform, and
+the names of packages in those package managers are typically the same between
+platforms.  To avoid duplicating the rules under several ``OS_NAME`` stanzas the
+``OS_NAME`` can be specified as `*` as long as the rule under it specifies the
+``PACKAGE_MANAGER`` explicitly.
+
+Similar to rule lookups regarding a `Wildcard OS_VERSION`_, an explicit
+``OS_NAME`` entry will take precedence over `*` rules entirely and an
+explicitly null ``PACKAGE_ARGUMENT`` for an ``OS_NAME`` will omit it from the
+wildcard.
+
+
 Dependencies
 ------------
 
@@ -426,6 +441,11 @@ This will be supported through ROS Fuerte.
 
 History
 =======
+
+12-Nov-2021
+-----------
+
+The section `Wildcard OS_NAME`_ has been added.
 
 24-Jan-2018
 -----------
