@@ -439,13 +439,14 @@ The proposed feature adds new functionality while not modifying existing functio
 Feature Progress
 ================
 
-To come.
+Currently, there has been some prototyping to understand how the proposed feature may look using C++ features.
 
+- `@audrow/type-negotiation-type-mapping <https://replit.com/@audrow/type-negotiation-type-mapping>`_ shows how the proposed feature may use C++ templating and a type map class to access publishers and subscribers.
+  Note that the types used in this approach will have to be replaced with ``structs`` in the future to allow for multiple supported types to use the same ROS Message type.
+- `@audrow/type-negotiation-possible-usage <https://replit.com/@audrow/type-negotiation-possible-usage>`_ shows another approach which uses inheritance to implement the proposed feature.
+  This approach requires some additional work from the user to implement functions that create typed publishers and subscribers.
 
-References
-==========
-
-To come.
+Perhaps the best way to proceed is in combining both of the approaches above, so that multiple supported types can use the same ROS Message type and the user doesn't need to implement as much boilerplate code.
 
 
 Copyright
