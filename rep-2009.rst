@@ -370,18 +370,18 @@ Rationale
 Having the Publisher Pick the Message Type
 ------------------------------------------
 
-Consider a network with ``m`` publishers and ``n`` subscribers, where ``m`` and ``n`` are positive integers.
-Also imagine that there are at least two publishers that are publishing on the same topic.
-In this case, it is possible to have each of these publishers consider the other publishers in their decision of what message type to send.
+Consider a network with ``m`` negotiating publishers and ``n`` negotiating subscribers, where ``m`` and ``n`` are positive integers.
+Also imagine that there are at least two publishers that are publishing with the same selected message type.
+In this case, it is possible to have each of the negotiating publishers consider the other negotiating publishers in their decision of what message type to send.
 
 It is also true that loops in the network may occur.
 For example, imagine nodes ``A``, ``B``, and ``C``.
 ``A`` sends a message to ``B``, and ``B`` sends a message to ``C``.
 This gets more complicated if ``A`` also sends a message to ``C``.
 
-In both of the above cases, it is much more challenging to find the best message type than the simple strategy detailed in a previous section.
+In both of the above cases, it is much more challenging to find the best selected message type than the simple strategy detailed in a previous section.
 It was thought that the simpler approach described above in the specifications gets us almost all the way there, while being much simpler to implement.
-In addition, if it turns out to be necessary, the simpler approach can always be replaced by a better method for getting the optimal solution in future work.
+In addition, if it turns out to be necessary, the simpler approach can always be replaced by a better method for getting the optimal solution selected message type in future work.
 
 
 Using Different Topics or the Same Topic For Different Message Types
@@ -398,36 +398,31 @@ While ``/image`` is cleaner, but may lead to confusion when a single topic is us
 Since the ``<topic>/<message type>`` format removes ambiguity and makes it harder to use negotiated nodes inappropriately, we will use the ``<topic>/<message type>`` format for all topics.
 
 
-Delaying Revealing Preferences Until the Publisher's Message Type is Known
---------------------------------------------------------------------------
-
-In some cases, it may be desirable for a node that has both publishers and subscribers to delay revealing its preference until the publisher's message type is known.
-This may be because data the subscriber receives may be used in the message that is ultimately published.
-
-One danger in this behavior is that there may be a loop in which all nodes are delaying revealing their preferences.
-A simple solution and the one proposed is to use a timeout to prevent this from happening.
-
-If there is a case that there is a valid loop, then at least one of the nodes must reveal its preferences.
-For this reason, nodes will have the ability to reveal their preferences or to delay revealing them.
-For a node to delay revealing its preferences, there is additional configuration that must occur, so the default behavior will be that nodes reveal their preferences readily.
-
-
 To Take a Centralized or Decentralized Approach
 -----------------------------------------------
 
-To come.
+The specification above takes a decentralized approach to negotiating publishers and subscribers.
+That is, each negotiating publisher and subscriber negotiates its own selected message type.
+It is also possible to take a centralized approach, where all publishers and subscribers broadcast their preferences to a higher system that decides the selected message types.
+
+The primary advantage of a decentralized approach is that it is easier to implement, especially given the greedy approach that we are using in computing the selected message type.
+If we wanted to find the optimal selected message types taking the entire system into account, we would most likely have to implement a centralized approach, which would have a full understanding of the entire system before making a decision.
 
 
 Extending Lifecycle Nodes
 -------------------------
 
-To come.
+Very much of the stateful behavior that is required for the negotiation process is implemented in lifecycle nodes.
+It also allows us to turn off nodes and free up the nodes resources should another task require those resources.
+Thus it was an easy decision to extend the lifecycle nodes to with the negotiation process.
 
 
 Putting this Implementation in ``rclcpp`` or ``rcl``
 ----------------------------------------------------
 
-To come.
+This feature is intended to be used with type adaptation (see `REP 2007 <./rep-2007.html>`_), which has been implemented in ``rclcpp``.
+Thus it makes sense to put the negotiation process in ``rclcpp``.
+As with REP 2007, the C++'s templating system will make it much easier handle the various message types expected safely.
 
 
 Backwards Compatibility
