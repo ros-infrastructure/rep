@@ -75,11 +75,21 @@ The proposed change has a few goals:
 - Core functions used for decision making are exposed to the user, namely the ability to choose how preferences are prioritized and the ability to delay stating preferences.
 
 
+Defining Supported Message Types
+--------------------------------
 
-This work is extends Lifecycle Nodes, so that we can control how and when publishers and subscribers are created.
+For each supported message type, the following information must be known:
 
-Defining a Publisher or Subscriber that Performs Type Negotiation
------------------------------------------------------------------
+- The topic that the supported message type should be published on.
+- The message type that will be sent (either a ROS 2 message type, such as  ``sensor_msgs::msg::Image``, or a custom data type).
+- The relative priority of the supported message type.
+
+The message type is important because multiple message types may be sent with the same ROS 2 message type.
+For example, a publisher may publish image data in the format of YUV420 or ARGB8888, both of which could be sent in a ``sensor_msgs::msg::Image``.
+
+Once there is a set of supported message types, publishers and subscribers can negotiate which type they prefer.
+
+
 
 In order to have publishers and subscribers negotiate which ROS message type is sent, the user must
 
