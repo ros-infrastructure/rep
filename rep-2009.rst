@@ -186,6 +186,27 @@ If the selected type or types do not match the subscriber's current message type
 While the negotiating subscriber is activating, it creates a new subscriber for the new selected message type.
 
 
+User Defined Functions
+^^^^^^^^^^^^^^^^^^^^^^
+
+There are two types functions in the negotiation process that the user can define:
+
+:Stating preferences:
+  A function to have a negotiating publisher or subscriber state its preferences, which may include a delay.
+:Picking selected message types:
+  A function to pick the selected message types from the publisher and subscribers supported message priority maps.
+
+The function for stating preferences allows the user to make the negotiating publisher or subscriber have its preferences be conditioned on some aspect of the system's state.
+For example, a negotiating publisher or subscriber may prefer a certain message type if a type of hardware is available, for example a GPU.
+This function is blocking and thus can delay the negotiation process.
+One special case for this function is when there is a negotiating publisher and subscriber pair, which is useful when the publisher and subscriber should ideally use the same supported message type.
+In this case, the user should define a function that will prioritize the supported message types based on the selected message type of the publisher, which will be passed to the function that states the negotiating publisher or subscriber's preferences.
+
+The function for picking selected message types is used to determine which of the supported message types the negotiating publisher or subscriber should use and is run in the negotiating publisher.
+Exposing this function allows the user to create a custom way to pick between supported types with different priorities.
+This may be useful to make high priorities count for relatively more weight in choosing a supported type or having normalized priorities (e.g., between 0 and 1).
+
+
 Negotiation Examples
 --------------------
 
