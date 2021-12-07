@@ -225,7 +225,7 @@ More practically, ``N_1`` is publishing ``x``, and ``N_2`` is subscribing to a t
    N_1(x) ----> N_2(x, y)
 
 
-Simple examples
+Simple Examples
 ^^^^^^^^^^^^^^^
 
 We can now use this notation to reason about the agreed upon the selected message type in several different scenarios.
@@ -254,7 +254,7 @@ There are several cases that are clear.
      N_1(x, y, z) ----> N_2(a, b, x)
 
 
-Publishing to multiple nodes
+Publishing to Multiple Nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There are also the cases where there are more than two nodes.
