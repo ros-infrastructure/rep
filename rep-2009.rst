@@ -43,6 +43,11 @@ Terminology
 :Supported Message Type:
   A message type that can be selected for use during negotiation.
 
+:Supported Message Priority Map:
+  A data structure that maps supported message types to their respective priority.
+  The exact function used to determine how to use these priorities can be overwritten by the user.
+  In general, higher numbers indicate higher priority, zero indicates no preference, and negative numbers indicate a vote against using a supported message type.
+
 :Selected Message Type:
   A supported type that has been selected for use during negotiation.
 
@@ -72,7 +77,7 @@ The proposed change has a few goals:
 - Support publishing in multiple formats at the same time.
 - Only necessary publishers and subscribers are active at any given time.
 - A publisher or subscriber can delay stating its preferences to wait for additional information.
-- Core functions used for decision making are exposed to the user, namely the ability to choose how preferences are prioritized and the ability to delay stating preferences.
+- Core functions are exposed to the user to overwrite, namely the ability to choose how preferences are prioritized and the ability to delay stating preferences.
 
 
 Defining Supported Message Types
@@ -108,42 +113,70 @@ In this case, the user should define a function that will prioritize the support
 Negotiation Algorithm
 ---------------------
 
-In negotiating preferences, it has been decided that publishers make the ultimate decision of what type to send (this design choice is discussed in more detail in the "Rationale" section).
-To accomplish this, a publisher seeks to know the supported types and preferences of each subscriber that receives messages from it.
-After receiving all of the subscribers supported types and preferences, the publisher considers all of the supported types and preferences, including its own supported types and preferences.
-The first step in the negotiation is to compare the supported types available.
-Specifically, we are looking to see what types are supported for all of the subscribers.
-In the case that no single format can be accepted by all subscribers, more than one message type will have to be published.
-If this occurs, a warning will be made visible to the user, as it may be undesirable to have such a large memory footprint.
-In either case, a minimal set of supported types will be obtained.
+Negotiating Publisher
+^^^^^^^^^^^^^^^^^^^^^
 
-After identifying a minimal set of supported message types, the priorities of each type for each subscriber and the publisher will considered.
-If there is a tie in priority for two supported types, the publisher will use its preferences to break the tie.
+The negotiating publisher will select zero or more supported message types (zero when publisher and subscribers have incompatible supported message types).
+To do this, the negotiating publisher performs the following steps:
 
-Once the message types have been prioritized the publisher(s) will be created.
-In the case that one message type doesn't satisfy the supported types for all of the subscribers, additional publishers will be created.
+#. Query all connected subscribers for their supported message priority maps.
+   - This can timeout if a negotiating subscriber delays stating its preferences indefinitely, for example if there is a deadlock.
+#. Decide the selected message types by considering the subscribers and the publisher's own supported message priority maps.
+   - This can result in zero or more matches, as mentioned above.
+     In the case that there are zero matches, an error should be thrown.
+   - Note that the publisher can also block here before it reveals its supported message types.
+     This may be useful to query system information that may inform the priority values in the publisher's supported message priority map.
+#. Notify all of the connected negotiating subscribers of the selected message types.
+   - If there are multiple matches, the subscriber will select the one with the highest priority in its own supported message priority map.
+     In the case that the multiple messages are of the same priority to the subscriber, the negotiating subscriber will choose a selected message type randomly.
+#. The negotiating publisher then creates a publisher for each supported message type.
 
-It is also possible that the graph of active nodes changes during runtime.
-If this occurs, the publishers and subscribers will renegotiate their types, if anything has changed for them.
+Note that all of the above occurs in an extended version of a lifecycle node.
+The following algorithm occurs when the lifecycle is transitioning to the active state.
+Specifically, this algorithm occurs in the callback when the node is activating.
 
-A high-level view of this algorithm can be seen below.
 
-.. code-block:: python
+Negotiating Subscriber
+^^^^^^^^^^^^^^^^^^^^^^
 
-    # Gather supported types and preferences
-    supported_types = get_supported_types([pub, sub_1, sub_2, ..., sub_m])
-    preferences = get_preferences([pub, sub_1, sub_2, ..., sub_m])
+The negotiating subscriber will send its supported message priority map to the negotiating publisher when queried and then wait on the negotiating publisher to tell it the selected message types.
+During this time, the negotiating subscriber, which will also be an extension of a lifecycle node, will be transitioning from inactive to active.
+Upon receiving the selected message types, the subscriber will create one subscriber.
+If multiple selected message types are received, the subscriber will pick the one that has the highest priority in its own supported message priority map.
+If the selected message types have equal priority, the subscriber will choose a selected message type randomly.
+Once the subscriber has been created, the negotiating subscriber will enter the active state.
 
-    # Find common message types that are supported by the publisher and subscribers
-    common_supported_types = find_common_supported_types(supported_types)
 
-    # Prioritize the common message types
-    selected_message_types = prioritize_types(common_supported_types, preferences)
+Negotiating Publisher and Subscriber Pair
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    # Let the subscribers know what message type will be used
-    send_selected_message_type_back_to_subscribers(selected_message_types)
-    # Create publishers now that the message type has been negotiated.
-    create_negotiated_publishers(topic, selected_message_types)
+The negotiating publisher and subscriber pair is a single node that has both a negotiating publisher and subscriber.
+In this case, the negotiating subscriber will wait on the negotiating publisher to pick selected message types and then make it's supported message priority map based on the publisher selected message types.
+Doing so allows the negotiating subscriber to prioritize the selected message types of the publisher, which may be desirable for efficient data transfer.
+
+The negotiating publisher and subscriber pair operates much as described in the previous two sections, with one exception: the node will remain in the activating state until both the negotiating publisher's publishers and the negotiating subscriber's subscriber have been created.
+At which point, the node will transition to the active state.
+
+As in previous sections, if no change is required to the selected message types, the node will remain in the active state.
+
+
+Renegotiating Selected Message Types
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In the case that the ROS 2 network is changing, the negotiating publisher may need to renegotiate its selected message types.
+The process looks similar to the original negotiation, however the negotiating publisher remains active until it determines that the selected messages must be changed.
+If the selected messages must change, the negotiating publisher deactivates itself and destroys its publishers.
+The negotiating publisher then becomes inactive and then activates again.
+In the activation step, the negotiating publisher will notify its subscribers of the new selected message types and create new publishers for the selected message types.
+When there is no change required in the selected types, the publisher will continue to be active.
+
+If the selected messages are being negotiated for a negotiating publisher and subscriber pair, the algorithm will proceed much as described, except the entire node will be inactive until both the publishers and subscriber have been created.
+
+Similarly, the negotiating subscriber may need to change its subscriber type.
+Once the negotiating publisher relays the new selected message types, the subscriber decide if it needs to be updated.
+If the selected type or types match the subscriber's current message type, the subscriber does nothing and continues to be active.
+If the selected type or types do not match the subscriber's current message type, the subscriber deactivates itself and activates again.
+While the negotiating subscriber is activating, it creates a new subscriber for the new selected message type.
 
 
 Negotiation Examples
