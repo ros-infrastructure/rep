@@ -120,15 +120,22 @@ The negotiating publisher will select zero or more supported message types (zero
 To do this, the negotiating publisher performs the following steps:
 
 #. Query all connected subscribers for their supported message priority maps.
+
    - This can timeout if a negotiating subscriber delays stating its preferences indefinitely, for example if there is a deadlock.
+
 #. Decide the selected message types by considering the subscribers and the publisher's own supported message priority maps.
+
    - This can result in zero or more matches, as mentioned above.
      In the case that there are zero matches, an error should be thrown.
+
    - Note that the publisher can also block here before it reveals its supported message types.
      This may be useful to query system information that may inform the priority values in the publisher's supported message priority map.
+
 #. Notify all of the connected negotiating subscribers of the selected message types.
+
    - If there are multiple matches, the subscriber will select the one with the highest priority in its own supported message priority map.
      In the case that the multiple messages are of the same priority to the subscriber, the negotiating subscriber will choose a selected message type randomly.
+
 #. The negotiating publisher then creates a publisher for each supported message type.
 
 Note that all of the above occurs in an extended version of a lifecycle node.
