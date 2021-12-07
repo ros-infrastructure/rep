@@ -90,19 +90,20 @@ For example, a publisher may publish image data in the format of YUV420 or ARGB8
 Once there is a set of supported message types, publishers and subscribers can negotiate which type they prefer.
 
 
+Defining Negotiating Publishers and Subscribers
+-----------------------------------------------
 
-In order to have publishers and subscribers negotiate which ROS message type is sent, the user must
+Negotiating publishers and subscribers both require a list of supported message types defined by the user.
 
-- specify the supported message types and,
-- provide a prioritization of the supported message types.
+While a default should be provided, the negotiating publisher can have the function it uses to prioritize the supported message types defined by the user.
 
-This is in addition to the standard arguments required for a publisher or subscriber, such as topic, quality of service, and queue size.
-Each supported message type will also need an associated callback, which tells the program how to send or receive supported message types.
+Both the publisher and subscriber can delay stating their preferences until additional information is available.
+Doing so may be useful to allow the publisher or subscriber to introspect the system before stating its preferences.
+This function is exposed to the user.
 
-The way of prioritizing the various message types can come in two forms:
+A special case of delaying preferences is when there is a negotiating publisher and subscriber pair, which is useful when the publisher and subscriber should ideally use the same supported message type.
+In this case, the user should define a function that will prioritize the supported message types based on the selected message type of the publisher.
 
-- A list where message types are ordered by preference.
-- A dictionary for nodes with both publishers and subscribers that want to delay publishing their subscribers preferences until their publisher has resolved its message type. This dictionary can be thought of as a list of preferences, where the list chosen depends on the publisher's message type.
 
 Negotiation Algorithm
 ---------------------
