@@ -53,7 +53,7 @@ Terminology
 
 :Negotiating Publisher:
   A publisher with preferences as to which supported message type it prefers to publish.
-  It can publish one or more selected message types, on the same number of topics.
+  It can publish one or more selected message types on the same number of topics.
 
 :Negotiating Subscriber:
   A subscriber with preferences as to which supported message type it prefers to subscribe to.
@@ -77,7 +77,7 @@ The proposed change has a few goals:
 - Support publishing in multiple formats at the same time.
 - Only necessary publishers and subscribers are active at any given time.
 - A publisher or subscriber can delay stating its preferences to wait for additional information.
-- Core functions are exposed to the user to overwrite, namely the ability to choose how preferences are prioritized and the ability to delay stating preferences.
+- Core functions are exposed to the user to overwrite, namely the ability to choose how priorities are used to pick the selected message types and the ability to delay stating preferences.
 
 
 Defining Supported Message Types
@@ -89,10 +89,10 @@ For each supported message type, the following information must be known:
 - The message type that will be sent (either a ROS 2 message type, such as  ``sensor_msgs::msg::Image``, or a custom data type).
 - The relative priority of the supported message type.
 
-The message type is important because multiple message types may be sent with the same ROS 2 message type.
+The message type is important because multiple supported message types may be sent with the same ROS 2 message type.
 For example, a publisher may publish image data in the format of YUV420 or ARGB8888, both of which could be sent in a ``sensor_msgs::msg::Image``.
 
-Once there is a set of supported message types, publishers and subscribers can negotiate which type they prefer.
+Once there is a set of supported message types, negotiating publishers and subscribers can negotiate which type they prefer.
 
 
 Defining Negotiating Publishers and Subscribers
@@ -180,7 +180,7 @@ When there is no change required in the selected types, the publisher will conti
 If the selected messages are being negotiated for a negotiating publisher and subscriber pair, the algorithm will proceed much as described, except the entire node will be inactive until both the publishers and subscriber have been created.
 
 Similarly, the negotiating subscriber may need to change its subscriber type.
-Once the negotiating publisher relays the new selected message types, the subscriber decide if it needs to be updated.
+Once the negotiating publisher relays the new selected message types, the subscriber decides if it needs to be updated.
 If the selected type or types match the subscriber's current message type, the subscriber does nothing and continues to be active.
 If the selected type or types do not match the subscriber's current message type, the subscriber deactivates itself and activates again.
 While the negotiating subscriber is activating, it creates a new subscriber for the new selected message type.
@@ -189,7 +189,7 @@ While the negotiating subscriber is activating, it creates a new subscriber for 
 User Defined Functions
 ^^^^^^^^^^^^^^^^^^^^^^
 
-There are two types functions in the negotiation process that the user can define:
+There are two types of functions in the negotiation process that the user can define:
 
 :Stating preferences:
   A function to have a negotiating publisher or subscriber state its preferences, which may include a delay.
@@ -200,7 +200,7 @@ The function for stating preferences allows the user to make the negotiating pub
 For example, a negotiating publisher or subscriber may prefer a certain message type if a type of hardware is available, for example a GPU.
 This function is blocking and thus can delay the negotiation process.
 One special case for this function is when there is a negotiating publisher and subscriber pair, which is useful when the publisher and subscriber should ideally use the same supported message type.
-In this case, the user should define a function that will prioritize the supported message types based on the selected message type of the publisher, which will be passed to the function that states the negotiating publisher or subscriber's preferences.
+In this case, the user should define a function that will prioritize the supported message types based on the selected message type of the publisher.
 
 The function for picking selected message types is used to determine which of the supported message types the negotiating publisher or subscriber should use and is run in the negotiating publisher.
 Exposing this function allows the user to create a custom way to pick between supported types with different priorities.
@@ -217,7 +217,7 @@ For convenience, let's also assume that the supported types are prioritized in t
 Using the node notation described above, we can then use the following notation to describe the agreed upon message type between multiple nodes.
 In the example below, node ``1`` (``N_1``) supports only type ``x``, and node ``2`` (``N_2``) supports types ``x`` and ``y``.
 In this case, the selected message type is ``x``, as shown by the ``x`` over the arrow pointing from node ``1`` to node ``2``.
-More practically, ``N_1`` is publishing ``x``, and ``N_2`` is subscribing to a topic with the selected message type``x``.
+More practically, ``N_1`` is publishing ``x``, and ``N_2`` is subscribing to a topic with the selected message type ``x``.
 
 .. code-block::
 
@@ -260,7 +260,7 @@ Publishing to Multiple Nodes
 There are also the cases where there are more than two nodes.
 
 In the following case, ``N_3`` has the limiting supported type, ``y``, so ``N_1`` will publish ``y``, despite the fact that both ``N_1`` and ``N_2`` prefer ``x``.
-This is assuming that the function for picking the selected types prioritizes sending one message over sending multiple messages, the selected message type will be ``y``.
+This is assuming that the function for picking the selected types prioritizes sending one message over sending multiple messages.
 
 .. code-block::
 
@@ -316,7 +316,7 @@ Also, note that regular nodes with the standard notation (e.g., ``N_n(x, y, z)``
      N_1(x, y, z) ----> N_2*(x, y, z) ----> N_3(y, z, x)
 
 This approach can also be useful in the networks that contain loops.
-In the case below, node ``2`` will cause node ``1`` wait to pick its preference until it has determined its selected message type.
+In the case below, node ``2`` will cause node ``1`` to wait to pick its preference until it has determined its selected message type.
 
 .. code-block::
 
@@ -381,7 +381,7 @@ This gets more complicated if ``A`` also sends a message to ``C``.
 
 In both of the above cases, it is much more challenging to find the best selected message type than the simple strategy detailed in a previous section.
 It was thought that the simpler approach described above in the specifications gets us almost all the way there, while being much simpler to implement.
-In addition, if it turns out to be necessary, the simpler approach can always be replaced by a better method for getting the optimal solution selected message type in future work.
+In addition, if it turns out to be necessary, the simpler approach can always be replaced by a better method for getting the optimal selected message type in future work.
 
 
 Using Different Topics or the Same Topic For Different Message Types
@@ -422,7 +422,7 @@ Putting this Implementation in ``rclcpp`` or ``rcl``
 
 This feature is intended to be used with type adaptation (see `REP 2007 <./rep-2007.html>`_), which has been implemented in ``rclcpp``.
 Thus it makes sense to put the negotiation process in ``rclcpp``.
-As with REP 2007, the C++'s templating system will make it much easier handle the various message types expected safely.
+As with REP 2007, the C++'s templating system will make it much easier to handle the various message types expected safely.
 
 
 Backwards Compatibility
