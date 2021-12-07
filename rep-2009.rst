@@ -31,6 +31,35 @@ That is, it may be the case that a node can do hardware-accelerated operations o
 In that case, the hardware vendor's node would mark a preference on YUV420 since that uses the hardware more efficiently.
 
 
+Terminology
+===========
+
+:Regular Publisher:
+  A publisher that publishes a single message type on a single topic.
+
+:Regular Subscriber:
+  A subscriber that subscribes to a single message type on a single topic.
+
+:Supported Message Type:
+  A message type that can be selected for use during negotiation.
+
+:Selected Message Type:
+  A supported type that has been selected for use during negotiation.
+
+:Negotiating Publisher:
+  A publisher with preferences as to which supported message type it prefers to publish.
+  It can publish one or more selected message types, on the same number of topics.
+
+:Negotiating Subscriber:
+  A subscriber with preferences as to which supported message type it prefers to subscribe to.
+  It subscribes to a single selected message type on a single topic.
+
+:Negotiating Publisher and Subscriber Pair:
+  A pair of negotiating publishers and subscribers that are related to each other in that the subscribers preferences may be based on the selected message type of the publisher.
+  An example would be if the subscriber receives data, modifies it, and then publishes it.
+  In this case, it is desirable to have the publisher and subscriber use the same selected message type.
+  However, the selected message type may not be known before the publisher negotiates it.
+
 Specification
 =============
 
