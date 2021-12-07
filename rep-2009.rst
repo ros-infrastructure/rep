@@ -63,8 +63,18 @@ Terminology
 Specification
 =============
 
-Extending Lifecycle Nodes
--------------------------
+High-level Goals
+----------------
+
+The proposed change has a few goals:
+
+- Provide a way for nodes to publish different types of messages.
+- Support publishing in multiple formats at the same time.
+- Only necessary publishers and subscribers are active at any given time.
+- A publisher or subscriber can delay stating its preferences to wait for additional information.
+- Core functions used for decision making are exposed to the user, namely the ability to choose how preferences are prioritized and the ability to delay stating preferences.
+
+
 
 This work is extends Lifecycle Nodes, so that we can control how and when publishers and subscribers are created.
 
