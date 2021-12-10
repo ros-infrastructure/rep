@@ -60,7 +60,7 @@ Terminology
   It subscribes to a single selected message type on a single topic.
 
 :Negotiating Publisher and Subscriber Pair:
-  A pair of negotiating publishers and subscribers that are related to each other in that the subscribers preferences may be based on the selected message type of the publisher.
+  A singe node that has pair of negotiating publishers and subscribers that are related to each other in that the subscribers preferences may be based on the selected message type of the publisher.
   An example would be if the subscriber receives data, modifies it, and then publishes it.
   In this case, it is desirable to have the publisher and subscriber use the same selected message type.
   However, the selected message type may not be known before the publisher negotiates it.
@@ -98,16 +98,19 @@ Once there is a set of supported message types, negotiating publishers and subsc
 Defining Negotiating Publishers and Subscribers
 -----------------------------------------------
 
-Negotiating publishers and subscribers both require a list of supported message types defined by the user.
+Negotiating publishers and subscribers both require a list of supported message types and a service topic that will be used to negotiate the selected message types.
 
-While a default should be provided, the negotiating publisher can have the function it uses to prioritize the supported message types defined by the user.
+While negotiating publishers and subscribers reveal their supported type priority map by default, a user may provide a function that returns a supported type priority map.
+This function may be useful to allow negotiating publishers and subscribers to introspect the system before stating their preferences, including available hardware and compute resources.
+This function is blocking and thus can delay the negotiation process.
 
-Both the publisher and subscriber can delay stating their preferences until additional information is available.
-Doing so may be useful to allow the publisher or subscriber to introspect the system before stating its preferences.
-This function is exposed to the user.
-
-A special case of delaying preferences is when there is a negotiating publisher and subscriber pair, which is useful when the publisher and subscriber should ideally use the same supported message type.
+A special case of using a function to return a supported type priority map is when there is a negotiating publisher and subscriber pair, which is useful when the publisher and subscriber should ideally use the same supported message type.
 In this case, the user should define a function that will prioritize the supported message types based on the selected message type of the publisher.
+
+One thing to note is that there are potentially many combinations of supported message types in negotiating publisher and subscriber pairs.
+For example, if there are four supported types for a negotiating publisher and subscriber and the developer wants to support all combinations, then the developer must implement six conversions between the supported message types (three choose two).
+However, in the custom function for the negotiating subscriber, the developer can choose not to include supported types that there are not conversions for.
+In the minimal case, the developer can just return a single supported type for the negotiating subscribers priority map: the publisher's selected message type.
 
 
 Negotiation Algorithm
@@ -118,6 +121,8 @@ Negotiating Publisher
 
 The negotiating publisher will select zero or more supported message types (zero when publisher and subscribers have incompatible supported message types).
 To do this, the negotiating publisher performs the following steps:
+
+#. Use DDS discovery to find all the connected subscribers that are using the user specified service topic.
 
 #. Query all connected subscribers for their supported message priority maps.
 
@@ -174,7 +179,7 @@ In the case that the ROS 2 network is changing, the negotiating publisher may ne
 The process looks similar to the original negotiation, however the negotiating publisher remains active until it determines that the selected messages must be changed.
 If the selected messages must change, the negotiating publisher deactivates itself and destroys its publishers.
 The negotiating publisher then becomes inactive and then activates again.
-In the activation step, the negotiating publisher will notify its subscribers of the new selected message types and create new publishers for the selected message types.
+In the activation step, the negotiating publisher will notify its subscribers of the new selected message types on the user specified service topic and create new publishers for the selected message types.
 When there is no change required in the selected types, the publisher will continue to be active.
 
 If the selected messages are being negotiated for a negotiating publisher and subscriber pair, the algorithm will proceed much as described, except the entire node will be inactive until both the publishers and subscriber have been created.
@@ -234,22 +239,30 @@ There are several cases that are clear.
 .. code-block::
 
    (1a)
-                    y
-           N_1(y) ----> N_2(x, y)
+                    x
+           N_1(x) ----> N_2(x)
 
    (1b)
-                    x
-        N_1(x, y) ----> N_2(x)
+
+           N_1(x) ----> N_2(y)  # FAILED NEGOTIATION
 
    (1c)
                     y
-        N_1(x, y) ----> N_2(y)
+           N_1(y) ----> N_2(x, y)
 
    (1d)
                     x
-     N_1(x, y, z) ----> N_2(x, a, b)
+        N_1(x, y) ----> N_2(x)
 
    (1e)
+                    y
+        N_1(x, y) ----> N_2(y)
+
+   (1f)
+                    x
+     N_1(x, y, z) ----> N_2(x, a, b)
+
+   (1g)
                     x
      N_1(x, y, z) ----> N_2(a, b, x)
 
@@ -287,10 +300,19 @@ Negotiating Publisher and Subscriber Pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To discuss negotiating publisher and subscriber pairs, we'll have to use additional notation.
+The following notation shows the result of a custom function that uses the negotiating publishers selected message type to decide the supported message priority map for the negotiating subscriber.
 
-Let ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})`` be a node ``p`` thats negotiating publishers and subscribers support ``x``, ``y``, and ``z`` message types, as given by the first argument.
-Then let the second argument be a dictionary that maps each message type to an ordered preference.
-This dictionary is used to determine the preference of node ``p``'s subscriber.
+Let ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})`` be a node ``p`` thats negotiating publishers and subscribers.
+The first argument ``[x, y, z]`` is the prioritized supported type map for the negotiating publisher, that is, in this case, the negotiating publisher prefers ``x`` more than ``y``, and ``y`` more than ``z``.
+The second argument ``{x: [x, y, z], y: [y, z, x], z: [z, x, y]}`` is the prioritized supported type map for the negotiating subscriber.
+This second argument is in the form of a dictionary (``{key1: value1, key2: value2, ...}``), where
+
+* the key is the selected message type of the negotiating publisher in the negotiating publisher subscriber pair and
+* the value is the prioritized supported type map for the negotiating subscriber given that key.
+
+For example, for the node ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})``, if the negotiating publisher negotiates with its subscribers and determines that the selected message type is ``y``, then the negotiating subscriber in the negotiating publisher subscriber pair will state its supported message priority map as ``[y, z, x]``.
+This is because in the second argument (the negotiating subscribers preference map) the key ``y`` is mapped to the value ``[y, z, x]``.
+Similarly, if the publisher chooses ``z``, then the subscriber will use the supported message priority map of ``[z, x, y]``.
 
 As a shorthand in figures, we'll define a node that differs its preference beforehand and add an asterisk to separate it from other nodes. For example:
 
@@ -315,7 +337,7 @@ Also, note that regular nodes with the standard notation (e.g., ``N_n(x, y, z)``
                     y                   y
      N_1(x, y, z) ----> N_2*(x, y, z) ----> N_3(y, z, x)
 
-This approach can also be useful in the networks that contain loops.
+This approach can also be useful in networks that contain loops.
 In the case below, node ``2`` will cause node ``1`` to wait to pick its preference until it has determined its selected message type.
 
 .. code-block::
