@@ -435,7 +435,8 @@ Extending Lifecycle Nodes
 
 Very much of the stateful behavior that is required for the negotiation process is implemented in lifecycle nodes.
 It also allows us to turn off nodes and free up the nodes resources should another task require those resources.
-Thus it was an easy decision to extend the lifecycle nodes to with the negotiation process.
+Thus it was an easy decision to extend the lifecycle nodes to work with the negotiation process.
+However, the type negotiation feature described in this REP will be in a separate package from the lifecycle nodes to avoid changing the lifecycle nodes.
 
 
 Putting this Implementation in ``rclcpp`` or ``rcl``
