@@ -862,9 +862,9 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+----------------------------+--------------------------------+
 | Middleware Library       | Middleware Provider | Support Level | Platforms                  | Architectures                  |
 +==========================+=====================+===============+============================+================================+
-| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms              | All Architectures              |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
 | rmw_fastrtps_cpp         | eProsima Fast-DDS   | Tier 1        | All Platforms              | All Architectures              |
++--------------------------+---------------------+---------------+----------------------------+--------------------------------+
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+---------------------+---------------+----------------------------+--------------------------------+
 | rmw_connextdds           | RTI Connext         | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 |
 +--------------------------+---------------------+---------------+----------------------------+--------------------------------+
