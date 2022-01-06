@@ -627,18 +627,20 @@ The following indicators show what delivery mechanisms are available for each pl
 
 Middleware Implementation Support:
 
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                        |
-+==========================+=====================+===============+=============================+======================================+
-|  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms               | All Architectures                    |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-|  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
-|                          |                     |               | and OpenEmbedded            |                                      |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
-| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
-+--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
++--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
+| Middleware Library       | Middleware Provider    | Support Level | Platforms                   | Architectures                        |
++==========================+========================+===============+=============================+======================================+
+| rmw_fastrtps_cpp         | eProsima Fast-RTPS     | Tier 1        | All Platforms               | All Architectures                    |
++--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms               | All Architectures                    |
++--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_connext_cpp          | RTI Connext            | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
+|                          |                        |               | and OpenEmbedded            |                                      |
++--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS     | Tier 2        | All Platforms               | All Architectures                    |
++--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
+| rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows          | All Architectures except arm32       |
++--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -687,6 +689,8 @@ Dependency Requirements:
 | Cyclone DDS |                                      0.7.x (Coquette)                                  |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 |  Fast-RTPS  |                                      2.0.x                                             |
++-------------+----------------+---------------+----------------+----------------+---------------------+
+| Gurum DDS   |      2.7.x     |     N/A       |     2.7.x      |               N/A                    |
 +-------------+----------------+---------------+----------------+----------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
@@ -742,17 +746,19 @@ The following indicators show what delivery mechanisms are available for each pl
 
 Middleware Implementation Support:
 
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| Middleware Library       | Middleware Provider | Support Level | Platforms                  | Architectures                  |
-+==========================+=====================+===============+============================+================================+
-| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms              | All Architectures              |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| rmw_fastrtps_cpp         | eProsima Fast-DDS   | Tier 1        | All Platforms              | All Architectures              |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| rmw_connextdds           | RTI Connext         | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS   | Tier 2        | All Platforms              | All Architectures              |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  |
++==========================+========================+===============+============================+================================+
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms              | All Architectures              |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_connextdds           | RTI Connext            | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS      | Tier 2        | All Platforms              | All Architectures              |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -799,6 +805,8 @@ Dependency Requirements:
 | Fast-DDS    |                                                2.3.x                                                |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | Connext DDS |              5.3.1              |   N/A    |     5.3.1     |                  N/A                   |
++-------------+----------------+----------------+----------+---------------+------------------+---------------------+
+| Gurum DDS   |              2.7.x              |                         N/A                                       |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
@@ -859,17 +867,19 @@ The following indicators show what delivery mechanisms are available for each pl
 
 Middleware Implementation Support:
 
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| Middleware Library       | Middleware Provider | Support Level | Platforms                  | Architectures                  |
-+==========================+=====================+===============+============================+================================+
-| rmw_fastrtps_cpp         | eProsima Fast-DDS   | Tier 1        | All Platforms              | All Architectures              |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS | Tier 1        | All Platforms              | All Architectures              |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| rmw_connextdds           | RTI Connext         | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
-| rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS   | Tier 2        | All Platforms              | All Architectures              |
-+--------------------------+---------------------+---------------+----------------------------+--------------------------------+
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  |
++==========================+========================+===============+============================+================================+
+| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms              | All Architectures              |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_connextdds           | RTI Connext            | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS      | Tier 2        | All Platforms              | All Architectures              |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+| rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
++--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -916,6 +926,8 @@ Dependency Requirements:
 | Fast-DDS    |                                                2.4.x                                                |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | Connext DDS |              5.3.1              |   N/A    |     5.3.1     |                  N/A                   |
++-------------+----------------+----------------+----------+---------------+------------------+---------------------+
+| Gurum DDS   |              2.7.x              |                         N/A                                       |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
