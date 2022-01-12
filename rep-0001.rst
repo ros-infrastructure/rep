@@ -317,7 +317,7 @@ encoding (see REP 12 [2]_).
 
 The Created header records the date that the REP was assigned a
 number, while Post-History is used to record the dates of when new
-versions of the REP are posted to discourse.ros.org.  Both headers 
+versions of the REP are posted to https://discourse.ros.org.  Both headers 
 should be in dd-mmm-yyyy format, e.g. 14-Aug-2010.
 
 Standards Track REPs must have a ROS-Version header which indicates
