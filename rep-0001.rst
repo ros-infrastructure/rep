@@ -68,9 +68,10 @@ There are three kinds of REP:
 REP Work Flow
 =============
 
-The REP editors assign REP numbers and change their status.  Please send
-all REP-related email to <ros-users@lists.ros.org> (no cross-posting please).
-Also see `REP Editor Responsibilities & Workflow`_ below.
+The REP editors assign REP numbers and change their status.  Please post
+all REP-related email to the General section of 
+`discourse.ros.org <https://discourse.ros.org>`_. Also see `REP Editor
+Responsibilities & Workflow`_ below.
 
 The REP process begins with a new idea for ROS.  It is highly
 recommended that a single REP contain a single key proposal or new
@@ -85,8 +86,9 @@ Each REP must have a champion -- someone who writes the REP using the
 style and format described below, shepherds the discussions in the
 appropriate forums, and attempts to build community consensus around
 the idea.  The REP champion (a.k.a. Author) should first attempt to
-ascertain whether the idea is REP-able.  Posting to the ros-users list
-is the best way to go about this.
+ascertain whether the idea is REP-able.  Posting to 
+`discourse.ros.org <https://discourse.ros.org>`_ is the best way to go
+about this.
 
 Vetting an idea publicly before going as far as writing a REP is meant
 to save the potential author time. Many ideas have been brought
@@ -100,13 +102,13 @@ Just because an idea sounds good to the author does not
 mean it will work for most people in most areas where ROS is used.
 
 Once the champion has asked the ROS community as to whether an idea
-has any chance of acceptance, a draft REP should be presented to
-ros-users.  This gives the author a chance to flesh out the draft REP
-to make properly formatted, of high quality, and to address initial
-concerns about the proposal.
+has any chance of acceptance, a draft REP should be posted to
+`discourse.ros.org <https://discourse.ros.org>`_.  This gives the 
+author a chance to flesh out the draft REP to make properly formatted,
+of high quality, and to address initial concerns about the proposal.
 
-Following a discussion on ros-users, the draft REP should be sent to
-the ros-users list. The draft must be written in REP style as
+Following an initial discussion on Discourse, the draft REP should be
+posted to Discourse as well. The draft must be written in REP style as
 described below, else it will be sent back without further regard
 until proper formatting rules are followed.
 
@@ -270,7 +272,7 @@ optional and are described below.  All other headers are required. ::
   * Requires: <rep numbers>
     Created: <date created on, in dd-mmm-yyyy format>
   * ROS-Version: <version number>
-    Post-History: <dates of postings to ros-users>
+    Post-History: <dates of postings to discourse.ros.org>
   * Replaces: <rep number>
   * Replaced-By: <rep number>
   * Resolution: <url>
@@ -302,9 +304,9 @@ other web resource where the pronouncement about the REP is made.*
 While a REP is in private discussions (usually during the initial
 Draft phase), a Discussions-To header will indicate the mailing list
 or URL where the REP is being discussed.  No Discussions-To header is
-necessary if the REP is being discussed privately with the author, or
-on the ros-users email mailing lists.  Note that email addresses in
-the Discussions-To header will not be obscured.
+necessary if the REP is being discussed privately with the author.  
+Note that email addresses in the Discussions-To header will not be 
+obscured.
 
 The Type header specifies the type of REP: Standards Track,
 Informational, or Process.
@@ -315,8 +317,8 @@ encoding (see REP 12 [2]_).
 
 The Created header records the date that the REP was assigned a
 number, while Post-History is used to record the dates of when new
-versions of the REP are posted to ros-users.  Both headers should be
-in dd-mmm-yyyy format, e.g. 14-Aug-2010.
+versions of the REP are posted to https://discourse.ros.org.  Both headers 
+should be in dd-mmm-yyyy format, e.g. 14-Aug-2010.
 
 Standards Track REPs must have a ROS-Version header which indicates
 the version/distribution of ROS that the feature will be released with.
