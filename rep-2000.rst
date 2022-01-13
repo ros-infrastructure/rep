@@ -934,7 +934,7 @@ Dependency Requirements:
 
 " ** " means that the dependency may see multiple version changes, because the dependency uses a package manager that continually updates the dependency without a stable API.
 
-" *** " webOS OSE provides this different version.
+" \*** " webOS OSE provides this different version.
 
 This document only captures the version at the first release of a ROS distribution and will not be updated as the dependencies move forward.
 These versions are thus a low watermark.
