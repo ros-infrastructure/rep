@@ -799,8 +799,21 @@ References
 Acknowledgements
 ================
 
-The work leading to this REP has been partially funded by the European Union
-through the H2020 SPRING project (grant agreement 871245), and the Tecniospring
+Contributors
+------------
+
+Andres Ramirez-Duque, Youssef Mohamed
+
+*(alphabetic order)*
+
+Funding
+-------
+
+This work has been primarily funded by PAL Robotics, with the Bristol Robotics
+Lab/University of the West of England funding the initial research.
+
+In addition, the work leading to this REP has received funding from the European Union
+through the H2020 SPRING project (grant agreement 871245), and the ACCIÓ Tecniospring
 TALBOT project.
 
 Copyright
