@@ -291,7 +291,7 @@ under ``/humans/faces/tracked`` (as a ``hri_msgs/IdsList`` message).
 For each detected face, a namespace ``/humans/faces/<faceID>/`` is
 created (eg ``/humans/faces/bf3d/``).
 
-The following subtopics might then available, depending on available
+The following subtopics MAY then be available, depending on available
 detectors:
 
 ================ ==================================== ======== ========================
@@ -329,7 +329,7 @@ The list of currently detected bodies (list of body IDs) is published
 under ``/humans/bodies/tracked`` (as a ``hri_msgs/IdsList`` message).
 
 For each detected body, a namespace ``/humans/bodies/<bodyID>/`` is
-created. The following subtopics might then available, depending on available
+created. The following subtopics MAY then be available, depending on available
 detectors:
 
 ================= ==================================== ======== ========================
@@ -360,7 +360,7 @@ under ``/humans/voices/tracked`` (as a ``hri_msgs/IdsList`` message).
 For each detected voice, a namespace ``/humans/voices/<voiceID>/`` is
 created.
 
-The following subtopics might then available, depending on available
+The following subtopics MAY then be available, depending on available
 detectors:
 
 ================ ==================================== ======== ========================
@@ -388,8 +388,8 @@ under ``/humans/persons/tracked`` (as a ``hri_msgs/IdsList`` message).
 For each detected person, a namespace ``/humans/persons/<personID>/`` is
 created.
 
-The following subtopics might then available, depending on available
-detectors, and whether or not the person has been matched to a face/body/voice:
+The following subtopics MAY then be available, depending on available
+detectors, and whether or not the person has yet been matched to a face/body/voice:
 
 ======================== ==================================== ======== ========================
 Name                     Message type                         Required Description
