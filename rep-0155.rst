@@ -80,7 +80,9 @@ different frameworks and experiments.
    perform human perception/social signal recognition per se.  It only specify
    naming conventions and interfaces between these nodes.
 
-
+The use of capitalized words such as MUST, SHOULD, MAY must be understood as
+specified in the IETF RFC2119 'Key words for use in RFCs to Indicate Requirement
+Levels' [6]_.
 
 Human Representation
 ====================
@@ -795,6 +797,9 @@ References
 
 .. [5] REP 103, Standard Units of Measure and Coordinate Conventions
    (http://www.ros.org/reps/rep-0103.html)
+
+.. [6] RFC2119, Key words for use in RFCs to Indicate Requirement Levels
+   (https://datatracker.ietf.org/doc/html/rfc2119)
 
 Acknowledgements
 ================
