@@ -106,15 +106,10 @@ associated with a unique person. This person ID is normally assigned by a module
 able to perform person identification (face recognition module, voice
 recognition module, sound source localisation + name, identification based on
 physical features like height/age/gender, person identification based on
-pre-defined features like the colour of the clothes, etc.)
-This ID is meant to be **persistent** so that the robot can recognise people
-across encounters/sessions. Nodes providing person IDs might even consider
-serialising these IDs for them to persist across e.g. robot reboots.
-
-As soon as a face, a body or a voice is detected, the robot can infer the
-presence of a person, and therefore a person ID MUST be created and associated
-with that face/body/voice. As person IDs are permanent, that ID will
-permanently remain in the robot’s knowledge.
+pre-defined features like the colour of the clothes, etc.) This ID is meant to
+be **persistent** so that the robot can recognise people across
+encounters/sessions. Nodes providing person IDs MAY serialise these IDs to a
+permanent storage, for them to persist across robot reboots.
 
 When meaningful (see section `Person frame`_), a TF frame MUST be
 associated to the person ID and named ``person_<personID>``. Due to the
