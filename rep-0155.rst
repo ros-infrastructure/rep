@@ -160,7 +160,7 @@ to recognise the face and re-assign the same face ID if the person re- appears.
 
 There is a one-to-one relationship between this face ID and the estimated 6D
 pose of the head, represented as a ROS TF frame named ``face_<faceID>`` (see
-section `Face frame`_ for the face frame conventions).
+section `Face and Gaze Frames`_ for the face frame conventions).
 
 At any given time, the list of tracked faces is published under the
 ``/humans/faces/tracked`` topic as ``hri_msgs/IdsList`` messages.
@@ -659,11 +659,11 @@ parameter server under ``/human_description_<bodyID>``.
    kinematic model of humans.
 
 
-Face Frame
-----------
+Face and Gaze Frames
+--------------------
 
 
--  Head pose estimation modules are requested to publish head 6D pose as
+-  Head pose estimation modules MUST publish the head 6D pose as
    a TF frame named ``face_<faceID>`` where ``<faceID>`` stands for the
    unique face identifier.
 -  the parent of this frame is the sensor frame used to estimate the
@@ -677,6 +677,19 @@ Face Frame
    person is standing vertically).
 -  Any other facial landmark published as a TF frame must be parented to
    the head TF frame. It should be suffixed with the same ``_<faceID>``.
+
+In addition, the person's gaze direction MUST be published as a
+``gaze_<faceID>`` frame, collocated with the ``face_<faceID>`` frame, and with
+its ``z`` axis aligned with the estimated gaze vector, ``x`` right, and ``y``
+down ('optical frame' convention).
+
+If gaze is not estimated beyond general head orientation, the
+``gaze_<faceID>``'s ``z`` axis will be colinear with the ``face_<faceID>``'s
+``x`` axis.
+
+Finally, nodes performing attention estimation MAY publish a frame
+``focus_<faceID>`` representing the estimated focus of attention of the person.
+
 
 Body Frames
 -----------
