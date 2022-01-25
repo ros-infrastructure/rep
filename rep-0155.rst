@@ -344,12 +344,14 @@ Name              Message type                         Required Description
                                                                 human body, following
                                                                 the `Kinematic Model 
                                                                 of the Human`_
-``/attitude``     ``hri_msgs/BodyAttitude``                     Recognised body attitude
-                                                                or gesture
+``/posture``      ``hri_msgs/BodyPosture``                      Recognised body posture
+                                                                (eg standing, sitting)
+``/gesture``      ``hri_msgs/Gesture``                          Recognised symbolic 
+                                                                gesture (eg waving)
 ================= ==================================== ======== ========================
 
-3D body poses are handled differently, via a joint state publisher and
-TF frames. Cf below.
+3D body poses SHOULD be exposed via TF frames. This is discussed in
+Section `Kinematic Model and Coordinate Frames`_.
 
 Voices
 ------
@@ -638,12 +640,15 @@ recommended human kinematic model.
   </div>
 
 In practice, each of these links and joints must be suffixed with the
-corresponding ``bodyID``, as several skeletons might be present at the same
+corresponding ``<bodyID>``, as several skeletons might be present at the same
 time.
 
-A parametric, reference URDF model of humans is available in the
-``human_description`` package. It can be used to instanciate at run-time new
-human URDF model, adjusted for the e.g. height of the detected persons.
+A parametric URDF model of humans is available in the ``human_description``
+package. It SHOULD be used to instanciate at run-time new human URDF model,
+adjusted for the e.g. height of the detected persons. The person's joint state
+(published under ``/humans/bodies/<bodyID>/joint_states``) can then be used with
+eg a `robot_state_publisher node <http://wiki.ros.org/robot_state_publisher>` to
+publish the body's TF frames.
 
 When generated, the URDF models of the humans should be loaded on the ROS
 parameter server under ``/human_description_<bodyID>``.
