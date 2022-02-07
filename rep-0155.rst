@@ -227,6 +227,8 @@ Global Parameters
   ``/humans/faces/XYZ/frontalized``
 - ``/human_description_<bodyID>``: URDF models of detected humans. See Section
   `Kinematic Model of the Human`_ for details.
+- ``/human/match_threshold`` (``float``, default: 0.5): the minimum level of
+  likelihood to consider a face/body/voice to belong to a given person.
 
 Topics Structure
 ================
