@@ -576,7 +576,7 @@ ROS Core
                  launch, launch_ros, launch_testing,
                  launch_testing_ament_cmake, launch_testing_ros,
                  launch_xml, launch_yaml, pluginlib, rcl_lifecycle,
-                 rclcpp, rclcpp_lifecycle, rclpy,
+                 rclcpp, rclcpp_action, rclcpp_lifecycle, rclpy,
                  ros2cli_common_extensions, ros2launch,
                  ros_environment, rosidl_default_generators,
                  rosidl_default_runtime, sros2, sros2_cmake]
