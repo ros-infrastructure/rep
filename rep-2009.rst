@@ -66,7 +66,7 @@ Terminology
   It subscribes to a single selected message type on a single topic.
 
 :Negotiating Publisher and Subscriber Pair:
-  A singe node that has pair of negotiating publishers and subscribers that are related to each other in that the subscribers preferences may be based on the selected message type of the publisher.
+  A single node that has pair of negotiating publishers and subscribers that are related to each other in that the subscribers preferences may be based on the selected message type of the publisher.
   An example would be if the subscriber receives data, modifies it, and then publishes it.
   In this case, it is desirable to have the publisher and subscriber use the same selected message type.
   However, the selected message type may not be known before the publisher negotiates it.
