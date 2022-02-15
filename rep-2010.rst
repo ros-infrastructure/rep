@@ -1,0 +1,162 @@
+REP: 2010
+Title: Evolving Message Types, and Other ROS Interface Types, Over Time
+Author: William Woodall <william@openrobotics.org>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 30-Nov-2021
+Post-History:
+
+
+Abstract
+========
+
+This REP proposes patterns and approaches for evolving message, service, and action ROS interface types over time.
+
+The proposed patterns use the existing default serialization technology, i.e. CDR, in combination with new tooling.
+However, technologies provided by different, perhaps future, serialization technologies can always be used in addition.
+
+Specifically, this REP proposes that interpreting older versions of the message at runtime, using its type information, and converting it to the current version of the message using user defined transfer functions, is a good way to achieve backwards compatibility in messages over long periods of time and in a variety of scenarios, e.g. over the wire, converting bag files, or in specialized tools.
+This approach does not rely on specific features of the serialization technology and instead relies on the ability to communicate the type information of the messages on the wire, beyond their name and version, and use that to dynamically interpret it at runtime.
+
+This approach can be used in conjunction with serialization technology specific features like optional fields, inheritance, etc., but it works even with the simplest serialization technologies so long as we have the ability to introspect the messages at runtime without prior knowledge of the type information, which a feature we also need for generic introspection tools.
+
+Also covered in this REP are recommended changes to the middleware API in ROS 2, as well as additional infrastructure, to support dynamic interpretation of messages at runtime.
+It is very similar to, though slightly narrower and more generic than, the DDS-XTypes specification, and will likely use it to implement the needed interfaces in the ROS 2 middleware API.
+
+Alternatives are also discussed in more detail.
+
+Motivation
+==========
+
+Evolving types over time is a necessary part of developing a new system using ROS 2 as well as a necessary part of evolving ROS 2 itself over time.
+As needs change types often need to change to accommodate new use cases by adding or removing fields, changing the type of fields, or splitting/combining messages across different topics.
+
+To understand this need, it's useful to look at a few common scenarios, for example consider this message definition (using the "rosidl" ``.msg`` format for convenience, but it could just as easily be the OMG IDL ``.idl`` format or something like protobuf):
+
+.. code::
+
+    # Temperature.msg
+    uint64 timestamp
+    int64 temperature
+
+There are many potential issues with this message type, but it isn't uncommon for messages like this to be created in the process of taking an idea from prototype into a product, and for the sake of this example, let's say that after using this message for a while the developers wanted to change the temperature field's type from int64 to float64.
+There are a few ways the developers could approach this, e.g. if the serialization technology allowed for optional fields they may add a new optional field like this (pseudo code):
+
+.. code::
+
+    # Temperature.msg
+    uint64 timestamp
+    int64 temperature
+    optional float64 temperature_float
+
+Updated code could use it like this:
+
+.. code::
+
+    void on_temperature(const Temperature & temp) {
+      // ...
+      double actual_temp = 0.0;
+      if (temp.temperature_float_is_set()) {
+        actual_temp = temp.temperature_float();
+      } else {
+        actual_temp = static_cast<double>(temp.temperature());
+      }
+    }
+
+This is not uncommon to see in projects, and it has the advantage that old data, whether it is from a program running on an older machine or is from old recorded data, can be interpreted by newer code without additional machinery or features beyond the optional field type.
+Older publishing code can also use the new definition without being updated to use the new ``temperature_float`` field, though that wouldn't be good long term most likely, so it is very forgiving to the code that uses the message definition.
+
+You can imagine other serialization features, like inheritance or type coercion, could be used to address this desired change, but in each case it relies on a feature of the serialization technology which may or may not be available in all middleware implementations for ROS 2.
+
+Each of these approaches also requires a more sophisticated message API for the users than what is currently provided by ROS 2.
+At the moment the user can access all fields of the message directly, i.e. "member based access" vs "method based access", and that would need to change in some way to use these features.
+
+A different approach would be to simply update the type as follows:
+
+.. code::
+
+    # Temperature.msg
+    uint64 timestamp
+    float64 temperature
+
+And also update any code publishing or subscribing to this type at the same time.
+This is typically what happens right now in ROS 2, and also what happened historically in ROS 1.
+This approach is simple and requires no additional serialization features, but obviously doesn't do anything on its own to help developers evolve their system while maintaining support for already deployed code and utilizing existing recorded data.
+
+However, which additional tooling these cases can be handled without the code of the application knowing about.
+Consider again the above example, but this time the update to the message was done without backwards compatibility in the message definition.
+This means that publishing old recorded data, for example, will not work with new code that subscribes to the topic but expects the new version of the message.
+For the purpose of this example, let's call the original message type ``Temperature`` and the one using ``float64`` we'll call ``Temperature'``.
+So, if you have rosbag2 publishing ``Temperature`` messages and a program consuming ``Temperature'`` messages they will not communicate, unless you have an intermediate program doing the translation.
+
+.. code::
+
+    ┌─────────┐  publishes     ┌──────────────┐ publishes     ┌─────┐
+    │ rosbag2 ├───────────────►│transfer func.├──────────────►│ App │
+    └─────────┘  Temperature   └──────────────┘ Temperature'  └─────┘
+
+The "transfer function" can be user-defined, or for simple takes (like changing the field type) it can be done automatically.
+We already do something like this for the ROS 1 to ROS 2 bridge in order to handle changes between message types in ROS 1 and ROS 2, and we used to do something like this for rosbags in ROS 1 with the "bag migration rules" feature.
+
+.. TODO:: cite the above
+
+This approach requires a few features, like the ability to have a single application read old and new versions of a message at the same time, and it requires more infrastructure and tooling to make it work, but it has the advantage of keeping both the publishing and subscribing code simple (agnostic to the fact that there are other versions of the message) and it keeps the message type from being cluttered with vestigial fields.
+
+Either way, a problem can usually be solved by changing a message in some of, if not all, of the of the above mentioned ways, and is often influenced by what the underlying technology allows for or encourages.
+ROS 2 has special considerations on this topic because it can support different serialization technologies, though CDR is the default and most common right now, and those technologies have different capabilities.
+It is neither desirable to depend on features of a specific technology, therefore tying ROS 2 to a specific technology, nor is it desirable suggest patterns that rely on features that only some serialization technologies provide, again tying ROS 2 to some specific technologies through their features.
+
+We will require some kind of features from the middleware and serialization technology, however, to handle evolving interfaces, but we should try to choose approaches which give ROS 2 the broadest support across middleware implementations, ideally while not limiting users from using specific features of the underlying technology when that suites them.
+
+With those examples and design constraints as motivation, this REP makes a proposal on how to handle evolving message types in the following Specification section, as well as a rationale in the Rationale section and a discussion of alternatives in the Alternatives section and its sub-sections.
+
+Terminology
+===========
+
+TODO
+
+
+Specification
+=============
+
+TODO
+
+
+Rationale
+=========
+
+TODO
+
+Backwards Compatibility
+=======================
+
+TODO
+
+Feature Progress
+================
+
+TODO
+
+
+References
+==========
+
+.. [1] DDS-XTYPES 1.3
+   (https://www.omg.org/spec/DDS-XTypes/1.3/About-DDS-XTypes/)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
