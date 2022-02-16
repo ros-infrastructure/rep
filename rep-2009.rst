@@ -414,8 +414,8 @@ Very much of the stateful behavior that is required for the negotiation process 
 Thus, while this REP does not prescribe using lifecycle nodes for negotiation, it makes sense for users to combine these two features when implementing nodes.
 
 
-Putting this implementation in the ROS 2 core or in a separate project
-----------------------------------------------------------------------
+Implementation in the ROS 2 Core or in a Separate Project
+---------------------------------------------------------
 
 While there are some advantages to having this project in the ROS 2 core, all of the needed APIs are available to make this a separate package.
 Thus, in the spirit of keeping the ROS 2 core smaller, this should be implemented in a separate project.
@@ -438,6 +438,8 @@ Currently, there has been some prototyping to understand how the proposed featur
   Note that the types used in this approach will have to be replaced with ``structs`` in the future to allow for multiple supported types to use the same ROS message type.
 - `@audrow/type-negotiation-possible-usage <https://replit.com/@audrow/type-negotiation-possible-usage>`_ shows another approach which uses inheritance to implement the proposed feature.
   This approach requires some additional work from the user to implement functions that create typed publishers and subscriptions.
+
+The current implementation is also available: https://github.com/osrf/negotiated
 
 
 References
