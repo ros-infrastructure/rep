@@ -10,7 +10,7 @@ Post-History:
 Abstract
 ========
 
-This REP proposes an extension to ROS 2 Lifecycle Nodes that will make it possible to negotiate the message types used by publishers and subscribers.
+This REP proposes a new set of classes ROS 2 that will make it possible to negotiate the message types used by publishers and subscriptions.
 
 
 Motivation
@@ -19,12 +19,12 @@ Motivation
 The primary reason for this change is to allow nodes to publish different types of messages that better allow the system to optimize its behavior.
 For example, a node may be more efficient with one image format (say, YUV420) than another (say, ARGB888).
 What's more, the optimal message type to publish may change over time, if say, a different part of the ROS 2 network becomes active to accomplish a different task.
-Perhaps the node with the original subscriber is no longer needed so the node goes into an idle mode, and another node with a different subscriber would prefer images in ARGB888, over YUV420, for resource reasons.
+Perhaps the node with the original subscription is no longer needed so the node goes into an idle mode, and another node with a different subscription would prefer images in ARGB888, over YUV420, for resource reasons.
 Currently, this behavior could be accomplished with ROS 2 nodes or lifecycle nodes, however doing so would require a significant amount of work for the programmer and are potential sources of errors.
 
 A second reason for this change is that it can improve developer experience by giving the developer more flexibility in how they interface with different nodes.
 The result of which is that they may need to spend less time writing code to convert a message type into the one message type accepted by the node they're using; instead the node may support additional types, so they may not need to perform any conversion.
-This may reduce the number of errors in the user's code, as well as it may allow them to prototype more efficiently, as they may not have to write as much code to perform conversions.
+This may reduce the number of errors in the user's code, and it may allow them to prototype more efficiently, as they may not have to write as much code to perform conversions.
 
 The final reason for this change is that it will enable vendors of hardware accelerators to provide the most efficient operations.
 That is, it may be the case that a node can do hardware-accelerated operations on a YUV420 image, but (slower) CPU conversions on a ARGB8888 image.
@@ -35,19 +35,24 @@ Terminology
 ===========
 
 :ROS Message Type:
-  To remove ambiguity in this document, a ROS message type can refer to ROS messages, such as ``std_msgs::msg::String``, or custom types that are defined through type adaptation (see REP 2007 [1]_).
-  The reason for referring to ROS messages and custom messages as ROS message types is that they are both sent over the ROS network.
+  A ROS message type always refers to ROS messages, such as ``std_msgs/msg/String``.
+  This is the canonical string representation of a ROS message type, and represents the data sent over the ROS network.
+
+:Type Adapted Type:
+  These are custom types that are defined through type adaptation (see REP 2007 [1]_).
+  These are never directly sent over the network, but instead are converted to and from ROS message types as necessary to send between publishers and subscriptions.
 
 :Regular Publisher:
   A publisher that publishes a single ROS message type on a single topic.
-  The ROS message type is defined when the publisher is created.
+  The publisher can be created either with a ROS Mesasage Type or a Type Adapted Type.
 
-:Regular Subscriber:
-  A subscriber that subscribes to a single ROS message type on a single topic.
-  The ROS message type is defined when the subscriber is created.
+:Regular Subscription:
+  A subscription that subscribes to a single ROS message type on a single topic.
+  The subscription can be created either with a ROS Message Type or a Type Adapted Type.
 
 :Supported Message Type:
   A message type that can be selected for use during negotiation.
+  As will be seen later, this is a combination of a ROS Message Type or a Type Adapted Type, along with an arbitrary name.
 
 :Supported Message Priority Map:
   A data structure that maps supported message types to their respective priority.
@@ -55,24 +60,25 @@ Terminology
   In general, higher numbers indicate higher priority, zero indicates no preference, and negative numbers indicate a vote against using a supported message type.
 
 :Selected Message Type:
-  A supported type that has been selected for use during negotiation.
+  A supported message type that has been selected for use during negotiation.
 
 :Negotiating Publisher:
   A publisher with preferences as to which supported message type it prefers to publish.
   It can publish one or more selected message types on the same number of topics.
 
-:Negotiating Subscriber:
-  A subscriber with preferences as to which supported message type it prefers to subscribe to.
+:Negotiating Subscription:
+  A subscription with preferences as to which supported message type it prefers to subscribe to.
   It subscribes to a single selected message type on a single topic.
 
-:Negotiating Publisher and Subscriber Pair:
-  A single node that has pair of negotiating publishers and subscribers that are related to each other in that the subscribers preferences may be based on the selected message type of the publisher.
-  An example would be if the subscriber receives data, modifies it, and then publishes it.
-  In this case, it is desirable to have the publisher and subscriber use the same selected message type.
+:Negotiating Publisher and Subscription Pair:
+  A single node with a negotiating publisher/negotiating subscription pair that are related to each other.
+  The preferences of the subscription may be based on the selected message type of the publisher.
+  An example would be if the subscription receives data, modifies it, and then publishes it.
+  In this case, it is desirable to have the publisher and subscription use the same selected message type.
   However, the selected message type may not be known before the publisher negotiates it.
 
 :Negotiation topic:
-  A topic that negotiating publishers and subscribers will use to negotiate the selected types that will be used.
+  A topic that negotiating publishers and subscriptions will use to negotiate the selected types that will be used.
 
 Specification
 =============
@@ -84,9 +90,9 @@ The proposed change has a few goals:
 
 - Provide a way for nodes to publish different types of messages.
 - Support publishing in multiple formats at the same time.
-- Only necessary publishers and subscribers are active at any given time.
-- A publisher or subscriber can delay stating its preferences to wait for additional information.
-- Core functions are exposed to the user to overwrite, namely the ability to choose how priorities are used to pick the selected message types and a function to define a supported message priority map.
+- Only necessary publishers and subscriptions are active at any given time.
+- A publisher or subscription can delay stating its preferences to wait for additional information.
+- Core functions are exposed to the user to overwrite.
 
 
 Defining Supported Message Types
@@ -94,36 +100,31 @@ Defining Supported Message Types
 
 For each supported message type, the following information must be known:
 
-- The topic that the supported message type should be published on.
-  Note that this topic should be unique for each supported message type.
-- The ROS message type that will be sent (either a ROS 2 message type, such as  ``sensor_msgs::msg::Image``, or a custom data type).
+- The ROS message type that will be sent (a ROS message type, such as  ``sensor_msgs/msg/Image``, or a custom Type Adapted type that can be converted into a ROS message type).
 - A string identifier for the supported message type.
   For example, "YUV420" could be the identifier for a supported message type that publishes images in YUV420 format.
   This will remove ambiguity in the case that the same ROS 2 message type is used for multiple supported message types.
 - The relative priority of the supported message type.
 
-The ROS message type is important because multiple supported message types may be sent with the same ROS message type.
-For example, a publisher may publish image data in the format of YUV420 or ARGB8888, both of which could be sent in a ``sensor_msgs::msg::Image``.
-
-Once there is a set of supported message types, negotiating publishers and subscribers can negotiate their selected message type.
+The combination of the ROS message type and the string identifier must form a unique tuple, since multiple supported message types may be sent with the same ROS message type.
+For example, a publisher may publish image data in the format of YUV420 or ARGB8888, both of which could be sent in a ``sensor_msgs/msg/Image``.
 
 
-Defining Negotiating Publishers and Subscribers
------------------------------------------------
+Defining Negotiating Publishers and Subscriptions
+-------------------------------------------------
 
-Negotiating publishers and subscribers both require a list of supported message types and a negotiation topic that will be used to negotiate the selected message types.
+Negotiating publishers and subscriptions both require a list of supported message types and a negotiation topic that will be used to negotiate the selected message types.
 
-While negotiating publishers and subscribers reveal their supported type priority map by default, a user may provide a function that returns a supported type priority map.
-This function may be useful to allow negotiating publishers and subscribers to introspect the system before stating their preferences, including available hardware and compute resources.
-This function is blocking and thus can delay the negotiation process.
+A user may do arbitrary work that determines the supported message priority map before revealing their preferences to the system.
+This may introspect the system looking for particular hardware and compute resources.
+Once the introspection is complete, the user can then inform the negotiating publisher or negotiating subscription about these preferences, and then reveal these preferences to the rest of the system.
 
-A special case of using a function to return a supported type priority map is when there is a negotiating publisher and subscriber pair, which is useful when the publisher and subscriber should ideally use the same supported message type.
-In this case, the user should define a function that will prioritize the supported message types based on the selected message type of the publisher.
+A special case of using a function to return a supported message priority map is when there is a negotiating publisher and subscription pair, which is useful for a node that receives data on a subscription, manipulates the data, and re-publishes it on a topic.
+In this case, the user should delay revealing preferences on the negotiating subscription until the type of the Negotiating Publisher is known.
 
-One thing to note is that there are potentially many combinations of supported message types in negotiating publisher and subscriber pairs.
-For example, if there are four supported types for a negotiating publisher and subscriber and the developer wants to support all combinations, then the developer must implement six conversions between the supported message types (three choose two).
-However, in the custom function for the negotiating subscriber, the developer can choose not to include supported types that there are not conversions for.
-In the minimal case, the developer can just return a single supported type for the negotiating subscribers priority map: the publisher's selected message type.
+One thing to note is that there are potentially many combinations of supported message types in negotiating publisher and subscription pairs.
+For example, if there are four supported types for a negotiating publisher and subscription and the developer wants to support all combinations, then the developer must implement six conversions between the supported message types (three choose two).
+However, the developer can choose to only implement a subset of these conversions, and only reveal the supported types for the ones that are supported.
 
 
 Negotiation Algorithm
@@ -132,57 +133,43 @@ Negotiation Algorithm
 Negotiating Publisher
 ^^^^^^^^^^^^^^^^^^^^^
 
-The negotiating publisher will select zero or more supported message types (zero when publisher and subscribers have incompatible supported message types).
+The negotiating publisher will select zero or more supported message types (zero when publisher and subscriptions have incompatible supported message types).
 To do this, the negotiating publisher performs the following steps:
 
-#. Use DDS discovery to find all the connected subscribers that are using the user specified negotiation topic.
+#. Use discovery to find all the connected subscriptions that are using the user specified negotiation topic.
 
-#. Query all connected subscribers for their supported message priority maps.
+#. Receive the supported message priority maps from all connected subscriptions.
 
-   - This can timeout if a negotiating subscriber delays stating its preferences indefinitely, for example if there is a deadlock.
-
-#. Decide the selected message types by considering the subscribers and the publisher's own supported message priority maps.
+#. Decide the selected message types by considering the supported message priority maps of the publisher itself and of all subscriptions.
 
    - This can result in zero or more matches, as mentioned above.
-     In the case that there are zero matches, an error should be thrown.
+     In the case that there are zero matches, an error should be returned.
 
-   - Note that the publisher can also block here before it reveals its supported message types.
-     This may be useful to query system information that may inform the priority values in the publisher's supported message priority map.
-
-#. Notify all of the connected negotiating subscribers of the selected message types.
-
-   - If there are multiple matches, the subscriber will select the one with the highest priority in its own supported message priority map.
-     In the case that the multiple messages are of the same priority to the subscriber, the negotiating subscriber will choose a selected message type randomly.
+   - While there is a built-in negotiation algorithm that works for most cases, the user can also provide a custom negotiation algorithm.
 
 #. The negotiating publisher then creates a regular publisher for each supported message type.
 
-Note that all of the above occurs in an extended version of a lifecycle node.
-The following algorithm occurs when the lifecycle is transitioning to the active state.
-Specifically, this algorithm occurs in the callback when the node is activating.
+#. Notify all of the connected negotiating subscriptions of the selected message types.
 
 
-Negotiating Subscriber
-^^^^^^^^^^^^^^^^^^^^^^
+Negotiating Subscription
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-The negotiating subscriber will send its supported message priority map to the negotiating publisher when queried and then wait on the negotiating publisher to tell it the selected message types.
-During this time, the negotiating subscriber, which will also be an extension of a lifecycle node, will be transitioning from inactive to active.
-Upon receiving the selected message types, the subscriber will create one subscriber.
-If multiple selected message types are received, the subscriber will pick the one that has the highest priority in its own supported message priority map.
-If the selected message types have equal priority, the subscriber will choose a selected message type randomly.
-Once the subscriber has been created, the negotiating subscriber will enter the active state.
+The negotiating subscription will send its supported message priority map to the negotiating publisher and then wait on the negotiating publisher to tell it the selected message types.
+Upon receiving the selected message types from the negotiating publisher, the subscription will choose the match with the highest priority in its own supported message priority map.
+In the case that the multiple messages are of the same priority to the subscription, the negotiating subscription will choose a selected message type randomly.
+The negotiating subscription will then create exactly one subscription corresponding to the chosen type and topic name.
 
 
-Negotiating Publisher and Subscriber Pair
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Negotiating Publisher and Subscription Pair
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The negotiating publisher and subscriber pair is a single node that has both a negotiating publisher and subscriber.
-In this case, the negotiating subscriber will wait on the negotiating publisher to pick selected message types and then make it's supported message priority map based on the publisher selected message types.
-Doing so allows the negotiating subscriber to prioritize the selected message types of the publisher, which may be desirable for efficient data transfer.
+The negotiating publisher and subscription pair is a single node that has both a negotiating publisher and subscription.
+In this case, the negotiating subscription will wait on the negotiating publisher to pick selected message types and then make it's supported message priority map based on the publisher selected message types.
+Doing so allows the negotiating subscription to prioritize the selected message types of the publisher, which may be desirable for efficient data transfer.
 
-The negotiating publisher and subscriber pair operates much as described in the previous two sections, with one exception: the node will remain in the activating state until both the negotiating publisher's regular publishers and the negotiating subscriber's regular subscriber have been created.
-At which point, the node will transition to the active state.
-
-As in previous sections, if no change is required to the selected message types, the node will remain in the active state.
+The negotiating publisher and subscription pair operates much as described in the previous two sections, with one exception: the negotiating subscription will delay revealing its preferences until the negotiating publisher has determined its type.
+At that point, the negotiating subscription will reveal its preferences, and take part in the upstream negotiation network.
 
 
 Renegotiating Selected Message Types
@@ -190,39 +177,29 @@ Renegotiating Selected Message Types
 
 In the case that the ROS 2 network is changing, the negotiating publisher may need to renegotiate its selected message types.
 The process looks similar to the original negotiation, however the negotiating publisher remains active until it determines that the selected messages must be changed.
-If the selected messages must change, the negotiating publisher deactivates itself and destroys its publishers.
-The negotiating publisher then becomes inactive and then activates again.
-In the activation step, the negotiating publisher will notify its subscribers of the new selected message types on the user specified negotiation topic and create new publishers for the selected message types.
+If the selected messages must change, the negotiating publisher destroys its publishers.
+The negotiating publisher will then notify its subscriptions of the new selected message types on the user specified negotiation topic and create new publishers for the selected message types.
 When there is no change required in the selected types, the publisher will continue to be active.
 
-If the selected messages are being negotiated for a negotiating publisher and subscriber pair, the algorithm will proceed much as described, except the entire node will be inactive until both the publishers and subscriber have been created.
-
-Similarly, the negotiating subscriber may need to change its selected message type.
-Once the negotiating publisher relays the new selected message types, the subscriber decides if it needs to be updated.
-If the selected type or types match the subscriber's current selected message type, the subscriber does nothing and continues to be active.
-If the selected type or types do not match the subscriber's current selected message type, the subscriber deactivates itself and activates again.
-While the negotiating subscriber is activating, it creates a new regular subscriber for the new selected message type.
+Similarly, the negotiating subscription may need to change its selected message type.
+Once the negotiating publisher relays the new selected message types, the subscription decides if it needs to be updated.
+If the selected type or types match the subscription's current selected message type, the subscription does nothing and continues to be active.
+If the selected type or types do not match the subscription's current selected message type, the subscription recreates the subscription with the new select message type.
 
 
 User Defined Functions
 ^^^^^^^^^^^^^^^^^^^^^^
 
-There are two types of functions in the negotiation process that the user can define:
+There are two types of custom functions in the negotiation process that the user can define:
 
-:Stating preferences:
-  A function to have a negotiating publisher or subscriber state its preferences, which may include a delay.
-:Picking selected message types:
-  A function to pick the selected message types from the publisher and subscribers supported message priority maps.
-
-The function for stating preferences allows the user to make the negotiating publisher or subscriber have its preferences be conditioned on some aspect of the system's state.
-For example, a negotiating publisher or subscriber may prefer a certain supported message type if a type of hardware is available, for example a GPU.
-This function is blocking and thus can delay the negotiation process.
-One special case for this function is when there is a negotiating publisher and subscriber pair, which is useful when the publisher and subscriber should ideally use the same supported message type.
-In this case, the user should define a function that will prioritize the supported message types based on the selected message type of the publisher.
-
-The function for picking selected message types is used to determine which of the supported message types the negotiating publisher or subscriber should use and is run in the negotiating publisher.
-Exposing this function allows the user to create a custom way to pick between supported types with different priorities.
-This may be useful to make high priorities count for relatively more weight in choosing a supported type or having normalized priorities (e.g., between 0 and 1).
+:Negotiating Publisher - Determining the set of selected message types:
+  This is the function that takes in the preferences from all of the negotiating subscription along with the negotiating publisher, and generates a set of results that satisfy the network.
+  The implementation of the negotiating publisher will have a built-in algorithm for determining the best set of matches for the network, but the user may want to override this decision making process.
+  As an example, it may be the case that the default negotiation algorithm would have chosen 3 matches, but the hardware only supports 2 types simultaneously.
+  In this case, the user would override the default negotiation algorithm to enhance it with one that can consult the hardware before making choices.
+:Negotiating Subscription - Picking selected message types:
+  This is the function that receives the preferences as given by the negotiating publisher, and chooses the one this negotiating subscription should subscribe to.
+  For instance, the default type selection may end up arbitrarily choosing the first supported type in the list, but the user may want to consult hardware before deciding which one to choose.
 
 
 Negotiation Examples
@@ -309,23 +286,23 @@ Thus, ``N_1`` has two selected message types, ``x`` and ``y``, and thus ``N_1`` 
              |-----> N_3(y)
 
 
-Negotiating Publisher and Subscriber Pairs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Negotiating Publisher and Subscription Pairs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To discuss negotiating publisher and subscriber pairs, we'll have to use additional notation.
-The following notation shows the result of a custom function that uses the negotiating publishers selected message type to decide the supported message priority map for the negotiating subscriber.
+To discuss negotiating publisher and subscription pairs, we'll have to use additional notation.
+The following notation shows the result of a custom function that uses the negotiating publishers selected message type to decide the supported message priority map for the negotiating subscription.
 
-Let ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})`` be a node ``p`` thats negotiating publishers and subscribers.
+Let ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})`` be a node ``p`` thats negotiating publishers and subscription.
 The first argument ``[x, y, z]`` is the prioritized supported type map for the negotiating publisher, that is, in this case, the negotiating publisher prefers ``x`` more than ``y``, and ``y`` more than ``z``.
-The second argument ``{x: [x, y, z], y: [y, z, x], z: [z, x, y]}`` is the prioritized supported type map for the negotiating subscriber.
+The second argument ``{x: [x, y, z], y: [y, z, x], z: [z, x, y]}`` is the prioritized supported type map for the negotiating subscription.
 This second argument is in the form of a dictionary (``{key1: value1, key2: value2, ...}``), where
 
-* the key is the selected message type of the negotiating publisher in the negotiating publisher subscriber pair and
-* the value is the prioritized supported type map for the negotiating subscriber given that key.
+* the key is the selected message type of the negotiating publisher in the negotiating publisher subscription pair and
+* the value is the prioritized supported type map for the negotiating subscription given that key.
 
-For example, for the node ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})``, if the negotiating publisher negotiates with its subscribers and determines that the selected message type is ``y``, then the negotiating subscriber in the negotiating publisher subscriber pair will state its supported message priority map as ``[y, z, x]``.
-This is because in the second argument (the negotiating subscribers preference map) the key ``y`` is mapped to the value ``[y, z, x]``.
-Similarly, if the publisher chooses ``z``, then the subscriber will use the supported message priority map of ``[z, x, y]``.
+For example, for the node ``N_p([x, y, z], {x: [x, y, z], y: [y, z, x], z: [z, x, y]})``, if the negotiating publisher negotiates with its subscriptions and determines that the selected message type is ``y``, then the negotiating subscription in the negotiating publisher/subscription pair will state its supported message priority map as ``[y, z, x]``.
+This is because in the second argument (the negotiating subscriptions preference map) the key ``y`` is mapped to the value ``[y, z, x]``.
+Similarly, if the publisher chooses ``z``, then the subscription will use the supported message priority map of ``[z, x, y]``.
 
 As a shorthand in figures, we'll define a node that differs its preference beforehand and add an asterisk to separate it from other nodes. For example:
 
@@ -405,7 +382,7 @@ Rationale
 Having the Publisher Pick the Selected Message Type
 ---------------------------------------------------
 
-Consider a network with ``m`` negotiating publishers and ``n`` negotiating subscribers, where ``m`` and ``n`` are positive integers.
+Consider a network with ``m`` negotiating publishers and ``n`` negotiating subscriptions, where ``m`` and ``n`` are positive integers.
 Also imagine that there are at least two publishers that are publishing with the same selected message type.
 In this case, it is possible to have each of the negotiating publishers consider the other negotiating publishers in their decision of what supported message type to select.
 
@@ -422,29 +399,26 @@ In addition, if it turns out to be necessary, the simpler approach can always be
 To Take a Centralized or Decentralized Approach
 -----------------------------------------------
 
-The specification above takes a decentralized approach to negotiating publishers and subscribers.
-That is, each negotiating publisher and subscriber negotiates its own selected message type.
-It is also possible to take a centralized approach, where all publishers and subscribers broadcast their preferences to a higher system that decides the selected message types.
+The specification above takes a decentralized approach to negotiating publishers and subscriptions.
+That is, each negotiating publisher and subscription negotiates its own selected message type.
+It is also possible to take a centralized approach, where all publishers and subscriptions broadcast their preferences to a higher system that decides the selected message types.
 
 The primary advantage of a decentralized approach is that it is easier to implement, especially given the greedy approach that we are using in computing the selected message type.
 If we wanted to find the optimal selected message types taking the entire system into account, we would most likely have to implement a centralized approach, which would have a full understanding of the entire system before making a decision.
 
 
-Extending Lifecycle Nodes
--------------------------
+Using in conjunction with Lifecycle Nodes
+-----------------------------------------
 
 Very much of the stateful behavior that is required for the negotiation process is implemented in lifecycle nodes.
-It also allows us to turn off nodes and free up the nodes resources should another task require those resources.
-Thus it was an easy decision to extend the lifecycle nodes to work with the negotiation process.
-However, the type negotiation feature described in this REP will be in a separate package from the lifecycle nodes to avoid changing the lifecycle nodes.
+Thus, while this REP does not prescribe using lifecycle nodes for negotiation, it makes sense for users to combine these two features when implementing nodes.
 
 
-Putting this Implementation in ``rclcpp`` or ``rcl``
-----------------------------------------------------
+Putting this implementation in the ROS 2 core or in a separate project
+----------------------------------------------------------------------
 
-This feature is intended to be used with type adaptation (see REP 2007 [1]_), which has been implemented in ``rclcpp``.
-Thus it makes sense to put the negotiation process in ``rclcpp``.
-As with REP 2007, the C++'s templating system will make it much easier to handle the various message types expected safely.
+While there are some advantages to having this project in the ROS 2 core, all of the needed APIs are available to make this a separate package.
+Thus, in the spirit of keeping the ROS 2 core smaller, this should be implemented in a separate project.
 
 
 Backwards Compatibility
@@ -460,10 +434,10 @@ Currently, there has been some prototyping to understand how the proposed featur
 
 - `@audrow/type-negotiation-fusing-examples <https://replit.com/@audrow/type-negotiation-fusing-examples>`_ shows how supported messages can be defined and used by a negotiating publisher.
   The approach taken in this example is most likely the closest to how the proposed feature will be implemented.
-- `@audrow/type-negotiation-type-mapping <https://replit.com/@audrow/type-negotiation-type-mapping>`_ shows how the proposed feature may use C++ templating and a type map class to access publishers and subscribers.
+- `@audrow/type-negotiation-type-mapping <https://replit.com/@audrow/type-negotiation-type-mapping>`_ shows how the proposed feature may use C++ templating and a type map class to access publishers and subscriptions.
   Note that the types used in this approach will have to be replaced with ``structs`` in the future to allow for multiple supported types to use the same ROS message type.
 - `@audrow/type-negotiation-possible-usage <https://replit.com/@audrow/type-negotiation-possible-usage>`_ shows another approach which uses inheritance to implement the proposed feature.
-  This approach requires some additional work from the user to implement functions that create typed publishers and subscribers.
+  This approach requires some additional work from the user to implement functions that create typed publishers and subscriptions.
 
 
 References
