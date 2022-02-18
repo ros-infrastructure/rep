@@ -407,7 +407,7 @@ The primary advantage of a decentralized approach is that it is easier to implem
 If we wanted to find the optimal selected message types taking the entire system into account, we would most likely have to implement a centralized approach, which would have a full understanding of the entire system before making a decision.
 
 
-Using in conjunction with Lifecycle Nodes
+Using in Conjunction with Lifecycle Nodes
 -----------------------------------------
 
 Very much of the stateful behavior that is required for the negotiation process is implemented in lifecycle nodes.
