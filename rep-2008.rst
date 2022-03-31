@@ -95,7 +95,6 @@ The first pillar represents extensions of the ``ament`` ROS 2 build system. Thes
       FILE src/vadd.cpp
       INCLUDE
         include
-      TARGET kv260
     )
 
 
