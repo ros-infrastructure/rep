@@ -40,7 +40,8 @@ Terminology
 
 :Type Adapted Type:
   These are custom types that are defined through type adaptation (see REP 2007 [1]_).
-  These are never directly sent over the network, but instead are converted to and from ROS message types as necessary to send between publishers and subscriptions.
+  The user directly interacts with these types, but they are never sent over the network.
+  Instead these types are converted to and from ROS message types as necessary to send between publishers and subscriptions.
 
 :Regular Publisher:
   A publisher that publishes a single ROS message type on a single topic.
@@ -120,7 +121,7 @@ This may introspect the system looking for particular hardware and compute resou
 Once the introspection is complete, the user can then inform the negotiating publisher or negotiating subscription about these preferences, and then reveal these preferences to the rest of the system.
 
 A special case of using a function to return a supported message priority map is when there is a negotiating publisher and subscription pair, which is useful for a node that receives data on a subscription, manipulates the data, and re-publishes it on a topic.
-In this case, the user should delay revealing preferences on the negotiating subscription until the type of the Negotiating Publisher is known.
+In this case, the user should delay revealing preferences on the negotiating subscription until the type of the negotiating publisher is known.
 
 One thing to note is that there are potentially many combinations of supported message types in negotiating publisher and subscription pairs.
 For example, if there are four supported types for a negotiating publisher and subscription and the developer wants to support all combinations, then the developer must implement six conversions between the supported message types (three choose two).
