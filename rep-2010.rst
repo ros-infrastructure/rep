@@ -168,24 +168,56 @@ The resulting data structure is hashed using a standard SHA-1 method, resulting 
 This hash is combined with a "type version hash standard version", the first of which will be ``IDLHASH-1``, with an ``@`` symbol, resulting in a complete type version hash like ``IDLHASH-1@<160-bit SHA-1 of data structure>``.
 This allows the tooling to know if a hash mismatch is due to a change in this standard (what is being hashed) or due to a difference in the interface types themselves.
 
-.. TODO: is the list of field names and types sufficient? how to capture things like .idl annotations, etc... I'm thinking of serialization format specific entries can be added to this data structure, but need to sketch it out a bit more
+.. TODO:: is the list of field names and types sufficient? how to capture things like .idl annotations, etc... I'm thinking of serialization format specific entries can be added to this data structure, but need to sketch it out a bit more
 
-Enforcing Type Compatibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enforcing Type Version
+~~~~~~~~~~~~~~~~~~~~~~
 
-With the type version hash available, it can be used to determine if two endpoints on a topic should communicate.
+With the type version hash available, it can be used as an additional constraint to determine if two endpoints, i.e. publishers and subscriptions, on a topic should communicate.
 
-.. TODO: move the draft section with details here after one of these options is selected: USER_DATA+ignore, USER_DATA+discovery "plugin", append type hash to type name in DDS, use type hash in DDS partition
+When creating a publisher or subscription, the caller normally provides: a topic name, QoS settings, and a topic type.
+The last of which is represented as a string and is automatically deduced based on the type given to the create function, e.g. as a template parameter in C++ or the message type as an argument in Python.
+For example, creating a publisher for ``std_msgs::msg::String`` in C++, may result in a topic type like ``std_msgs/msg/String``.
+All of these items are used by the middleware to determine if two endpoints should communicate or not, and this rep proposes that the type version be added to this list of provided information.
+From the user's perspective nothing needs to change, as the type version can be extracted based on the topic type given either at the ``rcl`` layer or in the ``rmw`` implementation itself.
+However, the type version would become something that the ``rmw`` implementation is provided and aware of in the course of creating a publisher or subscription, and therefore the job of using that information to enforce type compatibility would be left to the middleware, rather than implementing it as logic in ``rcl`` or other packages above the ``rmw`` API.
+
+The method for implementing the detection and enforcement of type version mismatches is left up to the middleware, as some middlewares will have tools to make this efficient and others will implement something like what would be possible in the ``rcl`` and above layers.
+By keeping this a detail of the ``rmw`` implementation, we allow the ``rmw`` implementations to make optimizations where they can.
+
+Recommended Strategy for Enforcing that Type Versions Match
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the middleware has a feature to handle type compatibility already, as is the case with DDS-XTypes which is discussed later, then that can be used to enforce type safety, and then the type version hash can be used to warn the user when the communication may not happen due to a version mismatch, and also if can be put into recordings for future comparison.
+
+However, if the middleware lacks this kind of feature, then the recommended strategy for accomplishing this in the ``rmw`` implementation is to simply concatenate the type name and the type version hash and then use that as the type name given to the underlying middleware.
+This has the benefit of "just working" for most middlewares which at least match based on the name of the type, and it is simple, requiring no further custom hooks into the middleware's discovery or match making process.
+However, the downside is that detecting the mismatch is more difficult and it also makes interoperating with ROS using the native middleware more difficult, as appending the version hash to the type name is just "one more thing" that you have to contend with when trying to connect non-ROS endpoints to a ROS graph.
+
+.. TODO:: figure out if mismatched types produces a IncompatibleQoSOffered callback or not, then document the recommended way to detect type version mismatches, also look into ``DDS XTypes spec v1.3: 7.6.3.4.2: INCONSISTENT_TOPIC`` as a possible alternative
+
+Notes for Implementing the Recommended Strategy with DDS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+Interactions with DDS-XTypes or Similar Implicit Middleware Features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+.. TODO:: move the draft section with details here after one of these options is selected: USER_DATA+ignore, USER_DATA+discovery "plugin", append type hash to type name in DDS, use type hash in DDS partition
 
 Inter-process Type Description Distribution
 -------------------------------------------
 
-.. TODO: move the draft section over, and make a selection between: telnet/http server per context/participant under rmw layer, service per context/participant under rmw layer, telnet/http server per node under rmw layer, service per node above rmw layer, or some combination with way to configure which should be used.
+.. TODO:: move the draft section over, and make a selection between: telnet/http server per context/participant under rmw layer, service per context/participant under rmw layer, telnet/http server per node under rmw layer, service per node above rmw layer, or some combination with way to configure which should be used.
 
 Runtime Type Introspection
 --------------------------
 
-.. TODO: terminology could be better? nothing off the top of my head, just deserves more bike-shedding.
+.. TODO:: terminology could be better? nothing off the top of my head, just deserves more bike-shedding.
 
 
 
@@ -193,6 +225,26 @@ Rationale
 =========
 
 TODO
+
+Alternatives
+------------
+
+TODO
+
+Use Type Hash from Middleware, e.g. from DDS-XTypes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO
+
+Handle Detection of Version Mismatch "Above" rmw Layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO
+
+Prevent Communication of Mismatched Versions "Above" rmw Layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TODO
+
 
 Backwards Compatibility
 =======================
