@@ -519,6 +519,20 @@ Attributes
 
     </font>
 
+Notes
+'''''
+
+The license information given in the license tags has to be consistent
+with the information given in the license headers of the source files.
+This may be checked by suitable linting tools.
+
+Furthermore, by the license tags in the ``package.xml`` file and the
+copyright information obtained from the license headers of the source files
+(e.g., using ``licensecheck --copyright``)
+a copyright file according to the `Machine-readable debian/copyright file
+specification V1.0 <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_
+for binary versions of this package can be created automatically.
+
 <url> (multiple)
 ----------------
 
