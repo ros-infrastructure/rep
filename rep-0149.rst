@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Oct-2017
-Post-History: 02-Jan-2018, 31-Aug-2020, 04-Apr-2022
+Post-History: 02-Jan-2018, 31-Aug-2020, 14-Apr-2022
 
 Outline
 =======
@@ -506,6 +506,14 @@ Attributes
   the logic described in Section 6.9 of the `Machine-readable
   debian/copyright file specification V1.0 <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
   Consequently, more general tags should be given first.
+
+ ``copyright="COPYRIGHT HOLDER INFORMATION"`` *(optional)*
+
+  Information about copyright holders of the source files this tag refers to. The attribute value is considered in addition to the
+  copyright information given in the license headers of those source files. In case of normal source files with proper license header
+  this attribute is not required. It is particularly intended for vendor packages, which download the source code during
+  the build process from another repository, i.e., where the actual source files are not stored in the current repository
+  and thus not available to tools that analyze the source code of the current package only.
 
   .. raw:: html
 
