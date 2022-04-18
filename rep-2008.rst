@@ -1,11 +1,11 @@
 REP: 2008
 Title: ROS 2 Hardware Acceleration Architecture and Conventions
-Author: Víctor Mayoral-Vilches <victorma@xilinx.com>
+Author: Víctor Mayoral-Vilches <victor@accelerationrobotics.com>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
 Created: 10-Aug-2021
-Post-History: 10-Aug-2021
+Post-History: 18-April-2022
 
 
 Abstract
@@ -17,7 +17,7 @@ This REP describes the architectural pillars and conventions required to introdu
 Motivation
 ==========
 
-With the decline of Moore’s Law, hardware acceleration has proven itself as the answer for achieving higher performance gains in robotics [1]_. By creating specialized compute architectures that rely on specific hardware (i.e. through FPGAs or GPUs), hardware acceleration empowers faster robots, with reduced computation times (real fast, as opposed to real-time), lower power consumption and more deterministic behaviours. The core idea is that instead of following the traditional control-driven approach for software development in robotics, a mixed control- and data-driven one allows to design custom compute architectures that further exploit parallelism. To do so, we need to integrate in the ROS 2 ecosystem external frameworks, tools and libraries that facilitate creating parallel compute architectures.
+With the decline of Moore’s Law, hardware acceleration has proven itself as the answer for achieving higher performance gains in robotics [1]_. By creating specialized compute architectures that rely on specific hardware (i.e. through FPGAs or GPUs), hardware acceleration empowers faster robots, with reduced computation times (real fast, as opposed to real-time), lower power consumption and more deterministic behaviours [9]_ [10]_. The core idea is that instead of following the traditional control-driven approach for software development in robotics, a mixed control- and data-driven one allows to design custom compute architectures that further exploit parallelism. To do so, we need to integrate in the ROS 2 ecosystem external frameworks, tools and libraries that facilitate creating parallel compute architectures.
 
 The purpose of this REP is to provide standard guidelines for how to use hardware acceleration in combination with ROS 2. These guidelines are realized in the form of a series of ROS 2 packages that integrate these external resources and provide a ROS 2-centric open architecture for hardware acceleration.
 
@@ -32,7 +32,7 @@ Value for stakeholders:
 - Silicon vendors and solution manufacturers can use these guidelines to connect their firmware and technologies to the ROS 2 ecosystem, obtaining direct support for hardware acceleration in all ROS 2 packages that support it.
 
 
-The outcome of this REP should be that maintainers who want to leverage hardware acceleration in their packages, can do so with consistent guidelines and with support across multiple technologies (FPGAs and GPUs) by following the conventions set. This way, maintainers will be able to create ROS 2 packages with support for hardware acceleration that can run across hardware acceleration technologies, including FPGAs and GPUs.
+The outcome of this REP should be that maintainers who want to leverage hardware acceleration in their packages, can do so with consistent guidelines and with support across multiple technologies (FPGAs and GPUs initially, but extending towards more accelerators in the future) by following the conventions set. This way, maintainers will be able to create ROS 2 packages with support for hardware acceleration that can run across hardware acceleration technologies, including FPGAs and GPUs.
 
 In turn, the documentation of categories and hardware acceleration capabilities will improve.
 The guidelines in here provide a ROS 2-centric open architecture for hardware acceleration, which silicon vendors can decide to adopt when engaging with the ROS 2 community.
@@ -60,26 +60,25 @@ Architecture pillars
 
 ::
 
-       ROS 2 stack                    Hardware Acceleration Architecture @ ROS 2 stack
+    ROS 2 stack         Hardware Acceleration Architecture @ ROS 2 stack
 
-    +-------------+             +---------------------------+
-    |             |             |   acceleration_examples   |
-    | user land   |  +-------------------+-----------+----------------+--------------------------------+
-    |             |  |       Drivers     |     Libraries              |           Cloud                |
-    +-------------+  +--------------+----+---------+-----------------------------------+---------------+
-    |             |  |   ament_sol1 | ament_soln   |                  |                |               |
-    |             |  +--------------+--------------+------------------+  accel_fw_sol1 | accel_fw_soln +
-    |  tooling    |  |     ament_acceleration   | colcon_acceleration |                |               |
-    |             |  +---------------------------------------------------------------------------------+
-    |             |  |      build system        |   meta build        |            firmware            |
-    +-------------+  +--------------------------+---------------------+--------------------------------+
-    |     rcl     |             ^                      ^                            ^
-    +-------------+             |                      |                            |
-    |     rmw     |             |                      |                            |
-    +-------------+             |                      |                            |
-    | rmw_adapter |          Pillar I              Pillar II                    Pillar III
-    +-------------+
-
+    +-----------+          +---------------------------+
+    |           |          |   acceleration_examples   |
+    |user land  | +-----------------+------------------+--+-----------------+
+    |           | |     Drivers     |     Libraries       | Firmware |Cloud |
+    +-----------+ +-----------------+-+-------------------------+-----------+
+    |           | | ament_1| ament_2  |                   |     |    |      |
+    |           | +---------------------------------------+ fw_1|fw_2|cloud1|
+    | tooling   | | ament_acceleration|colcon_acceleration|     |    |      |
+    |           | +---------------------------------------------+-----------+
+    |           | |    build system   |  meta build       | firmware | cloud|
+    +-----------+ +--------+----------+-------+-----------+-+--------+--+---+
+    |    rcl    |          |                  |             |           |
+    +-----------+          |                  |             |           |
+    |    rmw    |          |                  |             |           |
+    +-----------+          +                  +             +           +
+    |rmw_adapter|       Pillar I          Pillar II    Pillar III   Pillar IV
+    +-----------+
 
 
 .. _pillarI:
@@ -164,6 +163,18 @@ Each ROS 2 workspace can have one or multiple firmware packages deployed. The se
 
 By splitting vendors across packages, consumers and maintainers can easily switch between hardware acceleration solutions.
 
+
+.. _pillarIV:
+
+Pillar IV - cloud extensions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Leveraging the cloud provides roboticists with unlimited resources to further accelerate computations. Besides lots of CPU, cloud computing providers such as `GCP <https://cloud.google.com>`_, `Azure <https://azure.microsoft.com>`_ or `AWS <https://aws.amazon.com>`_ offer instances that provide big FPGAs and GPUs for on-cloud hardware acceleration. This means once the ROS graph is partially in the cloud, architects can use computing there, including custom accelerators, to reduce and optimize robotic computations. But tapping into all that power while aligned with common ROS and robotics development flows is non-trivial.
+
+This fourth pillar, ``cloud extensions``, helps robotic architects bridge the gap and simplify the use of hardware acceleration in the cloud for ROS. It does so by extending the three prior pillars (pillarI_, pillarII_ and pillarIII_) and adding cloud capabilities to them. Ultimately, the cloud extensions allow to easily build hardware acceleration kernels that target cloud instances while aligning to the unified APIs for cloud provisioning, set up, deployment and launch derived from the standard ROS 2 launch system.
+
+In turn, a reference implementation leveraging hardware acceleration in the cloud with ROS 2 will be facilitated with one of the cloud service providers.
 
 
 .. _specification:
@@ -840,6 +851,11 @@ References and Footnotes
 .. [8] Acceleration Robotics, "Hardware accelerated ROS 2 pipelines and towards the Robotic Processing Unit (RPU)".
    https://news.accelerationrobotics.com/hardware-accelerated-ros2-pipelines/
 
+.. [9] Mayoral-Vilches, V., & Corradi, G. (2021). Adaptive computing in robotics, leveraging ros 2 to enable software-defined hardware for fpgas. 
+   https://www.xilinx.com/support/documentation/white_papers/wp537-adaptive-computing-robotics.pdf
+
+.. [10] Mayoral-Vilches, V. (2021). Kria Robotics Stack.
+   https://www.xilinx.com/content/dam/xilinx/support/documentation/white_papers/wp540-kria-robotics-stack.pdf
 
 
 Copyright
