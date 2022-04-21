@@ -4,7 +4,8 @@ Author: Séverin Lemaignan <severin.lemaignan@pal-robotics.com>
 Status: Draft
 Type: Informational
 Content-Type: text/x-rst
-Created: 11-Jan-2021
+Created: 11-Jan-2022
+Version: 21-Apr-2022
 
 
 Abstract
@@ -220,11 +221,11 @@ Global Parameters
 =================
 
 - ``/humans/faces/width`` (default: 128): width in pixels of the cropped faces
-  published under ``/humans/faces/XYZ/cropped`` and
-  ``/humans/faces/XYZ/frontalized``
+  published under ``/humans/faces/XYZ/cropped``, ``/humans/faces/XYZ/aligned``
+  and ``/humans/faces/XYZ/frontalized``
 - ``/humans/faces/height`` (default: 128): height in pixels of the cropped
-  faces published under ``/humans/faces/XYZ/cropped`` and
-  ``/humans/faces/XYZ/frontalized``
+  faces published under ``/humans/faces/XYZ/cropped``,
+  ``/humans/faces/XYZ/aligned`` and ``/humans/faces/XYZ/frontalized``
 - ``/human_description_<bodyID>``: URDF models of detected humans. See Section
   `Kinematic Model of the Human`_ for details.
 - ``/human/match_threshold`` (``float``, default: 0.5): the minimum level of
@@ -309,6 +310,12 @@ Name             Message type                         Required Description
                                                                and
                                                                ``/humans/faces/height``
                                                                ROS parameters
+``/aligned``      ``sensor_msgs/Image``                        Aligned (eg, the two 
+                                                               eyes are horizontally 
+                                                               aligned) version of the
+                                                               cropped face, with same 
+                                                               resolution as
+                                                               ``/cropped``
 ``/frontalized``  ``sensor_msgs/Image``                        Frontalized version of
                                                                the cropped face, with
                                                                same resolution as
