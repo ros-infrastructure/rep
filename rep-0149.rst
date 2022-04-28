@@ -507,14 +507,6 @@ Attributes
   debian/copyright file specification V1.0 <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
   Consequently, more general tags should be given first.
 
- ``copyright="COPYRIGHT HOLDER INFORMATION"`` *(optional)*
-
-  Information about copyright holders of the source files this tag refers to. The attribute value is considered in addition to the
-  copyright information given in the license headers of those source files. In case of normal source files with proper license header
-  this attribute is not required. It is particularly intended for vendor packages, which download the source code during
-  the build process from another repository, i.e., where the actual source files are not stored in the current repository
-  and thus not available to tools that analyze the source code of the current package only.
-
   .. raw:: html
 
     </font>
