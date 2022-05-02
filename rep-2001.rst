@@ -35,14 +35,14 @@ End-user entry points
 
 We define four main entry points for ROS users.
 
- * `desktop_full` (recommended from Humble): The `desktop_full` metapackage is the main entry point for users.
+ * `quickstart` (recommended from Humble): The `quickstart` variant is the main entry point for new users.
    It provides a "batteries included" experience, enabling novice users to complete most entry
    tutorials without knowledge of the underlying library structure.
- * `desktop` (recommended until Galactic): The `desktop` provides all commonly used libraries as well as
+ * `desktop` (recommended until Galactic): The `desktop` variant provides all commonly used libraries as well as
    visualization tools and tutorials.
- * `ros_base`: The `ros_base` metapackage composes the `ros_core` metapackage with commonly used libraries.
+ * `ros_base`: The `ros_base` variant composes the `ros_core` metapackage with commonly used libraries.
    It may not contain any GUI dependencies.
- * `ros_core`: The `ros_core` variants composes the core communication protocols.
+ * `ros_core`: The `ros_core` variant composes the core communication protocols.
    It may not contain any GUI dependencies.
 
 
@@ -655,16 +655,16 @@ Simulation
 
   - simulation:
       extends:  [ros_base]
-      packages: [ros_ign]
+      packages: [ros_ign_bridge, ros_ign_gazebo, ros_ign_image, ros_ign_interfaces]
 
-Desktop Full
+Quick Start
 """"""""""
 
 ::
 
-  - desktop_full:
+  - quickstart:
       extends:  [desktop]
-      packages: [perception, simulation]
+      packages: [perception, simulation, ros_ign_gazebo_demos]
 
 
 References
