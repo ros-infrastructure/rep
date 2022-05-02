@@ -33,7 +33,7 @@ Specification
 End-user entry points
 ---------------------
 
-We define four main entry points for ROS users.
+We define various entry points for ROS users.
 
  * `quickstart` (recommended from Humble): The `quickstart` variant is the main entry point for new users.
    It provides a "batteries included" experience, enabling novice users to complete most entry
@@ -44,6 +44,9 @@ We define four main entry points for ROS users.
    It may not contain any GUI dependencies.
  * `ros_core`: The `ros_core` variant composes the core communication protocols.
    It may not contain any GUI dependencies.
+ * `perception`: The `perception` variant includes packages commonly used for perception capabilities.
+ * `simulation`: The `simulation` variant includes packages that are needed for automated simulation,
+   without extra debugging tools.
 
 
 Institution-specific and robot-specific
