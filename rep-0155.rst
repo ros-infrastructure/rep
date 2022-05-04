@@ -313,39 +313,41 @@ created (eg ``/humans/faces/bf3d/``).
 The following subtopics MAY then be available, depending on available
 detectors:
 
-================ ==================================== ======== ========================
-Name             Message type                         Required Description
-================ ==================================== ======== ========================
-``/roi``         ``sensor_msgs/RegionOfInterest``        x     Region of the face in
-                                                               the source image
-``/cropped``     ``sensor_msgs/Image``                   x     Cropped face image, if 
-                                                               necessary scaled, 
-                                                               centered and 0-padded 
-                                                               to match the
-                                                               ``/humans/faces/width``
-                                                               and
-                                                               ``/humans/faces/height``
-                                                               ROS parameters
-``/aligned``      ``sensor_msgs/Image``                        Aligned (eg, the two 
-                                                               eyes are horizontally 
-                                                               aligned) version of the
-                                                               cropped face, with same 
-                                                               resolution as
-                                                               ``/cropped``
-``/frontalized``  ``sensor_msgs/Image``                        Frontalized version of
-                                                               the cropped face, with
-                                                               same resolution as
-                                                               ``/cropped``
-``/landmarks``   ``hri_msgs/FacialLandmarks``                  2D facial landmarks
-                                                               extracted from the face
-``/facs``        ``hri_msgs/FacialActionUnits``                The presence and
-                                                               intensity of facial
-                                                               action units found in 
-                                                               the face
-``/expression``  ``hri_msgs/Expression``                       The expression
-                                                               recognised from the
-                                                               face
-================ ==================================== ======== ========================
+=================== ==================================== ======== ========================
+Name                Message type                         Required Description
+=================== ==================================== ======== ========================
+``/roi``            ``sensor_msgs/RegionOfInterest``        x     Region of the face in
+                                                                  the source image
+``/cropped``        ``sensor_msgs/Image``                   x     Cropped face image, if 
+                                                                  necessary scaled, 
+                                                                  centered and 0-padded 
+                                                                  to match the
+                                                                  ``/humans/faces/width``
+                                                                  and
+                                                                  ``/humans/faces/height``
+                                                                  ROS parameters
+``/aligned``         ``sensor_msgs/Image``                        Aligned (eg, the two 
+                                                                  eyes are horizontally 
+                                                                  aligned) version of the
+                                                                  cropped face, with same 
+                                                                  resolution as
+                                                                  ``/cropped``
+``/frontalized``     ``sensor_msgs/Image``                        Frontalized version of
+                                                                  the cropped face, with
+                                                                  same resolution as
+                                                                  ``/cropped``
+``/landmarks``      ``hri_msgs/FacialLandmarks``                  2D facial landmarks
+                                                                  extracted from the face
+``/facs``           ``hri_msgs/FacialActionUnits``                The presence and
+                                                                  intensity of facial
+                                                                  action units found in 
+                                                                  the face
+``/expression``     ``hri_msgs/Expression``                       The expression
+                                                                  recognised from the
+                                                                  face
+``/softbiometrics`` ``hri_msgs/SoftBiometrics``                   Detected age and gender
+                                                                  of the person
+=================== ==================================== ======== ========================
 
 Bodies
 ------
@@ -447,8 +449,6 @@ Name                     Message type                         Required Descripti
                                                                        seen*, 0 means *person
                                                                        location unknown*. See
                                                                        `Person Frame`_
-``/softbiometrics``      ``hri_msgs/SoftBiometrics``                   Detected age and gender
-                                                                       of the person
 ``/name``                ``std_msgs/String``                           Name, if known
 ``/native_language``     ``std_msgs/String``                           IETF language codes like
                                                                        EN_gb, if known
