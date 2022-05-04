@@ -439,11 +439,8 @@ Name                     Message type                         Required Descripti
                                                                        this topic contains the
                                                                        person ID of the new 
                                                                        person
-``/engaged``             ``std_msgs/Bool``                             if true, the person is
-                                                                       considered to be
-                                                                       currently engaged in an
-                                                                       interaction with the 
-                                                                       robot
+``/engagement_status``   ``hri_msgs/EngagementLevel``                  Engagement status of the
+                                                                       person with the robot
 ``/location_confidence`` ``std_msgs/Float32``                          Location confidence; 1
                                                                        means *person currently
                                                                        seen*, 0 means *person
