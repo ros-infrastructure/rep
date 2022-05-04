@@ -846,7 +846,7 @@ Acknowledgements
 Contributors
 ------------
 
-Andres Ramirez-Duque, Youssef Mohamed
+Antonio Andriella, Lorenzo Ferrini, Youssef Mohamed, Andres Ramirez-Duque
 
 *(alphabetic order)*
 
