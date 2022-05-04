@@ -103,9 +103,9 @@ Person Identifier
 -----------------
 
 The **person identifier** MUST be a unique ID (typically, a UUID) permanently
-associated with a unique person. This person ID is normally assigned by a module
-able to perform person identification (face recognition module, voice
-recognition module, sound source localisation + name, identification based on
+associated with a unique person. This person ID is normally assigned by a node
+able to perform person identification (face recognition node, voice
+recognition node, sound source localisation + name, identification based on
 physical features like height/age/gender, person identification based on
 pre-defined features like the colour of the clothes, etc.) This ID is meant to
 be **persistent** so that the robot can recognise people across
@@ -182,7 +182,7 @@ At any given time, the list of tracked bodies is published under the
 Voice Identifier
 ----------------
 
-Likewise, a speech separation module should assign a unique, non-persistent, ID
+Likewise, a speech separation node should assign a unique, non-persistent, ID
 for each detected voice. Tracked voices are published under the
 ``/humans/voices/tracked`` topic as ``hri_msgs/IdsList`` messages.
 
@@ -672,7 +672,7 @@ Face and Gaze Frames
 --------------------
 
 
--  Head pose estimation modules MUST publish the head 6D pose as
+-  Head pose estimation nodes MUST publish the head 6D pose as
    a TF frame named ``face_<faceID>`` where ``<faceID>`` stands for the
    unique face identifier.
 -  the parent of this frame is the sensor frame used to estimate the
