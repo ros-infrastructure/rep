@@ -119,7 +119,7 @@ frame is expected to be placed as close as possible to the head of the human.
 If neither the face nor the skeleton are tracked, the ``person_<personID>``
 frame might be located to the last known position of the human, or removed
 altogether if no meaningful estimate of the human location is available. See
-below for details regarding the ``person_<personID>`` frame.
+section `Person frame`_ for details regarding the ``person_<personID>`` frame.
 
 At any given time, the list of known persons is published under the
 ``/humans/persons/tracked`` topic as ``hri_msgs/IdsList`` messages.
@@ -137,6 +137,22 @@ person, by publishing the ID of the other person on a special subtopic named
 
 .. Note:: The reverse operation (spliting a person into two) can be realised
    by simply publishing a second person ID.
+
+Anonymous persons
+'''''''''''''''''
+
+While person IDs are generally expected to be permanent, one exception exists
+for persons that the robot has detected but not yet identified.
+
+For instance, the robot hears a voice, and therefore knows that a person is
+around, but no voice identification nodes is available -- or the voice
+identification has not yet recognised the voice: in such a case, an *anonymous
+person* might be created, ie a person who has not yet been assigned a permanent
+ID.
+
+*Anonymous persons* are treated like regular persons. They however publish a
+latched ``true`` boolean on their ``/anonymous`` subtopic, and their ID is not
+guaranteed to be permanent (it can in fact change at any point).
 
 Face Identifier
 ---------------
@@ -405,6 +421,11 @@ detectors, and whether or not the person has yet been matched to a face/body/voi
 ======================== ==================================== ======== ========================
 Name                     Message type                         Required Description
 ======================== ==================================== ======== ========================
+``/anonymous``           ``std_msgs/Bool``                     x       If true, the person is
+                         (latched)                                     *anonymous*, ie has
+                                                                       not yet been identified,
+                                                                       and has not been issued
+                                                                       a permanent ID
 ``/face_id``             ``std_msgs/String``                           Face matched to that
                          (latched)                                     person (if any)
 ``/body_id``             ``std_msgs/String``                           Body matched to that
