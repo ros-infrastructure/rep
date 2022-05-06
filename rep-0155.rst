@@ -410,8 +410,12 @@ Name             Message type                         Required Description
 Persons
 -------
 
-The list of currently detected persons (list of person IDs) is published
+The list of currently tracked persons (list of person IDs) is published
 under ``/humans/persons/tracked`` (as a ``hri_msgs/IdsList`` message).
+
+The list of known persons (either actively tracked, or known but not tracked
+anymore) is published under ``/humans/persons/known`` (as a ``hri_msgs/IdsList``
+message).
 
 For each detected person, a namespace ``/humans/persons/<personID>/`` is
 created.
