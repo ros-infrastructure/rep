@@ -1,7 +1,7 @@
 REP: 2009
 Title: Type Negotiation Feature
 Author: Audrow Nash <audrow@openrobotics.org>, Chris Lalancette <clalancette@openrobotics.org>, Gonzalo de Pedro <gonzalodepedro@ekumenlabs.com>, William Woodall <william@openrobotics.org>
-Status: Accepted
+Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 04-Nov-2021
