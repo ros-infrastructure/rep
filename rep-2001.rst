@@ -35,7 +35,7 @@ End-user entry points
 
 We define various entry points for ROS users.
 
- * `desktop_full` (available from Humble): The `desktop_full` variant provides a "batteries included" experience, enabling novice users to complete most entry tutorials without knowledge of the underlying library structure.
+ * `desktop_full`: The `desktop_full` variant provides a "batteries included" experience, enabling novice users to complete most entry tutorials without knowledge of the underlying library structure.
  * `desktop` (recommended): The `desktop` variant provides all commonly used libraries as well as
    visualization tools and tutorials.
  * `ros_base`: The `ros_base` variant composes the `ros_core` metapackage with commonly used libraries.
