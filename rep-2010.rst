@@ -16,13 +16,18 @@ This REP proposes patterns and approaches for evolving message, service, and act
 The proposed patterns use the existing default serialization technology, i.e. CDR, in combination with new tooling.
 However, technologies provided by different, perhaps future, serialization technologies can always be used in addition.
 
-Specifically, this REP proposes that interpreting older versions of the message at runtime, using its type information, and converting it to the current version of the message using user defined transfer functions, is a good way to achieve backwards compatibility in messages over long periods of time and in a variety of scenarios, e.g. over the wire, converting bag files, or in specialized tools.
+Specifically, this REP proposes that the following is a good way to achieve backwards compatibility in messages over long periods of time and in a variety of scenarios, e.g. over the wire, converting bag files, or in specialized tools:
+
+- Interpreting older versions of the message at runtime;
+- Using its type information;
+- And converting it to the current version of the message using user defined transfer functions
+
 This approach does not rely on specific features of the serialization technology and instead relies on the ability to communicate the type information of the messages on the wire, beyond their name and version, and use that to dynamically interpret it at runtime.
 
 This approach can be used in conjunction with serialization technology specific features like optional fields, inheritance, etc., but it works even with the simplest serialization technologies so long as we have the ability to introspect the messages at runtime without prior knowledge of the type information, which is a feature we also need for generic introspection tools.
 
 Also covered in this REP are recommended changes to the middleware API in ROS 2, as well as additional infrastructure, to support dynamic interpretation of messages at runtime.
-It is very similar to, though slightly narrower and more generic than, the DDS-XTypes specification, and will likely use it to implement the needed interfaces in the ROS 2 middleware API.
+It is very similar to, though slightly narrower and more generic than, the DDS-XTypes specification, and an interface similar to DDS-XTypes will likely be adopted in the ROS 2 middleware API, without explicitly relying on it.
 
 Alternatives are also discussed in more detail.
 
@@ -41,7 +46,7 @@ To understand this need, it's useful to look at a few common scenarios, for exam
     int64 temperature
 
 There are many potential issues with this message type, but it isn't uncommon for messages like this to be created in the process of taking an idea from a prototype into a product, and for the sake of this example, let's say that after using this message for a while the developers wanted to change the temperature field's type from int64 to float64.
-There are a few ways the developers could approach this, e.g. if the serialization technology allowed for optional fields they may add a new optional field like this (pseudo code):
+There are a few ways the developers could approach this, e.g. if the serialization technology allowed for optional fields, they may add a new optional field like this (pseudo code):
 
 .. code::
 
@@ -152,17 +157,18 @@ In order to detect type version mismatches and enforce them, a way to uniquely i
 Type Version Hash
 ~~~~~~~~~~~~~~~~~
 
-The type version hashes are not sequential and do imply any rank among versions of the type, i.e. given two version hashes of a type there is no way to tell which is "newer".
-There is only whether or not the type versions are equal and whether or not there exists transfer functions that be chained together in order to convert between them.
+The type version hashes are not sequential and do not imply any rank among versions of the type. That is, given two version hashes of a type, there is no way to tell which is "newer".
+The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
 Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
 
-In order to calculate the type version hashes so that they are stable and are not sensitive to trivial changes like changes in the comments or whitespace in the IDL file, the IDL file given by the user, which for example may be a ``.msg`` or ``.idl`` or something else, is parsed and stored into a data structure which excludes things like comments but includes things that impact compatibility on the wire.
+In order to calculate the type version hashes so that they are stable and are not sensitive to trivial changes like changes in the comments or whitespace in the IDL file, the IDL file given by the user, which may be a ``.msg`` file, ``.idl`` file, or something else, is parsed and stored into a data structure which excludes things like comments but includes things that impact compatibility on the wire.
+
 The data structure includes:
 
-- a list of field names and types, but not default values
-- the serialization format
-- the serialization format version
-- an optional user-defined interface version, or 0 if not provided
+- A list of field names and types, but not default values
+- The serialization format
+- The serialization format version
+- An optional user-defined interface version, or 0 if not provided
 
 The resulting data structure is hashed using a standard SHA-1 method, resulting in a standard 160-bit (20-byte) hash value which is also generally known as a "message digest".
 This hash is combined with a "type version hash standard version", the first of which will be ``IDLHASH-1``, with an ``@`` symbol, resulting in a complete type version hash like ``IDLHASH-1@<160-bit SHA-1 of data structure>``.
@@ -173,13 +179,13 @@ This allows the tooling to know if a hash mismatch is due to a change in this st
 Enforcing Type Version
 ~~~~~~~~~~~~~~~~~~~~~~
 
-With the type version hash available, it can be used as an additional constraint to determine if two endpoints, i.e. publishers and subscriptions, on a topic should communicate.
+If the type version hash is available, it can be used as an additional constraint to determine if two endpoints (publishers and subscriptions) on a topic should communicate.
 
 When creating a publisher or subscription, the caller normally provides: a topic name, QoS settings, and a topic type.
-The last of which is represented as a string and is automatically deduced based on the type given to the create function, e.g. as a template parameter in C++ or the message type as an argument in Python.
+The topic type is represented as a string and is automatically deduced based on the type given to the create function, e.g. as a template parameter in C++ or the message type as an argument in Python.
 For example, creating a publisher for ``std_msgs::msg::String`` in C++, may result in a topic type like ``std_msgs/msg/String``.
-All of these items are used by the middleware to determine if two endpoints should communicate or not, and this rep proposes that the type version be added to this list of provided information.
-From the user's perspective nothing needs to change, as the type version can be extracted based on the topic type given either at the ``rcl`` layer or in the ``rmw`` implementation itself.
+All of these items are used by the middleware to determine if two endpoints should communicate or not, and this REP proposes that the type version be added to this list of provided information.
+From the user's perspective, nothing needs to change, as the type version can be extracted based on the topic type given either at the ``rcl`` layer or in the ``rmw`` implementation itself.
 However, the type version would become something that the ``rmw`` implementation is provided and aware of in the course of creating a publisher or subscription, and therefore the job of using that information to enforce type compatibility would be left to the middleware, rather than implementing it as logic in ``rcl`` or other packages above the ``rmw`` API.
 
 The method for implementing the detection and enforcement of type version mismatches is left up to the middleware, as some middlewares will have tools to make this efficient and others will implement something like what would be possible in the ``rcl`` and above layers.
