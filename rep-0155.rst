@@ -151,7 +151,7 @@ ID.
 
 *Anonymous persons* are treated like regular persons. They however publish a
 latched ``true`` boolean on their ``/anonymous`` subtopic, and their ID is not
-guaranteed to be permanent (it can in fact change at any point).
+guaranteed to be permanent (it can in fact change/be removed at any point).
 
 Face Identifier
 ---------------
@@ -216,6 +216,23 @@ matches between voices and persons) and one 'person manager' node collecting
 the candidates, and publishing the most likely associations between a person ID
 and its face/body/voice IDs under the ``/humans/persons/`` namespace.
 
+Special case for anonymous persons
+''''''''''''''''''''''''''''''''''
+
+A node that want to advertise that a person exists, but is not identified yet
+("anonymous person") can publish a ``hri_msgs/IdsMatch`` message on the
+``/humans/candidate_matches`` topic with only one specified id. For instance, a
+simple face *detector* (ie, not performing face identification) can published a
+message like:
+
+.. code:: python
+
+  {face_id: 'ff424', body_id: '', voice_id: '', person_id: '' confidence: 0.0, }
+
+to indicate that the face ``ff424`` has been detected, and thus, a corresponding
+person must exist. That person will be published as ``anonymous``, and that
+message will have lower precedence if another message associate that face to a
+recognised person. Note that in that case, the confidence is ignored.
 
 Identifier Syntax
 -----------------
