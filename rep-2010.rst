@@ -104,12 +104,15 @@ So, if you have rosbag2 publishing ``Temperature`` messages and a program consum
 The "transfer function" can be user-defined, or for simple changes (like changing the field type to a compatible type) it can be done automatically.
 We already do something like this for the ROS 1 to ROS 2 bridge in order to handle changes between message types in ROS 1 and ROS 2, and something like this was also done for rosbags in ROS 1 with the "bag migration rules" feature.
 
+Furthermore, the "transfer function" approach also allows for runtime transformation of messages that only change in field semantics (e.g., a change of ``float distance`` to mean centimeters instead of meters, but with no change in field name or type.) Although in those cases, users will likely have to define the transfer function themselves.
+
 .. TODO:: cite the above
 
 This approach requires a few features, like the ability to have a single application read old and new versions of a message at the same time, and it requires more infrastructure and tooling to make it work, but it has the advantage of keeping both the publishing and subscribing code simple, i.e agnostic to the fact that there are other versions of the message, and it keeps the message type from being cluttered with vestigial fields.
 
 Either way, a problem can usually be solved by changing a message in some of, if not all, of the of the above mentioned ways, and is often influenced by what the underlying technology allows for or encourages.
 ROS 2 has special considerations on this topic because it can support different serialization technologies, though CDR is the default and most common right now, and those technologies have different capabilities.
+
 It is neither desirable to depend on features of a specific technology, therefore tying ROS 2 to a specific technology, nor is it desirable suggest patterns that rely on features that only some serialization technologies provide, again tying ROS 2 to some specific technologies through their features.
 
 We will require some features from the middleware and serialization technology, however, to handle evolving interfaces, but we should try to choose approaches which give ROS 2 the broadest support across middleware implementations, ideally while not limiting users from using specific features of the underlying technology when that suites them.
@@ -158,6 +161,7 @@ Type Version Hash
 ~~~~~~~~~~~~~~~~~
 
 The type version hashes are not sequential and do not imply any rank among versions of the type. That is, given two version hashes of a type, there is no way to tell which is "newer".
+
 The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
 Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
 
@@ -173,6 +177,8 @@ The data structure includes:
 The resulting data structure is hashed using a standard SHA-1 method, resulting in a standard 160-bit (20-byte) hash value which is also generally known as a "message digest".
 This hash is combined with a "type version hash standard version", the first of which will be ``IDLHASH-1``, with an ``@`` symbol, resulting in a complete type version hash like ``IDLHASH-1@<160-bit SHA-1 of data structure>``.
 This allows the tooling to know if a hash mismatch is due to a change in this standard (what is being hashed) or due to a difference in the interface types themselves.
+
+Notably, the user-defined interface version being included in the hash allows for messages that only change in field semantics (i.e., without changing field names or types) to be picked up as discrepancies when they would not before, allowing users to be prompted to write "transfer functions" to resolve them.
 
 .. TODO:: is the list of field names and types sufficient? how to capture things like .idl annotations, etc... I'm thinking of serialization format specific entries can be added to this data structure, but need to sketch it out a bit more
 
