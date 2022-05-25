@@ -775,13 +775,9 @@ The ``person_<personID>`` frame has a slightly more complex semantic and
 must be interpreted in conjunction with the person's ``location_confidence``
 value (see `Persons`_ topics).
 
-We can distinguish four cases:
+We can distinguish three cases:
 
-1. The person has not yet been identified, no ``personID`` has been
-   assigned yet. In that case, no TF frame is published. In other words,
-   **the TF frame** ``person_<personID>`` can only exist once the person
-   has been recognised.
-2. The human is currently being tracked (ie ``personID`` is set, and at
+1. The human is currently being tracked (ie ``personID`` is set, and at
    least one of ``faceID`` or ``bodyID`` is set). In this case,
    ``location_confidence`` MUST be set to 1 and:
 
@@ -793,7 +789,7 @@ We can distinguish four cases:
   -  if both the face and body IDs are defined, the ``person_<personID>``
      frame must be collocated with the ``face_<faceID>`` frame.
 
-3. The human is not seen, but has been previously seen. In this case,
+2. The human is not seen, but has been previously seen. In this case,
    ``location_confidence`` MUST be set to a value ``< 1``
    and a ``person_<personID>`` TF frame MUST be published **as long as**
    ``location_confidence > 0``. Simple implementations
@@ -803,7 +799,7 @@ We can distinguish four cases:
    might slowly decrease ``location_confidence`` over time
    to represent the fact that the human might have walked away, for
    instance.
-4. The human is known, but has never been seem before. In this case,
+3. The human is known, but has never been seen before. In this case,
    ``location_confidence`` MUST be set to ``0``, and no TF
    frame should be broadcast.
 
