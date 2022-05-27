@@ -262,6 +262,12 @@ Global Parameters
   `Kinematic Model of the Human`_ for details.
 - ``/human/match_threshold`` (``float``, default: 0.5): the minimum level of
   likelihood to consider a face/body/voice to belong to a given person.
+- ``/humans/reference_frame`` (``string``, default: `map`): persons' TF frames
+  must be published with respect to `reference_frame`. Typically,
+  faces/bodies/voices frames are published wrt to their respective sensors
+  frame.  `reference_frame` is usually a 'static' frame (eg `map`), so that if
+  the person moves out of view of the robot (and therefore, its position can not
+  be updated anymore), it 'stays' where it was last seen.
 
 Topics Structure
 ================
