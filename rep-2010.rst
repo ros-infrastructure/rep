@@ -228,8 +228,8 @@ Security
 Enabling service introspection creates more attack surface for an existing ROS system by adding 2*N more topics (where N is the number of services with the feature enabled).
 These topics are vulnerable to undesired actors listening in on service communication or even interfering with parts of the system they may be relying on service events.
 
-Luckily, we can leverage the existing security feature for topics in ROS 2 [7]_.
-Any existing tooling for aiding users
+Luckily, we can leverage the existing security feature for topics in ROS 2 (see SROS 2 [7]_).
+Any existing tooling for aiding users in setting up ROS security should consider the new service event topics (e.g. NoDL [8]_).
 
 Command line interface
 ----------------------
@@ -287,6 +287,9 @@ References
 
 .. [7] SROS 2
    (https://github.com/ros2/sros2)
+
+.. [8] NoDL
+   (https://github.com/ubuntu-robotics/nodl)
 
 
 Copyright
