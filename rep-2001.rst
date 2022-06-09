@@ -45,6 +45,7 @@ We define various entry points for ROS users.
  * `perception`: The `perception` variant includes packages commonly used for perception capabilities.
  * `simulation`: The `simulation` variant includes packages that are needed for automated simulation,
    without extra debugging tools.
+ * `dev_tools`: The `dev_tools` variant provides the commonly used libraries for compiling ROS 2 code from source, e.g. `colcon`.
 
 
 Institution-specific and robot-specific
@@ -763,6 +764,16 @@ Simulation
       extends:  [ros_base]
       packages: [ros_ign_bridge, ros_ign_gazebo, ros_ign_image, ros_ign_interfaces]
 
+Dev Tools
+"""""""""
+
+::
+
+  - dev_tools:
+      packages: [python3-colcon-common-extensions, python3-flake8, python3-pip,
+                 python3-pytest, python3-pytest-cov, python3-rosdep, python3-setuptools,
+                 python3-vcstool, cmake, git, wget]
+
 Desktop Full
 """"""""""""
 
@@ -770,7 +781,7 @@ Desktop Full
 
   - desktop_full:
       extends:  [desktop]
-      packages: [perception, simulation, ros_ign_gazebo_demos]
+      packages: [perception, simulation, ros_ign_gazebo_demos, dev_tools]
 
 
 References
