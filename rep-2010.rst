@@ -1,0 +1,305 @@
+REP: 2010
+Title: Service Introspection
+Author: Jacob Perron <jacob@openrobotics.org>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 07-Jun-2022
+Post-History:
+
+Abstract
+========
+
+This REP proposes a feature to introspect ROS services during runtime.
+The feature allows users to remotely monitor service requests and responses.
+
+
+Terminology
+===========
+
+:Service:
+  A ROS service.
+  Accepts requests from clients and sends responses.
+:Client:
+  A ROS service client.
+  Sends requests to services and receives responses.
+:Request:
+  A ROS service request.
+:Response:
+  A ROS service response.
+
+
+Motivation
+==========
+
+The primary motivation for this proposal is to make it easier for users to externally validate that services are operating as expected.
+Drawing an analogy to ROS topics, there exists tools and libraries for "echoing" and recording messages sent over a topic, and we would like to see the same kind of capabilities for services.
+Specifically, we want the capability to introspect requests and responses that are sent to and from services and clients.
+Being able to remotely monitor services allows users to more effectively troubleshoot issues in a ROS system.
+For example, we could verify requests are being received by a service by employing a command-line tool during runtime.
+Or, we could post-process recorded requests and responses to validate their content.
+
+There are additional features that could leverage this proposal, such as:
+
+- Playback of recorded services (for example, from a rosbag [1]_)
+- Introspection of ROS actions, which are built on services
+- Validation of a live ROS system by referencing a recording from a previous session
+
+Though this proposal focuses on the core feature of introspecting requests and responses, we want to keep the design flexible so additional features like those listed above can be implemented in the future.
+
+
+Specification
+=============
+
+Publishing Service Events
+-------------------------
+
+Whenever a request or response is sent or received, a *service event* message will be published to a topic.
+Services are responsible for publishing a message when they receive a request and when they send a response.
+Likewise, clients are responsible for publishing a message when they send a request and when they receive a response.
+Therefore, we have a total of four possible events:
+
+:Request Sent:
+  Emitted from a client after sending a request to a service.
+:Request Received:
+  Emitted from a service after receiving a request from a client.
+:Response Sent:
+  Emitted from a service after sending a response to a client.
+:Response Received:
+  Emitted from a client after receiving a response from a service.
+
+Request event messages shall be published to the hidden topic ``/SERVICE_NAME/_request_event``, where ``SERVICE_NAME`` is the fully-qualified name of the service.
+Similarly, response event messages shall be published to the hidden topic ``/SERVICE_NAME/_response_event``.
+
+By publishing service event messages to predetermined topics, tools and libraries are able to subscribe to these topics to inspect the flow of data between services.
+
+Service Event Definitions
+-------------------------
+
+For each service definition, ``my/srv/Foo``, we define two new ROS message types using the ROS IDL specification [2]_:
+
+:my/msg/Foo_RequestEvent:
+  This type communicates a request sent or request received event.
+
+  .. code-block::
+
+     # Indicates this request event was emitted from a client
+     int8 REQUEST_SENT     = 0
+
+     # Indicates this request event was emitted from a service
+     int8 REQUEST_RECEIVED = 1
+
+     # Whether this is a REQUEST_SENT or REQUEST_RECEIVED event.
+     uint8 request_type
+
+     # Timestamp for when the event occurred (sent or received time)
+     builtin_interfaces/Time stamp
+
+     # Unique identifier for the client that sent the request
+     # Note, this is only unique for the current session
+     unique_identifier_msgs/msg/UUID client_id
+
+     # Sequence number for the request
+     # Combined with the client ID, this creates a unique ID for the request
+     int64 sequence_number
+
+     # The actual request content sent or received
+     # Setting this field is optional
+     my/srv/Foo_Request request
+
+:my/msg/Foo_ResponseEvent:
+  This type communicates a response sent or response received event.
+
+  .. code-block::
+
+     # Indicates this response event was emitted from a client
+     int8 RESPONSE_SENT     = 0
+
+     # Indicates this response event was emitted from a service
+     int8 RESPONSE_RECEIVED = 1
+
+     # Whether this is a RESPONSE_SENT or RESPONSE_RECEIVED event.
+     uint8 response_type
+
+     # Timestamp for when the event occurred (sent or received time)
+     builtin_interfaces/Time stamp
+
+     # Unique identifier for the client that sent the request associated with this response
+     # Note, this is only unique for the current session
+     unique_identifier_msgs/msg/UUID client_id
+
+     # Sequence number for the request associated with this response
+     # Combined with the client ID, this creates a unique ID for the request
+     int64 sequence_number
+
+     # The actual response content sent or received
+     # Setting this field is optional
+     my/srv/Foo_Response response
+
+Note, we put the service event definitions into the ``msg`` namespace, as this expected for message interface types in many libraries and tools in the ROS ecosystem.
+
+The service event definitions are generated as part of the rosidl pipeline [3]_.
+
+Timestamp
+^^^^^^^^^
+
+Timestamps represent the time at which the event occurred.
+I.e. they are set to the time directly after a request or response is sent or received.
+
+Timestamps shall respect ROS time [4]_.
+This means by default they will by set with wall-time.
+If simulation time is enabled by the node implementing the service or client, then timestamps will get their time from the ``/clock`` topic.
+
+Client ID and sequence number
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Both the client ID and sequence number are provided by the ROS middleware [5]_.
+They can be accessed from ``rcl`` [6]_ when taking a request or response for a service or client respectively.
+
+Example
+^^^^^^^
+
+For example, consider a service ``example_interfaces/srv/AddTwoInts`` defined as follows:
+
+.. code-block::
+
+   int64 a
+   int64 b
+   ---
+   int64 sum
+
+The following service event message definitions are generated when building the ``example_interfaces`` package (comments elided for brevity):
+
+:example_interfaces/msg/AddTwoInts_RequestEvent:
+
+.. code-block::
+
+   int8 REQUEST_SENT     = 0
+   int8 REQUEST_RECEIVED = 1
+
+   uint8 request_type
+
+   builtin_interfaces/Time stamp
+
+   unique_identifier_msgs/msg/UUID client_id
+
+   int64 sequence_number
+
+   example_interfaces/srv/AddTwoInts_Request request
+
+:example_interfaces/msg/AddTwoInts_ResponseEvent:
+
+.. code-block::
+
+   int8 RESPONSE_SENT     = 0
+   int8 RESPONSE_RECEIVED = 1
+
+   uint8 response_type
+
+   builtin_interfaces/Time stamp
+
+   unique_identifier_msgs/msg/UUID client_id
+
+   int64 sequence_number
+
+   example_interfaces/srv/AddTwoInts_Response response
+
+The definition for ``example_interfaces/srv/AddTwoInts_Request`` is,
+
+.. code-block::
+
+   int64 a
+   int64 b
+
+And the definitions for ``example_interfaces/srv/AddTwoInts_Reponse`` is,
+
+.. code-block::
+
+   int64 sum
+
+Configuration
+-------------
+
+TODO: Describe what configuration options there are and how we plan to expose them (e.g. with ROS parameters and/or environment variables).
+
+Security
+--------
+
+Enabling service introspection creates more attack surface for an existing ROS system by adding 2*N more topics (where N is the number of services with the feature enabled).
+These topics are vulnerable to undesired actors listening in on service communication or even interfering with parts of the system they may be relying on service events.
+
+Luckily, we can leverage the existing security feature for topics in ROS 2 [7]_.
+Any existing tooling for aiding users
+
+Command line interface
+----------------------
+
+TODO: Consider proposing an interface for a CLI here. Although it seems a bit tangent to the core feature, I think it is important to the proposal since it makes it so people can immediately start using the feature.
+
+Rationale
+=========
+
+Only supporting one service per name
+------------------------------------
+
+TODO
+
+Separate request and response events instead of single service event
+--------------------------------------------------------------------
+
+TODO
+
+Optional content
+----------------
+
+TODO
+
+Backwards Compatibility
+=======================
+
+TODO
+
+Feature Progress
+================
+
+TODO
+
+References
+==========
+
+.. [1] rosbag2
+   (https://github.com/ros2/rosbag2)
+
+.. [2] ROS interface definitions
+   (https://design.ros2.org/articles/legacy_interface_definition.html)
+
+.. [3] ROS IDL pipeline
+   (https://github.com/ros2/rosidl)
+
+.. [4] ROS Time
+   (https://design.ros2.org/articles/clock_and_time.html)
+
+.. [5] RMW
+   (https://github.com/ros2/rmw)
+
+.. [6] rcl
+   (https://github.com/ros2/rcl)
+
+.. [7] SROS 2
+   (https://github.com/ros2/sros2)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
