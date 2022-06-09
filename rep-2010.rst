@@ -235,6 +235,10 @@ Command line interface
 ----------------------
 
 TODO: Consider proposing an interface for a CLI here. Although it seems a bit tangent to the core feature, I think it is important to the proposal since it makes it so people can immediately start using the feature.
+We can have a tool like ``ros2 service echo example_interfaces/srv/AddTwoInts`` that internally subscribes to the two hidden topics ``example_interfaces/srv/AddTwoInts_RequestEvent`` and
+``example_interfaces/srv/AddTwoInts_ResponseEvent`` and echoes them. It should also support additional command line parameters used for topics, like ``--filter, --no-arr, --no-str, --include-msg-info``, etc.
+
+One additional parameter that can be included is ``--response-time``, which should print the delay between the time the client sent the request and the server sent the response.
 
 Rationale
 =========
