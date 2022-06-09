@@ -84,10 +84,10 @@ For each service definition, ``my/srv/Foo``, we define two new ROS message types
   .. code-block::
 
      # Indicates this request event was emitted from a client
-     int8 REQUEST_SENT     = 0
+     unt8 REQUEST_SENT     = 0
 
      # Indicates this request event was emitted from a service
-     int8 REQUEST_RECEIVED = 1
+     unt8 REQUEST_RECEIVED = 1
 
      # Whether this is a REQUEST_SENT or REQUEST_RECEIVED event.
      uint8 request_type
@@ -113,10 +113,10 @@ For each service definition, ``my/srv/Foo``, we define two new ROS message types
   .. code-block::
 
      # Indicates this response event was emitted from a client
-     int8 RESPONSE_SENT     = 0
+     unt8 RESPONSE_SENT     = 0
 
      # Indicates this response event was emitted from a service
-     int8 RESPONSE_RECEIVED = 1
+     unt8 RESPONSE_RECEIVED = 1
 
      # Whether this is a RESPONSE_SENT or RESPONSE_RECEIVED event.
      uint8 response_type
@@ -174,8 +174,8 @@ The following service event message definitions are generated when building the 
 
 .. code-block::
 
-   int8 REQUEST_SENT     = 0
-   int8 REQUEST_RECEIVED = 1
+   unt8 REQUEST_SENT     = 0
+   unt8 REQUEST_RECEIVED = 1
 
    uint8 request_type
 
@@ -191,8 +191,8 @@ The following service event message definitions are generated when building the 
 
 .. code-block::
 
-   int8 RESPONSE_SENT     = 0
-   int8 RESPONSE_RECEIVED = 1
+   unt8 RESPONSE_SENT     = 0
+   unt8 RESPONSE_RECEIVED = 1
 
    uint8 response_type
 
