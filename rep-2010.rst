@@ -101,8 +101,8 @@ So, if you have rosbag2 publishing ``Temperature`` messages and a program consum
 The "transfer function" can be user-defined, or for simple changes (like changing the field type to a compatible type) it can be done automatically.
 We already do something like this for the ROS 1 to ROS 2 bridge in order to handle changes between message types in ROS 1 and ROS 2, and something like this was also done for rosbags in ROS 1 with the "bag migration rules" feature.
 
-Furthermore, the "transfer function" approach also allows for conversions between messages which are only semantically different (e.g., a change in semantics for a field ``float distance`` to mean centimeters instead of meters, but with no change in field name or type).
-However, the user would have to write the transfer function for these changes, because it could not be made automatically as they are not captured in a structured way.
+Furthermore, the "transfer function" approach also allows for runtime transformation of messages that only change in field semantics (e.g., a change of ``float distance`` to mean centimeters instead of meters, but with no change in field name or type).
+Although in those cases, users will likely have to define the transfer function themselves.
 
 .. TODO:: cite the above
 
@@ -175,7 +175,7 @@ The resulting data structure is hashed using a standard SHA-1 method, resulting 
 This hash is combined with a "type version hash standard version", the first of which will be ``IDLHASH-1``, with an ``@`` symbol, resulting in a complete type version hash like ``IDLHASH-1@<160-bit SHA-1 of data structure>``.
 This allows the tooling to know if a hash mismatch is due to a change in this standard (what is being hashed) or due to a difference in the interface types themselves.
 
-The optional user-defined interface version included in the hash allows the user to indicate that there was a change in message semantics (i.e. no change in the field names or types), causing the versions to mismatch and allowing the user to write a "transfer functions" to resolve the semantic differences.
+The user-defined interface version makes it possible to change the version of a message that only changed in "field semantics" (i.e. without changing field names or types), and therefore makes it possible to write "transfer functions" to handle semantic-only conversions between versions.
 
 .. TODO:: is the list of field names and types sufficient? how to capture things like .idl annotations, etc... I'm thinking of serialization format specific entries can be added to this data structure, but need to sketch it out a bit more
 
@@ -218,10 +218,105 @@ TODO
 
 .. TODO:: move the draft section with details here after one of these options is selected: USER_DATA+ignore, USER_DATA+discovery "plugin", append type hash to type name in DDS, use type hash in DDS partition
 
-Inter-process Type Description Distribution
--------------------------------------------
+Type Description Distribution
+-----------------------------
 
-.. TODO:: move the draft section over, and make a selection between: telnet/http server per context/participant under rmw layer, service per context/participant under rmw layer, telnet/http server per node under rmw layer, service per node above rmw layer, or some combination with way to configure which should be used.
+For some use cases the type version hash is insufficient and instead the full type description is required.
+
+One of those use cases, which is also described in this REP, is "runtime type introspection", which is the ability to introspect the contents of a message at runtime when the description for that message, or that version of that message, was unavailable at compile time.
+In this use case the type description is used to interpret the serialized data dynamically.
+
+Another use case, which is not covered in this REP, is using the type description in tooling to either display the type description to the user or to include it in recordings like rosbags.
+
+In either case, where the type description comes from doesn't really matter, and so, for example, it could be looked up on the local filesystem or read from a rosbag file.
+However, in practice, the correct type description may not be found locally, especially in cases where you have different versions of messages in the same system, either because it's on another computer or perhaps because it is from a different distribution of ROS or was built in a different workspace.
+
+So, it is useful to have a mechanism to convey the type descriptions from the source of the data to other nodes, which we describe here as "type description distribution".
+Furthermore, this feature should be agnostic to the underlying middleware and serialization library.
+
+Sending the Type Description
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. TODO:: should each publisher be contacted for each type/version pair or should we assume that the type/version pair guarantees a unique type description?
+
+Type descriptions will be provided by a ROS Service (``~/_get_type_description``) on each node.
+There will be a single ROS service per node, regardless of the number of publishers or subscriptions on that node.
+
+.. TODO:: should this service be required/optional?
+
+A service request to this ROS Service will comprise of the type name and the type version hash, which is distributed during discovery of endpoints and will be accessible through the ROS API.
+The service server will respond with the type description and any necessary metadata needed to do runtime type introspection.
+This service is not expected to be called frequently, and is likely to only occur when new topic or service endpoints are created, and even then, only if the endpoint type hashes do not match.
+
+Type Description Contents and Format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The response sent by the service server will contain a combination of the original ``idl`` or ``msg`` file's content, as well as any necessary information to serialize and deserialize the raw message buffers sent on the topic.
+The response will contain a version of the description that contains comments from the original type description, as those might be relevant to interpreting the semantic meaning of the message fields.
+
+Additionally, the response could include the serialization library used, its version, or any other helpful information from the original producer of the data.
+
+All of this type description information will be sent as a ROS 2 service response, as the nodes in the previous section will be queried on the ROS layer.
+
+.. TODO:: What happens if the message consumer doesn't have access to the serialization library stated in the meta-type?
+
+The ROS 2 message that defines the type description must be able to describe any message type, including itself, and since it is describing the message format, it should work independently from any serialization technologies used.
+This "meta-type description" message would then be used to communicate the structure of the type as part of the "get type description" service response.
+The final form of these interfaces should be found in the reference implementation, but such a Service interface might look like this:
+
+.. code::
+
+    string type_name
+    string version_hash
+    ---
+    bool successful  # True if the type description information is available and populated in the response
+    string failure_reason  # Empty if 'successful' was true, otherwise contains details on why it failed
+
+    string type_description_raw  # The idl or msg file, with comments and whitespace
+    TypeDescription type_description  # The parse type description which can be used programmatically
+
+    string serialization_library
+    string serialization_version
+    # ... other useful meta data
+
+Again, the final form of these interfaces should be referenced from the reference implementation, but the ``TypeDescription`` message type might look like this:
+
+.. code::
+
+    IndividualTypeDescription type_description
+    IndividualTypeDescription[] referenced_type_descriptions
+
+And the ``IndividualTypeDescription`` type:
+
+.. code::
+
+    FIELD_TYPE_INT = 0
+    FIELD_TYPE_DOUBLE = 1
+    # ... and so on
+
+    uint8_t[] field_types
+    string[] field_names
+
+These naive examples of the interfaces just give an idea of the structure but perhaps do not yet consider some other complications like field annotations and more advanced IDL (generically all "interface description languages" not just the OMG-IDL that DDS uses) have.
+
+.. TODO:: Should we use strings instead of integer enum for the ``field_types``?
+
+
+Additional Notes for TypeDescription Message Type
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Given that the type description message interface has to be generic enough to support anything described in the ROS interfaces, there will be a need to add or remove fields over time in the type description message itself.
+This should be done in such a way that the fields are tick-tocked and deprecated properly, possibly by having explicitly named versions of this interface, e.g. ``TypeDescriptionV1`` and ``TypeDescriptionV2`` and so on.
+
+Implementation in the `rcl` Layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The implementation of the type description distribution feature will be made in the ``rcl`` layer as opposed to the ``rmw`` layer to take advantage of the abstraction away from the middleware and to allow for compatibility with the client libraries.
+
+A hook will be added to ``rcl_node_init()`` to initialize the type description distribution service with the appropriate ``rcl_service_XXX()`` functions.
+This hook should also keep a map of published and subscribed types which will be populated on each initialization of a publisher or subscription in the respective ``rcl_publisher_init()`` and ``rcl_subscription_init()`` function calls.
+The passed ``rosidl_message_type_support_t`` in the init call can be introspected with getter functions to obtain the relevant information, alongside any new methods added to support type version hashing.
+
 
 Runtime Type Introspection
 --------------------------
@@ -234,6 +329,45 @@ Rationale
 =========
 
 TODO
+
+Type Description Distribution
+-----------------------------
+
+Using a Single ROS Service per Node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The node that is publishing the data must already have access to the correct type description, at the correct version, in order to publish it, and therefore it is natural to get the data from that node.
+Similarly, a subscribing node also knows what type they are wanting to receive, both in name and version, and therefore it is again natural to get that information from the subscribing node.
+The type description for a given type, at a given version, could have been retrieved from other places, e.g. a centralized database, but the other alternatives considered would have had to take care to ensure that it had the right version of the message, which is not the case for the node publishing the data.
+
+Because the interface for getting a type description is generic, it is not necessary to have this interface on a per entity, i.e. publisher, subscription, etc, basis, but instead to offer the ROS Service on a per node basis to reduce the number of ROS Services.
+Therefore, the specification dictates that the type description is distributed by single ROS Service for each individual node.
+
+There were also multiple alternatives for how to get this information from each node, but the use of a single ROS Service was selected because the task of requesting the type description from a node is well suited to a request-response style ROS Service.
+Some of the alternatives offered other benefits, but using a ROS Service introduced the fewest dependencies, feature-wise, while accomplishing the task.
+
+.. TODO:: cite the above, https://en.wikipedia.org/wiki/Request%E2%80%93response
+
+Combining the Raw and Parsed Type Description in the Service Response
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The contents of the "get type description" service response should include information that supports both aforementioned use cases (i.e. tools and runtime type introspection).
+These use cases have orthogonal interests, with the former requiring human-readable descriptions, and the latter preferring machine-readable descriptions.
+
+Furthermore, the type description should be useful even across middlewares and serialization libraries and that makes it especially important to send at least the original inputs to the "type support pipeline" (i.e. the process of taking user-defined types and generating all supporting code).
+In this case, because the "type support pipeline" is a lossy process, there is a need to ensure that enough information is sent to completely reproduce the original definition of the type, and therefore it makes sense to just send the original ``idl`` or ``msg`` file.
+
+At the same time, it is useful to send information with the original description that makes it easier to process data at the receiving end, as it is often not trivial to get to the "parsed" version of the type description from the original text description.
+
+Finally, while there could be an argument for sending a losslessly compressed version of the message file, the expected low frequency of queries to the type description service incurs a negligible overhead that heavily reduces the benefit.
+
+Implementing in ``rcl`` versus ``rmw``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While it is true that implementing the type description distribution on the ``rmw`` layer would allow for much lower level optimization, removing the layer of abstraction avoids having to implement this feature in each rmw implementation.
+
+Given that the potential gains from optimization will be small due to how infrequently the service is expected to be called, this added development overhead was determined to not be worth it.
+Instead the design prefers to have a unified implementation of this feature in ``rcl`` so it is agnostic to any middleware implementations and client libraries.
 
 Alternatives
 ------------
@@ -253,6 +387,37 @@ TODO
 Prevent Communication of Mismatched Versions "Above" rmw Layer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TODO
+
+Type Description Distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Other Providers of Type Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Several other candidate strategies for distributing the type descriptions were considered but ultimately discarded for one or more reasons like: causing a strong dependency on a particular middleware or a third-party technology, difficulties with resolving the message type description locally, difficulties with finding the correct entity to query, or causing network throughput issues.
+
+These are some of the candidates that were considered, and the reasons for their rejection:
+
+- Store the type description as a ROS parameter
+   * Causes a mass of parameter event messages being sent at once on init, worsening the network initialization problem
+- Store the type description on a centralized node per machine
+   * Helps reduce network bandwidth, but makes it non-trivial to find the correct centralized node to query, and introduces issues of resolving the local message package, such as when nodes are started from different sourced workspaces.
+- Send type description alongside discovery with middlewares
+   * Works very well if supported, but is only supported by some DDS implementations (which support XTypes or some other way to attach discovery metadata), but causes a strong dependency on DDS.
+- Send type description using a different network protocol
+   * Introduces additional third-party dependencies separate from ROS and the middleware.
+
+Alternative Type Description Contents and Format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A combination of the original ``idl`` / ``msg`` file and any other information needed for serialization and deserialization being sent allows for one to cover the weaknesses of the other.
+Specifically, given that certain use-cases (e.g., ``rosbag``) might encounter situations where consumers of a message are using a different middleware or serialization scheme the message was serialized with, it becomes extremely important to send enough information to both reconstruct the type support, and also allow the message fields to be accessed in a human readable fashion to aid in the writing of transfer functions.
+As such, it is not a viable option to only send one or the other.
+
+Additionally, the option to add a configuration option to choose what contents to receive from the service server was disregarded due to how infrequently the type description query is expected to be called.
+
+As for the format of the type description, using the ROS interfaces to describe the type, as opposed to an alternative format like XML, JSON, or something like the TypeObject defined by DDS-XTypes, makes it easier to embed in the ROS Service response.
+It also prevents unnecessary coupling with third-party specifications that could be subject to change and reduces the formats that need to be considered on the receiving end of the ROS Service call.
 
 
 Backwards Compatibility
