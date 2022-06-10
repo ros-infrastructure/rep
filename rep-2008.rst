@@ -2,10 +2,10 @@ REP: 2008
 Title: ROS 2 Hardware Acceleration Architecture and Conventions
 Author: Víctor Mayoral-Vilches <victor@accelerationrobotics.com>
 Status: Active
-Type: Informational
+Type: Standards Track
 Content-Type: text/x-rst
 Created: 10-Aug-2021
-Post-History: 18-April-2022
+Post-History: 10-June-2022
 
 
 Abstract
@@ -85,7 +85,7 @@ Architecture pillars
 
 Pillar I - Extensions to ament
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The first pillar represents extensions of the ``ament`` ROS 2 build system. These CMake extensions help achieve the objective of simplifying the creation of acceleration kernels. By providing an experience and a syntax similar to other ROS 2 libraries targeting CPUs, maintainers will be able to integrate kernels into their packages easily. The ``ament_acceleration`` ROS 2 package abstracts the build system extensions from technology-specific frameworks and software platforms. This allows to easily support hardware acceleration across FPGAs and GPUs while using the same syntax, simplifying the work of maintainers. The code listing below provides an example that instructs the ``CMakeLists.txt`` file of a ROS 2 package to build a ``vadd`` kernel with the corresponding sources and configuration:
+The first pillar represents extensions of the ``ament`` ROS 2 build system. These CMake extensions help achieve the objective of simplifying the creation of acceleration kernels. By providing an experience and a syntax similar to other ROS 2 libraries targeting CPUs, maintainers will be able to integrate kernels into their packages easily. The `ament_acceleration <https://github.com/ros-acceleration/ament_acceleration/>`_ ROS 2 package abstracts the build system extensions from technology-specific frameworks and software platforms. This allows to easily support hardware acceleration across FPGAs and GPUs while using the same syntax, simplifying the work of maintainers. The code listing below provides an example that instructs the ``CMakeLists.txt`` file of a ROS 2 package to build a ``vadd`` kernel with the corresponding sources and configuration:
 
 ::
 
@@ -713,10 +713,15 @@ The chart below compares Quality Levels 1 through 5 relative to the 'Level 1' re
 
 
 
+Backwards Compatibility
+=======================
+The proposed features and conventions add new functionality while not modifying existing functionality.
+
+
 Reference Implementation and recommendations
 ============================================
 
-Reference implementations complying with this REP and extending the ROS 2 build system and tools for hardware acceleration are available at the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_. This includes also the abstraction layer ``ament_acceleration`` and firmware from vendor specializalizations like `ament_vitis <https://github.com/ros-acceleration/ament_vitis/>`_.
+Reference implementations complying with this REP and extending the ROS 2 build system and tools for hardware acceleration are available at the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_. This includes also the abstraction layer `ament_acceleration <https://github.com/ros-acceleration/ament_acceleration/>`_ and firmware from vendor specializalizations like `ament_vitis <https://github.com/ros-acceleration/ament_vitis/>`_. A paper describing in more detail the reference implementation is available at [11]_.
 
 For additional implementations and recommendations, check out the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_.
 
@@ -851,11 +856,14 @@ References and Footnotes
 .. [8] Acceleration Robotics, "Hardware accelerated ROS 2 pipelines and towards the Robotic Processing Unit (RPU)".
    https://news.accelerationrobotics.com/hardware-accelerated-ros2-pipelines/
 
-.. [9] Mayoral-Vilches, V., & Corradi, G. (2021). Adaptive computing in robotics, leveraging ros 2 to enable software-defined hardware for fpgas. 
+.. [9] Mayoral-Vilches, V., & Corradi, G. (2021). "Adaptive computing in robotics, leveraging ros 2 to enable software-defined hardware for fpgas". 
    https://www.xilinx.com/support/documentation/white_papers/wp537-adaptive-computing-robotics.pdf
 
-.. [10] Mayoral-Vilches, V. (2021). Kria Robotics Stack.
+.. [10] Mayoral-Vilches, V. (2021). "Kria Robotics Stack".
    https://www.xilinx.com/content/dam/xilinx/support/documentation/white_papers/wp540-kria-robotics-stack.pdf
+
+.. [11] Mayoral-Vilches, V., Neuman, S. M., Plancher, B., & Reddi, V. J. (2022). "RobotCore: An Open Architecture for Hardware Acceleration in ROS 2".
+   https://arxiv.org/pdf/2205.03929.pdf
 
 
 Copyright
