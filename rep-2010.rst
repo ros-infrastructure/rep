@@ -234,7 +234,10 @@ Any existing tooling for aiding users in setting up ROS security should consider
 Command line interface
 ----------------------
 
-TODO: Consider proposing an interface for a CLI here. Although it seems a bit tangent to the core feature, I think it is important to the proposal since it makes it so people can immediately start using the feature.
+The existing ``ros2 service`` tool can be extended using an ``echo`` keyword to monitor service events.
+Internally, it would subscribe to the hidden topics and echo them.
+The existing command line parameters for topics can be extended to be used with this ``echo`` verb, along with new
+arguments on to filter message content and analyse delays.
 
 Rationale
 =========
@@ -262,7 +265,47 @@ TODO
 Feature Progress
 ================
 
-TODO
+Proposed command line usage example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Suppose we have a service named ``/add_two_ints`` of type ``example_interfaces/srv/AddTwoInts``.
+We can extend ``ros2 service`` with an ``echo`` verb such that it internally subscribes to the two hidden topics ``example_interfaces/srv/AddTwoInts_RequestEvent``, ``example_interfaces/srv/AddTwoInts_ResponseEvent`` and echoes them.
+
+For example,
+.. code-block::
+
+   $ ros2 service echo /add_two_ints
+   -----------------------
+   request_type: REQUEST_SENT
+   stamp: 1.00
+   client_id: 1234
+   sequence_number: 1
+   request:
+      a: 1
+      b: 2
+   -----------------------
+   request_type: REQUEST_RECEIVED
+   stamp: 1.10
+   client_id: 1235
+   sequence_number: 1
+   request:
+      a: 1
+      b: 2
+   -----------------------
+   request_type: RESPONSE_SENT
+   stamp: 1.20
+   client_id: 1235
+   sequence_number: 2
+   request:
+      sum: 3
+   -----------------------
+   request_type: RESPONSE_RECEIVED
+   stamp: 1.30
+   client_id: 1234
+   sequence_number: 2
+   request:
+      sum: 3
+   -----------------------
 
 References
 ==========
