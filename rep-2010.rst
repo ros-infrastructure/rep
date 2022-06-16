@@ -112,10 +112,10 @@ For each service definition, ``my/srv/Foo``, we define two new ROS message types
 
   .. code-block::
 
-     # Indicates this response event was emitted from a client
+     # Indicates this response event was emitted from a service
      uint8 RESPONSE_SENT     = 0
 
-     # Indicates this response event was emitted from a service
+     # Indicates this response event was emitted from a client
      uint8 RESPONSE_RECEIVED = 1
 
      # Whether this is a RESPONSE_SENT or RESPONSE_RECEIVED event.
