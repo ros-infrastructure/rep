@@ -70,6 +70,7 @@ Therefore, we have a total of four possible events:
 
 Request event messages shall be published to the hidden topic ``/SERVICE_NAME/_request_event``, where ``SERVICE_NAME`` is the fully-qualified name of the service.
 Similarly, response event messages shall be published to the hidden topic ``/SERVICE_NAME/_response_event``.
+Note that this implies that services must have unique names.
 
 By publishing service event messages to predetermined topics, tools and libraries are able to subscribe to these topics to inspect the flow of data between services.
 
@@ -84,12 +85,12 @@ For each service definition, ``my/srv/Foo``, we define two new ROS message types
   .. code-block::
 
      # Indicates this request event was emitted from a client
-     uint8 REQUEST_SENT     = 0
+     uint8 CLIENT_SENT     = 0
 
      # Indicates this request event was emitted from a service
-     uint8 REQUEST_RECEIVED = 1
+     uint8 SERVICE_RECEIVED = 1
 
-     # Whether this is a REQUEST_SENT or REQUEST_RECEIVED event.
+     # Whether this is a CLIENT_SENT or SERVICE_RECEIVED event.
      uint8 request_type
 
      # Timestamp for when the event occurred (sent or received time)
@@ -113,12 +114,12 @@ For each service definition, ``my/srv/Foo``, we define two new ROS message types
   .. code-block::
 
      # Indicates this response event was emitted from a service
-     uint8 RESPONSE_SENT     = 0
+     uint8 SERVICE_SENT     = 0
 
      # Indicates this response event was emitted from a client
-     uint8 RESPONSE_RECEIVED = 1
+     uint8 CLIENT_RECEIVED = 1
 
-     # Whether this is a RESPONSE_SENT or RESPONSE_RECEIVED event.
+     # Whether this is a SERVICE_SENT or CLIENT_RECEIVED event.
      uint8 response_type
 
      # Timestamp for when the event occurred (sent or received time)
@@ -138,11 +139,10 @@ For each service definition, ``my/srv/Foo``, we define two new ROS message types
 
 Note, we put the service event definitions into the ``msg`` namespace, as this expected for message interface types in many libraries and tools in the ROS ecosystem.
 
-The service event definitions are generated as part of the rosidl pipeline [3]_.
+The service event definitions are generated as part of the ``rosidl`` pipeline [3]_.
 
 Timestamp
 ^^^^^^^^^
-
 Timestamps represent the time at which the event occurred.
 I.e. they are set to the time directly after a request or response is sent or received.
 
@@ -152,7 +152,6 @@ If simulation time is enabled by the node implementing the service or client, th
 
 Client ID and sequence number
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 Both the client ID and sequence number are provided by the ROS middleware [5]_.
 They can be accessed from ``rcl`` [6]_ when taking a request or response for a service or client respectively.
 
@@ -220,7 +219,34 @@ And the definitions for ``example_interfaces/srv/AddTwoInts_Reponse`` is,
 Configuration
 -------------
 
-TODO: Describe what configuration options there are and how we plan to expose them (e.g. with ROS parameters and/or environment variables).
+Configuration of service introspection features will be done through ROS parameters.
+
+.. code-block:: yaml
+
+   /NODE_NAME:
+      ros__parameters:
+         
+         # Indicates if CLIENT_SENT and CLIENT_RECEIVED events will be published
+         SERVICE_NAME/client_events_enabled: bool
+
+         # Indicates if SERVICE_SENT and SERVICE_RECEIVED events will be published
+         SERVICE_NAME/service_events_enabled: bool
+         
+         # Indicates if request content will be included in CLIENT_SENT RequestEvent messages
+         SERVICE_NAME/_enable_client_sent_content: bool
+
+         # Indicates if request content will be included in SERVICE_RECEIVED RequestEvent messages
+         SERVICE_NAME/_enable_service_receive_content: bool
+
+         # Indicates if response content will be included in SERVICE_SENT RequestEvent messages
+         SERVICE_NAME/_enable_service_sent_content: bool
+
+         # Indicates if response content will be included in CLIENT_RECEIVED RequestEvent messages
+         SERVICE_NAME/_enable_client_receive_content: bool
+         
+         # Indicates if service introspection will be enabled for default services
+         _enable_default_service_introspection: bool 
+
 
 Security
 --------
@@ -231,47 +257,77 @@ These topics are vulnerable to undesired actors listening in on service communic
 Luckily, we can leverage the existing security feature for topics in ROS 2 (see SROS 2 [7]_).
 Any existing tooling for aiding users in setting up ROS security should consider the new service event topics (e.g. NoDL [8]_).
 
-Command line interface
-----------------------
-
-The existing ``ros2 service`` tool can be extended using an ``echo`` keyword to monitor service events.
-Internally, it would subscribe to the hidden topics and echo them.
-The existing command line parameters for topics can be extended to be used with this ``echo`` verb, along with new
-arguments on to filter message content and analyse delays.
 
 Rationale
 =========
 
+
+Using ROS Parameters for configuration
+--------------------------------------
+ROS parameters provide a well-known and supported way of interacting with node-level settings at various points in a node's lifecycle.
+An user may want to avoid the overhead of publishing service event messages during normal operation,
+so it is desirable to be able to enable service introspection features during runtime.
+There is existing tooling to work with parameters on a per-node basis such as the ``parameter_client`` API in ``rclcpp`` or ``rclpy`` as well as for groups of nodes in ``ros2 launch`` or all nodes using wildcards in ``YAML`` parameter files [10]_.
+This makes ROS parameters the ideal choice as opposed to using environment variables or some other custom implementation.
+
+
+Default Services
+----------------
+
+ROS 2 parameters are built on top of ROS 2 service/clients and already publish out to ``/parameter_events`` on parameter changes [11]_.
+As parameters can be set directly by the host as well as through the corresponding parameter service, the service introspection proposed by this REP would fail to capture a subset of parameter events.
+For this reason service introspection will be disabled by default for ROS 2 parameters in favour of ``/parameter_events``. 
+This behavior can be changed through `a parameter <Configuration_>`_ if desired.
+
+
 Only supporting one service per name
 ------------------------------------
+It is technically possible to create more than one service on a given name (though not recommended).
+This use case will not be supported since enabling service introspection in such a case would result in ambiguous behaviour.
 
-TODO
 
 Separate request and response events instead of single service event
 --------------------------------------------------------------------
 
-TODO
+Separate events for requests and responses will be published instead of a single service event or 
+publishing an unique event for clients and services (for a total of 4 event types).
+This is to best balance avoiding introducing additional topic surface area and complexity of consuming emitted introspection data. 
+Grouping events by request or response rather than by client or subscriber would also ease request/response tracing work.
+
+.. Concern: our enable flags are enable by serv/client but our messages are grouped via req/response. Could be confusing?
+
 
 Optional content
 ----------------
 
-TODO
+Duplicating request or response content will be optional as service response messages can be *very* large and flooding the ROS network with up to four copies of the same message can introduce undesirable load and latency.
+By default content will be included on ``REQUEST_SENT`` and ``RESPONSE_SENT``. 
+
 
 Backwards Compatibility
 =======================
 
-TODO
+Service introspection is a new feature which is not planned to impact any existing logic. 
+It is also an opt-in feature so there will be no additional incurred overhead by default.
+As always, code written to take advantage of this new feature will not be backwards compatible (at least regarding this feature) with versions of ROS 2 that do not have it implemented.
 
-Feature Progress
-================
 
-Proposed command line usage example
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Other
+=====
 
-Suppose we have a service named ``/add_two_ints`` of type ``example_interfaces/srv/AddTwoInts``.
-We can extend ``ros2 service`` with an ``echo`` verb such that it internally subscribes to the two hidden topics ``example_interfaces/srv/AddTwoInts_RequestEvent``, ``example_interfaces/srv/AddTwoInts_ResponseEvent`` and echoes them.
 
-For example,
+Tooling
+----------------------
+
+``ros2 service``
+^^^^^^^^^^^^^^^^
+The existing ``ros2 service`` tool can be extended using an ``echo`` keyword to monitor service events.
+Internally, it would subscribe to the `hidden topics <Publishing Service Events_>`_ and echo them.
+The existing command line parameters for topics can be extended to be used with this ``echo`` verb, along with new
+arguments on to filter message content and analyse delays.
+
+Building off the example with AddTwoInts discussed earlier, an example ``ros2 service echo`` call may look like the following:
+
 .. code-block::
 
    $ ros2 service echo /add_two_ints
@@ -307,6 +363,20 @@ For example,
       sum: 3
    -----------------------
 
+
+``ros2 bag``
+^^^^^^^^^^^^
+
+``rosbag2`` integration for service introspection will come more or less for free since the request/response events are simply being echoed through ROS 2 publishers.
+Syntactic sugar may be included to enable service introspection and record, e.g. ``ros2 bag record --enable-services``.
+
+Replaying service and client events
+-----------------------------------
+
+The design should support implementation of a tool for "replaying" service and client events. 
+For example, tooling may be developed to take the recorded event stream and replay requests and responses back into the ROS network.
+
+
 References
 ==========
 
@@ -334,6 +404,16 @@ References
 .. [8] NoDL
    (https://github.com/ubuntu-robotics/nodl)
 
+.. [9] Launch
+   (https://github.com/ros2/launch)
+
+.. [10] YAML parameter file wildcard
+   (https://docs.ros.org/en/rolling/Tutorials/Launch/Using-ROS2-Launch-For-Large-Projects.html#using-wildcards-in-yaml-files)
+
+.. [11] Parameter Events
+   (https://design.ros2.org/articles/ros_parameters.html)
+
+
 
 Copyright
 =========
@@ -349,3 +429,8 @@ This document has been placed in the public domain.
    fill-column: 70
    coding: utf-8
    End:
+
+
+
+
+
