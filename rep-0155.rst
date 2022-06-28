@@ -34,7 +34,7 @@ Rationale
 =========
 
 ROS is widely used in the context of human-robot interactions (HRI).
-However, to date, not a single effort (e.g. [1]_ [2]_) has been successful at
+However, to date, no single effort (e.g. [1]_ [2]_) has been successful at
 coming up with broadly accepted interfaces and pipelines for that domain, as
 found in other parts of the ROS ecosystem (for manipulation or 2D navigation for
 instance).
@@ -173,14 +173,15 @@ To cater for a broad range of applications (where re-identification might not be
 always necessary), there is no expectation that the face detector will attempt
 to recognise the face and re-assign the same face ID if the person re- appears.
 
-.. note:: It is however permissible for a face detector/face tracker to re-use
-   the same face ID if it is confident that the face if indeed the same.
+.. note:: A face detector/face tracker MAY re-use the same face ID if it is 
+   confident that the face if indeed the same.
 
 There is a one-to-one relationship between this face ID and the estimated 6D
-pose of the head, represented as a ROS TF frame named ``face_<faceID>`` (see
-section `Face and Gaze Frames`_ for the face frame conventions).
+pose of the head. If the node published a head pose estimated, the ROS TF frame
+MUST be named ``face_<faceID>`` (see section `Face and Gaze Frames`_ for the
+face frame conventions).
 
-At any given time, the list of tracked faces is published under the
+At any given time, the list of tracked faces SHOULD be published under the
 ``/humans/faces/tracked`` topic as ``hri_msgs/IdsList`` messages.
 
 Body Identifier
@@ -188,27 +189,26 @@ Body Identifier
 
 Similarly to the face identifier, the **body identifier** MUST be a unique ID,
 associated to a person’s skeleton.
-It is normally created by a skeleton tracker
-upon detection of a skeleton.
+It is normally created by a skeleton tracker upon detection of a skeleton.
 
 Like the face ID, **the body ID is not persistent**, and is valid only as long
 as the specific skeleton is tracked by skeleton tracker which initially
 detected it.
 
 The corresponding TF frame is ``body_<bodyID>``, and TF frames associated with
-each of the body parts of the person, are suffixed with the same ID (see
+each of the body parts of the person, MUST suffixed with the same ID (see
 section `Body frames`_).
 
-At any given time, the list of tracked bodies is published under the
+At any given time, the list of tracked bodies SHOULD be published under the
 ``/humans/bodies/tracked`` topic as ``hri_msgs/IdsList`` messages.
 
 Voice Identifier
 ----------------
 
-Likewise, a speech separation node should assign a unique, non-persistent, ID
+Likewise, a speech separation node MUST assign a unique, non-persistent, ID
 for each detected voice.
-Tracked voices are published under the
-``/humans/voices/tracked`` topic as ``hri_msgs/IdsList`` messages.
+Tracked voices SHOULD be published under the ``/humans/voices/tracked`` topic as
+``hri_msgs/IdsList`` messages.
 
 Identifier Matching
 -------------------
@@ -216,8 +216,7 @@ Identifier Matching
 Associations between IDs (for instance to denote that a given voice belongs to
 a given person, or a given face to a given body) are expressed by publishing
 ``hri_msgs/IdsMatch`` messages on the ``/humans/candidate_matches`` topic.
-The
-``hri_msgs/IdsMatch`` message includes a confidence level.
+The ``hri_msgs/IdsMatch`` message MAY include a confidence level.
 
 A typical implementation will have several specialised nodes publishing
 candidate matches on ``/humans/candidate_matches`` (e.g. a face recognition node
@@ -230,11 +229,10 @@ Special case for anonymous persons
 ''''''''''''''''''''''''''''''''''
 
 A node that want to advertise that a person exists, but is not identified yet
-("anonymous person") can publish a ``hri_msgs/IdsMatch`` message on the
+("anonymous person") SHOULD publish a ``hri_msgs/IdsMatch`` message on the
 ``/humans/candidate_matches`` topic with only one specified id.
-For instance, a
-simple face *detector* (ie, not performing face identification) can published a
-message like:
+For instance, a simple face *detector* (ie, not performing face identification)
+can published a message like:
 
 .. code:: python
 
@@ -242,24 +240,15 @@ message like:
 
 to indicate that the face ``ff424`` has been detected, and thus, a corresponding
 person must exist.
-That person will be published as ``anonymous``, and that
-message will have lower precedence if another message associate that face to a
-recognised person.
-Note that in that case, the confidence is ignored.
+That person will be published as ``anonymous``, and that message will have lower
+precedence if another message associate that face to a recognised person.
+Note that in that case, the confidence MUST be ignored.
 
 Identifier Syntax
 -----------------
 
 Identifiers can be arbitrary, as long as they are unique.
-It is also
-recommended to keep them short to avoid clutter.
-One reasonably simple
-way of generating random IDs with few collision is:
-
-.. code:: python
-
-   import uuid
-   id=str(uuid.uuid4())[:5] # for a 5 char long ID
+It is also recommended to keep them short to avoid clutter.
 
 Note that using people’s names as identifier is possible, but not
 generally recommended as collisions are likely.
@@ -287,7 +276,7 @@ Global Parameters
 Topics Structure
 ================
 
-A system implementing this REP is expected to follow the following conventions
+A system implementing this REP MUST follow the following conventions
 for all HRI-related topics:
 
 1. all topics are grouped under the global namespace ``/humans/``
