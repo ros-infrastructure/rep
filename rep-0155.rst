@@ -11,8 +11,9 @@ Abstract
 ========
 
 This REP provides a set of conventions and common interfaces for Human-Robot
-Interaction (HRI) scenarios, with a focus on the perception of humans and
-social signals. It aims at enabling interoperability and reusability of core
+Interaction (HRI) scenarios, with a focus on the perception of humans and social
+signals.
+It aims at enabling interoperability and reusability of core
 functionality between the many HRI-related software tools, from skeleton
 tracking, to face recognition, to natural language processing.
 
@@ -32,15 +33,15 @@ Specifically, this REP covers:
 Rationale
 =========
 
-ROS is widely used in the context of human-robot interactions (HRI). However,
-to date, not a single effort (e.g. [1]_ [2]_) has been successful at coming up
-with broadly accepted interfaces and pipelines for that domain, as found in
-other parts of the ROS ecosystem (for manipulation or 2D navigation for
-instance). As a result, many different implementations of common tasks
-(skeleton tracking, face recognition, speech processing, etc) cohabit, and
-while they achieve similar goals, they are not generally compatible, hampering
-the code reusability, experiment replicability, and general sharing of
-knowledge.
+ROS is widely used in the context of human-robot interactions (HRI).
+However, to date, not a single effort (e.g. [1]_ [2]_) has been successful at
+coming up with broadly accepted interfaces and pipelines for that domain, as
+found in other parts of the ROS ecosystem (for manipulation or 2D navigation for
+instance).
+As a result, many different implementations of common tasks (skeleton tracking,
+face recognition, speech processing, etc) cohabit, and while they achieve
+similar goals, they are not generally compatible, hampering the code
+reusability, experiment replicability, and general sharing of knowledge.
 
 In order to address this issue, this REP aims at structuring the whole "ROS for
 HRI" space by creating an adequate set of ROS messages and services to describe
@@ -76,7 +77,7 @@ By following the naming conventions and leveraging the interfaces defined in
 this REP, both tools and libraries can be designed to be reusable between
 different frameworks and experiments.
 
-.. Note:: Importantly, the REP does not mandate specific tools or algorithms to
+.. note:: Importantly, the REP does not mandate specific tools or algorithms to
    perform human perception/social signal recognition per se.  It only specify
    naming conventions and interfaces between these nodes.
 
@@ -90,8 +91,8 @@ Human Representation
 To accommodate existing tools and technique used to detect and recognise
 humans, the representation of a person is build on a combination of 4
 unique identifiers (UUIDs): a **person identifier**, a **face identifier**, a
-**body identifier** and a **voice identifier**. Future revisions of this REP
-might add additional identifiers.
+**body identifier** and a **voice identifier**.
+Future revisions of this REP might add additional identifiers.
 
 These four identifiers are not mutually exclusive, and depending on the
 requirements of the application, the available sensing capabilities, and the
@@ -102,23 +103,27 @@ Person Identifier
 -----------------
 
 The **person identifier** MUST be a unique ID (typically, a UUID) permanently
-associated with a unique person. This person ID is normally assigned by a node
-able to perform person identification (face recognition node, voice
-recognition node, sound source localisation + name, identification based on
-physical features like height/age/gender, person identification based on
-pre-defined features like the colour of the clothes, etc.) This ID is meant to
-be **persistent** so that the robot can recognise people across
-encounters/sessions. Nodes providing person IDs MAY serialise these IDs to a
-permanent storage, for them to persist across robot reboots.
+associated with a unique person.
+This person ID is normally assigned by a node able to perform person
+identification (face recognition node, voice recognition node, sound source
+localisation + name, identification based on physical features like
+height/age/gender, person identification based on pre-defined features like the
+colour of the clothes, etc.)
+This ID is meant to be **persistent** so that the robot can recognise people
+across encounters/sessions.
+Nodes providing person IDs MAY serialise these IDs to a permanent storage, for
+them to persist across robot reboots.
 
 When meaningful (see section `Person frame`_), a TF frame MUST be
-associated to the person ID and named ``person_<personID>``. Due to the
-importance of the head in human-robot interaction, the ``person_<personID>``
-frame is expected to be placed as close as possible to the head of the human.
+associated to the person ID and named ``person_<personID>``.
+Due to the importance of the head in human-robot interaction, the
+``person_<personID>`` frame is expected to be placed as close as possible to the
+head of the human.
 If neither the face nor the skeleton are tracked, the ``person_<personID>``
 frame might be located to the last known position of the human, or removed
-altogether if no meaningful estimate of the human location is available. See
-section `Person frame`_ for details regarding the ``person_<personID>`` frame.
+altogether if no meaningful estimate of the human location is available.
+See section `Person frame`_ for details regarding the ``person_<personID>``
+frame.
 
 At any given time, the list of known persons is published under the
 ``/humans/persons/tracked`` topic as ``hri_msgs/IdsList`` messages.
@@ -132,9 +137,10 @@ are indeed the same person).
 
 In such a case, one of the person ID is marked as an *alias* of the other
 person, by publishing the ID of the other person on a special subtopic named
-``alias``. See section `Topics structure`_ for details.
+``alias``.
+See section `Topics structure`_ for details.
 
-.. Note:: The reverse operation (spliting a person into two) can be realised
+.. note:: The reverse operation (spliting a person into two) can be realised
    by simply publishing a second person ID.
 
 Anonymous persons
@@ -149,9 +155,10 @@ identification has not yet recognised the voice: in such a case, an *anonymous
 person* might be created, ie a person who has not yet been assigned a permanent
 ID.
 
-*Anonymous persons* are treated like regular persons. They however publish a
-latched ``true`` boolean on their ``/anonymous`` subtopic, and their ID is not
-guaranteed to be permanent (it can in fact change/be removed at any point).
+*Anonymous persons* are treated like regular persons.
+They however publish a latched ``true`` boolean on their ``/anonymous``
+subtopic, and their ID is not guaranteed to be permanent (it can in fact
+change/be removed at any point).
 
 Face Identifier
 ---------------
@@ -161,12 +168,12 @@ This ID is typically generated by the face detector/head pose estimator upon
 face detection.
 
 Importantly, **this ID is not persistent**: once a face is lost (for instance,
-the person goes out of frame), its ID is not valid nor meaningful anymore. To
-cater for a broad range of applications (where re-identification might not be
+the person goes out of frame), its ID is not valid nor meaningful anymore.
+To cater for a broad range of applications (where re-identification might not be
 always necessary), there is no expectation that the face detector will attempt
 to recognise the face and re-assign the same face ID if the person re- appears.
 
-.. Note:: It is however permissible for a face detector/face tracker to re-use
+.. note:: It is however permissible for a face detector/face tracker to re-use
    the same face ID if it is confident that the face if indeed the same.
 
 There is a one-to-one relationship between this face ID and the estimated 6D
@@ -180,7 +187,8 @@ Body Identifier
 ---------------
 
 Similarly to the face identifier, the **body identifier** MUST be a unique ID,
-associated to a person’s skeleton. It is normally created by a skeleton tracker
+associated to a person’s skeleton.
+It is normally created by a skeleton tracker
 upon detection of a skeleton.
 
 Like the face ID, **the body ID is not persistent**, and is valid only as long
@@ -198,7 +206,8 @@ Voice Identifier
 ----------------
 
 Likewise, a speech separation node should assign a unique, non-persistent, ID
-for each detected voice. Tracked voices are published under the
+for each detected voice.
+Tracked voices are published under the
 ``/humans/voices/tracked`` topic as ``hri_msgs/IdsList`` messages.
 
 Identifier Matching
@@ -206,7 +215,8 @@ Identifier Matching
 
 Associations between IDs (for instance to denote that a given voice belongs to
 a given person, or a given face to a given body) are expressed by publishing
-``hri_msgs/IdsMatch`` messages on the ``/humans/candidate_matches`` topic. The
+``hri_msgs/IdsMatch`` messages on the ``/humans/candidate_matches`` topic.
+The
 ``hri_msgs/IdsMatch`` message includes a confidence level.
 
 A typical implementation will have several specialised nodes publishing
@@ -221,7 +231,8 @@ Special case for anonymous persons
 
 A node that want to advertise that a person exists, but is not identified yet
 ("anonymous person") can publish a ``hri_msgs/IdsMatch`` message on the
-``/humans/candidate_matches`` topic with only one specified id. For instance, a
+``/humans/candidate_matches`` topic with only one specified id.
+For instance, a
 simple face *detector* (ie, not performing face identification) can published a
 message like:
 
@@ -230,15 +241,19 @@ message like:
   {face_id: 'ff424', body_id: '', voice_id: '', person_id: '' confidence: 0.0, }
 
 to indicate that the face ``ff424`` has been detected, and thus, a corresponding
-person must exist. That person will be published as ``anonymous``, and that
+person must exist.
+That person will be published as ``anonymous``, and that
 message will have lower precedence if another message associate that face to a
-recognised person. Note that in that case, the confidence is ignored.
+recognised person.
+Note that in that case, the confidence is ignored.
 
 Identifier Syntax
 -----------------
 
-Identifiers can be arbitrary, as long as they are unique. It is also
-recommended to keep them short to avoid clutter. One reasonably simple
+Identifiers can be arbitrary, as long as they are unique.
+It is also
+recommended to keep them short to avoid clutter.
+One reasonably simple
 way of generating random IDs with few collision is:
 
 .. code:: python
@@ -258,16 +273,16 @@ Global Parameters
 - ``/humans/faces/height`` (default: 128): height in pixels of the cropped
   faces published under ``/humans/faces/XYZ/cropped``,
   ``/humans/faces/XYZ/aligned`` and ``/humans/faces/XYZ/frontalized``
-- ``/human_description_<bodyID>``: URDF models of detected humans. See Section
-  `Kinematic Model of the Human`_ for details.
+- ``/human_description_<bodyID>``: URDF models of detected humans.
+  See Section `Kinematic Model of the Human`_ for details.
 - ``/human/match_threshold`` (``float``, default: 0.5): the minimum level of
   likelihood to consider a face/body/voice to belong to a given person.
 - ``/humans/reference_frame`` (``string``, default: `map`): persons' TF frames
-  must be published with respect to `reference_frame`. Typically,
-  faces/bodies/voices frames are published wrt to their respective sensors
-  frame.  `reference_frame` is usually a 'static' frame (eg `map`), so that if
-  the person moves out of view of the robot (and therefore, its position can not
-  be updated anymore), it 'stays' where it was last seen.
+  must be published with respect to `reference_frame`.
+  Typically, faces/bodies/voices frames are published wrt to their respective
+  sensors frame.  `reference_frame` is usually a 'static' frame (eg `map`), so
+  that if the person moves out of view of the robot (and therefore, its position
+  can not be updated anymore), it 'stays' where it was last seen.
 
 Topics Structure
 ================
@@ -286,9 +301,9 @@ for all HRI-related topics:
 
 3. the first four (``/faces``, ``/bodies``, ``/voices``, ``/persons``) expose
    one sub-namespace per face, body, voice, person detected, named after the
-   corresponding ID (for instance, ``/humans/faces/bd34a/``). In addition,
-   they expose a topic ``/tracked`` (of type ``hri_msgs/IdsList``) where the 
-   list of currently tracked faces/bodies/voices/persons is published;
+   corresponding ID (for instance, ``/humans/faces/bd34a/``).
+   In addition, they expose a topic ``/tracked`` (of type ``hri_msgs/IdsList``)
+   where the list of currently tracked faces/bodies/voices/persons is published;
 4. matches between faces/bodies/voices/persons are published on the 
    ``/humans/candidate_matches`` topic, as explained in Section `Identifier
    matching`_;
@@ -296,10 +311,10 @@ for all HRI-related topics:
    level signals, including gazing patterns and social
    groups.
 
-.. Note:: the ``hri_msgs`` messages are defined in the `hri_msgs
+.. note:: the ``hri_msgs`` messages are defined in the `hri_msgs
    <https://github.com/ros4hri/hri_msgs>`_ repository.
 
-.. Note:: The slightly unconvential structure of topics (with one namespace per
+.. note:: The slightly unconvential structure of topics (with one namespace per
    face, body, person, etc.) enables modular pipelines.
 
    For instance, a face detector might publish cropped images of detected faces
@@ -307,8 +322,9 @@ for all HRI-related topics:
    etc.
 
    Then, depending on the application, an additional facial expression
-   recognizer might be needed as well. For each detected faces, that node would
-   subscribe to the corresponding `/cropped` topic and publish its results under
+   recognizer might be needed as well.
+   For each detected faces, that node would subscribe to the corresponding
+   `/cropped` topic and publish its results under
    ``/humans/faces/face_1/expression``, ``/humans/faces/face_2/expression``,
    etc., augmenting the available information about each faces in a modular way.
 
@@ -318,7 +334,7 @@ for all HRI-related topics:
 
    See the `Illustrative Example`_ below for a complete example.
 
-.. Note:: `libhri <https://github.com/ros4hri/libhri>`_ can be used to hide away
+.. note:: `libhri <https://github.com/ros4hri/libhri>`_ can be used to hide away
    the complexity of tracking new persons/faces/bodies/voices. It automatically
    handles subscribing/unsubcribing to the right topics when new
    persons/faces/bodies/voices are detected.
@@ -378,7 +394,8 @@ The list of currently detected bodies (list of body IDs) is published
 under ``/humans/bodies/tracked`` (as a ``hri_msgs/IdsList`` message).
 
 For each detected body, a namespace ``/humans/bodies/<bodyID>/`` is
-created. The following subtopics MAY then be available, depending on available
+created.
+The following subtopics MAY then be available, depending on available
 detectors:
 
 ================= ==================================== ======== ========================
@@ -399,7 +416,8 @@ Name              Message type                         Required Description
                                                                 gesture (eg waving)
 ================= ==================================== ======== ========================
 
-3D body poses SHOULD be exposed via TF frames. This is discussed in
+3D body poses SHOULD be exposed via TF frames.
+This is discussed in
 Section `Kinematic Model and Coordinate Frames`_.
 
 Voices
@@ -495,8 +513,10 @@ See section `Group-level Interactions`_ for details.
 Illustrative Example
 --------------------
 
-You run a node ``your_face_detector_node``. This node detects two faces, and
-publishes the corresponding regions of interest and cropped faces. The node
+You run a node ``your_face_detector_node``.
+This node detects two faces, and
+publishes the corresponding regions of interest and cropped faces.
+The node
 effectively advertises and publishes onto the following topics:
 
 .. code::
@@ -508,11 +528,13 @@ effectively advertises and publishes onto the following topics:
    /humans/faces/b092e/cropped # sensor_msgs/Image
 
 .. note:: The IDs (in this example, ``23bd5`` and ``b092e``) are arbitrary, as
-   long as they are unique. However, for practical reasons, it is recommended to
-   keep them reasonably short.
+   long as they are unique.
+   However, for practical reasons, it is recommended to keep them reasonably
+   short.
 
 You start an additional node to recognise expressions:
-``your_expression_classifier_node``. The node subscribes to the
+``your_expression_classifier_node``.
+The node subscribes to the
 ``/humans/faces/<faceID>/cropped`` topics and publishes expressions for each
 faces under the same namespace:
 
@@ -527,7 +549,8 @@ faces under the same namespace:
    /humans/faces/b092e/expression # hri_msgs/Expression
 
 
-You then launch ``your_body_tracker_node``. It detects one body:
+You then launch ``your_body_tracker_node``.
+It detects one body:
 
 .. code::
 
@@ -539,7 +562,8 @@ You then launch ``your_body_tracker_node``. It detects one body:
 
 In addition, you start a 2D/3D pose estimator ``your_skeleton_estimator_node``.
 The 2D skeleton can be published under the same body namespace, and the 3D
-skeleton is published as a joint state. The joint state can then be converted
+skeleton is published as a joint state.
+The joint state can then be converted
 into TF frames using eg a URDF model of the human, alongside a
 ``robot_state_publisher``:
 
@@ -559,19 +583,20 @@ into TF frames using eg a URDF model of the human, alongside a
    > rosrun robot_state_publisher robot_state_publisher joint_states:=/humans/bodies/67dd1/joint_states robot_description:=human_description_67dd1
 
 .. note:: In this example, we manually generate the URDF model of the human,
-   load it to the ROS parameter server, and start a ``robot_state_publisher``. In
-   practice, this should be done programmatically everytime a new body is
+   load it to the ROS parameter server, and start a ``robot_state_publisher``.
+   In practice, this should be done programmatically everytime a new body is
    detected.
 
 
 So far, faces and bodies are detected, but they are not yet 'unified' as a
 person.
 
-First, we need a stable way to associate a face to a person. This would
-typically require a node for facial recognition. Such a node would subscribe to
-each of the detected faces' ``/cropped`` subtopics, and publish *candidate
-matches* on the ``/humans/candidate_matches`` topic, using a
-``hri_msgs/IdsMatch`` message. For instance:
+First, we need a stable way to associate a face to a person.
+This would typically require a node for facial recognition.  Such a node would
+subscribe to each of the detected faces' ``/cropped`` subtopics, and publish
+*candidate matches* on the ``/humans/candidate_matches`` topic, using a
+``hri_msgs/IdsMatch`` message.
+For instance:
 
 .. code::
 
@@ -598,9 +623,11 @@ Finally, you would need a ``your_person_manager_node`` to publish the
    /humans/persons/76c0c/face_id
 
 In this simple example, only the ``/face_id`` subtopic would be advertised (with a
-latched message pointing to the face ID ``23bd5``). In practice, additional
+latched message pointing to the face ID ``23bd5``).
+In practice, additional
 information could be gathered by the ``your_person_manager_node`` to expose eg
-soft biometrics, engagement, etc. Similarly, the association between the person
+soft biometrics, engagement, etc.
+Similarly, the association between the person
 and its body would have to be performed by a dedicated node.
 
 Overall, six independent nodes are combined to implement this pipeline:
@@ -626,7 +653,8 @@ Overall, six independent nodes are combined to implement this pipeline:
 
 This possible pipeline is only for illustration purposes: depending on each
 specific pipeline implementations, some of these nodes might be merged or on
-the contrary, further divided into smaller nodes. For instance, one might
+the contrary, further divided into smaller nodes.
+For instance, one might
 choose to integrate together the face recogniser node and the person manager.
 
 Note as well that, in order to build a complete perception pipeline for HRI,
@@ -648,9 +676,9 @@ Kinematic Model of the Human
   :alt: Main joints of the human kinematic model (right: human URDF model,
         rendered in rviz)
 
-The main 15 links defined on the human body. Frames orientations and naming are
-based on REP-103 and REP-120. Right: render of the reference URDF model of the
-human body in `rviz`.
+The main 15 links defined on the human body are presented in the above diagram.
+Frames orientations and naming are based on REP-103 and REP-120.
+Right: render of the reference URDF model of the human body in `rviz`.
 
 The following diagram presents all the link (boxes) and joints (arrows) in the
 recommended human kinematic model. 
@@ -697,8 +725,10 @@ corresponding ``<bodyID>``, as several skeletons might be present at the same
 time.
 
 A parametric URDF model of humans is available in the ``human_description``
-package. It SHOULD be used to instanciate at run-time new human URDF model,
-adjusted for the e.g. height of the detected persons. The person's joint state
+package.
+It SHOULD be used to instanciate at run-time new human URDF model,
+adjusted for the e.g. height of the detected persons.
+The person's joint state
 (published under ``/humans/bodies/<bodyID>/joint_states``) can then be used with
 eg a `robot_state_publisher node <http://wiki.ros.org/robot_state_publisher>` to
 publish the body's TF frames.
@@ -706,7 +736,7 @@ publish the body's TF frames.
 When generated, the URDF models of the humans should be loaded on the ROS
 parameter server under ``/human_description_<bodyID>``.
 
-.. Note:: the `human_description
+.. note:: the `human_description
    <https://github.com/ros4hri/human_description>`_ ROS package contains a launch
    script ``visualize.launch`` that can be used to quickly experiment with the
    kinematic model of humans.
@@ -722,14 +752,15 @@ Face and Gaze Frames
 -  the parent of this frame is the sensor frame used to estimate the
    face pose.
 -  The origin of the frame must be the sellion (defined as the deepest
-   midline point of the angle formed between the nose and forehead. It
-   can generally be approximated to the mid point of line connecting the
-   two eyes).
+   midline point of the angle formed between the nose and forehead.
+   It can generally be approximated to the mid point of line connecting the two
+   eyes).
 -  The ``x`` axis is expected to point forward (ie, out of the face),
    the ``z`` axis is expected to point toward the scalp (ie, up when the
    person is standing vertically).
 -  Any other facial landmark published as a TF frame must be parented to
-   the head TF frame. It should be suffixed with the same ``_<faceID>``.
+   the head TF frame.
+   It should be suffixed with the same ``_<faceID>``.
 
 In addition, the person's gaze direction MUST be published as a
 ``gaze_<faceID>`` frame, collocated with the ``face_<faceID>`` frame, and with
@@ -759,8 +790,9 @@ Body Frames
    person is standing vertically).
 -  The other skeleton points published as TF frames must be parented to
    the root ``body_<bodyID>`` frame, and all be suffixed with the same
-   ``_<bodyID>``. Section  `Kinematic Model of the Human`_ lists
-   the recommended names of body links and body joints.
+   ``_<bodyID>``.
+   Section  `Kinematic Model of the Human`_ lists the recommended names of body
+   links and body joints.
 -  if the skeleton tracker provide an estimate of the head pose, it
    might publish a frame named ``head_<bodyID>``. *It is the joint
    responsibility of the face tracker and skeleton tracker to ensure
@@ -771,7 +803,8 @@ Voice Frame
 -----------
 
 - Sound source localisation algorithms can broadcast estiamted TF frames for
-  detected voices. These frames should be named ``voice_<voiceID>``.
+  detected voices.
+  These frames should be named ``voice_<voiceID>``.
 - The orientation of the frame is meaningless, and should be ignored.
 
 Person Frame
@@ -784,8 +817,8 @@ value (see `Persons`_ topics).
 We can distinguish three cases:
 
 1. The human is currently being tracked (ie ``personID`` is set, and at
-   least one of ``faceID`` or ``bodyID`` is set). In this case,
-   ``location_confidence`` MUST be set to 1 and:
+   least one of ``faceID`` or ``bodyID`` is set).
+   In this case, ``location_confidence`` MUST be set to 1 and:
 
   -  when a face ID is also defined, the ``person_<personID>`` frame must
      be collocated with the ``face_<faceID>`` frame.
@@ -795,19 +828,20 @@ We can distinguish three cases:
   -  if both the face and body IDs are defined, the ``person_<personID>``
      frame must be collocated with the ``face_<faceID>`` frame.
 
-2. The human is not seen, but has been previously seen. In this case,
-   ``location_confidence`` MUST be set to a value ``< 1``
-   and a ``person_<personID>`` TF frame MUST be published **as long as**
-   ``location_confidence > 0``. Simple implementations
-   might choose to set ``location_confidence = 0.5`` as
-   soon as the person is not actively seen anymore, continuously
-   broadcast the last known location. More advanced implementations
-   might slowly decrease ``location_confidence`` over time
-   to represent the fact that the human might have walked away, for
+2. The human is not seen, but has been previously seen.  In this case,
+   ``location_confidence`` MUST be set to a value ``< 1`` and a
+   ``person_<personID>`` TF frame MUST be published **as long as**
+   ``location_confidence > 0``.
+   Simple implementations might choose to set ``location_confidence = 0.5`` as
+   soon as the person is not actively seen anymore, continuously broadcast the
+   last known location.
+   More advanced implementations might slowly decrease ``location_confidence``
+   over time to represent the fact that the human might have walked away, for
    instance.
-3. The human is known, but has never been seen before. In this case,
-   ``location_confidence`` MUST be set to ``0``, and no TF
-   frame should be broadcast.
+
+3. The human is known, but has never been seen before.
+   In this case, ``location_confidence`` MUST be set to ``0``, and no TF frame
+   should be broadcast.
 
 Group-level Interactions
 ========================
@@ -830,9 +864,10 @@ Social gazing (eg, gazing between people) is represented as
 ``/humans/interactions/gazing`` topic.
 
 Each ``Gaze.msg`` messages contain a *sender* and a *receiver* that MUST be
-known persons. Note that the relationship is not symmetrical: "A gazes at B"
-does not imply "B gazes at A". As such, *mutual gaze* will lead to two messages
-being published.
+known persons.
+Note that the relationship is not symmetrical: "A gazes at B" does not imply "B
+gazes at A".
+As such, *mutual gaze* will lead to two messages being published.
 
 If one or the other of the sender and receiver IDs are not set, the robot is
 assumed to respectively originate or be the target of the gaze.
