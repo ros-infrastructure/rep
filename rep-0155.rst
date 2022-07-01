@@ -46,7 +46,7 @@ reusability, experiment replicability, and general sharing of knowledge.
 In order to address this issue, this REP aims at structuring the whole "ROS for
 HRI" space by creating an adequate set of ROS messages and services to describe
 the software interactions relevant to the HRI domain, as well as a set of
-convention (eg topics structure, tf frames) to expose human-related
+conventions (eg topics structure, tf frames) to expose human-related
 information.
 
 The REP aims at modeling these interfaces based on existing, state-of-the-art
@@ -88,8 +88,8 @@ Levels' [6]_.
 Human Representation
 ====================
 
-To accommodate existing tools and technique used to detect and recognise
-humans, the representation of a person is build on a combination of 4
+To accommodate existing tools and techniques used to detect and recognise
+humans, the representation of a person is built on a combination of 4
 unique identifiers (UUIDs): a **person identifier**, a **face identifier**, a
 **body identifier** and a **voice identifier**.
 Future revisions of this REP might add additional identifiers.
@@ -135,12 +135,12 @@ In certain cases, two person IDs must be merged (for instance, the robot
 detects that a voice and a face that were thought to belong to different people
 are indeed the same person).
 
-In such a case, one of the person ID is marked as an *alias* of the other
+In such a case, one of the person IDs is marked as an *alias* of the other
 person, by publishing the ID of the other person on a special subtopic named
 ``alias``.
 See section `Topics structure`_ for details.
 
-.. note:: The reverse operation (spliting a person into two) can be realised
+.. note:: The reverse operation (splitting a person into two) can be realised
    by simply publishing a second person ID.
 
 Anonymous persons
@@ -171,10 +171,10 @@ Importantly, **this ID is not persistent**: once a face is lost (for instance,
 the person goes out of frame), its ID is not valid nor meaningful anymore.
 To cater for a broad range of applications (where re-identification might not be
 always necessary), there is no expectation that the face detector will attempt
-to recognise the face and re-assign the same face ID if the person re- appears.
+to recognise the face and re-assign the same face ID if the person reappears.
 
-.. note:: A face detector/face tracker MAY re-use the same face ID if it is 
-   confident that the face if indeed the same.
+.. note:: A face detector/face tracker MAY reuse the same face ID if it is 
+   confident that the face is indeed the same.
 
 There is a one-to-one relationship between this face ID and the estimated 6D
 pose of the head. If the node published a head pose estimated, the ROS TF frame
@@ -228,7 +228,7 @@ and its face/body/voice IDs under the ``/humans/persons/`` namespace.
 Special case for anonymous persons
 ''''''''''''''''''''''''''''''''''
 
-A node that want to advertise that a person exists, but is not identified yet
+A node that wants to advertise that a person exists, but is not identified yet
 ("anonymous person") SHOULD publish a ``hri_msgs/IdsMatch`` message on the
 ``/humans/candidate_matches`` topic with only one specified id.
 For instance, a simple face *detector* (ie, not performing face identification)
@@ -241,7 +241,7 @@ can published a message like:
 to indicate that the face ``ff424`` has been detected, and thus, a corresponding
 person must exist.
 That person will be published as ``anonymous``, and that message will have lower
-precedence if another message associate that face to a recognised person.
+precedence than another message that associates that face to a recognised person.
 Note that in that case, the confidence MUST be ignored.
 
 Identifier Syntax
@@ -253,7 +253,7 @@ It is also recommended to keep them short to avoid clutter.
 Note that using people’s names as identifier is possible, but not
 generally recommended as collisions are likely.
 
-Global Parameters
+Common Parameters
 =================
 
 - ``/humans/faces/width`` (default: 128): width in pixels of the cropped faces
@@ -312,14 +312,14 @@ for all HRI-related topics:
 
    Then, depending on the application, an additional facial expression
    recognizer might be needed as well.
-   For each detected faces, that node would subscribe to the corresponding
+   For each detected face, that node would subscribe to the corresponding
    `/cropped` topic and publish its results under
    ``/humans/faces/face_1/expression``, ``/humans/faces/face_2/expression``,
-   etc., augmenting the available information about each faces in a modular way.
+   etc., augmenting the available information about each face in a modular way.
 
-   Such modularity would not be easily possible if we add chosen to publish
+   Such modularity would not be easily possible if we had chosen to publish
    instead a generic ``Face`` message, as a single node would have had first to
-   fuse every possible information about faces.
+   fuse all possible information about faces.
 
    See the `Illustrative Example`_ below for a complete example.
 
@@ -715,7 +715,7 @@ time.
 
 A parametric URDF model of humans is available in the ``human_description``
 package.
-It SHOULD be used to instanciate at run-time new human URDF model,
+It SHOULD be used to instantiate at run-time new human URDF model,
 adjusted for the e.g. height of the detected persons.
 The person's joint state
 (published under ``/humans/bodies/<bodyID>/joint_states``) can then be used with
@@ -791,7 +791,7 @@ Body Frames
 Voice Frame
 -----------
 
-- Sound source localisation algorithms can broadcast estiamted TF frames for
+- Sound source localisation algorithms can broadcast estimated TF frames for
   detected voices.
   These frames should be named ``voice_<voiceID>``.
 - The orientation of the frame is meaningless, and should be ignored.
@@ -862,7 +862,7 @@ If one or the other of the sender and receiver IDs are not set, the robot is
 assumed to respectively originate or be the target of the gaze.
 
 Nodes publishing gazing information are expected to continuously publish
-gaze messages, until the person is not gazing to the target anymore.
+gaze messages, until the person is not gazing at the target anymore.
 
 
 References
