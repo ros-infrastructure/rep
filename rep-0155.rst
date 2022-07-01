@@ -109,7 +109,7 @@ identification (face recognition node, voice recognition node, sound source
 localisation + name, identification based on physical features like
 height/age/gender, person identification based on pre-defined features like the
 colour of the clothes, etc.)
-This ID is meant to be **persistent** so that the robot can recognise people
+This ID is meant to be **persistent** so that the robot can recognize people
 across encounters/sessions.
 Nodes providing person IDs MAY serialise these IDs to a permanent storage, for
 them to persist across robot reboots.
