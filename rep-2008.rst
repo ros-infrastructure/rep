@@ -64,20 +64,20 @@ Architecture pillars
 
     +-----------+          +---------------------------+
     |           |          |   acceleration_examples   |
-    |user land  | +-----------------+------------------+--+-----------------+
-    |           | |     Drivers     |     Libraries       | Firmware |Cloud |
-    +-----------+ +-----------------+-+-------------------------+-----------+
-    |           | | ament_1| ament_2  |                   |     |    |      |
-    |           | +---------------------------------------+ fw_1|fw_2|cloud1|
-    | tooling   | | ament_acceleration|  colcon_hw_accel  |     |    |      |
-    |           | +---------------------------------------------+-----------+
-    |           | |    build system   |    meta build     | firmware | cloud|
-    +-----------+ +--------+----------+-------------------+-+--------+--+---+
-    |    rcl    |          |                                |           |
-    +-----------+          |                                |           |
-    |    rmw    |          |                                |           |
-    +-----------+          +                                +           +
-    |rmw_adapter|       Pillar I                        Pillar II    Pillar III
+    |user land  | +-----------------+------------------+--+----------+
+    |           | |     Drivers     |     Libraries       | Firmware |
+    +-----------+ +-----------------+-+-------------------------+----+
+    |           | | ament_1| ament_2  |                   |     |    |
+    |           | +---------------------------------------+ fw_1|fw_2|
+    | tooling   | | ament_acceleration|  colcon_hw_accel  |     |    |
+    |           | +---------------------------------------------+----+
+    |           | |    build system   |    meta build     | firmware |
+    +-----------+ +--------+----------+-------------------+-+--------+
+    |    rcl    |          |                                |         
+    +-----------+          |                                |         
+    |    rmw    |          |                                |         
+    +-----------+          +                                +         
+    |rmw_adapter|       Pillar I                        Pillar II
     +-----------+
 
 
@@ -132,19 +132,6 @@ The second pillar is firmware, it is meant to provide firmware artifacts for eac
 Each ROS 2 workspace can have one or multiple firmware packages deployed. The selection of the active firmware in the workspace is performed by the ``colcon acceleration select`` subverb (pillarII_). To get a technology solution aligned with this REP's architecture, each vendor should provide and maintain an ``acceleration_firmware_<solution>`` package specialization that delivers the corresponding artifacts in line with its supported categories_ and capabilities_. Firmware artifacts should be deployed at ``<ros2_workspace_path>/acceleration/firmware/<solution>`` and be ready to be used by the ROS 2 build system extensions at (pillarI_) . For a reference implementation of specialized vendor firmware package, see `acceleration_firmware_kv260 <https://github.com/ros-acceleration/acceleration_firmware_kv260>`_.
 
 By splitting vendors across packages, consumers and maintainers can easily switch between hardware acceleration solutions.
-
-
-.. _pillarIII:
-
-Pillar III - cloud extensions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-Leveraging the cloud provides roboticists with unlimited resources to further accelerate computations. Besides lots of CPU, cloud computing providers such as `GCP <https://cloud.google.com>`_, `Azure <https://azure.microsoft.com>`_ or `AWS <https://aws.amazon.com>`_ offer instances that provide big FPGAs and GPUs for on-cloud hardware acceleration. This means once the ROS graph is partially in the cloud, architects can use computing there, including custom accelerators, to reduce and optimize robotic computations. But tapping into all that power while aligned with common ROS and robotics development flows is non-trivial.
-
-This third pillar, ``cloud extensions``, helps robotic architects bridge the gap and simplify the use of hardware acceleration in the cloud for ROS. It does so by extending the three prior pillars (pillarI_, pillarII_ and pillarIII_) and adding cloud capabilities to them. Ultimately, the cloud extensions allow to easily build hardware acceleration kernels that target cloud instances while aligning to the unified APIs for cloud provisioning, set up, deployment and launch derived from the standard ROS 2 launch system.
-
-In turn, a reference implementation leveraging hardware acceleration in the cloud with ROS 2 will be facilitated with one of the cloud service providers.
 
 
 .. _specification:
