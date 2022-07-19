@@ -5,7 +5,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 10-Aug-2021
-Post-History: 10-June-2022
+Post-History: 19-July-2022
 
 
 Abstract
@@ -72,12 +72,12 @@ Architecture pillars
     | tooling   | | ament_acceleration|colcon_acceleration|     |    |      |
     |           | +---------------------------------------------+-----------+
     |           | |    build system   |  meta build       | firmware | cloud|
-    +-----------+ +--------+----------+-------+-----------+-+--------+--+---+
-    |    rcl    |          |                  |             |           |
-    +-----------+          |                  |             |           |
-    |    rmw    |          |                  |             |           |
-    +-----------+          +                  +             +           +
-    |rmw_adapter|       Pillar I          Pillar II    Pillar III   Pillar IV
+    +-----------+ +--------+----------+-------------------+-+--------+--+---+
+    |    rcl    |          |                                |           |
+    +-----------+          |                                |           |
+    |    rmw    |          |                                |           |
+    +-----------+          +                                +           +
+    |rmw_adapter|       Pillar I                        Pillar II    Pillar III
     +-----------+
 
 
@@ -124,55 +124,25 @@ Through ``ament_acceleration`` and technology-specific specializations (like ``a
 
 .. _pillarII:
 
-Pillar II - Extensions to colcon
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The second pillar extends the ``colcon`` ROS 2 meta built tools to integrate hardware acceleration flows into the ROS 2 CLI tooling and allow to manage it. Examples of these extensions include emulation capabilities to speed-up the development process and/or facilitate it without access to the real hardware, or raw image production tools, which are convenient when packing together acceleration kernels for embedded targets. These extensions are implemented by the `colcon_acceleration <https://github.com/ros-acceleration/colcon_acceleration/>`_ ROS 2 package. On a preliminary implementation, these extensions are provided the following ``colcon acceleration`` subverbs:
+Pillar II - firmware
+^^^^^^^^^^^^^^^^^^^^
 
-::
-
-    colcon acceleration subverbs:
-      board                 Report the board supported in the deployed firmware
-      emulation             Manage hardware emulation capabilities
-      hls                   Vitis HLS capabilities management extension
-      hypervisor            Configure the Xen hypervisor
-      linux                 Configure the Linux kernel
-      list                  List supported firmware for hardware acceleration
-      mkinitramfs           Creates compressed cpio initramfs (ramdisks) from raw image
-      mount                 Mount raw images
-      package               Packages workspace with kernels for distribution
-      platform              Report the platform enabled in the deployed firmware
-      select                Select an existing firmware and default to it.
-      umount                Umount raw images
-      v++                   Vitis v++ compiler wrapper
-      version               Report version of the tool
-
-
-Using the ``list`` and ``select`` subverbs, it's possible to inspect and configure the different hardware acceleration solutions. The rest of the subverbs allow to manage hardware acceleration artifacts and platforms in a simplified manner.
-
-In turn, the list of subverbs will improve and grow to cover other technology solutions.
-
-
-.. _pillarIII:
-
-Pillar III - firmware
-^^^^^^^^^^^^^^^^^^^^^
-
-The third pillar is firmware, it is meant to provide firmware artifacts for each supported technology so that the kernels can be compiled against them, simplifying the process for consumers and maintainers, and further aligning with the ROS typical development flow.
+The second pillar is firmware, it is meant to provide firmware artifacts for each supported technology so that the kernels can be compiled against them, simplifying the process for consumers and maintainers, and further aligning with the ROS typical development flow.
 
 Each ROS 2 workspace can have one or multiple firmware packages deployed. The selection of the active firmware in the workspace is performed by the ``colcon acceleration select`` subverb (pillarII_). To get a technology solution aligned with this REP's architecture, each vendor should provide and maintain an ``acceleration_firmware_<solution>`` package specialization that delivers the corresponding artifacts in line with its supported categories_ and capabilities_. Firmware artifacts should be deployed at ``<ros2_workspace_path>/acceleration/firmware/<solution>`` and be ready to be used by the ROS 2 build system extensions at (pillarI_) . For a reference implementation of specialized vendor firmware package, see `acceleration_firmware_kv260 <https://github.com/ros-acceleration/acceleration_firmware_kv260>`_.
 
 By splitting vendors across packages, consumers and maintainers can easily switch between hardware acceleration solutions.
 
 
-.. _pillarIV:
+.. _pillarIII:
 
-Pillar IV - cloud extensions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pillar III - cloud extensions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 Leveraging the cloud provides roboticists with unlimited resources to further accelerate computations. Besides lots of CPU, cloud computing providers such as `GCP <https://cloud.google.com>`_, `Azure <https://azure.microsoft.com>`_ or `AWS <https://aws.amazon.com>`_ offer instances that provide big FPGAs and GPUs for on-cloud hardware acceleration. This means once the ROS graph is partially in the cloud, architects can use computing there, including custom accelerators, to reduce and optimize robotic computations. But tapping into all that power while aligned with common ROS and robotics development flows is non-trivial.
 
-This fourth pillar, ``cloud extensions``, helps robotic architects bridge the gap and simplify the use of hardware acceleration in the cloud for ROS. It does so by extending the three prior pillars (pillarI_, pillarII_ and pillarIII_) and adding cloud capabilities to them. Ultimately, the cloud extensions allow to easily build hardware acceleration kernels that target cloud instances while aligning to the unified APIs for cloud provisioning, set up, deployment and launch derived from the standard ROS 2 launch system.
+This third pillar, ``cloud extensions``, helps robotic architects bridge the gap and simplify the use of hardware acceleration in the cloud for ROS. It does so by extending the three prior pillars (pillarI_, pillarII_ and pillarIII_) and adding cloud capabilities to them. Ultimately, the cloud extensions allow to easily build hardware acceleration kernels that target cloud instances while aligning to the unified APIs for cloud provisioning, set up, deployment and launch derived from the standard ROS 2 launch system.
 
 In turn, a reference implementation leveraging hardware acceleration in the cloud with ROS 2 will be facilitated with one of the cloud service providers.
 
@@ -722,6 +692,8 @@ Reference Implementation and recommendations
 ============================================
 
 Reference implementations complying with this REP and extending the ROS 2 build system and tools for hardware acceleration are available at the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_. This includes also the abstraction layer `ament_acceleration <https://github.com/ros-acceleration/ament_acceleration/>`_ and firmware from vendor specializalizations like `ament_vitis <https://github.com/ros-acceleration/ament_vitis/>`_. A paper describing in more detail the reference implementation is available at [11]_.
+
+``colcon`` ROS 2 meta built tools can be extended to help integrate hardware acceleration flows into the ROS 2 CLI tooling. Examples of these extensions include emulation capabilities to speed-up the development process and/or facilitate it without access to the real hardware, or raw image production tools, which are convenient when packing together acceleration kernels for embedded targets. A reference implementation of these extensions is implemented at the `colcon-hardware-acceleration <https://github.com/colcon/colcon-hardware-acceleration/>`_ ROS 2 package, which is available in the buildfarm. Refer to the package for more details on its capabilities.
 
 For additional implementations and recommendations, check out the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_.
 
