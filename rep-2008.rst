@@ -352,7 +352,7 @@ The following list describes the hardware acceleration capabilities that hardwar
 
 .. _benchmarking_capability:
 
-1. **Benchmarking:**
+4. **Benchmarking:**
 
     .. _4.i:
 
