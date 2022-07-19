@@ -17,17 +17,16 @@ The feature allows users to remotely monitor service requests and responses.
 Terminology
 ===========
 
+:Request:
+  A ROS service request.
+:Response:
+  A ROS service response.
 :Service:
   A ROS service.
   Accepts requests from clients and sends responses.
 :Client:
   A ROS service client.
   Sends requests to services and receives responses.
-:Request:
-  A ROS service request.
-:Response:
-  A ROS service response.
-
 
 Motivation
 ==========
@@ -68,81 +67,70 @@ Therefore, we have a total of four possible events:
 :Response Received:
   Emitted from a client after receiving a response from a service.
 
-Request event messages shall be published to the hidden topic ``/SERVICE_NAME/_request_event``, where ``SERVICE_NAME`` is the fully-qualified name of the service.
-Similarly, response event messages shall be published to the hidden topic ``/SERVICE_NAME/_response_event``.
+Event messages shall be published to the hidden topic ``/SERVICE_NAME/_service_event``, where ``SERVICE_NAME`` is the fully-qualified name of the service.
+Both services and clients will publish events to the same topic.
 Note that this implies that services must have unique names.
 
 By publishing service event messages to predetermined topics, tools and libraries are able to subscribe to these topics to inspect the flow of data between services.
 
-Service Event Definitions
--------------------------
+Service Event Definition
+------------------------
 
-For each service definition, ``my/srv/Foo``, we define two new ROS message types using the ROS IDL specification [2]_:
-
-:my/msg/Foo_RequestEvent:
-  This type communicates a request sent or request received event.
+For each service definition, ``my/srv/Foo.srv``, we define a new ROS message type, ``my/srv/Foo_Event.msg``, with the ROS IDL specification [2]_:
 
   .. code-block::
 
-     # Indicates this request event was emitted from a client
-     uint8 CLIENT_SENT      = 0
+   # Event info
+   # Contains event type, timestamp, and request ID
+   rcl_interfaces/msg/ServiceEventInfo info
 
-     # Indicates this request event was emitted from a service
-     uint8 SERVICE_RECEIVED = 1
+   # The actual request content sent or received
+   # This field is only set if the event type is REQUEST_SENT or REQUEST_RECEIVED,
+   # and the introspection feauture is configured to include payload data.
+   my/srv/Foo_Request[<=1] request
 
-     # Whether this is a CLIENT_SENT or SERVICE_RECEIVED event.
-     uint8 request_type
+   # The actual response content sent or received
+   # This field is only set if the event type is RESPONSE_SENT or RESPONSE_RECEIVED,
+   # and the introspection feauture is configured to include payload data.
+   my/srv/Foo_Response[<=1] response
 
-     # Timestamp for when the event occurred (sent or received time)
-     builtin_interfaces/msg/Time stamp
-
-     # Unique identifier for the client that sent the request
-     # Note, this is only unique for the current session
-     unique_identifier_msgs/msg/UUID client_id
-
-     # Sequence number for the request
-     # Combined with the client ID, this creates a unique ID for the request
-     int64 sequence_number
-
-     # The actual request content sent or received
-     # Setting this field is optional
-     my/srv/Foo_Request request
-
-:my/msg/Foo_ResponseEvent:
-  This type communicates a response sent or response received event.
+where ``rcl_interfaces/msg/ServiceEventInfo.msg`` is defined as,
 
   .. code-block::
 
-     # Indicates this response event was emitted from a service
-     uint8 SERVICE_SENT     = 0
+   # Indicates this is a request sent event emitted from a client
+   uint8 REQUEST_SENT      = 0
 
-     # Indicates this response event was emitted from a client
-     uint8 CLIENT_RECEIVED  = 1
+   # Indicates this is a request received event emitted from a service
+   uint8 REQUEST_RECEIVED  = 1
 
-     # Whether this is a SERVICE_SENT or CLIENT_RECEIVED event.
-     uint8 response_type
+   # Indicates this is a response sent event emitted from a service
+   uint8 RESPONSE_SENT     = 2
 
-     # Timestamp for when the event occurred (sent or received time)
-     builtin_interfaces/msg/Time stamp
+   # Indicates this is a response received event emitted from a client
+   uint8 RESPONSE_RECEIVED = 3
 
-     # Unique identifier for the client that sent the request associated with this response
-     # Note, this is only unique for the current session
-     unique_identifier_msgs/msg/UUID client_id
+   # The kind of event this message represents
+   uint8 event_type
 
-     # Sequence number for the request associated with this response
-     # Combined with the client ID, this creates a unique ID for the request
-     int64 sequence_number
+   # Timestamp for when the event occurred (sent or received time)
+   builtin_interfaces/msg/Time stamp
 
-     # The actual response content sent or received
-     # Setting this field is optional
-     my/srv/Foo_Response response
+   # Unique identifier for the client that sent the service request
+   # Note, this is only unique for the current session
+   unique_identifier_msgs/msg/UUID client_id
 
-Note, we put the service event definitions into the ``msg`` namespace, as this is expected for message interface types in many libraries and tools in the ROS ecosystem.
+   # Sequence number for the request
+   # Combined with the client ID, this creates a unique ID for the service transaction
+   int64 sequence_number
 
-The service event definitions are generated as part of the ``rosidl`` pipeline [3]_.
+The reserved underscore character is used in the generated type name to avoid potential collisions with user-defined types.
+
+Service event definitions are generated as part of the ``rosidl`` pipeline [3]_.
 
 Timestamp
 ^^^^^^^^^
+
 Timestamps represent the time at which the event occurred.
 I.e. they are set to the time directly after a request or response is sent or received.
 
@@ -152,6 +140,7 @@ If simulation time is enabled by the node implementing the service or client, th
 
 Client ID and sequence number
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Both the client ID and sequence number are provided by the ROS middleware [5]_.
 They can be accessed from ``rcl`` [6]_ when taking a request or response for a service or client respectively.
 
@@ -167,41 +156,17 @@ For example, consider a service ``example_interfaces/srv/AddTwoInts`` defined as
    ---
    int64 sum
 
-The following service event message definitions are generated when building the ``example_interfaces`` package (comments elided for brevity):
+The following service event message definition is generated when building the ``example_interfaces`` package (comments elided for brevity):
 
-:example_interfaces/msg/AddTwoInts_RequestEvent:
-
-.. code-block::
-
-   uint8 CLIENT_SENT      = 0
-   uint8 SERVICE_RECEIVED = 1
-
-   uint8 request_type
-
-   builtin_interfaces/msg/Time stamp
-
-   unique_identifier_msgs/msg/UUID client_id
-
-   int64 sequence_number
-
-   example_interfaces/srv/AddTwoInts_Request request
-
-:example_interfaces/msg/AddTwoInts_ResponseEvent:
+:example_interfaces/srv/AddTwoInts_Event:
 
 .. code-block::
 
-   uint8 SERVICE_SENT     = 0
-   uint8 CLIENT_RECEIVED  = 1
+   rcl_interfaces/msg/ServiceEventInfo info
 
-   uint8 response_type
+   example_interfaces/srv/AddTwoInts_Request[<=1] request
 
-   builtin_interfaces/msg/Time stamp
-
-   unique_identifier_msgs/msg/UUID client_id
-
-   int64 sequence_number
-
-   example_interfaces/srv/AddTwoInts_Response response
+   example_interfaces/srv/AddTwoInts_Response[<=1] response
 
 The definition for ``example_interfaces/srv/AddTwoInts_Request`` is,
 
@@ -223,29 +188,31 @@ Configuration of service introspection features will be done through ROS paramet
 Each node may offer the following four Boolean parameters:
 
 :publish_client_events:
-  If true, then client "request sent" and "response received" events will be published for all clients created by this node.
+  If ``true``, then client "request sent" and "response received" events will be published for all clients created by this node.
+  The default value is ``false``.
 :publish_service_events:
-  If true, then service "request received" and "response sent" events will be published for all services created by this node.
-:client_event_content:
-  If true, then client event messages will include the request and response content.
+  If ``true``, then service "request received" and "response sent" events will be published for all services created by this node.
+  The default value is ``false``.
+:client_event_payload:
+  If ``true``, then client event messages will have the ``request`` and ``response`` members set.
   Only applies if ``publish_client_events`` is ``true``.
-:service_event_content:
-  If true, then service event messages will include the request and response content.
+  The default value is ``true``.
+:service_event_payload:
+  If ``true``, then service event messages will have the ``request`` and ``response`` members set.
   Only applies if ``publish_service_events`` is ``true``.
+  The default value is ``true``.
 
-By default, all parameters shall be ``false`` so users do not pay for a feature they do not plan to use.
+By default, the event publishing feautre is off so users do not pay for a feature they do not plan to use.
 Furthermore, node authors may opt-in by default or disable the service introspection feature altogether as they see fit.
 
-As an example, users can enable service introspection for all services by providing the following parameters YAML file to nodes [7]_:
+As an example, service introspection can be enabled for all services and clients by providing the following parameters YAML file to ROS nodes [7]_:
 
 .. code-block:: yaml
 
    /**:
       ros__parameters:
          publish_service_events: true
-         # Also include request and response content in event messages
-         service_event_content: true
-
+         publish_client_events: true
 
 Since it is possible to set parameters with a parameter service [8]_, one or more service events *may* be published when setting a service introspection parameter.
 The behavior depends on the order of operations and is defined by the implementation.
@@ -262,7 +229,7 @@ Security
 Enabling service introspection creates more attack surface for an existing ROS system by adding 2*N more topics (where N is the number of services with the feature enabled).
 These topics are vulnerable to undesired actors listening in on service communication or even interfering with parts of the system that may be relying on service events.
 
-Luckily, we can leverage the existing security feature for topics in ROS 2 (see SROS 2 [10]_).
+Luckily, we can leverage the existing security feature for topics and services in ROS 2 (see SROS 2 [10]_).
 Any existing tooling for aiding users in setting up ROS security should consider the new service event topics introduced by this REP (e.g. NoDL [11]_).
 
 
@@ -319,13 +286,13 @@ Therefore, as far as this REP is concerned, creating multiple services with the 
 Separate request and response events instead of single service event
 --------------------------------------------------------------------
 
-This REP defines two event types for requests and responses.
+This REP defines four event types for requests and responses.
 Publishing separate events from client and services makes it possible to detect the situations such as:
 
 * a request was sent by a client, but not received by a service
 * a request was received by a service, but a response was not sent
 
-Alternatively, a single event type could have been defined containing both the request and response.
+Alternatively, a single event could have been defined containing both the request and response.
 While this would be convenient for tools to match requests and responses, it would result in duplicate or unused message content.
 
 A second alternative is to define unique request and response event types for clients and services (for a total of four event types and four topics per service).
