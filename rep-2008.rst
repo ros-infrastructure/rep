@@ -540,100 +540,11 @@ Reference implementations complying with this REP and extending the ROS 2 build 
 For additional implementations and recommendations, check out the `Hardware Accelerationg WG GitHub organization <https://github.com/ros-acceleration>`_.
 
 
-
-.. _labels for maintainers:
-
-Labels for maintainers
-^^^^^^^^^^^^^^^^^^^^^^
-Maintainers are encouraged to mark their packages including hardware acceleration with a label that indicates so, for each one of the hardware acceleration technology solutions they support. This REP proposes that such indication takes the following shape:
-
-.. image:: https://img.shields.io/badge/hardware_acceleration-KV260-ec1c24.svg
-
-which can be created with:
-
-::
-
-    https://img.shields.io/badge/hardware_acceleration-<technology-solution>-ec1c24.svg
-
-    e.g. to deliver the result above
-        https://img.shields.io/badge/hardware_acceleration-KV260-ec1c24.svg
-
-
-Template for Maintainers
-^^^^^^^^^^^^^^^^^^^^^^^^
-Besides indicating the acceleration solutions supported by a given package through `labels for maintainers`_, maintainers are encouraged to also add additional information of the acceleration kernels the package to provide consumers with a quick intuition of the added value of using hardware acceleration.
-
-The following **Markdown** table provides an example of such additional information for the `accelerated_vadd_publisher <https://github.com/ros-acceleration/acceleration_examples/tree/main/accelerated_vadd_publisher>`_ that ships within `acceleration examples`_.
-
-
-::
-
-  ### Hardware acceleration
-
-  | Kernel     | Description |   Acceleration factor | Technology | CPU baseline | Acceleration measurement |
-  |------------|-------------|-----------------------|------------|--------------|--------------------------|
-  | [`vadd`](https://github.com/ros-acceleration/acceleration_examples/blob/main/accelerated_vadd_publisher/src/vadd.cpp)  |  An offloaded version of the trivial [vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/vadd_publisher) ROS 2 publisher which adds two inputs to a vector in a loop and publishes them at 10 Hz. Vector add operations are offloaded into to the FPGA. The offloading operation into the FPGA allows the publisher to go from 2 Hz to 6 Hz but still misses its target (10 Hz)  |      3    |  KV260 |  2 Hz (measured with `ros2 topic hz` | 6 Hz `ros2 topic hz` |
-
-
-In case it's a meta-package, and there're several packages with one or multipole kernels, the following format can be used instead:
-
-::
-
-  ### Hardware acceleration
-
-  | Package | Kernel     | Description |   Acceleration factor | Technology | CPU baseline | Acceleration measurement |
-  |---------|------------|-------------|-----------------------|------------|--------------|--------------------------|
-  | [accelerated_vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/accelerated_vadd_publisher) | [`vadd`](https://github.com/ros-acceleration/acceleration_examples/blob/main/accelerated_vadd_publisher/src/vadd.cpp)  |  An offloaded version of the trivial [vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/vadd_publisher) ROS 2 publisher which adds two inputs to a vector in a loop and publishes them at 10 Hz. Vector add operations are offloaded into to the FPGA. The offloading operation into the FPGA allows the publisher to go from 2 Hz to 6 Hz but still misses its target (10 Hz)  |      3    |  KV260 |  2 Hz (measured with `ros2 topic hz` | 6 Hz `ros2 topic hz` |
-  | [faster_vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/faster_vadd_publisher) | [`vadd`](https://github.com/ros-acceleration/acceleration_examples/blob/main/faster_vadd_publisher/src/vadd.cpp)  |  An accelerated version of the trivial [vadd_publisher](https://github.com/ros-acceleration/acceleration_examples/tree/main/vadd_publisher) ROS 2 publisher which adds two inputs to a vector in a loop and publishes them at 10 Hz. Vector add operations are offloaded into to the FPGA. The acceleration and optimizations of the dataflow allows the publisher to go from 2 Hz to 10 Hz, meeting its target |      5    |  KV260 |  2 Hz (measured with `ros2 topic hz` | 10 Hz `ros2 topic hz` |
-
-
-This REP encourages maintainers to report the impact of hardware acceleration. Each maintainer is free to customize the reporting template.
-
 Template for Vendors
 ^^^^^^^^^^^^^^^^^^^^
 Silicon vendors and solution manufacturers can help set the expectations of the level of support their hardware acceleration technology provides in alignment with this REP by providing a template in the README.md files of their ``firmware`` and/or ``ament`` extensions. Doing so will facilitate the process for consumers and maintainers.
 
-The following template provides an example in **Markdown** syntax:
-
-::
-
-  | Capability | Status |
-  |------------|--------|
-  | **`1.` Kernel Levels** | |
-  | [`1.i` level I kernels](https://ros.org/reps/rep-2008.html#i) | ✓ |
-  | [`1.ii` level II kernels](https://ros.org/reps/rep-2008.html#ii) | :warning: (see [this](https://github.com/Lien182/ReconROS)) |
-  | [`1.iii` level III kernels](https://ros.org/reps/rep-2008.html#iii) |  |
-  | **`2.` Build System** | |
-  | [`2.i` ament extensions](https://ros.org/reps/rep-2008.html#id13) | ✓ |
-  | [`2.ii` `ament_acceleration` support](https://ros.org/reps/rep-2008.html#id14) | |
-  | **`3`. Build Tools** | |
-  | [`3.i` hardware emulation (`hw_emu`) ](https://ros.org/reps/rep-2008.html#id15) |  |
-  | [`3.ii` hardware emulation (`sw_emu`)](https://ros.org/reps/rep-2008.html#id16) | ✓ |
-  | [`3.iii` image tooling](https://ros.org/reps/rep-2008.html#id17) | ✓ |
-  | [`3.iv` Linux kernel ](https://ros.org/reps/rep-2008.html#iv) | ✓ |
-  | [`3.iv.a` modern Linux kernel](https://ros.org/reps/rep-2008.html#iv-a) | ✓ |
-  | [`3.iv.b` LTS Linux kernel](https://ros.org/reps/rep-2008.html#iv-b) | |
-  | [`3.v` hypervisor ](https://ros.org/reps/rep-2008.html#v) | ✓ |
-  | [`3.v.a` no control domain VMs](https://ros.org/reps/rep-2008.html#v-a) | ✓ |
-  | [`3.v.b` guest VMs in disk](https://ros.org/reps/rep-2008.html#v-b) | ✓ |
-  | [`3.v.c` control domain in disk](https://ros.org/reps/rep-2008.html#v-c) | ✓  |
-  | [`3.v.d` no control domain VMs in disk](https://ros.org/reps/rep-2008.html#v-d) | |
-  | [`3.vi` network booting ](https://ros.org/reps/rep-2008.html#vi) | |
-  | [`3.vi.a` boot artifacts ](https://ros.org/reps/rep-2008.html#vi-a) | |
-  | [`3.vi.b` rootfs ](https://ros.org/reps/rep-2008.html#vi-b) | |
-  | [`3.vi.c` multi-network boot](https://ros.org/reps/rep-2008.html#vi-c) | |
-  | [`3.vi.d` secure network booting](https://ros.org/reps/rep-2008.html#vi-d) | |
-  | [`3.vi.e` save in disk network boot](https://ros.org/reps/rep-2008.html#vi-e) | |
-  | **`4.` Benchmarking** | |
-  | [`4.i` kernel benchmarking](https://ros.org/reps/rep-2008.html#id18) | ✓ |
-  | [`4.ii` ROS 2 acceleration benchmarking](https://ros.org/reps/rep-2008.html#id19) | |
-  | **`5.` Documentation** | |
-  | [`5.i` in-code documentation](https://ros.org/reps/rep-2008.html#id20) | ✓ |
-  | **`6.` Testing and CI** | |
-  | [`6.i` `acceleration_examples` ](https://ros.org/reps/rep-2008.html#id21) | ✓ |
-
-
-
+For a **Markdown** syntax example of such template, refer to `acceleration_firmware_kr260 <https://github.com/ros-acceleration/acceleration_firmware_kr260#hardware-acceleration-capabilities>`_.
 
 
 References and Footnotes
