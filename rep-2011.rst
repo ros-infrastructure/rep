@@ -273,7 +273,7 @@ The final form of these interfaces should be found in the reference implementati
     string failure_reason  # Empty if 'successful' was true, otherwise contains details on why it failed
 
     string type_description_raw  # The idl or msg file, with comments and whitespace
-    TypeDescription type_description  # The parse type description which can be used programmatically
+    TypeDescription type_description  # The parsed type description which can be used programmatically
 
     string serialization_library
     string serialization_version
@@ -290,17 +290,107 @@ And the ``IndividualTypeDescription`` type:
 
 .. code::
 
-    FIELD_TYPE_INT = 0
-    FIELD_TYPE_DOUBLE = 1
+    string   type_name
+    Field[]  fields
+
+And the ``Field`` type:
+
+.. code::
+
+    NESTED_TYPE = 0
+    FIELD_TYPE_INT = 1
+    FIELD_TYPE_DOUBLE = 2
     # ... and so on
 
-    uint8_t[] field_types
-    string[] field_names
+    uint8_t field_type
+    string  field_name
+    string  nested_type_name  # If applicable (when field_type is 0)
 
 These naive examples of the interfaces just give an idea of the structure but perhaps do not yet consider some other complications like field annotations and more advanced IDL (generically all "interface description languages" not just the OMG-IDL that DDS uses) have.
 
-.. TODO:: Should we use strings instead of integer enum for the ``field_types``?
+Nested TypeDescription Example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+The ``TypeDescription`` message type shown above also supports the complete description of a type that contains other types (a nested type), up to an arbitrary level of nesting.
+Consider the following example:
+
+.. code::
+
+  # A.msg
+  B b
+  C c
+
+  # B.msg
+  bool b_bool
+
+  # C.msg
+  D d
+
+  # D.msg
+  bool d_bool
+
+The corresponding ``TypeDescription`` for ``A.msg`` will be as follows, with the referenced type descriptions accessible as ``IndividualTypeDescription`` types in the ``referenced_type_descriptions`` field of ``A``:
+
+.. code::
+
+  # A: TypeDescription
+  type_description: A_IndividualTypeDescription
+  referenced_type_descriptions: [B_IndividualTypeDescription,
+                                 C_IndividualTypeDescription,
+                                 D_IndividualTypeDescription]
+
+Note that the type description for ``A`` itself is found in the ``type_description`` field instead of the ``referenced_type_descriptions`` field.
+Additionally, in the case where a type description contains no referenced types (i.e., when it has no fields, or all of its fields are primitive types), the ``referenced_type_descriptions`` array will be empty.
+
+.. code::
+
+  # A: IndividualTypeDescription
+  type_name: "A"
+  fields: [A_b_Field, A_c_Field]
+
+  # B: IndividualTypeDescription
+  type_name: "B"
+  fields: [B_b_bool_Field]
+
+  # C: IndividualTypeDescription
+  type_name: "C"
+  fields: [C_d_Field]
+
+  # D: IndividualTypeDescription
+  type_name: "D"
+  fields: [D_d_bool_Field]
+
+With the corresponding ``Field`` fields:
+
+.. code::
+
+  # A_b_Field
+  field_type: 0
+  field_name: "b"
+  nested_type_name: "B"
+
+  # A_c_Field
+  field_type: 0
+  field_name: "c"
+  nested_type_name: "C"
+
+  # B_b_bool_Field
+  field_type: 9         # Suppose 9 corresponds to a boolean field
+  field_name: "b_bool"
+  nested_type_name: ""  # Empty if primitive type
+
+  # C_d_Field
+  field_type: 0
+  field_name: "d"
+  nested_type_name: "D"
+
+  # D_d_bool_Field
+  field_type: 9
+  field_name: "d"
+  nested_type_name: ""
+
+In order to handle the type of a nested type such as ``A``, the receiver can use the ``referenced_type_descriptions`` array as a lookup table keyed by the value of ``Field.nested_type_name`` or ``IndividualTypeDescription.type_name`` (which will be identical for a given type) to obtain the type information of a referenced type.
+This type handling process can also support any recursive level of nesting (e.g. while handling A, C is encountered as a nested type, C can then be looked up using the top level ``referenced_type_descriptions`` array).
 
 Additional Notes for TypeDescription Message Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -398,7 +488,7 @@ The following is an example of how this plugin matching and loading interface co
 .. code::
 
     // Suppose LaserScanDescription reports that it uses FastCDR v1.0.24 for its serialization
-    rcl_message_description_t LaserScanDescription = node->get_type_description("/scan");
+    rcl_runtime_introspection_description_t LaserScanDescription = node->get_type_description("/scan");
 
     rcl_type_introspection_t * introspection_handle;
     introspection_handle->init();  // Locate local plugins here
@@ -408,81 +498,123 @@ The following is an example of how this plugin matching and loading interface co
     rcl_serialization_plugin_t * plugin = introspection_handle->load_plugin(plugin_name);
 
     // If we wanted to force the use of MicroCDR instead
-    introspection_handle->match_plugin(LaserScanDescription->get_serialization_type(), "microcdr");
-
-Then, the plugin should be able to use the description to deserialize the message buffer using the plugin:
-
-.. code::
-
-    rcl_deserialized_message_t * scan_msg;
-    introspection_handle->deserialize(&plugin, message_buffer, &LaserScanDescription, scan_msg);
-
-    // Where, internally...
-    // rcl_type_introspection_t->(*deserialize)
-    void deserialize(rcl_serialization_plugin_t *plugin,
-                     void *buffer,
-                     rcl_message_description_t *description,
-                     rcl_deserialized_message_t *msg)
-    {
-      ...
-
-      // Do something serialization specific
-      plugin_internal_description_t parsed_description = plugin->impl->parse_description(description);
-      plugin->impl->deserialize(buffer, parsed_description, msg);
-
-      ...
-    }
-
-Similar interfaces could be created to allow access a message's fields by name or index without deserializing the whole message.
+    introspection_handle->match_plugin(LaserScanDescription->get_serialization_format(), "microcdr");
 
 Example Introspection API
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Once the serialization library plugins are able to deserialize the raw message buffer, downstream programs can then introspect the constructed deserialized message object, which should be laid out as such:
+The following is an example for how the introspection API could look like.
+This example will show a read-only interface.
+
+Overview
+""""""""
+
+It should comprise several components
+- a handler for the message buffer, to handle pre-processing (e.g. decompression)
+- a handler for the message description, to keep track of message field names of arbitrary nesting level
+- handler functions for message buffer introspection
+
+Also, this example uses the LaserScan message definition: https://github.com/ros2/common_interfaces/blob/foxy/sensor_msgs/msg/LaserScan.msg
+
+.. TODO:: (methylDragon) Add a reference somehow?
+
+API Example
+"""""""""""
+
+First, the message buffer handler:
 
 .. code::
 
-    struct rcl_deserialized_field_t {
-        void * value;
-        char * type;
+    struct rcl_buffer_handle_t {
+      const void * buffer;  // The buffer should not be modified
+
+      const char * serialization_type;
+      rcl_serialization_plugin_t * serialization_plugin;
+      rcl_runtime_introspection_description_t * description;  // Convenient to have
+
+      // And some examples of whatever else might be needed to support deserialization or introspection...
+      void * serialization_impl;
     }
 
-    struct rcl_deserialized_message_t {
-        int message_field_count;
-        const char** message_field_names;
-        const char** message_types;
+The message buffer handler should allocate new memory if necessary, or store a pointer to the message buffer otherwise in its ``buffer`` member.
 
-        // Some dynamically allocated key->value associative map type storing void * field values
-        rcl_associative_array message_fields;
+Then, functions should be written that allow for convenient traversal of the type description tree.
+These functions should allow a user to get the field names and field types of the top level type, as well as from any nested types.
 
-        // Function pointers
-        rcl_deserialized_field_t * (*get_field_by_index)(int index);
+.. code::
+
+    struct rcl_field_info_t {  // Mirroring Field
+        const char * field_name;  // This should be an absolute address (e.g. "header.seq", instead of "seq")
+
+        uint8_t type;
+        const char * nested_type_name;  // Populated if the type is not primitive
     };
 
-Now, for a given message description `Foo.msg`:
+    // Get descriptions
+    rcl_runtime_introspection_description_t LaserScanDescription = node->get_type_description("/scan");
+    rcl_runtime_introspection_description_t HeaderDescription = node->get_referenced_description(LaserScanDescription, "Header");
+
+    // All top-level fields from description
+    rcl_field_info_t ** fields = get_field_infos(&LaserScanDescription);
+
+    // A single field from description
+    rcl_field_info_t * header_field = get_field_info(&LaserScanDescription, "header");
+
+    // A single field from a referenced description
+    rcl_field_info_t * stamp_field = get_field_info(&HeaderDescription, "stamp");
+
+    // A nested field from top-level description
+    rcl_field_info_t * stamp_field = get_field_info(&LaserScanDescription, "header.stamp");
+
+Finally, there should be functions to obtain the data stored in the message fields.
+This could be by value or by reference, depending on what the serialization library supports, for different types.
+
+There minimally needs to be a family of functions to obtain data stored in a single primitive message field, no matter how deeply nested it is.
+These need to be created for each primitive type.
+
+The rest of the type introspection machinery can then be built on top of that family of functions, in layers higher than the C API.
 
 .. code::
 
-    // Foo.msg
-    bool bool_field
-    char char_field
-    float32 float_field
+    rcl_buffer_handle_t * scan_buffer = node->get_processed_buffer(some_raw_buffer);
 
-The corresponding `rcl_deserialized_message_t` can be queried accordingly:
+    // Top-level primitive field
+    get_primitive_field_float32(scan_buffer, "scan_time");
+
+    // Nested primitive field
+    get_primitive_field_uint32_seq(scan_buffer, "header.seq");
+
+    // Nested primitive field sequence element (overloaded)
+    get_field_seq_length(scan_buffer, "header.seq");  // Support function
+    get_primitive_field_uint32(scan_buffer, "header.seq", 0);
+
+If we attempt to do the same by reference, the plugin might decide to allocate new memory for the pointer, or return a pointer to existing memory.
 
 .. code::
 
-    rcl_deserialized_message_t * foo_msg;
-    foo_msg->message_field_names[0];  // "bool_field"
-    foo_msg->message_types[0];  // "bool"
+    // Nested primitive field
+    get_primitive_field_uint32_seq_ptr(scan_buffer, "header.seq");
 
-    // Get the field
-    if (strcmp("bool", foo_msg->get_field_by_index(0)->type) == 0)
-    {
-        *((bool*)foo_msg->get_field_by_index(0)->value);
-    }
+    // Be sure to clean up any dangling pointers
+    finalize_field(some_field_data_ptr);
 
-.. TODO:: Create pseudocode/definitions for sequences and arbitrarily nested message descriptions.
+Error cases
+"""""""""""
+
+The following should be error cases:
+
+- accessing field data as incorrect type
+- accessing or introspecting incorrect/nonexistent field names
+
+.. TODO: (methylDragon) Are there more cases? It feels like there are...
+
+Pointer lifecycles
+""""""""""""""""""
+
+- the raw message buffer should outlive the ``rcl_buffer_handle_t``, since it is not guaranteed that the buffer handle will allocate new memory
+- the ``rcl_buffer_handle_t`` should outlive any returned field data pointers, since it is not guaranteed that the serialization plugin will allocate new memory
+- however, ``rcl_field_info_t`` objects **do not** have any lifecycle dependencies, since they are merely descriptors
+
 
 Rationale
 =========
@@ -577,6 +709,47 @@ Additionally, the option to add a configuration option to choose what contents t
 
 As for the format of the type description, using the ROS interfaces to describe the type, as opposed to an alternative format like XML, JSON, or something like the TypeObject defined by DDS-XTypes, makes it easier to embed in the ROS Service response.
 It also prevents unnecessary coupling with third-party specifications that could be subject to change and reduces the formats that need to be considered on the receiving end of the ROS Service call.
+
+TypeDescription Structure
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Representing Fields as An Array of Field Types
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The use of an array of ``Field`` messages was balanced against using two arrays in the ``IndividualTypeDescription`` type to describe the field types and field names instead, e.g.:
+
+.. code::
+
+  # Rejected IndividualTypeDescription Variants
+
+  # String variant
+  string type_name
+  string field_types[]
+  string field_names[]
+
+  # uint8_t Variant
+  string type_name
+  uint8_t field_types[]
+  string field_names[]
+
+The string variant was rejected because using strings to represent primitive types wastes space, and will lead to increased bandwidth usage during the discovery and type distribution process.
+The uint8_t variant was rejected because uint8_t enums are insufficiently expressive to support nested message types.
+
+The use of the ``Field`` type, with a ``nested_type_name`` field that defaults to an empty string mitigates the space issue while allowing for support of nested message types.
+Furthermore, it allows the fields to be described in a single array, which is easier to iterate through and also reduces the chances of any errors from mismatching the array lengths.
+
+Using an Array to Store Referenced Types
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some alternatives to using an array of type descriptions to store referenced types in a nested type were considered, including:
+
+- Storing the referenced types inside the individual type descriptions and accessing them by traversing the type description tree recursively instead of using a lookup table.
+
+  - Rejected because the IDL spec does not allow for a type description to store itself, and also because it could possibly introduce duplicate, redundant type descriptions in the tree, using up unnecessary space.
+
+- Sending referenced types in a separate service call or message.
+
+  - Rejected because needing to collate all of the referenced types on the receiver end introduces additional implementation complexity, and also increases network bandwidth with all the separate calls that must be made.
 
 
 Backwards Compatibility
