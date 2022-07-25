@@ -21,21 +21,21 @@ Terminology
   A ROS service request.
 :Response:
   A ROS service response.
-:Service:
-  A ROS service.
+:Server:
+  A ROS service server.
   Accepts requests from clients and sends responses.
 :Client:
   A ROS service client.
-  Sends requests to services and receives responses.
+  Sends requests to servers and receives responses.
 
 Motivation
 ==========
 
 The primary motivation for this proposal is to make it easier for users to externally validate that services are operating as expected.
 Drawing an analogy to ROS topics, there exists tools and libraries for "echoing" and recording messages sent over a topic, and we would like to see the same kind of capabilities for services.
-Specifically, we want the capability to introspect requests and responses that are sent to and from services and clients.
+Specifically, we want the capability to introspect requests and responses that are sent to and from service servers and clients.
 Being able to remotely monitor services allows users to more effectively troubleshoot issues in a ROS system.
-For example, we could verify requests are being received by a service by employing a command-line tool during runtime.
+For example, we could verify requests are being received by a server by employing a command-line tool during runtime.
 Or, we could post-process recorded requests and responses to validate their content.
 
 There are additional features that could leverage this proposal, such as:
@@ -54,21 +54,21 @@ Publishing Service Events
 -------------------------
 
 Whenever a request or response is sent or received, a *service event* message will be published to a topic.
-Services are responsible for publishing a message when they receive a request and when they send a response.
+Servers are responsible for publishing a message when they receive a request and when they send a response.
 Likewise, clients are responsible for publishing a message when they send a request and when they receive a response.
 Therefore, we have a total of four possible events:
 
 :Request Sent:
-  Emitted from a client after sending a request to a service.
+  Emitted from a client after sending a request to a server.
 :Request Received:
-  Emitted from a service after receiving a request from a client.
+  Emitted from a server after receiving a request from a client.
 :Response Sent:
-  Emitted from a service after sending a response to a client.
+  Emitted from a server after sending a response to a client.
 :Response Received:
-  Emitted from a client after receiving a response from a service.
+  Emitted from a client after receiving a response from a server.
 
 Event messages shall be published to the hidden topic ``/SERVICE_NAME/_service_event``, where ``SERVICE_NAME`` is the fully-qualified name of the service.
-Both services and clients will publish events to the same topic.
+Both servers and clients will publish events to the same topic.
 Note that this implies that services must have unique names.
 
 By publishing service event messages to predetermined topics, tools and libraries are able to subscribe to these topics to inspect the flow of data between services.
@@ -101,10 +101,10 @@ where ``rcl_interfaces/msg/ServiceEventInfo.msg`` is defined as,
    # Indicates this is a request sent event emitted from a client
    uint8 REQUEST_SENT      = 0
 
-   # Indicates this is a request received event emitted from a service
+   # Indicates this is a request received event emitted from a server
    uint8 REQUEST_RECEIVED  = 1
 
-   # Indicates this is a response sent event emitted from a service
+   # Indicates this is a response sent event emitted from a server
    uint8 RESPONSE_SENT     = 2
 
    # Indicates this is a response received event emitted from a client
@@ -136,13 +136,13 @@ I.e. they are set to the time directly after a request or response is sent or re
 
 Timestamps shall respect ROS time [4]_.
 This means by default they will be set with wall-time.
-If simulation time is enabled by the node implementing the service or client, then timestamps will get their time from the ``/clock`` topic.
+If simulation time is enabled by the node implementing the server or client, then timestamps will get their time from the ``/clock`` topic.
 
 Client ID and sequence number
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Both the client ID and sequence number are provided by the ROS middleware [5]_.
-They can be accessed from ``rcl`` [6]_ when taking a request or response for a service or client respectively.
+They can be accessed from ``rcl`` [6]_ when taking a request or response for a service server or client respectively.
 
 Example
 ^^^^^^^
@@ -191,21 +191,21 @@ Each node may offer the following four Boolean parameters:
   If ``true``, then client "request sent" and "response received" events will be published for all clients created by this node.
   The default value is ``false``.
 :publish_service_events:
-  If ``true``, then service "request received" and "response sent" events will be published for all services created by this node.
+  If ``true``, then service "request received" and "response sent" events will be published for all service servers created by this node.
   The default value is ``false``.
 :client_event_payload:
   If ``true``, then client event messages will have the ``request`` and ``response`` members set.
   Only applies if ``publish_client_events`` is ``true``.
   The default value is ``true``.
 :service_event_payload:
-  If ``true``, then service event messages will have the ``request`` and ``response`` members set.
+  If ``true``, then server event messages will have the ``request`` and ``response`` members set.
   Only applies if ``publish_service_events`` is ``true``.
   The default value is ``true``.
 
-By default, the event publishing feautre is off so users do not pay for a feature they do not plan to use.
+By default, the event publishing feature is off so users do not pay for a feature they do not plan to use.
 Furthermore, node authors may opt-in by default or disable the service introspection feature altogether as they see fit.
 
-As an example, service introspection can be enabled for all services and clients by providing the following parameters YAML file to ROS nodes [7]_:
+As an example, service introspection can be enabled for all servers and clients by providing the following parameters YAML file to ROS nodes [7]_:
 
 .. code-block:: yaml
 
@@ -261,9 +261,9 @@ therefore it should be easy to turn on the feature for all services.
 However, since it is difficult to predict how the feature will ultimately be used, we want to provide some flexibility.
 
 Boolean parameters are chosen as an easy way to toggle the feature on and off per node (because ROS parameters are stored per node).
-Recognizing that both client events and service events contain redundant information (besides timestamps), we provide a separate parameter to toggle the feature for clients.
+Recognizing that both client events and server events contain redundant information (besides timestamps), we provide a separate parameter to toggle the feature for clients.
 Similarly, extra overhead may arise in cases where service requests or responses are *very* large.
-So, additional parameters are offered to avoid sending content for client or service events.
+So, additional parameters are offered to avoid sending content for client or server events.
 This way users who are concerned with extra overhead incurred by enabling service introspection have mitigation options.
 
 
@@ -287,10 +287,10 @@ Separate request and response events instead of single service event
 --------------------------------------------------------------------
 
 This REP defines four event types for requests and responses.
-Publishing separate events from client and services makes it possible to detect the situations such as:
+Publishing separate events from client and servers makes it possible to detect situations such as:
 
-* a request was sent by a client, but not received by a service
-* a request was received by a service, but a response was not sent
+* a request was sent by a client, but not received by a server
+* a request was received by a server, but a response was not sent
 
 Alternatively, a single event could have been defined containing both the request and response.
 While this would be convenient for tools to match requests and responses, it would result in duplicate or unused message content.
