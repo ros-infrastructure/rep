@@ -314,6 +314,7 @@ All items on the list for the next distro should already be released into the ro
 
 * Features
 
+  * `diagnostics/diagnostic_aggregator <https://index.ros.org/p/diagnostic_aggregator/>`_
   * `diagnostics/diagnostic_updater <https://index.ros.org/p/diagnostic_updater/>`_
   * `diagnostics/self_test <https://index.ros.org/p/self_test/>`_
   * `joint_state_publisher/joint_state_publisher <https://index.ros.org/p/joint_state_publisher/>`_
