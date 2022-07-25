@@ -421,6 +421,7 @@ All items on the list for the next distro should already be released into the ro
   * `geometry2/tf2_tools <https://index.ros.org/p/tf2_tools/>`_
   * `kdl_parser/kdl_parser <https://index.ros.org/p/kdl_parser/>`_
   * `message_filters/message_filters <https://index.ros.org/p/message_filters/>`_
+  * `ros/bond_core <https://github.com/ros/bond_core/>`_
   * `sros2/sros2 <https://index.ros.org/p/sros2/>`_
   * `sros2/sros2_cmake <https://index.ros.org/p/sros2_cmake/>`_
   * `teleop_twist_joy/teleop_twist_joy <https://index.ros.org/p/teleop_twist_joy/>`_
