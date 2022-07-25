@@ -407,7 +407,7 @@ References
    (https://docs.ros.org/en/rolling/Concepts/About-Quality-of-Service-Settings.html)
 
 .. [10] SROS 2
-   (https://github.com/ros2/sros2)
+   (https://aliasrobotics.com/files/SROS2.pdf)
 
 .. [11] NoDL
    (https://github.com/ubuntu-robotics/nodl)
