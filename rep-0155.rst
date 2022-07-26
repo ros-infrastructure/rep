@@ -125,8 +125,10 @@ altogether if no meaningful estimate of the human location is available.
 See section `Person frame`_ for details regarding the ``person_<personID>``
 frame.
 
-At any given time, the list of known persons is published under the
-``/humans/persons/tracked`` topic as ``hri_msgs/IdsList`` messages.
+At any given time, the list of currently-seen persons is published under the
+``/humans/persons/tracked`` topic as ``hri_msgs/IdsList`` messages, and the list
+of all known persons (ie, persons that have been seen and recognized at least
+once in the past) under ``/humans/persons/known``.
 
 Merging Person Identifiers
 ''''''''''''''''''''''''''
@@ -151,8 +153,8 @@ for persons that the robot has detected but not yet identified.
 
 For instance, the robot hears a voice, and therefore knows that a person is
 around, but no voice identification nodes is available -- or the voice
-identification has not yet recognised the voice: in such a case, an *anonymous
-person* might be created, ie a person who has not yet been assigned a permanent
+identification has not yet recognised the voice. In such a case, an *anonymous
+person* MAY be created, ie a person who has not yet been assigned a permanent
 ID.
 
 *Anonymous persons* are treated like regular persons.
@@ -177,7 +179,7 @@ to recognise the face and re-assign the same face ID if the person reappears.
    confident that the face is indeed the same.
 
 There is a one-to-one relationship between this face ID and the estimated 6D
-pose of the head. If the node published a head pose estimated, the ROS TF frame
+pose of the head. If the node publishes a head pose estimation, the ROS TF frame
 MUST be named ``face_<faceID>`` (see section `Face and Gaze Frames`_ for the
 face frame conventions).
 
@@ -192,7 +194,7 @@ associated to a person’s skeleton.
 It is normally created by a skeleton tracker upon detection of a skeleton.
 
 Like the face ID, **the body ID is not persistent**, and is valid only as long
-as the specific skeleton is tracked by skeleton tracker which initially
+as the specific skeleton is tracked by the skeleton tracker which initially
 detected it.
 
 The corresponding TF frame is ``body_<bodyID>``, and TF frames associated with
