@@ -426,7 +426,7 @@ detectors:
 ================ ==================================== ======== ========================
 Name             Message type                         Required Description
 ================ ==================================== ======== ========================
-``/audio``       ``audio_msgs/AudioData``                x     Separated audio stream
+``/audio``       ``audio_common_msgs/AudioData``         x     Separated audio stream
                                                                for this voice
 ``/features``    ``hri_msgs/AudioFeatures``                    INTERSPEECH’09 Emotion
                                                                challenge [4]_
