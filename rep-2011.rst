@@ -208,7 +208,7 @@ It will continue to do this until it reaches the desired type version or it fail
     └─┬────────────────────┘                  └─────────────────────────┘
       │                                                          ▲
       │             ┌─────────────────────────────────┐          │
-      ✓ /topic/ABC  │ Transfer Functions for ABC->XYZ │    /topic ✓
+      ✓ /topic/ABC  │ Transfer Functions for ABC->XYZ │   /topic ✓
       │             │                                 │          │
       │  ┌──────────┴──────────────┐   ┌──────────────┴───────┐  │
       └─►│Subscription<Message@ABC>│   │Publisher<Message@XYZ>├──┘
