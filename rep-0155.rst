@@ -249,14 +249,15 @@ Common Parameters
   ``/humans/faces/XYZ/aligned`` and ``/humans/faces/XYZ/frontalized``
 - ``/human_description_<bodyID>``: URDF models of detected humans.
   See Section `Kinematic Model of the Human`_ for details.
-- ``/human/match_threshold`` (``float``, default: 0.5): the minimum level of
+- ``/humans/match_threshold`` (``float``, default: 0.5): the minimum level of
   likelihood to consider a face/body/voice to belong to a given person.
 - ``/humans/reference_frame`` (``string``, default: `map`): persons' TF frames
   must be published with respect to `reference_frame`.
   Typically, faces/bodies/voices frames are published wrt to their respective
   sensors frame.  `reference_frame` is usually a 'static' frame (eg `map`), so
   that if the person moves out of view of the robot (and therefore, its position
-  can not be updated anymore), it 'stays' where it was last seen.
+  can not be updated anymore), it remains where it was last seen, independently
+  of any possible robot motion.
 
 Topics Structure
 ================
@@ -628,10 +629,10 @@ Overall, six independent nodes are combined to implement this pipeline:
 This possible pipeline is only for illustration purposes: depending on each
 specific pipeline implementations, some of these nodes might be merged or on
 the contrary, further divided into smaller nodes.
-For instance, one might
-choose to integrate together the face recogniser node and the person manager.
+For instance, one might choose to integrate together the face recogniser node
+and the person manager.
 
-Note as well that, in order to build a complete perception pipeline for HRI,
+Note as well that in order to build a complete perception pipeline for HRI,
 additional nodes would be needed, for instance for voice processing.
 
 Kinematic Model and Coordinate Frames
