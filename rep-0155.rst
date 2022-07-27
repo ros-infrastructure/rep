@@ -227,30 +227,13 @@ matches between voices and persons) and one 'person manager' node collecting
 the candidates, and publishing the most likely associations between a person ID
 and its face/body/voice IDs under the ``/humans/persons/`` namespace.
 
-Special case for anonymous persons
-''''''''''''''''''''''''''''''''''
-
-A node that wants to advertise that a person exists, but is not identified yet
-("anonymous person") SHOULD publish a ``hri_msgs/IdsMatch`` message on the
-``/humans/candidate_matches`` topic with only one specified id.
-For instance, a simple face *detector* (ie, not performing face identification)
-can published a message like:
-
-.. code:: python
-
-  {face_id: 'ff424', body_id: '', voice_id: '', person_id: '' confidence: 0.0, }
-
-to indicate that the face ``ff424`` has been detected, and thus, a corresponding
-person must exist.
-That person will be published as ``anonymous``, and that message will have lower
-precedence than another message that associates that face to a recognised person.
-Note that in that case, the confidence MUST be ignored.
 
 Identifier Syntax
 -----------------
 
-Identifiers can be arbitrary, as long as they are unique.
-It is also recommended to keep them short to avoid clutter.
+Identifiers can be arbitrary, as long as they are unique. We recommend to follow
+standard syntaxic rules so that they are also valid indentifiers in mainstream
+programming languages (eg, start with a letter).
 
 Note that using people’s names as identifier is possible, but not
 generally recommended as collisions are likely.
