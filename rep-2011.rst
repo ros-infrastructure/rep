@@ -185,7 +185,7 @@ They can use a tool that will look at a catalogue of available transfer function
                                      or
 
                           ┌───────────────────────┐
-    ┌───────────────┐     │ User-defiend transfer │          ┌───────────────┐
+    ┌───────────────┐     │ User-defined transfer │          ┌───────────────┐
     │Message@current├────►│ function from current ├───...───►│Message@desired│
     └───────────────┘     │to desired/intermediate│    ▲     └───────────────┘
                           └───────────────────────┘    │
@@ -653,6 +653,11 @@ In the case where there exists multiple applicable plugins for a particular seri
     That would need the ability to both create a new type from nothing (maybe no more than creating a ``TypeDescription`` instance) as well as a read-write interface to the reflection.
     We don't have to support these things in this REP, but we should at least mention them and state if it is in or out of the scope of the REP.
 
+Tools for Evolving Types
+------------------------
+
+TODO
+
 Rationale
 =========
 
@@ -958,7 +963,7 @@ Furthermore, an initial evolving message test with FastDDS, Cyclone and Connext 
 Handle Detection of Version Mismatch "Above" rmw Layer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We can choose to utilize ``USER_DATA`` QoS to distribute the message version during discovery phase. The message version for each participant will then be accessable across all available nodes. By getting the version hash through ``user_data`` via the ``rmw`` layer, similar type version matching can be detected.
+We can choose to utilize ``USER_DATA`` QoS to distribute the message version during discovery phase. The message version for each participant will then be accessible across all available nodes. By getting the version hash through ``user_data`` via the ``rmw`` layer, similar type version matching can be detected.
 
 Prevent Communication of Mismatched Versions "Above" rmw Layer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
