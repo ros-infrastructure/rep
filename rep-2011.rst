@@ -239,8 +239,8 @@ In order to support this vision, three missing features will need to be added in
 
 These features are described in the following sections.
 
-Interface Type Enforcement
---------------------------
+Type Version Enforcement
+------------------------
 
 In order to detect type version mismatches and enforce them, a way to uniquely identify versions is required, and this proposal uses type version hashes.
 
