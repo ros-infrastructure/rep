@@ -582,6 +582,7 @@ All items on the list for the next distro should already be released into the ro
   * `ApexAI/performance_test <https://gitlab.com/ApexAI/performance_test>`_
   * `ApexAI/performance_test_ros1_msgs <https://gitlab.com/ApexAI/performance_test>`_
   * `ApexAI/performance_test_ros1_publisher <https://gitlab.com/ApexAI/performance_test>`_
+  * `ms-iot/vscode-ros <https://github.com/ms-iot/vscode-ros>`_
   * RQt
 
     * `python_qt_binding/python_qt_binding <https://index.ros.org/p/python_qt_binding/>`_
