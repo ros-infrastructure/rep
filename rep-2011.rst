@@ -232,7 +232,7 @@ Tools will assist the user in making these remappings and running the necessary 
 Once the mismatched messages are flowing through the transfer functions, communication should be possible and neither the publishing side nor the subscribing side have any specific knowledge of the conversions taking place or that any conversions are necessary.
 
 .. TODO::
-    
+
     Extend conceptual overview to describe how this will work with Services and Actions.
     Services, since they are not sensitive to the many-to-many (many publisher) issue, unlike Topics, and because they do not have as many QoS settings that apply to them, they can probably have transfer functions that are plugins, rather than separate component nodes that repeat the service call, like the ros1_bridge.
     Actions will be a combination of topics and services, but will have other considerations in the tooling.
@@ -1276,10 +1276,108 @@ Backwards Compatibility
 
 TODO
 
+
 Feature Progress
 ================
 
-TODO
+Supporting Feature Development:
+
+- TypeDescription Message:
+
+  - [ ] Define and place the TypeDescription.msg Message type in a package
+
+- Enforced Type Versioning:
+
+  - [ ] Create library to calculate version hash from message files
+  - [ ] Create library to calculate version hash from service files
+  - [ ] Create library to calculate version hash from action files
+  - [ ] Create command-line tool to show the version hash of an interface
+
+  - [ ] Add topic type version hash to the "graph" API
+  - [ ] Implement delivery of type version hash during discovery:
+
+    - [ ] rmw_fastrtps_cpp
+    - [ ] rmw_cyclonedds_cpp
+    - [ ] rmw_connextdds
+
+  - [ ] Add rmw API for notifying user when a topic endpoint was not matched due to type mismatch
+
+  - [ ] Detect when Message versions do not match, prevent matching, notify user:
+
+    - [ ] rmw_fastrtps_cpp
+    - [ ] rmw_cyclonedds_cpp
+    - [ ] rmw_connextdds
+
+  - [ ] Detect when Service versions do not match, prevent matching, notify user:
+
+    - [ ] rmw_fastrtps_cpp
+    - [ ] rmw_cyclonedds_cpp
+    - [ ] rmw_connextdds
+
+  - [ ] Detect when Action versions do not match, prevent matching, notify user:
+
+    - [ ] rmw_fastrtps_cpp
+    - [ ] rmw_cyclonedds_cpp
+    - [ ] rmw_connextdds
+
+- Type Description Distribution:
+
+  - [ ] Define and place the GetTypeDescription.srv Service type in a package
+  - [ ] Implement the "get type description" service in the rcl layer
+
+- Run-time Interface Reflection:
+
+  - [ ] Prototype "description of type" -> "accessing data fields from buffer" for each rmw vendor:
+
+    - [ ] Fast-DDS
+    - [ ] CycloneDDS
+    - [ ] RTI Connext Pro
+
+  - [ ] Prototype "description of type" -> "create datareaders/writers" for each rmw vendor:
+
+    - [ ] Fast-DDS
+    - [ ] CycloneDDS
+    - [ ] RTI Connext Pro
+
+  - [ ] Implement reflection API in ``rcl_serialization`` package, providing (de)serialization with just a description
+  - [ ] Implement single "plugin" using Fast-CDR (tentatively)
+  - [ ] Implement plugin system, allowing for multiple backends for (X)CDR
+  - [ ] Implement at least one other (X)CDR backend, perhaps based on RTI Connext Pro
+
+  - [ ] Add "description of type" -> ``rosidl_message_type_support_t`` to ``rmw`` API
+
+    - [ ] rmw_fastrtps_cpp
+    - [ ] rmw_cyclonedds_cpp
+    - [ ] rmw_connextdds
+
+  - [ ] Update APIs for creating Publishers and Subscriptions in rclcpp using a TypeDescription instance
+
+  - [ ] Add "description of type" -> ``rosidl_service_type_support_t`` to ``rmw`` API
+
+    - [ ] rmw_fastrtps_cpp
+    - [ ] rmw_cyclonedds_cpp
+    - [ ] rmw_connextdds
+
+  - [ ] Update APIs for creating Service Clients and Servers in rclcpp using a TypeDescription instance
+
+Tooling Development:
+
+- [ ] Command-line tools for interacting with type version hashes
+- [ ] Add a default warning to users when a topic has mismatched types (by type or version)
+
+- [ ] Command-line tool for determining if two versions of a type are convertible
+
+- [ ] CMake and C++ APIs for writing transfer functions, including usage documentation
+- [ ] Command-line tools for interacting with user-defined transfer functions
+- [ ] Command-line tool for starting a conversion node between two versions of a type
+
+- [ ] Integration with launch, making it easier to set up conversions in launch files
+
+- [ ] Integration with rosbag2
+
+  - [ ] Record the type version hash, TypeDescription, and other metadata into bags
+  - [ ] Use recorded metadata to create subscriptions without needing the type to be built locally
+  - [ ] Use recorded metadata to create publishers from descriptions in bag
 
 
 References
