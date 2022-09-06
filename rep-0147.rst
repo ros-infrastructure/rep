@@ -1,7 +1,7 @@
 REP: 147
 Title: A Standard interface for Aerial Vehicles
 Author: Tully Foote
-Status: Draft
+Status: Deferred
 Type: Informational
 Content-Type: text/x-rst
 Created: 16-May-2016
@@ -25,7 +25,7 @@ Rationale
 
 There are a lot of developers around the world using ROS on aerial vehicles.
 As such there are also many different implementations which are similiar but not exactly compatible.
-A short list of existing known bridges and implementations follows: 
+A short list of existing known bridges and implementations follows:
 
  - astec_mav_framework [#astec]_
  - autopilot_bridge [#autopilot_bridge]_
@@ -50,7 +50,7 @@ Other interface defintions
 ==========================
 
 There are a lot of messages already defined.
-These messages definitions were used to help define this set. 
+These messages definitions were used to help define this set.
 
  - DroneKit [#dronekit]_
  - mav_msgs [#mav_msgs]_
@@ -76,7 +76,7 @@ Control Abstractions
 For controlling an aerial vehicle we will use the following terms for the interfaces.
 
 .. raw:: html
-  
+
   <div class="mermaid">
   graph LR
     na[ ]
@@ -88,12 +88,12 @@ For controlling an aerial vehicle we will use the following terms for the interf
     tc ==>|Pose|ac
     ac ==>|Rate|rc
     rc ==>|Acceleration|va
-    
+
     va -.-> am[Allocation Matrix]
     va -.-> mixer
-    
+
     am -.-> Actuators
-    mixer -.-> Actuators 
+    mixer -.-> Actuators
   </div>
 
 High Level Architecture
@@ -102,7 +102,7 @@ High Level Architecture
 A higher level view of the system uses the following abstraction.
 
 .. raw:: html
-  
+
   <div class="mermaid">
   graph LR
     GCS[Ground Control Station]
@@ -125,7 +125,7 @@ A higher level view of the system uses the following abstraction.
     OS -->|Odometry|C
     GCS -->|Goals|MSC
     MSC -->|Control Abstraction|C
-    %% Links to L 
+    %% Links to L
     linkStyle 0 fill:#fff,stroke:#ff0,stroke-width:0px;
     linkStyle 1 fill:#fff,stroke:#ff0,stroke-width:0px;
     linkStyle 2 fill:#fff,stroke:#ff0,stroke-width:0px;
@@ -152,7 +152,7 @@ This message used is ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]
 This message is not the most straight forward to parse as it has a lot of optional fields which increases the complexity and requires consistent labelling and filling.
 The complexity of the message parsing is traded off against supporting a relatively compact representations.
 
-* Datatype: ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_ 
+* Datatype: ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_
 * Topic: ``command_trajectory``
 
 ::
@@ -337,7 +337,7 @@ To send a series of goals a list of GlobalPositions can be used.
 * Datatype: ``nav_msgs/GlobalWaypoints`` `[proposed]`
 * Topic: ``command_gps_pose``
 
-:: 
+::
 
   nav_msgs/GlobalPosition[] waypoints
 
@@ -424,7 +424,7 @@ In theory all of the states could be eliminated and the arming, takeoff, landing
 To that end the following modes for ROS flight operations are proposed.
 
 .. raw:: html
-  
+
   <div class="mermaid">
   graph LR
     DISARMED[Disarmed]
@@ -495,7 +495,7 @@ Text Status Outputs
 -------------------
 
 Code should use the ROS_CONSOLE or RCL status api to report status.
-This has infrastructure for enabling and setting verbosity levels at startup and runtime as well as changing them during runtime and has standard messages for remotely monitoring and controlling them. 
+This has infrastructure for enabling and setting verbosity levels at startup and runtime as well as changing them during runtime and has standard messages for remotely monitoring and controlling them.
 
 - ``STATUSTEXT``
 
@@ -675,7 +675,7 @@ Logging and playback are recommended to be managed by rosbag.
 There are APIs already implemented for controlling recording remotely.
 There are not currently apis for downloading the data but that is likely better done using a standard file transfer mechanism than through a runtime behavior.
 
-Related mavlink messages include: 
+Related mavlink messages include:
 
 - ``LOG_REQUEST_END``
 - ``LOG_ERASE``
