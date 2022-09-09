@@ -1350,15 +1350,23 @@ Supporting Feature Development:
     - [ ] rmw_cyclonedds_cpp
     - [ ] rmw_connextdds
 
-  - [ ] Update APIs for creating Publishers and Subscriptions in rclcpp using a TypeDescription instance
-
   - [ ] Add "description of type" -> ``rosidl_service_type_support_t`` to ``rmw`` API
 
     - [ ] rmw_fastrtps_cpp
     - [ ] rmw_cyclonedds_cpp
     - [ ] rmw_connextdds
 
-  - [ ] Update APIs for creating Service Clients and Servers in rclcpp using a TypeDescription instance
+  - [ ] Update APIs for rclcpp to support using TypeDescription instances to create entities:
+
+    - [ ] Topics
+    - [ ] Services
+    - [ ] Actions
+
+  - [ ] Update APIs for rclpy to support using TypeDescription instances to create entities:
+
+    - [ ] Topics
+    - [ ] Services
+    - [ ] Actions
 
 Tooling Development:
 
@@ -1378,6 +1386,7 @@ Tooling Development:
   - [ ] Record the type version hash, TypeDescription, and other metadata into bags
   - [ ] Use recorded metadata to create subscriptions without needing the type to be built locally
   - [ ] Use recorded metadata to create publishers from descriptions in bag
+  - [ ] Provide a method to playback/update old bag files that do not have type descriptions stored
 
 
 References
