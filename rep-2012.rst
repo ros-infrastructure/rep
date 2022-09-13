@@ -94,7 +94,9 @@ For each service definition, ``my/srv/Foo.srv``, we define a new ROS message typ
    # and the introspection feauture is configured to include payload data.
    my/srv/Foo_Response[<=1] response
 
-where ``rcl_interfaces/msg/ServiceEventInfo.msg`` is defined as,
+The reserved underscore character is used in the generated type name to avoid potential collisions with user-defined types.
+
+``rcl_interfaces/msg/ServiceEventInfo.msg`` is defined as,
 
   .. code-block::
 
@@ -124,8 +126,6 @@ where ``rcl_interfaces/msg/ServiceEventInfo.msg`` is defined as,
    # Combined with the client ID, this creates a unique ID for the service transaction
    int64 sequence_number
 
-The reserved underscore character is used in the generated type name to avoid potential collisions with user-defined types.
-
 Service event definitions are generated as part of the ``rosidl`` pipeline [3]_.
 
 Timestamp
@@ -143,6 +143,7 @@ Client ID and sequence number
 
 Both the client ID and sequence number are provided by the ROS middleware [5]_.
 They can be accessed from ``rcl`` [6]_ when taking a request or response for a service server or client respectively.
+Together they are used to uniquely identify the service transaction (i.e. they uniquely identify a single request-reponse pair).
 
 Example
 ^^^^^^^
@@ -236,6 +237,7 @@ Any existing tooling for aiding users in setting up ROS security should consider
 Rationale
 =========
 
+The following sections summarize *why* certain design decisions were made and some of the alternatives considered.
 
 Using ROS Parameters for configuration
 --------------------------------------
@@ -298,6 +300,29 @@ While this would be convenient for tools to match requests and responses, it wou
 A second alternative is to define unique request and response event types for clients and services (for a total of four event types and four topics per service).
 However, it's not clear that there is much benefit in the additional types considering the definition of a client request type and service request type would be identical (the same applying to response types).
 
+Define a single event type with serialized data
+-----------------------------------------------
+
+Rather than generating event types in ``rosidl``, we considered defining a single type with type-erased data for the request and/or response, for example,
+
+  .. code-block::
+
+   rcl_interfaces/msg/ServiceEventInfo info
+
+   # The request/response type
+   # e.g. my/srv/Foo_Request
+   string idl_type_name
+
+   # Serialized data
+   byte[] request_or_response
+
+This has the benefit of avoiding additional code generation for each service type and gives us the option to put all service events on one common topic.
+
+The downsides include extra overhead from serializing/deserializing the data and tools having to filter out messages based on the service type or name.
+
+Ultimately, it was decided that having separate event topics per service name would be more useful for tooling and debugging.
+For example, it makes it easier to selectively introspection a subset of services by name.
+
 
 Backwards Compatibility
 =======================
@@ -325,7 +350,7 @@ Internally, it would subscribe to the `hidden topics <Publishing Service Events_
 The existing command line parameters for topics can be extended to be used with this ``echo`` verb, along with new
 arguments on to filter message content and analyze delays.
 
-Building off the example with AddTwoInts discussed earlier, an example ``ros2 service echo`` call may look like the following:
+Building on the example with AddTwoInts discussed earlier, an example ``ros2 service echo`` call may look like the following:
 
 .. code-block::
 
