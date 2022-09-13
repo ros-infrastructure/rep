@@ -5,7 +5,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 07-Jun-2022
-Post-History:
+Post-History: 20-Jun-2022
 
 Abstract
 ========
@@ -440,6 +440,12 @@ References
 .. [12] Launch ROS
    (https://github.com/ros2/launch_ros)
 
+
+Discussions
+-----------
+
+* Review of first draft review on GitHub
+  (https://github.com/ros-infrastructure/rep/pull/360)
 
 
 Copyright
