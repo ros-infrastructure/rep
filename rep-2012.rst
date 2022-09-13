@@ -333,8 +333,9 @@ As an opt-in feature, users should not incur additional overhead by default.
 Feature Progress
 ================
 
-TODO: development of a prototype is underway.
+Most elements of this proposal have been implemented and are currently under review.
 
+Progress on the implementation is being tracked on GitHub at `ros2/ros2#1285 <https://github.com/ros2/ros2/issues/1285>`_.
 
 Other
 =====
