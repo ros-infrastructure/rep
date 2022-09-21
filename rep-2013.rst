@@ -1,0 +1,58 @@
+REP: 2013
+Title: ROS 2 Client Library Integration
+Author: Steven! Ragnarok <steven@openrobotics.org>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 21-Sep-2022
+Post-History: 21-Sep-2022
+
+
+Abstract
+========
+
+This REP will document, retroactively, the aspects and expectations of language-specific client libraries in ROS 2 in order to serve as a template for new language communities and client libraries which can be integrated into ROS.
+In particular this REP is an attempt to elaborate on the questions raised on ROS Discourse [1]_ regarding incorporating third-party client libraries into the ROS 2 core.
+
+
+Integration and Infrastructure
+==============================
+
+  * rosidl pipeline
+  * colcon
+  * rosdep
+  * bloom
+
+Languages and ecosystems
+========================
+
+  * C, C++, and CMake
+  * python and PyPI
+  * Rust and Crates
+
+Alternative approaches
+======================
+
+  * document the existing gradle, node, and rust approaches
+
+References
+==========
+
+.. [1] Process for third-party client libraries to be incorporated into the core ROS 2 distribution 
+   (https://discourse.ros.org/t/process-for-third-party-client-libraries-to-be-incorporated-into-the-core-ros-2-distribution/27325/)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
