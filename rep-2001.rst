@@ -22,7 +22,7 @@ please see REP 108 [1]_.
 
 This document covers the common variants used for recommended
 installations.
-It is expressed in the ros2/variants repository on github.com [2]_.
+It is expressed in the ros2/variants [2]_ and in ros-infrastructure/infra-variants [3]_ repositories on github.com.
 
 The definitions in this REP are concise for clearer purpose, and do not list all transitive dependencies explicitly.
 
@@ -775,8 +775,11 @@ Desktop Full
       packages: [perception, simulation, ros_ign_gazebo_demos]
 
 
-Distro Independent (September 2022 - Ongoing)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ROS Distribution Independent (September 2022 - Ongoing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These variants are not released as ROS packages within each distribution as the others are.
+Instead they are made available as independent packages outside of any ROS distribution.
 
 Build Essential
 """""""""""""""
@@ -808,6 +811,8 @@ References
 .. [2] ROS Variants Repository
    (https://github.com/ros2/variants)
 
+.. [3] ROS Infrastructure Metapackages Repository
+   (https://github.com/ros-infrastructure/infra-variants)
 
 Copyright
 =========
