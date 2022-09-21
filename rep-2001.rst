@@ -765,6 +765,19 @@ Simulation
       extends:  [ros_base]
       packages: [ros_ign_bridge, ros_ign_gazebo, ros_ign_image, ros_ign_interfaces]
 
+Desktop Full
+""""""""""""
+
+::
+
+  - desktop_full:
+      extends:  [desktop]
+      packages: [perception, simulation, ros_ign_gazebo_demos]
+
+
+Distro Independent (September 2022 - Ongoing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Build Essential
 """""""""""""""
 
@@ -784,14 +797,6 @@ Dev Tools
       packages: [python3-flake8, python3-pip, python3-pytest,
                  python3-pytest-cov, python3-vcstool]
 
-Desktop Full
-""""""""""""
-
-::
-
-  - desktop_full:
-      extends:  [desktop]
-      packages: [perception, simulation, ros_ign_gazebo_demos, dev_tools]
 
 
 References
