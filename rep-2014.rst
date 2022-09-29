@@ -1,0 +1,36 @@
+REP: 2014
+Title: Benchmarking performance in ROS 2
+Author: Víctor Mayoral-Vilches <victor@accelerationrobotics.com>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 29-Sept-2022
+Post-History: 29-Sept-2022
+
+
+Abstract
+========
+
+This REP describes some principles and guidelines for benchmarking performance in ROS 2. It's intended to be a living document that can be updated as new information becomes available.
+
+
+Motivation
+==========
+
+Benchmarking is the act of running a computer program to assess its relative performance. In the context of ROS 2, performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. The quantitative approach [1]_ to robotics systems architecture fits well in this context and helps robotic architects come up with better performing architectures through an empirical strategy.
+
+TODO
+
+Value for stakeholders:
+- TODO
+
+
+Specification
+=============
+
+TODO
+
+References and Footnotes
+========================
+
+.. [1] Z. Hennessy, J. L., & Patterson, D. A. (2011). Computer architecture: a quantitative approach. 
