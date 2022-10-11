@@ -142,15 +142,15 @@ Robots are deterministic machines and their performance should be understood by 
 
 - **memory**: the amount of short-term data (not to be confused with storage) required while executing a given task.
 
-These metrics can help determine performance characteristics of a robotic system. Of most relevance, we often encounter the *real-time* and *determinism* characteristics defined as follows: 
+These metrics can help determine performance characteristics of a robotic system. Of most relevance for robotic systems we often encounter the *real-time* and *determinism* characteristics defined as follows: 
 
 - **real-time**: ability of completing a task's computations while meeting time deadlines
 - **determinsm**: that a task happens in exactly the same timeframe, each time.
 
 
-For example, a robotic system may be able to perform a task in a short amount of time (*low latency*), but it may not be able to do it in *real-time*. In this case, the system would be considered to be *non-real-time* given the time deadlines imposed. On the other hand, a robotic system may be able to perform a task in real-time, but it may not be able to do it in a short amount of time. In this case, the system would be considered to be *non-interactive*. Finally, a robotic system may be able to perform a task in real-time and in a short amount of time, but it may consume a lot of *power*. In this case, the system would be considered to be *non-energy-efficient*.
+For example, a robotic system may be able to perform a task in a short amount of time (*low latency*), but it may not be able to do it in *real-time*. In this case, the system would be considered to be *non-real-time* given the time deadlines imposed. On the other hand, a robotic system may be able to perform a task in *real-time*, but it may not be able to do it in a short amount of time. In this case, the system would be considered to be *non-interactive*. Finally, a robotic system may be able to perform a task in real-time and in a short amount of time, but it may consume a lot of *power*. In this case, the system would be considered to be *non-energy-efficient*.
 
-In another example, a robotic system that can perform a task in 1 second with a power consumption of `2W` is twice as fast (*low latency*) as another robotic system that can perform the same task in 2 seconds with a power consumption of `0.5W`. However, the second robotic system is twice as efficient as the first one. In this case, the solution that requires less power would be the best option from an energy efficiency perspective (with a higher *performance-per-watt*). Similarly, a robotic system that has a high bandwidth but consumes a lot of energy might not be the best option for a mobile robot that must operate for a long time on a battery.
+In another example, a robotic system that can perform a task in 1 second with a power consumption of `2W` is twice as fast (*latency*) as another robotic system that can perform the same task in 2 seconds with a power consumption of `0.5W`. However, the second robotic system is twice as efficient as the first one. In this case, the solution that requires less power would be the best option from an energy efficiency perspective (with a higher *performance-per-watt*). Similarly, a robotic system that has a high bandwidth but consumes a lot of energy might not be the best option for a mobile robot that must operate for a long time on a battery.
 
 Therefore, it is important to consider different of these metrics when benchmarking a robotic system. The metrics presented in this REP are intended to be used as a guideline, and should be adapted to the specific needs of a robot.
 
@@ -183,10 +183,12 @@ The following diagram shows the proposed methodology for benchmarking performanc
 3. create performance reports with the results of the benchmarking.
 
 
-Reference Implementation and recommendations
+Reference implementation and recommendations
 ============================================
 
-Reference implementations complying with the recommendations of this REP can be found in literature for applications like perception and mapping [5]_, hardware acceleration [6]_ [7]_ or self-driving mobility [8]_. A particular example of interest for the reader is the instrumentation of the image_pipeline ROS 2 package [12]_, which is a set of nodes for processing image data in ROS 2. The image_pipeline package has been instrumented with LTTng probes which are available upstream in its ROS 2 `Humble` branch. The results of the benchmarking `image_pipeline`` are available in [13]_ using the resources of [14]_.
+The reader is referred to `ros2_tracing <https://gitlab.com/ros-tracing/ros2_tracing>`_ and `LTTng <https://lttng.org/>`_ to familiarize herself with the tools and the methodology of collecting and analyzing performance data. In addition, [3]_ and [4]_ present comprehensive descriptions of the `ros2_tracing <https://gitlab.com/ros-tracing/ros2_tracing>`_ tools and the `LTTng <https://lttng.org/>`_ infrastructure.
+
+Reference implementations complying with the recommendations of this REP can be found in literature for applications like perception and mapping [5]_, hardware acceleration [6]_ [7]_ or self-driving mobility [8]_. A particular example of interest for the reader is the instrumentation of the `image_pipeline <https://github.com/ros-perception/image_pipeline/tree/humble/>`_ ROS 2 package [12]_, which is a set of nodes for processing image data in ROS 2. The `image_pipeline <https://github.com/ros-perception/image_pipeline/tree/humble/>`_ package has been instrumented with LTTng probes available in the ROS 2 `Humble` release, which results in various perception Components (e.g. `RectifyNode <https://github.com/ros-perception/image_pipeline/blob/ros2/image_proc/src/rectify.cpp#L82/>`_ *Component*) leveraging intrumentation which if enabled, can help trace the computational graph information flow of a ROS 2 application using such Component. The results of benchmarking the performance of `image_pipeline <https://github.com/ros-perception/image_pipeline/tree/humble/>`_ are available in [13]_ and launch scripts to both trace and analyze perception graphs available in [14]_.
 
 
 References and Footnotes
