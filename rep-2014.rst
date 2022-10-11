@@ -5,30 +5,47 @@ Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Created: 29-Sept-2022
-Post-History: 29-Sept-2022
+Post-History: 11-Oct-2022
 
 
 Abstract
 ========
 
-This REP describes some principles and guidelines for benchmarking performance in ROS 2. It's intended to be a living document that can be updated as new information becomes available.
+This REP describes some principles and guidelines for benchmarking performance in ROS 2.
 
 
 Motivation
 ==========
 
-Benchmarking is the act of running a computer program to assess its relative performance. In the context of ROS 2, performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. The quantitative approach [1]_ to robotics systems architecture fits well in this context and helps robotic architects come up with better performing architectures through an empirical strategy.
+Benchmarking is the act of running a computer program to assess its relative performance. In the context of ROS 2, performance information can help robotists design more efficient robotic systems and select the right hardware for their robotic application. It can also help understand the trade-offs between different algorithms that implement the same capability, and help them choose the best approach for their use case. Performance data can also be used to compare different versions of ROS 2 and to identify regressions. Finally, performance information can be used to help prioritize future development efforts.
 
-TODO
+
+The myriad combinations of robot hardware and robotics software make assessing robotic-system performance in an architecture-neutral, representative, and reproducible manner challenging. This REP attempts to provide some guidelines to help robotists benchmark their systems in a consistent and reproducible manner by following a quantitative approach. This REP also provides a set of tools and examples to help guide robotists while collecting and reporting performance data.
 
 Value for stakeholders:
 - TODO
 
 
-Specification
-=============
+
+A quantitative approach
+-----------------------
+Performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. The quantitative approach [1]_ to robotics systems architecture fits well in this context and helps robotic architects come up with better performing architectures through an empirical strategy.
+
+
+Prior work and industry standards
+---------------------------------
+
+
 
 TODO
+
+
+
+Methodology for benchmarking performance
+========================================
+
+TODO
+
 
 References and Footnotes
 ========================
