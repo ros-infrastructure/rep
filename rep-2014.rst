@@ -230,3 +230,9 @@ References and Footnotes
 
 .. [14] acceleration_examples. ROS 2 package examples demonstrating the use of hardware acceleration. 
     https://github.com/ros-acceleration/acceleration_examples
+
+
+Copyright
+=========
+
+This document is placed in the public domain or under the CC0-1.0-Universal license, whichever is more permissive.
