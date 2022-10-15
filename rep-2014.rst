@@ -162,7 +162,7 @@ Therefore, it is important to consider different of these metrics when benchmark
 Methodology for benchmarking performance in ROS 2
 =================================================
 
-In this REP, we **recommend adopting a grey-box and non-functional benchmarking approach** to measure performance and allow to evaluate ROS 2 individual nodes as well as complete computational graphs. To realize it in an architecture-neutral, representative, and reproducible manner, we also recommend using the Linux Tracing Toolkit next generation (`LTTng <https://lttng.org/>`_) through the `ros-tracing` project, which leverages probes already inserted in the ROS 2 core layers and tools to facilitate benchmarking ROS 2 abstractions.
+In this REP, we **recommend adopting a grey-box and non-functional benchmarking approach** to measure performance and allow to evaluate ROS 2 individual nodes as well as complete computational graphs. To realize it in an architecture-neutral, representative, and reproducible manner, we also recommend using the Linux Tracing Toolkit next generation (`LTTng <https://lttng.org/>`_) through the `ros2_tracing` project, which leverages probes already inserted in the ROS 2 core layers and tools to facilitate benchmarking ROS 2 abstractions.
 
 The following diagram shows the proposed methodology for benchmarking performance in ROS 2 which consists of 3 steps:
 
