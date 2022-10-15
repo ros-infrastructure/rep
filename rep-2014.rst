@@ -134,7 +134,7 @@ Robots are deterministic machines and their performance should be understood by 
 
 - **latency**: time between the start and the completion of a task.
 
-- **bandwidth or throughput**: the total amount of work done in a given time for a task.
+- **bandwidth or throughput**: the total amount of work done in a given time for a task. When measuring bandwidth or throughput in a ROS 2 system Messages per second is interesting, and the total number of bytes per second is interesting too.
 
 - **power**: the electrical energy per unit of time consumed while executing a given task.
 
