@@ -149,7 +149,7 @@ Robots are deterministic machines and their performance should be understood by 
 These metrics can help determine performance characteristics of a robotic system. Of most relevance for robotic systems we often encounter the *real-time* and *determinism* characteristics defined as follows: 
 
 - **real-time**: ability of completing a task's computations while meeting time deadlines
-- **determinsm**: that a task happens in exactly the same timeframe, each time.
+- **determinism**: that the same external or internal event leads to the same system behavior, with executions in the same order, each time.
 
 
 For example, a robotic system may be able to perform a task in a short amount of time (*low latency*), but it may not be able to do it in *real-time*. In this case, the system would be considered to be *non-real-time* given the time deadlines imposed. On the other hand, a robotic system may be able to perform a task in *real-time*, but it may not be able to do it in a short amount of time. In this case, the system would be considered to be *non-interactive*. Finally, a robotic system may be able to perform a task in real-time and in a short amount of time, but it may consume a lot of *power*. In this case, the system would be considered to be *non-energy-efficient*.
