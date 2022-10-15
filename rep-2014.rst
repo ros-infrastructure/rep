@@ -133,6 +133,10 @@ Performance metrics in robotics
 Robots are deterministic machines and their performance should be understood by considering metrics like the following ones:
 
 - **latency**: time between the start and the completion of a task.
+- **system reaction time**: time between receipt of an external stimulus and the beginning of the system's actions (for example, time between an obstacle sensor firing and the first velocity command taking this into account)
+- **software system reaction time**: time between when an external stimulus is received by the robot's software and when the corresponding action has been executed by the software. This is usually the more directly measurable version of system reaction time.
+- **message latency**: Time between publishing a message and invocation of the corresponding callback on the receiver side
+- **execution latency**: Time between when an event leading to an execution (such as a timer firing, or a message being received) occurs, and when the corresponding callback is called
 
 - **bandwidth or throughput**: the total amount of work done in a given time for a task. When measuring bandwidth or throughput in a ROS 2 system Messages per second is interesting, and the total number of bytes per second is interesting too.
 
