@@ -131,7 +131,7 @@ When looking at other related areas to robotics we find the MLPerf Inference and
 
 Performance metrics in robotics
 ===============================
-Robots are deterministic machines and their performance should be understood by considering metrics like the following ones:
+Robots are deterministic machines and their performance should be understood by considering metrics such as the following:
 
 - **latency**: time between the start and the completion of a task.
 - **system reaction time**: time between receipt of an external stimulus and the beginning of the system's actions (for example, time between an obstacle sensor firing and the first velocity command taking this into account)
