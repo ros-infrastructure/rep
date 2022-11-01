@@ -787,7 +787,6 @@ Build Essential
 ::
 
  - ros-build-essential:
- - ros-build-essential:
       packages: [cmake, git, python3-setuptools]
 
 Dev Tools
