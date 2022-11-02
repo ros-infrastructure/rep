@@ -784,7 +784,7 @@ Instead they are made available as independent packages outside of any ROS distr
 Build Essential
 """""""""""""""
 
-In addition to the explicitly listed packages this variant should include the base toolchain for any operating system (such as `build-essential`) on Debian as well as GNU Make and a C++ compiler if not already part of that toolchain.
+In addition to the explicitly listed packages this variant should include the base toolchain for any operating system (such as `build-essential` on Debian) as well as GNU Make and a C++ compiler if not already part of that toolchain.
 
 ::
 
