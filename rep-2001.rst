@@ -1,6 +1,6 @@
 REP: 2001
 Title: ROS 2 Variants
-Author: Tully Foote <tfoote@openrobotics.org>, Mikael Arguedas <mikael@openrobotics.org>, Ruffin White <roxfoxpox@gmail.com>, David V. Lu!! <davidvlu@gmail.com>
+Author: Tully Foote <tfoote@openrobotics.org>, Mikael Arguedas <mikael@openrobotics.org>, Ruffin White <roxfoxpox@gmail.com>, David V. Lu!! <davidvlu@gmail.com>, Steven! Ragnarok <steven@openrobotics.org>, Chris Lalancette <clalancette@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
