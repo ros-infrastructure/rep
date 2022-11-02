@@ -35,7 +35,7 @@ The guidelines in here are intended to be a living document that can be updated 
 
 A quantitative approach
 -----------------------
-Performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. The quantitative approach [1]_ to robotics systems architecture fits well in this context and helps robotic architects come up with better performing architectures through an empirical strategy.
+Performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. When creating benchmarks, prefer to use realistic data and situations rather than data designed to test one edge case. Follow the quantitative approach [1]_ when designing your architecture.
 
 
 Approaches to benchmark performance
