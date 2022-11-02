@@ -24,7 +24,7 @@ The myriad combinations of robot hardware and robotics software make assessing r
 
 Value for stakeholders:
 
-- Package maintainers can use these guidelines to integrate performance benchmarking data in their packages.
+- Package maintainers can use these guidelines to integrate performance benchmarking tools (e.g. instrumentation) and data (e.g. results, plots and datasets) in their packages.
 
 - Consumers can use the guidelines in the REP to benchmark ROS Nodes and Graphs in an architecture-neutral, representative, and reproducible manner, as well as the corresponding performance data offered in ROS packages to set expectations on the capabilities of each.
 
