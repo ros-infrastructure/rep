@@ -49,7 +49,7 @@ There're different types of benchmarking approaches, specially when related to p
 
 - `Black-box performance testing`: Measures performance by eliminating the layers above the *layer-of-interest* and replacing those with a specific test application that stimulates the layer-of-interest in the way you need it. This allows to gather the measurement data right inside your specific test application. The acquisition of the data (the probe) resides inside the test application. A major design constraint in such a test is that you have to eliminate the “application” in order to test the system. Otherwise, the real application and the test application would likely interfere.
 
-- `Grey-box performance testing`: More application-specific measure which is capable of watching internal states of the system and can measure (probe) certain points in the system, thus generate the measurement data minimal interference. Requires to instrument the complete application.
+- `Grey-box performance testing`: More application-specific measure which is capable of watching internal states of the system and can measure (probe) certain points in the system, thus generate the measurement data with minimal interference. Requires to instrument the complete application.
 
 Graphically depicted:
 
