@@ -302,7 +302,7 @@ This can be summarized as follows:
 - 3. develop a hardware acceleration kernels for those functions identified before, and optimize the dataflow across Nodes
 
     - 3.1 accelerate computations at the Node or Component level for each one of those functions identified in 2. as good candidates.
-    - 3.2 accelerate inter-Node exchanges and reduce the overhead of the ROS 2 message-passing system across all its abstraction layers.
+    - 3.2 accelerate inter-Node exchanges and reduce the overhead of the ROS 2 message-passing system across all its abstraction layers. To do so, consider leveraging REP-2007 and REP-2009.
 
 - 4. trace, benchmark and analyze the ROS 2 application including the acceleration kernels and compare against the CPU baseline obtained in 2. to determine the performance improvement. Re-iterate 3. and 4. until the desired performance is achieved.
 
