@@ -199,16 +199,16 @@ Reference implementations complying with the recommendations of this REP can be 
 References and Footnotes
 ========================
 
-.. [1] Z. Hennessy, J. L., & Patterson, D. A. (2011). Computer architecture: a quantitative approach. 
+.. [1] Hennessy, J. L., & Patterson, D. A. (2011). Computer architecture: a quantitative approach. Elsevier.
 
-.. [2] A. Pemmaiah​, D. Pangercic, D. Aggarwal, K. Neumann, K. Marcey, "Performance Testing in ROS 2".
+.. [2] Pemmaiah​, A., Pangercic, D., Aggarwal, D., Neumann, K., & Marcey, K. (2019) "Performance Testing in ROS 2".
    https://drive.google.com/file/d/15nX80RK6aS8abZvQAOnMNUEgh7px9V5S/view
 
-.. [3] Bédard, Christophe, Ingo Lütkebohle, and Michel Dagenais. "ros2_tracing: Multipurpose Low-Overhead Framework for Real-Time Tracing of ROS 2." IEEE Robotics and Automation Letters 7.3 (2022): 6511-6518.
+.. [3] Bédard, C., Lütkebohle, I., & Dagenais, M. (2022). ros2_tracing: Multipurpose Low-Overhead Framework for Real-Time Tracing of ROS 2. IEEE Robotics and Automation Letters, 7(3), 6511-6518.
 
-.. [4] Bédard, Christophe, et al. "Message Flow Analysis with Complex Causal Links for Distributed ROS 2 Systems." arXiv preprint arXiv:2204.10208 (2022).
+.. [4] Bédard, C., Lajoie, P. Y., Beltrame, G., & Dagenais, M. (2022). Message Flow Analysis with Complex Causal Links for Distributed ROS 2 Systems. arXiv preprint arXiv:2204.10208.
 
-.. [5] Lajoie, Pierre-Yves, Christophe Bédard, and Giovanni Beltrame. "Analyze, Debug, Optimize: Real-Time Tracing for Perception and Mapping Systems in ROS 2." arXiv preprint arXiv:2204.11778 (2022).
+.. [5] Lajoie, P. Y., Bédard, C., & Beltrame, G. (2022). Analyze, Debug, Optimize: Real-Time Tracing for Perception and Mapping Systems in ROS 2. arXiv preprint arXiv:2204.11778.
 
 .. [6] Mayoral-Vilches, V., Neuman, S. M., Plancher, B., & Reddi, V. J. (2022). "RobotCore: An Open Architecture for Hardware Acceleration in ROS 2".
    https://arxiv.org/pdf/2205.03929.pdf
@@ -216,7 +216,7 @@ References and Footnotes
 .. [7] Mayoral-Vilches, V. (2021). "Kria Robotics Stack".
    https://www.xilinx.com/content/dam/xilinx/support/documentation/white_papers/wp540-kria-robotics-stack.pdf
 
-.. [8] Li, Zihang, Atsushi Hasegawa, and Takuya Azumi. "Autoware_Perf: A tracing and performance analysis framework for ROS 2 applications." Journal of Systems Architecture 123 (2022): 102341.
+.. [8] Li, Z., Hasegawa, A., & Azumi, T. (2022). Autoware_Perf: A tracing and performance analysis framework for ROS 2 applications. Journal of Systems Architecture, 123, 102341.
 
 .. [9] European robotic framework for bipedal locomotion benchmarking
     https://eurobench2020.eu/
