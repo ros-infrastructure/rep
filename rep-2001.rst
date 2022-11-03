@@ -45,7 +45,7 @@ We define various entry points for ROS users.
  * `perception`: The `perception` variant includes packages commonly used for perception capabilities.
  * `simulation`: The `simulation` variant includes packages that are needed for automated simulation,
    without extra debugging tools.
- * `ros-build-essential`: The `ros-build-essential` ROS distribution independent variant includes only the packages that are required for building and compiling ROS 2 packages.
+ * `ros-build-essential`: The `ros-build-essential` ROS distribution independent variant includes only the packages that are required for building standalone ROS 2 packages. ROS developers should use `ros-dev-tools` instead for the full set of recommended tools.
  * `ros-dev-tools`: The `ros-dev-tools` ROS distribution independent variant provides the commonly-used tools and libraries that a user would want if they're developing ROS 2 packages.
 
 
