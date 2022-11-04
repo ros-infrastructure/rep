@@ -1,6 +1,6 @@
 REP: 2001
 Title: ROS 2 Variants
-Author: Tully Foote <tfoote@openrobotics.org>, Mikael Arguedas <mikael@openrobotics.org>, Ruffin White <roxfoxpox@gmail.com>
+Author: Tully Foote <tfoote@openrobotics.org>, Mikael Arguedas <mikael@openrobotics.org>, Ruffin White <roxfoxpox@gmail.com>, David V. Lu!! <davidvlu@gmail.com>, Steven! Ragnarok <steven@openrobotics.org>, Chris Lalancette <clalancette@openrobotics.org>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
@@ -22,7 +22,7 @@ please see REP 108 [1]_.
 
 This document covers the common variants used for recommended
 installations.
-It is expressed in the ros2/variants repository on github.com [2]_.
+It is expressed in the ros2/variants [2]_ and in ros-infrastructure/infra-variants [3]_ repositories on github.com.
 
 The definitions in this REP are concise for clearer purpose, and do not list all transitive dependencies explicitly.
 
@@ -45,6 +45,8 @@ We define various entry points for ROS users.
  * `perception`: The `perception` variant includes packages commonly used for perception capabilities.
  * `simulation`: The `simulation` variant includes packages that are needed for automated simulation,
    without extra debugging tools.
+ * `ros-build-essential`: The `ros-build-essential` ROS distribution independent variant includes only the packages that are required for building standalone ROS 2 packages. ROS developers should use `ros-dev-tools` instead for the full set of recommended tools.
+ * `ros-dev-tools`: The `ros-dev-tools` ROS distribution independent variant provides the commonly-used tools and libraries that a user would want if they're developing ROS 2 packages.
 
 
 Institution-specific and robot-specific
@@ -773,6 +775,34 @@ Desktop Full
       packages: [perception, simulation, ros_ign_gazebo_demos]
 
 
+ROS Distribution Independent (September 2022 - Ongoing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These variants are not released as ROS packages within each distribution as the others are.
+Instead they are made available as independent packages outside of any ROS distribution.
+
+Build Essential
+"""""""""""""""
+
+In addition to the explicitly listed packages this variant should include the base toolchain for any operating system (such as `build-essential` on Debian) as well as GNU Make and a C++ compiler if not already part of that toolchain.
+
+::
+
+ - ros-build-essential:
+      packages: [cmake, git, python3, python3-setuptools]
+
+Dev Tools
+"""""""""
+
+::
+
+  - ros-dev-tools:
+      extends:  [ros-build-essential]
+      packages: [python3-bloom, python3-colcon-common-extensions,
+                 python3-rosdep, python3-vcstool, wget]
+
+
+
 References
 ==========
 
@@ -782,6 +812,8 @@ References
 .. [2] ROS Variants Repository
    (https://github.com/ros2/variants)
 
+.. [3] ROS Infrastructure Metapackages Repository
+   (https://github.com/ros-infrastructure/infra-variants)
 
 Copyright
 =========
