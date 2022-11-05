@@ -25,9 +25,9 @@ Hardware acceleration can revolutionize ROS 2 computations, enabling new applica
 
 .. This REP aims to provide a vendor-neutral, scalable and technology-agnostic approach to hardware acceleration in ROS 2 that can be easily adopted by roboticists and researchers alike.
 
-**The purpose of this REP is thereby to provide standard guidelines on how to use hardware acceleration in combination with ROS 2**. These guidelines are realized in the form of a series of ROS 2 packages that implement an open architecture and abstract away these external resources providing a vendor-neutral, scalable and technology-agnostic ROS 2-centric development experience for hardware acceleration. The proposed open architecture also allows for the integration of external frameworks, tools and libraries, so that changing from one accelerator to another becomes trivial. This REP also recommends a methodology for developing ROS 2 packages that integrate hardware acceleration which can help developers guide their efforts. **This REP does not aim to dictate policy on which frameworks or languages shall be used to create acceleration kernels, nor it aims to abstract away from these technologies**. This decision is left to the architect building the acceleration. For example, the use of OpenCL, CUDA, Vulkan, HLS, Halide, Exo, etc. is beyond the scope of this REP and often attached to the specific accelerator in-use, as each silicon vendor supports only certain technologies. What this REP provides is an entry point for developers to define their own acceleration kernels, integrate them into ROS 2 applications and if appropriate, command the ROS 2 build system to build such accelerators.
+**The purpose of this REP is thereby to provide standard guidelines on how to use hardware acceleration in combination with ROS 2**. These guidelines are realized in the form of a series of ROS 2 packages that implement an open architecture and abstract away these external resources providing a vendor-neutral, Operating System (OS) and technology-agnostic ROS 2-centric development experience for hardware acceleration. The proposed open architecture also allows for the integration of external frameworks, tools and libraries, so that changing from one accelerator to another becomes trivial. This REP also recommends a methodology for developing ROS 2 packages that integrate hardware acceleration which can help developers guide their efforts. **This REP does not aim to dictate policy on which OS, frameworks or languages shall be used to create acceleration kernels, nor it aims to abstract away from these technologies**. This decision is left to the architect building the acceleration. For example, the use of OpenCL, CUDA, Vulkan, HLS, Halide, Exo, etc. is beyond the scope of this REP and often attached to the specific accelerator in-use, as each silicon vendor supports only certain technologies. What this REP provides is an entry point for developers to define their own acceleration kernels, integrate them into ROS 2 applications and if appropriate, command the ROS 2 build system to build such accelerators.
 
-To do so, the architecture proposed extends the ROS 2 build system (``ament``), optionally extends the ROS 2 build tools (``colcon``) and adds a new firmware pillar to simplify the production and deployment of acceleration kernels. The architecture is agnostic to the computing target (i.e. considers support for edge, workstation, data center or cloud targets), technology-agnostic (considers initial support for FPGAs and GPUs), application-agnostic and modular, which enhances portability to new accelerators across silicon vendors. The core components of the architecture are implemented and open sourced under an Apache 2.0 license, and maintained at the `ROS 2 Hardware Acceleration Working Group GitHub organization <https://github.com/ros-acceleration/>`_.
+To do so, the architecture proposed extends the ROS 2 build system (``ament``), optionally extends the ROS 2 build tools (``colcon``) and adds a new firmware pillar to simplify the production and deployment of acceleration kernels. The architecture is agnostic to the computing target (i.e. considers support for edge, workstation, data center or cloud targets), OS and technology-agnostic (considers initial support for FPGAs and GPUs), application-agnostic and modular, which enhances portability to new accelerators across silicon vendors. The core components of the architecture are implemented and open sourced under an Apache 2.0 license, and maintained at the `ROS 2 Hardware Acceleration Working Group GitHub organization <https://github.com/ros-acceleration/>`_.
 
 .. _stakeholders:
 
@@ -37,7 +37,7 @@ Value for stakeholders:
 
 - Consumers can use the guidelines in the REP, as well as the corresponding benchmarks of each accelerator (if available), to set expectations on the hardware acceleration capabilities, *ease of use* and scalability that could be obtained from each vendor's hardware acceleration solution.
 
-- Silicon vendors and hardware solution manufacturers can use these guidelines to connect their accelerators and firmware (including frameworks, tools and libraries) to the ROS 2 ecosystem. By doing so, they will obtain direct support for hardware acceleration in all ROS 2 packages that support it.
+- Silicon vendors, OS suppliers and hardware solution manufacturers can use these guidelines to connect their accelerators and firmware (including frameworks, tools and libraries) to the ROS 2 ecosystem. By doing so, they will obtain direct support for hardware acceleration in all ROS 2 packages that support it.
 
 
 The outcome of this REP should be that maintainers who want to leverage hardware acceleration in their packages, can do so with consistent guidelines and with support across multiple hardware acceleration technologies (FPGAs and GPUs initially, but extending towards more accelerators in the future) by following the conventions set. This way, maintainers will be able to create ROS 2 packages with support for hardware acceleration that can run across accelerators. In turn, as silicon vendors add support for their technologies and accelerators, ROS 2 packages aligned with this REP will automatically gain support for these new accelerators.
@@ -60,6 +60,8 @@ The motivation behind this REP does **not** include:
 
   * No maintainer is required to target any specific hardware solution by any of the guidelines in this REP.
   * Instead, maintainers are free to choose from either using the proposed generic CMake macros meant to support all accelerators (e.g. ``acceleration_kernel`` ), or instead use vendor-specific CMake extensions for particular supported technologies and hardware solutions (e.g. ``vitis_acceleration_kernel`` ).
+
+* Excluding any supported ROS 2 OS.
 
 .. _Kernel Levels:
 
@@ -214,7 +216,7 @@ Separating the build and install directories for each accelerator is encouraged 
     # build for accelerator_B
     colcon build --merge-install --build-base=build-accelerator-B --install-base=install-accelerator-B --merge-install --mixin accelerator_B --packages-select package_1
 
-The architecture proposed in this REP is meant to be generic and technology-agnostic, so that it can be extended to support other hardware acceleration technologies and hardware solutions in the future while bringing value to all stakeholders_. Silicon vendors and hardware solution manufacturers aiming to integrate their solutions in the ROS 2 ecosystem are encouraged to provide themselves their own technology-specific extensions to the ROS 2 build system (pillarII_) and firmware packages (pillarI_). This way, consumers and maintainers can easily adopt their technologies to build kernels, and switch between hardware acceleration solutions within the same ROS workspace.
+The architecture proposed in this REP is meant to be generic and technology-agnostic (including OS), so that it can be extended to support other hardware acceleration technologies and hardware solutions in the future while bringing value to all stakeholders_. Silicon vendors and hardware solution manufacturers aiming to integrate their solutions in the ROS 2 ecosystem are encouraged to provide themselves their own technology-specific extensions to the ROS 2 build system (pillarII_) and firmware packages (pillarI_). This way, consumers and maintainers can easily adopt their technologies to build kernels, and switch between hardware acceleration solutions within the same ROS workspace.
 
 Package maintainers are encouraged to integrate hardware acceleration in their ROS 2 packages by using the *CMake hardware acceleration variables* and the ``acceleration_kernel`` CMake macro, or any of its specializations. These CMake macros are meant to be used by maintainers to conditionally compile their ROS 2 packages and acceleration kernels for those accelerators that implement the architecture_. This would like like this on the package's ``CMakeLists.txt``:
 
@@ -289,13 +291,13 @@ Methodology for developing ROS 2 packages that integrate hardware acceleration
                          |      |  |            +-------+------+
                          |      |  |                    |
                          +------+  |                    |
-                           LTTng   +--------------------+
+                          Tracer   +--------------------+
                                        re-instrument
 
 
 This can be summarized as follows:
 
-- 1. instrument the core components of a ROS 2 application using `LTTng <https://lttng.org/>`_ and trace its execution to obtain information about its time bottlenecks. Refer to `ros2_tracing <https://gitlab.com/ros-tracing/ros2_tracing>`_ for tools, documentation and ROS 2 core layers tracepoints;
+- 1. instrument the core components of a ROS 2 application using a tracing framework and trace its execution to obtain information about its time bottlenecks. Refer to REP-2014 for guidelines on tracing and benchmarking performance in ROS 2, including examples of tracing frameworks and how to use them.
 
 - 2. trace, benchmark and analyze the ROS 2 application on the CPU to establish a compute baseline; Determine which functions are subject to be hardware accelerated.
   
@@ -307,7 +309,7 @@ This can be summarized as follows:
 - 4. trace, benchmark and analyze the ROS 2 application including the acceleration kernels and compare against the CPU baseline obtained in 2. to determine the performance improvement. Re-iterate 3. and 4. until the desired performance is achieved.
 
 
-Details about tracing and benchmarking are beyond the scope of this REP. For more details about tracing and benchmarking, see REP-2014.
+Additional about tracing and benchmarking are beyond the scope of this REP. For more details about tracing and benchmarking, see REP-2014.
 
 .. _acceleration examples:
 
