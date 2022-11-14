@@ -975,7 +975,7 @@ The following indicators show what delivery mechanisms are available for each pl
 
 " [d] " Distribution-specific (Debian, RPM, etc.) packages will be provided for this platform for packages submitted to the rosdistro.
 
-" [a] " Binary releases are provided as a single archive per platform containing all packages in the Humble ROS 2 repos file [11]_.
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Iron ROS 2 repos file [12]_.
 
 " [s] " Compilation from source.
 
@@ -1117,6 +1117,8 @@ References and Footnotes
    (https://github.com/ros2/ros2/blob/galactic/ros2.repos)
 .. [11] Humble ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/humble/ros2.repos)
+.. [12] Iron ROS 2 Repos File
+   (https://github.com/ros2/ros2/blob/rolling/ros2.repos)
 
 Copyright
 =========
