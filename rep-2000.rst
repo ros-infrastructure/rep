@@ -1043,7 +1043,7 @@ Dependency Requirements:
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | Connext DDS |              6.0.1              |   N/A    | 6.0.1             |                  N/A                   |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
-| Gurum DDS   |              2.7.x              |   N/A    |              N/A                                       |
+| Gurum DDS   |              2.8.x              |   N/A    |              N/A                                       |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
