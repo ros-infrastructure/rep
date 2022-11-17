@@ -39,7 +39,7 @@ There are several aspects to that support which we will try to summarize here.
 rosidl pipeline
 ^^^^^^^^^^^^^^^
 
-TODO introduce the idl pipeline in a way that is accurate and succinct.
+TODO link out to documentation describing the idl pipeline in a way that is accurate and succinct.
 Message packages in ROS contain generated code for supported languages to directly interact with message fields.
 The rosidl pipeline handles the process of generating language specific code for working with each supported runtime and typesupport.
 Generating and distributing code for a rosidl runtime on the ROS build farm requires the rosidl runtime and typesupport packages to be available when message packages are built.
