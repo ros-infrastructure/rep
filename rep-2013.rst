@@ -33,6 +33,8 @@ Additional system dependencies are also required as installed by ``rosdep`` (TOD
 Integration and Infrastructure
 ==============================
 
+The ROS build infrastructure, including the ROS 2 build farm, does not currently support building Rust packages.
+There are several aspects to that support which we will try to summarize here.
 
 rosidl pipeline
 ^^^^^^^^^^^^^^^
