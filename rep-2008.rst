@@ -52,7 +52,7 @@ The motivation behind this REP does **not** include:
 
 * Dictating policy implementation specifics on maintainers to achieve hardware acceleration and/or create acceleration kernels (e.g use of CUDA, HLS, OpenCL, or similar)
 
-  * Policy requirements about which framework to use (e.g. ROCm, JetPack, etc.) or wihch specific C++ preprocessor instructions are *intentionally generic* and to remain technology-agnostic.
+  * Policy requirements about which framework to use (e.g. ROCm, JetPack, etc.) or which specific C++ preprocessor instructions are *intentionally generic* and to remain technology-agnostic.
   * Maintainers can come up with their own policies depending on the technology targeted (FPGAs, GPUs, etc.) and framework used (``HLS``, ``ROCm``, ``CUDA``, etc).
 
 
