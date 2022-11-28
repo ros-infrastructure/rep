@@ -25,7 +25,7 @@ This REP focuses on ros2_rust[3]_, specifically the rosidl_generator_rs, rosidl_
 Developer workstation usage
 ===========================
 
-ros2_rust includes setup instructions for building ros2-rust.
+ros2_rust includes setup instructions for building ros2_rust.
 These instructions require the use of two colcon extensions not currently distributed with ros-dev-tools by default: ``colcon-cargo`` and ``colcon-ros-cargo`` as well as the ``cargo-ament-build`` extension for Rust's cargo build system.
 Additional system dependencies are also required as installed by ``rosdep`` (TODO: nuclearsandwich) these are not currently installed via rosdep and we should correct that prior to publication)
 
