@@ -40,14 +40,18 @@ rosidl pipeline
 ^^^^^^^^^^^^^^^
 
 TODO link out to documentation describing the idl pipeline in a way that is accurate and succinct.
-Message packages in ROS contain generated code for supported languages to directly interact with message fields.
+Message packages in ROS contain generated code (and potentially libraries compiled from that generated code) for supported languages to directly interact with message fields.
 The rosidl pipeline handles the process of generating language specific code for working with each supported runtime and typesupport.
-Generating and distributing code for a rosidl runtime on the ROS build farm requires the rosidl runtime and typesupport packages to be available when message packages are built.
+Generating and distributing code for a rosidl runtime on the ROS build farm requires the rosidl generator and typesupport packages to be available when message packages are built.
+Interface packages must declare build dependencies on rosidl_default_generators for expected functionality to work.
+Bloom currently inserts build dependencies on rosidl static typesupport packages appropriate to each platform and rosdistro.
 
 package build types
 ^^^^^^^^^^^^^^^^^^^
 
-TODO hoist in some of the stuff common to colcon and bloom
+The colcon build tool has an extension system for discovering and analyzing packages which includes detecting how the package must be built.
+For ROS packages, this discovery is augmented by reading the ``package.xml`` contents including the ``<export><build_type/></export>`` field.
+These build types are also used by other tools in the ROS ecosystem, most notably bloom, to generate appropriate packaging metadata for various platforms.
 
 colcon
 ^^^^^^
@@ -56,6 +60,13 @@ colcon is the recommended build tool for ROS 2.
 It is highly extensible and support for nearly all package build types is provided by extensions rather than built into colcon core.
 Support for most build types is also separated into base support and ros-specific support so that colcon can be used with that build type with or without ROS.
 The prime examples here are colcon-cmake [4]_ and colcon-ros-cmake [5]_ which provide general support for CMake packages and some ROS specific behavior which builds on the existing CMake support.
+
+The ros2-rust team has already created colcon extensions supporting the use of cargo-based Rust packages in a colcon workspace.
+
+colcon-cargo and crates.io
+--------------------------
+
+The current versions of these tools allow the mix of package dependencies from crates.io, the Rust package registry, and the local workspace through the use of underlying cargo features.
 
 rosdep
 ^^^^^^
