@@ -42,7 +42,7 @@ Rationale
 Why Specify QoS Settings
 ------------------------
 
-Unlike ROS1, ROS2's QoS settings chosen by an application can affect the ability for data to be transmitted from a publisher to a subscriber.
+Unlike ROS1, ROS 2's QoS settings chosen by an application can affect the ability for data to be transmitted from a publisher to a subscriber.
 There exists several combinations of QoS settings that will not transmit data from one node to another even while composed in a single process.
 By specifying QoS settings for common interfaces, the aim is to ensure all sensor data and map sources can be interchangable with each other at run-time.
 
