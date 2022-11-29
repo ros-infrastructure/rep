@@ -12,7 +12,7 @@ Abstract
 ========
 
 This REP covers the standards surrounding Quality of Service (QoS) settings for common needs in ROS 2.
-This includes sensor drivers and map representations to standardize interfaces of not only message types outlined by REPs such as REP 118, 138, and 145, but also QoS to ensure ROS2 interoperability.
+This includes sensor drivers and map representations to standardize interfaces of not only message types outlined by REPs such as REP 118, 138, and 145, but also QoS to ensure ROS 2 interoperability.
 
 Specification
 =============
