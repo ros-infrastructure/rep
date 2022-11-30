@@ -5,8 +5,7 @@ Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 08-Nov-2019
-ROS-Version: Dashing
-Post-History: 08-Nov-2019
+Post-History: 30-Nov-2022
 
 Abstract
 ========
@@ -30,9 +29,9 @@ This specification does not prescribe any particular map representation but rath
 Sensor Driver Quality of Service
 --------------------------------
 
-Sensor data provided by a sensor driver from a camera, inertial measurement unit, laser scanner, GPS, depth, or range finder are expected to be provided over a `SensorDataQoS` quality of service as provided by the implemented ROS2 version API.
+Sensor data provided by a sensor driver from a camera, inertial measurement unit, laser scanner, GPS, depth, range finder, or other sensors are expected to be provided over a `SystemDefaultsQoS` quality of service as provided by the implemented ROS 2 version API.
+Consumers of sensor data are to use `SensorDataQoS` quality of service as provided by the implemented ROS 2 version API.
 This is to allow for unreliable transmission of sensor data directly from source to its first processing stage(s).
-These processing stage(s) are also expected to receive a sensor reading using the SensorDataQoS provided QoS profile implemented by the ROS2 version API.
 
 This specification does not enforce QoS settings for sensor data transmitted or received by stage(s) after the sensor driver.
 
@@ -42,9 +41,10 @@ Rationale
 Why Specify QoS Settings
 ------------------------
 
-Unlike ROS1, ROS 2's QoS settings chosen by an application can affect the ability for data to be transmitted from a publisher to a subscriber.
-There exists several combinations of QoS settings that will not transmit data from one node to another even while composed in a single process.
+Unlike ROS 1, ROS 2's QoS settings chosen by an application can affect the ability for data to be transmitted from a publisher to a subscriber.
+The may exist publisher and subscriber QoS combinations that will not transmit data from one node to another, even while composed in a single process.
 By specifying QoS settings for common interfaces, the aim is to ensure all sensor data and map sources can be interchangable with each other at run-time.
+This resolves subtle user issues of new sensor and map data sources not being communicated due to QoS incompatibilities leading some to believe a driver or package is not functioning.
 
 Why Not Specify Later Stage Sensor QoS Settings
 -----------------------------------------------
