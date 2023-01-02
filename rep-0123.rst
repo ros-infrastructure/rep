@@ -127,11 +127,11 @@ References
 .. [1] REP 122: FHS layout for ROS installation
    (https://ros.org/reps/rep-0122.html) 
 .. [2] ROS filesystem environment variables
-   (http://ros.org/doc/api/rospkg/html/environment.html) 
+   (https://docs.ros.org/en/independent/api/rospkg/html/rospkg_environment.html) 
 .. [3] Wikipedia: Filesystem Hiearchy Standard
-   (http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
+   (https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
 .. [4] rospkg documentation
-   (http://ros.org/doc/api/rospkg/html/)
+   (https://docs.ros.org/en/independent/api/rospkg/html/)
 
 Copyright
 =========
