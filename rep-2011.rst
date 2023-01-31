@@ -119,7 +119,7 @@ ROS 2 has special considerations on this topic because it can support different 
 Therefore, it is neither desirable to depend on features of a specific technology, nor is it desirable suggest patterns that rely on features that only some serialization technologies provide.
 In either case, that would tie ROS 2 to specific serialization technologies, and that should be avoided if possible.
 
-That being said, this proposal will require some specific features from the middleware and serialization technology, but the goal is to choose approaches which give ROS 2 the broadest support across middleware implementations, ideally while not limiting users from using specific features of the underlying technology when that suites them.
+That being said, this proposal will require some specific features from the middleware and serialization technology, but the goal is to choose approaches which give ROS 2 the broadest support across middleware implementations, ideally while not limiting users from using specific features of the underlying technology when that suits them.
 
 With those examples and design constraints as motivation, this REP makes a proposal on how to handle evolving message types in the following Specification section, as well as rationales and considered alternatives in the Rationale section and its sub-sections.
 
@@ -248,59 +248,62 @@ These features are described in the following sections.
 Type Version Enforcement
 ------------------------
 
-In order to detect type version mismatches and enforce them, a way to uniquely identify versions is required, and this proposal uses type version hashes.
+In order to detect and enforce type version mismatches, as well as communicate information about type descriptions compactly, a way to uniquely identify versions is required.
+This proposal uses a hash of the type's description for this purpose.
+
 
 Type Version Hash
 ^^^^^^^^^^^^^^^^^
 
-The type version hashes are not sequential and do not imply any rank among versions of the type.
-That is, given two version hashes of a type, there is no way to tell which is "newer".
+The hash must be calculated in a stable way such that it is not changed by trivial differences that do not impact serialization compatibility.
+The hash must also be able to be calculated at runtime from information received on the wire.
+This allows subscribers to validate the received TypeDescriptions against advertised hashes, and allows dynamic publishers to invent new types and advertise their hash programmatically.
+The interface description source provided by the user, which may be a ``.msg``, ``.idl`` or other file type, is parsed into the TypeDescription object as an intermediate representation.
+This way, types coming from two sources that have the same stated name and are wire compatible will be given the same hash, even if they are defined using source text that is not exactly equal.
+The hash must only be computed using fields that affect communication compatibility.  Thus the representation should include:
 
-The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
-Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
+This representation includes:
 
-The type version hashes are calculated in a stable way and are not sensitive to trivial changes like changes in the comments or whitespace of the IDL file.
-The IDL file given by the user, which may be a ``.msg`` file, ``.idl`` file, or something else, is parsed and stored into a data structure which excludes things like comments but includes things that impact compatibility on the wire.
+- the package, namespace, and type name, for example `sensor_msgs/msg/Image`
+- a list of field names and types
+- a list of all recursively referenced types
+- no field default values
+- no comments
 
-The data structure includes:
+Finally, the resulting filled data structure must be represented in a platform-independent format, rather than running the hash function on the in-memory native type representation.
+Different languages, architectures, or compilers will produce different in-memory representations, and the hash must be consistently calculable in different contexts.
 
-- a list of field names and types, but not default values
-- a recursive list of field names and types for referenced types
-- an optional user-defined interface version, or 0 if not provided
-
-.. TODO::
-
-    Should the message name, including package and namespace, be part of this?
-    Consider a situation where you have the same data structure but two different type names, should those two instances have the same hash?
-    They are unique when paired with their type name, so it should be ok, but it is a bit weird, perhaps, since we're not using this type hash to check for wire compatibility between differently named types.
-
-.. TODO::
-
-    Related TODO, should we just use the TypeDescription described in a later section?
-    It's essentially the same thing, but it does include the type name.
-    I (wjwwood) am leaning in this direction.
-
-The resulting data structure is hashed using a standard SHA-1 method, resulting in a standard 160-bit (20-byte) hash value which is also generally known as a "message digest".
+The resulting data structure is hashed using SHA-256, resulting in a 256-bit (32-byte) hash value which is also generally known as a "message digest".
 This hash is combined with a type version hash standard version, which we will call the "ROS IDL Hashing Standard" or "RIHS", the first version of which will be ``RIHS1``.
-They are combined using an ``_`` symbol, resulting in a complete type version hash like ``RIHS1_<160-bit SHA-1 of data structure>``.
-This allows the tooling to know if a hash mismatch is due to a change in this standard (what is being hashed) or due to a difference in the interface types themselves.
+They are combined using an ``_`` symbol, resulting in a complete type version hash like ``RIHS1_<256-bit SHA-256 of data structure>``.
+This allows the tooling to know if a hash mismatch is due to a change in this standard (how hash is computed) or due to a difference in the interface types themselves.
+In the case of a change in standard, it will be unknown whether the interface types are equal or not.
 
 For now, the list of field names and their types are the only contributing factors, but in the future that could change, depending on which "annotations" are supported in ``.idl`` files.
 The "IDL - Interface Definition and Language Mapping" design document\ [2]_ describes which features of the OMG IDL standard are supported by ROS 2.
-If that is extended in the future, then this data structure may need to be updated, and if so the "type version hash standard version" will also need to be incremented.
+If that is extended in the future, then this data structure may need to be updated, and if so the "ROS IDL Hashing Standard" version will also need to be incremented.
+New sanitizing may be needed on the TypeDescription pre-hash procedure, in the case of these new features.
 
 .. TODO::
 
     Re-audit the supported features from OMG IDL according to the referenced design document, including the @key annotation and how it may impact this for the reference implementation.
 
-The optional user-defined interface version makes it possible to change the version hash of a message that only changed in "field semantics" (i.e. without changing field names or types), and therefore makes it possible to write "transfer functions" to handle semantic-only conversions between versions.
-There is currently no standard way to specify the user-defined interface version in either ``.msg`` or ``.idl`` files.
+Notes:
 
-.. TODO::
+The type version hash is not sequential and does not imply any rank among versions of the type. That is, given two version hashes of a type, there is no way to tell which is "newer".
 
-    Remove the idea of the user-defined interface version or define how it can be supplied by the user in one or more of the idl file kinds.
+Because the hash contains the stated name of the type, differently-named types with otherwise identical descriptions will be mismatched as incompatible.
+This matches existing ROS precedent of strongly-typed interfaces.
 
-Note that this data structure does not include the serialization format being used, nor does it include the version of the serialization technology.
+The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
+Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
+
+It may be desirable, as a user, to change the version hash of a message even when no field types or names have changed, perhaps due to a change in semantics of existing fields.
+There is no built-in way to do this manual re-versioning.
+However, we suggest the following method which requires no special tooling: provide an extra field within the interface with a name ``bool versionX = true``.
+To manually trigger a hash update, change by increment the name of the field, for example ``bool versionY = true``.
+
+The TypeDescription does not include the serialization format being used, nor does it include the version of the serialization technology.
 This type version hash is for the *description* of the type, and is not meant to be used to determine wire compatibility by itself.
 The type version hash must be considered in context, with the serialization format and version in order to determine wire compatibility.
 
