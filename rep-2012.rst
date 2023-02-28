@@ -32,11 +32,11 @@ Motivation
 ==========
 
 The primary motivation for this proposal is to make it easier for users to externally validate that services are operating as expected.
-Drawing an analogy to ROS topics, there exists tools and libraries for "echoing" and recording messages sent over a topic, and we would like to see the same kind of capabilities for services.
-Specifically, we want the capability to introspect requests and responses that are sent to and from service servers and clients.
+Drawing an analogy to ROS topics, there exist tools and libraries for "echoing" and recording messages sent over a topic, and this REP proposes the same kind of capabilities for services.
+Specifically, the capability to introspect requests and responses that are sent to and from service servers and clients.
 Being able to remotely monitor services allows users to more effectively troubleshoot issues in a ROS system.
-For example, we could verify requests are being received by a server by employing a command-line tool during runtime.
-Or, we could post-process recorded requests and responses to validate their content.
+For example, users could verify requests are being received by a server by employing a command-line tool during runtime.
+Or the user could post-process recorded requests and responses to validate their content.
 
 There are additional features that could leverage this proposal, such as:
 
@@ -44,7 +44,7 @@ There are additional features that could leverage this proposal, such as:
 - Introspection of ROS actions, which are built on services
 - Validation of a live ROS system by referencing a recording from a previous session
 
-Though this proposal focuses on the core feature of introspecting requests and responses, we want to keep the design flexible so additional features like those listed above can be implemented in the future.
+Though this proposal focuses on the core feature of introspecting requests and responses, the design is purposely flexible so additional features like those listed above can be implemented in the future.
 
 
 Specification
@@ -76,13 +76,13 @@ By publishing service event messages to predetermined topics, tools and librarie
 Service Event Definition
 ------------------------
 
-For each service definition, ``my/srv/Foo.srv``, we define a new ROS message type, ``my/srv/Foo_Event.msg``, with the ROS IDL specification [2]_:
+For each service definition, ``my/srv/Foo.srv``, a new (hidden) ROS message type is defined, ``my/srv/Foo_Event.msg``, with the ROS IDL specification [2]_:
 
   .. code-block::
 
    # Event info
    # Contains event type, timestamp, and request ID
-   rcl_interfaces/msg/ServiceEventInfo info
+   service_msgs/msg/ServiceEventInfo info
 
    # The actual request content sent or received
    # This field is only set if the event type is REQUEST_SENT or REQUEST_RECEIVED,
@@ -96,7 +96,7 @@ For each service definition, ``my/srv/Foo.srv``, we define a new ROS message typ
 
 The reserved underscore character is used in the generated type name to avoid potential collisions with user-defined types.
 
-``rcl_interfaces/msg/ServiceEventInfo.msg`` is defined as,
+``service_msgs/msg/ServiceEventInfo.msg`` is defined as,
 
   .. code-block::
 
@@ -112,15 +112,18 @@ The reserved underscore character is used in the generated type name to avoid po
    # Indicates this is a response received event emitted from a client
    uint8 RESPONSE_RECEIVED = 3
 
-   # The kind of event this message represents
+   # The type of event this message represents
    uint8 event_type
 
    # Timestamp for when the event occurred (sent or received time)
    builtin_interfaces/msg/Time stamp
 
    # Unique identifier for the client that sent the service request
-   # Note, this is only unique for the current session
-   unique_identifier_msgs/msg/UUID client_id
+   # Note, this is only unique for the current session.
+   # The size here has to match the size of rmw_dds_common/msg/Gid,
+   # but unfortunately we cannot use that message directly due to a
+   # circular dependency.
+   char[16] client_gid
 
    # Sequence number for the request
    # Combined with the client ID, this creates a unique ID for the service transaction
@@ -132,7 +135,7 @@ Timestamp
 ^^^^^^^^^
 
 Timestamps represent the time at which the event occurred.
-I.e. they are set to the time directly after a request or response is sent or received.
+That is, they are set to the time directly after a request or response is sent or received.
 
 Timestamps shall respect ROS time [4]_.
 This means by default they will be set with wall-time.
@@ -157,7 +160,7 @@ For example, consider a service ``example_interfaces/srv/AddTwoInts`` defined as
    ---
    int64 sum
 
-The following service event message definition is generated when building the ``example_interfaces`` package (comments elided for brevity):
+The following (hidden) service event message definition is generated when building the ``example_interfaces`` package:
 
 :example_interfaces/srv/AddTwoInts_Event:
 
@@ -185,39 +188,16 @@ And the definitions for ``example_interfaces/srv/AddTwoInts_Reponse`` is,
 Configuration
 -------------
 
-Configuration of service introspection features will be done through ROS parameters.
-Each node may offer the following four Boolean parameters:
+Configuration of service introspection features will be done through API calls on a per-client or per-server basis.
 
-:publish_client_events:
-  If ``true``, then client "request sent" and "response received" events will be published for all clients created by this node.
-  The default value is ``false``.
-:publish_service_events:
-  If ``true``, then service "request received" and "response sent" events will be published for all service servers created by this node.
-  The default value is ``false``.
-:client_event_payload:
-  If ``true``, then client event messages will have the ``request`` and ``response`` members set.
-  Only applies if ``publish_client_events`` is ``true``.
-  The default value is ``true``.
-:service_event_payload:
-  If ``true``, then server event messages will have the ``request`` and ``response`` members set.
-  Only applies if ``publish_service_events`` is ``true``.
-  The default value is ``true``.
+The API will allow users to:
 
-By default, the event publishing feature is off so users do not pay for a feature they do not plan to use.
+- Disable introspection completely
+- Enable the sending of only metadata
+- Enable the sending of metadata and service contents
+
+By default, the event publishing feature is off for all clients and all services so users do not pay for a feature they do not plan to use.
 Furthermore, node authors may opt-in by default or disable the service introspection feature altogether as they see fit.
-
-As an example, service introspection can be enabled for all servers and clients by providing the following parameters YAML file to ROS nodes [7]_:
-
-.. code-block:: yaml
-
-   /**:
-      ros__parameters:
-         publish_service_events: true
-         publish_client_events: true
-
-Since it is possible to set parameters with a parameter service [8]_, one or more service events *may* be published when setting a service introspection parameter.
-The behavior depends on the order of operations and is defined by the implementation.
-For example, if ``publish_service_events`` was previously set to ``true``, then any service call to change one of the parameters defined above may cause a service request event and/or a response event to be published for the parameter service.
 
 Quality of Service
 ------------------
@@ -239,43 +219,23 @@ Rationale
 
 The following sections summarize *why* certain design decisions were made and some of the alternatives considered.
 
-Using ROS Parameters for configuration
---------------------------------------
+Configuring service introspection through API calls
+---------------------------------------------------
 
-ROS parameters are the canonical way to configure a node at runtime, and so it seems to be a natural choice for configuring the service introspection feature.
-We can benefit from existing tools for interacting with parameters such as the parameter services API in ``rclcpp`` or ``rclpy`` and ROS launch files [12]_.
-Parameters also offer the convenience of being reconfigurable during runtime, so by extension service introspection may be toggled on and off while the node is running.
+There are a few reasons to configure introspection through API calls.
 
-Environment variables were considered as an alternative method for configuring service introspection, however they are not reconfigurable during runtime and do not naturally map to nodes the same way parameters do.
+First, enabling or disabling introspection is fundamentally a per-client or per-service action.
+In most scenarios, users probably will not want to enable service introspection on all clients and services at once, as this will greatly increase network traffic.
 
-Configuration options
----------------------
+Next, it makes sense to have users of the rcl client/server API not have to specified arguments that will never be used if they don't enable introspection.
+By having a separate API for this, only API users concerned with enabling the introspection feature need to provide the feature.
 
-It would be nice to define a single enumeration type to reduce the number of configuration points, however since ROS parameters do not support enumeration types multiple Boolean parameters are defined instead.
+Finally, by having a separate API call for introspection, the API behavior ends up being completely orthogonal.
+That is, users can cycle between having introspection off, metadata only, or contents sent, and the system will do the correct thing.
 
-The number of parameters was chosen as a compromise between flexibility and complexity.
-At one extreme, service introspection could be configured per-service with nodes offering S * 4 parameters, where S is the number of services and each has 4 parameters as described in `Configuration <Configuration_>`_.
-This runs the risk of overwhelming users with the sheer number of parameters offered by a node.
-At the other extreme, there could be a single option to enable service introspection for all services in a ROS system, which is not very flexible.
-
-It seems likely that there will by a large number of users that will want to introspect (or record) all services in system,
-therefore it should be easy to turn on the feature for all services.
-However, since it is difficult to predict how the feature will ultimately be used, we want to provide some flexibility.
-
-Boolean parameters are chosen as an easy way to toggle the feature on and off per node (because ROS parameters are stored per node).
-Recognizing that both client events and server events contain redundant information (besides timestamps), we provide a separate parameter to toggle the feature for clients.
-Similarly, extra overhead may arise in cases where service requests or responses are *very* large.
-So, additional parameters are offered to avoid sending content for client or server events.
-This way users who are concerned with extra overhead incurred by enabling service introspection have mitigation options.
-
-
-Parameter Services
-------------------
-
-There already exists a set of default services for interacting with ROS parameters [8]_.
-There is also the ``/parameter_events`` topic where changes to ROS parameters for all nodes are published.
-We considered leveraging this REP to implement (or replace) the existing ``/parameter_events`` topic, however parameter events may be triggered by local changes in a node (and not necessarily through a parameter service), so we cannot capture all possible parameter events from service events.
-
+One downside of using APIs for configuration is that there is no obvious way to configure the introspection feature at runtime.
+However, it is easy to hook up the API call to a ROS parameter (say), and control it through that.
+If that turns out to be a popular feature, the implementation can be extended to automatically expose this per-service introspection as a parameter.
 
 Only supporting one service per name
 ------------------------------------
