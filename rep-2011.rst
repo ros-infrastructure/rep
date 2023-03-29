@@ -274,9 +274,13 @@ Finally, the resulting filled data structure must be represented in a platform-i
 Different languages, architectures, or compilers will produce different in-memory representations, and the hash must be consistently calculable in different contexts.
 
 The resulting data structure is hashed using SHA-256, resulting in a 256-bit (32-byte) hash value which is also generally known as a "message digest".
-This hash is combined with a type version hash standard version, which we will call the "ROS IDL Hashing Standard" or "RIHS", the first version of which will be ``RIHS1``.
-They are combined using an ``_`` symbol, resulting in a complete type version hash like ``RIHS1_<256-bit SHA-256 of data structure>``.
-This allows the tooling to know if a hash mismatch is due to a change in this standard (how hash is computed) or due to a difference in the interface types themselves.
+This hash is paired with a type version hash standard version, which we will call the "ROS IDL Hashing Standard" or "RIHS", the first version of which will be ``RIHS01``.
+RIHS Version 00 is reserved for "Invalid" / "unset", and the RIHS version is limited by this specification to a maximum value of 255.
+RIHS hash values must have a well-defined UTF-8 string representation for human readability and for passing over string-only communication channels.
+The prefix of a well-formed RIHS string will always be ``RIHSXX_``, where ``X`` is one hexadecimal digit, followed by the version-dependent string representation of the hash value.
+For ``RIHS01``, the hash value is 64 hexadecimal digits representing the 256-bit message digest, leading to a known ``RIHS01`` string length of 71.
+
+This versioning allows the tooling to know if a hash mismatch is due to a change in this standard (how hash is computed) or due to a difference in the interface types themselves.
 In the case of a change in standard, it will be unknown whether the interface types are equal or not.
 
 For now, the list of field names and their types are the only contributing factors, but in the future that could change, depending on which "annotations" are supported in ``.idl`` files.
@@ -348,7 +352,7 @@ For example, a type name using this approach may look like this:
 
 .. code::
 
-    sensor_msgs/msg/Image__RIHS1_XXXXXXXXXXXXXXXXXXXX
+    sensor_msgs/msg/Image__RIHS01_XXXXXXXXXXXXXXXXXXXX
 
 This has the benefit of "just working" for most middlewares which at least match based on the name of the type, and it is simple, requiring no further custom hooks into the middleware's discovery or matchmaking process.
 
@@ -776,8 +780,8 @@ Registering a transfer function in an ``ament_cmake`` project might look like th
     create_transfer_function(
         src/my_transfer_function.cpp
         FUNCTION_NAME my_transfer_function
-        FROM sensor_msgs/msg/Image RIHS1_XXXXXXXXXXXXXXXXX123
-        TO sensor_msgs/msg/Image RIHS1_XXXXXXXXXXXXXXXXXabc
+        FROM sensor_msgs/msg/Image RIHS01_XXXXXXXXXXXXXXXXX123
+        TO sensor_msgs/msg/Image RIHS01_XXXXXXXXXXXXXXXXXabc
     )
 
 This CMake function would create the library target, link the necessary libraries, and install any files in the ``ament_index`` needed to make the transfer function discoverable by the tools.
