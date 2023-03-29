@@ -1,0 +1,137 @@
+REP: 2015
+Title: ROS2 DDS security PKCS#11 URI support
+Author: Miguel Company <miguelcompany@eprosima.com>, Iker Luengo <ikerluengo@eprosima.com>
+Status: Final
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 29-Mar-2023
+Post-History:
+
+Abstract
+========
+
+The DDS-Security specification [1] defines the use of Hardware Security Modules (HSM) and PKCS#11 URIs as an alternative to private keys and certificates stored in the file system.
+Current implementation only supports these tokens to be directly stored in the file system as ``.pem`` files.
+This is a design proposal to support PKCS#11 URIs.
+
+Motivation
+==========
+
+The DDS-Security specification [1] requires the security documents (private keys, certificates, governance and permissions) to be provided to the DDS implementation within the participant's ``properties``.
+It defines a set of reserved properties, that must hold the URI of the corresponding document.
+However, it allows different URI schemes to be used.
+Specifically, in the case of certificates and private keys, it defines the support for:
+
++------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
+| **scheme**                                           | **definition**                                                                                                 |
++------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
+| file                                                 | ``file:/keystore/enclaves/foo/key.pem``                                                                        |
++------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
+| PKCS#11                                              | ``pkcs11:object=MyParticipantPrivateKey;type=private``                                                         |
++------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
+| data                                                 | ``data:,-----BEGIN RSA PRIVATE KEY----- MIIEpAIBAAKCAQEA3HIh...AOBaaqSV37XBUJg== -----END RSA PRIVATE KEY----``|
++------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
+
+Current RCL implementation only support the ``file`` scheme.
+Furthermore, it searches these security files in an enclave subdirectory within the reserved ``enclaves`` subfolder of the root keystore, corresponding to the fully-qualified path of every enclave.
+For example, for the ``/foo/bar`` enclave, the directory structure would look like:
+
+.. code-block::
+
+    <root>
+    ├── enclaves
+    │   └── foo
+    │       └── bar
+    │           ├── cert.pem
+    │           ├── key.pem
+    │           ├── ...
+    └── public
+        ├── ...
+
+Note that it also requires the names of the files to be the ones expected.
+Specifically, all certificate and key files must have the ``.pem`` extension.
+In order to configure the security properties of a DDS participant, the path of the appropriate file in the enclave directory is added as the ``file`` URI of the corresponding property.
+For example, for the private key in the authentication plugin:
+
+.. code-block::
+
+    dds.sec.auth.private_key = file:<root>/enclaves/foo/bar/key.pem
+
+
+Terminology
+===========
+
+:Certificate:
+  A data file containing the identity and authentication information of an entity.
+
+:PKCS#11:
+  Refers to one of the Public-Key Cryptography Standards, defined in PKCS#11 Standard [2].
+
+:Keystore:
+  The keystore is the root directory where the DDS security artifacts are stored.
+  See ROS 2 Security Enclaves [3] for further information.
+
+:Enclave:
+  The process or group of processes that will share the same identity and access control rules.
+  See ROS 2 Security Enclaves [3] for further information.
+
+:URI:
+  A resource's identifier that specifies how it can be accessed.
+
+Specification
+=============
+
+Goals
+-----
+
+Support PKCS#11 URIs for certificates and key files.
+``data`` URIs are out of scope of this proposal.
+
+Proposal
+--------
+
+We want to keep the current keystore structure as much as possible, as this will enable to keep all the current implementations regarding the enclave management and the CLI features that help setting up the keystore.
+No changes should be needed to systems that do not use the PKCS#11 scheme.
+
+The problem then is how to let the RMW implementation when we want to use a ``file`` URI and when a ``pkcs11`` URI; and how to provide the values of these URIs (i.e., the file path in the case of ``file`` and the token name in the case of ``pkcs11``).
+
+This can be solved if we allow for the key and certificate files in the enclave to have ``.pem`` or ``.p11`` extensions.
+Files with ``.p11`` will contain the PKCS#11 URI instead of the actual document data.
+Then, the RMW can be aware of the file extension and set the security property accordingly.
+Taking the private key in the authentication plugin as an example:
+
+#. The RMW will look for a file with name ``key.pem`` or ``key.p11`` in the enclave.
+#. If there is a ``key.p11`` file, and the RMW supports ``pkcs11`` URIs, it must load the content of the file, and set this content as the value of the property.
+   Some check can be done at this point, e.g., assert that the file contains a valid URI (i.e., starts with ``pkcs11:``).
+#. Otherwise, if there is a ``key.pem`` file, it keeps the current behavior, and sets the value of the property to the path of the file.
+
+With this proposal, current RMW implementations do not need to be updated if no support for PKCS#11 URIs is planned.
+Existing use SROS2 projects that do not use PKCS#11 URIs will continue to work with both the legacy or the updated implementation.
+New projects that want to use PKCS#11 URIs will fail unless the RMW supports ``.p11`` extension files as described in this proposal.
+
+
+References
+==========
+
+.. [1] DDS-Security
+   (https://www.omg.org/spec/DDS-SECURITY/1.1/PDF)
+
+.. [2] PKCS#11 Standard
+   (http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html)
+
+.. [3] ROS 2 Security Enclaves
+   (https://design.ros2.org/articles/ros2_security_enclaves.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
