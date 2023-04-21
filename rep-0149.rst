@@ -465,18 +465,21 @@ Example
 <license> (multiple, but at least one)
 --------------------------------------
 
-Name of license for this package or selected files of this package,
-e.g. BSD-3-Clause, GPL-3.0-or-later, Apache-2.0. In order to assist
-machine readability, only include the `SPDX license identifier
-<https://spdx.org/licenses/>`_ in this tag. In the rare case that
-a package (or selected source files of the package) are licensed under
-multiple alternative licenses, the identifiers can be combined by
-``or`` as described in Section 7.2 of the `Machine-readable
+Name of license for this package or selected files of this package, e.g.,
+``BSD-3-Clause``, ``GPL-3.0-or-later``, ``Apache-2.0``. In order to assist
+machine readability, it is strongly recommended to use `SPDX license
+identifiers <https://spdx.org/licenses/>`_ in this tag and to document
+the use of SPDX by the ``type`` attribute.
+
+In the rare case that a package (or selected source files of the package)
+are licensed under multiple alternative licenses, the identifiers can be
+combined by ``or`` as described in Section 7.2 of the `Machine-readable
 debian/copyright file specification V1.0
 <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
 
 Attributes
 ''''''''''
+
   .. raw:: html
 
     <font color="blue">
@@ -493,19 +496,28 @@ Attributes
 
  ``source-files="FILENAME-PATTERN"`` *(optional)*
 
-  A filename pattern using the simplified shell glob syntax specified in Section 6.9 of the `Machine-readable
-  debian/copyright file specification V1.0 <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_
-  and relative to the ``package.xml`` file.
+  A filename pattern using the simplified shell glob syntax specified in
+  Section 6.9 of the `Machine-readable debian/copyright file specification V1.0
+  <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_ and
+  relative to the ``package.xml`` file.
 
-  The filename pattern specifies the source files this license information refers to. The value
-  ``source-files="*"`` refers to all source files of the package, including source files that are downloaded automatically
-  during the build process - for example in the case of so-called *vendor packages*. If the attribute is not specified,
-  the tag again refers to all source files of the package, including downloaded source files.
+  The filename pattern specifies the source files this license information
+  refers to. The value ``source-files="*"`` refers to all source files of the
+  package, including source files that are downloaded automatically during the
+  build process - for example in the case of so-called *vendor packages*. If
+  the attribute is not specified, the tag again refers to all source files of
+  the package, including downloaded source files.
 
-  If the filename patterns of multiple license tags match a particular file, the last tag applies to it - following
-  the logic described in Section 6.9 of the `Machine-readable
-  debian/copyright file specification V1.0 <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
+  If the filename patterns of multiple license tags match a particular file,
+  the last tag applies to it - following the logic described in Section 6.9
+  of the `Machine-readable debian/copyright file specification V1.0
+  <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
   Consequently, more general tags should be given first.
+
+ ``type="LICENSE-IDENTIFIER-TYPE"`` *(optional)*
+
+  The type of license identifier being used in the tag. The type should be one
+  of the following identifiers: ``freeform`` (default) or ``SPDX``.
 
   .. raw:: html
 
