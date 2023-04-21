@@ -346,7 +346,7 @@ Example
     </description>
     <maintainer email="someone@example.com">Someone</maintainer>
 
-    <license file="LICENSE">BSD-3-Clause</license>
+    <license file="LICENSE" type="spdx">BSD-3-Clause</license>
     <license source-files="include/my_package/linear_math/*">Zlib</license>
 
     <url type="website">http://wiki.ros.org/my_package</url>
@@ -517,7 +517,7 @@ Attributes
  ``type="LICENSE-IDENTIFIER-TYPE"`` *(optional)*
 
   The type of license identifier being used in the tag. The type should be one
-  of the following identifiers: ``freeform`` (default) or ``SPDX``.
+  of the following identifiers: ``freeform`` (default) or ``spdx``.
 
   .. raw:: html
 
