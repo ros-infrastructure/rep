@@ -1,5 +1,5 @@
 REP: 2015
-Title: ROS2 DDS security PKCS#11 URI support
+Title: ROS 2 DDS security PKCS#11 URI support
 Author: Miguel Company <miguelcompany@eprosima.com>, Iker Luengo <ikerluengo@eprosima.com>
 Status: Final
 Type: Standards Track
