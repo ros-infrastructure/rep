@@ -156,7 +156,7 @@ References
    (http://wiki.ros.org/ROS/Patterns/Conventions#Packages)
 
 .. [2] Browsing ROS Packages
-   (http://www.ros.org/browse)
+   (https://index.ros.org/packages/)
 
 .. [3] Indexing Your ROS Repository for Documentation Generation
    (http://wiki.ros.org/rosdistro/Tutorials/Indexing%20Your%20ROS%20Repository%20for%20Documentation%20Generation)
