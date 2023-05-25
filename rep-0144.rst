@@ -59,8 +59,8 @@ Mandatory Rules
   This rule is simply to force the name of the package to be more human understandable.
   It's recommended to be noteably longer, see below.
 
-Global Rules
-------------
+Global Guidelines
+-----------------
 
 * **Package names should be specific enough to identify what the package does.**
   For example, a motion planner should not be called ``planner``.
@@ -73,13 +73,19 @@ Global Rules
 * **A package name should not contain** ``ros`` **as it is redundant.**
   Exceptions include core packages and ROS bindings of an upstream library
   (e.g. ``moveit_ros``)
-* **The package name should describe what the package does, not where it came from.**
+* **The package name should describe what the package does, but also avoid naming collisions.**
+  Priority should be given to describing what the package does, but in an effort to avoid
+  name collisions, packages which are primarily (at least to start with) used in a single
+  project or organization should have a prefix with the project or organization name.
   One of ROS's goals is to develop a canonical set of tools for making robots do
-  interesting things.
-  Then again, as stated in the rules below, ``if a package is specialized
-  by an entity (lab, company, ...), prepend the name of the entity``.
-  But once the package is commonly used, owned and maintained, that name can be dropped
-  as the package becomes the reference
+  interesting things, however, as stated in the rules below, ``if a package is specialized
+  by an entity (...), prepend the name of the entity``.
+  The preference is for packages to start namespaced and then once the package is commonly
+  used, owned and maintained, that name can be dropped as the package becomes the reference.
+  Exceptions for special situations where multiple organizations are collaborating on a package,
+  or core packages, or official driver packages for hardware, and other special cases can be
+  made.
+  This is a guideline, not a steadfast rule.
 * **Do not use a name that's already been taken.** 
   To check whether a name is taken, consult [2]_. If you'd like your
   repository included in that list, see the tutorial at [3]_
@@ -100,9 +106,10 @@ For prefixes:
 * if a package is specialized for a software project, prepend its name
 * if a package is specialized for a hardware piece, prepend its name
 * if a package is specialized for a robot, prepend its name
-* if a package is specialized by an entity (lab, company, ...), prepend the 
+* if a package is specialized by an entity (lab, company, individual, ...), prepend the
   name of the entity.
-  Once the package is commonly used, owned and maintained, that name can be dropped
+  Once the package is commonly used, owned and maintained, that name can be dropped,
+  but it should ideally start namespaced
 
 For suffixes:
 
