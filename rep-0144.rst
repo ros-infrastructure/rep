@@ -85,6 +85,7 @@ Global Guidelines
   Exceptions for special situations where multiple organizations are collaborating on a package,
   or core packages, or official driver packages for hardware, and other special cases can be
   made.
+  When prefixed by an entity the unprefixed name should follow the other rules about specificity and meaningful naming.
   This is a guideline, not a steadfast rule.
 * **Do not use a name that's already been taken.** 
   To check whether a name is taken, consult [2]_. If you'd like your
