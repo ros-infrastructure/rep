@@ -287,7 +287,7 @@ With this layout, sourcing ~/rosbuild_ws/setup.*sh also sources ~/catkin_ws/deve
 References
 ==========
 
-.. [1] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
+.. [1] REP 1, REP Purpose and Guidelines, Conley
    (https://ros.org/reps/rep-0001.html)
 
 

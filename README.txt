@@ -1,18 +1,15 @@
 reStructuredText for REPs
 =========================
 
-This is a direct search-and-replace port of the Python REP
+This is a direct search-and-replace port of the Python PEP
 scripts at:
 
-http://svn.python.org/projects/reps/trunk/
+http://svn.python.org/projects/peps/trunk/
 
 Original (modified) README.txt follows:
 
-Original REP source may be written using two standard formats, a
-mildly idiomatic plaintext format and the reStructuredText format
-(also, technically plaintext).  These two formats are described in REP
-9 and REP 12 respectively.  The rep2html.py processing and
-installation script knows how to produce the HTML for either REP
-format.  A local copy of the Docutils package is included for
-processing reStructuredText REPs.
-
+Original REP source is written using the reStructuredText
+format. This format is described in REP 12. The rep2html.py
+processing and installation script knows how to produce the
+HTML for the REP format. A local copy of the Docutils
+package is included for processing reStructuredText REPs.
