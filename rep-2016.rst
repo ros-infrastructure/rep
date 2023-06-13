@@ -1,0 +1,150 @@
+REP: 2016
+Title: ROS 2 Interface Type Descriptions - Representation, Hashing, Discovery and Distribution
+Author: Emerson Knapp
+Status: Active
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 13-Jun-2023
+Post-History:
+
+
+Abstract
+========
+
+This REP proposes a standard format for the communication of ROS 2 interface types, along with tooling to support their use.
+
+It provides a ROS 2 interface type that can contain these descriptions, runtime data structures, and a universally reproducible serialization method.
+Alongside the description format, this REP also defines a hashing algorithm to create standardized hashes of type descriptions, to quickly detect type mismatch during discovery.
+
+
+Motivation
+==========
+
+ROS 1 clients provided an MD5 sum from msg files to check for matching definitions.
+
+Terminology
+===========
+
+Type Source - original text used to define a type
+Type Description - a data structure representating a parsed Type Source, which removes irrelevant data such as comments, and will be equal regardless of whether the source was msg, IDL, or otherwise.
+RIHS (ROS Interface Hashing Standard) - a versioned specification for producing a hash value for a Type Description
+
+
+Specification
+=============
+
+In order to communicate and compare types, Type Description Interfaces are defined to contain type information.
+To detect and enforce type version mismatches, and communicate information about type descriptions compactly, a way to uniquely identify types is required.
+This proposal uses a hash of the type's description for this purpose.
+
+
+Type Description Interfaces
+---------------------------
+
+A Type Description must be produced in a stable way such that it is not changed by trivial differences that do not impact compatibility.
+The interface description source provided by the user, which may be a ``.msg``, ``.idl`` or other file type, is parsed into the TypeDescription object as an intermediate representation.
+This way, types coming from two sources that have the same stated name and have the same information will be given the same description, even if they are defined using sources that do not have identical text.
+The description should only contain information needed for programmatic reasons.
+Thus the representation should include:
+
+This representation includes:
+
+- the package, namespace, and type name, for example `sensor_msgs/msg/Image`
+- a list of field names and types
+- a list of all recursively referenced types
+- no comments
+
+
+Type Hash
+---------
+
+The hash must also be able to be calculated at runtime from information received on the wire.
+The hash must only be computed using fields that affect communication compatibility.
+Thus the hash excludes one aspect of Type Descriptions: it omits default values.
+This is because default values for fields are only used by the writer of a packet, the recipient always receives some value in the field and can read it, thus defaults cannot affect compatibility.
+
+This allows subscribers to validate the received TypeDescriptions against advertised hashes, and allows dynamic publishers to invent new types and advertise their hash programmatically.
+
+Finally, the resulting filled data structure must be represented in a platform-independent format, rather than running the hash function on the in-memory native type representation.
+Different languages, architectures, or compilers will produce different in-memory representations, and the hash must be consistently calculable in different contexts.
+
+The resulting data structure is hashed using SHA-256, resulting in a 256-bit (32-byte) hash value which is also generally known as a "message digest".
+This hash is paired with a type version hash standard version, which we will call the "ROS IDL Hashing Standard" or "RIHS", the first version of which will be ``RIHS01``.
+RIHS Version 00 is reserved for "Invalid" / "unset", and the RIHS version is limited by this specification to a maximum value of 255.
+RIHS hash values must have a well-defined UTF-8 string representation for human readability and for passing over string-only communication channels.
+The prefix of a well-formed RIHS string will always be ``RIHSXX_``, where ``X`` is one hexadecimal digit, followed by the version-dependent string representation of the hash value.
+For ``RIHS01``, the hash value is 64 hexadecimal digits representing the 256-bit message digest, leading to a known ``RIHS01`` string length of 71.
+
+This versioning allows the tooling to know if a hash mismatch is due to a change in this standard (how hash is computed) or due to a difference in the interface types themselves.
+In the case of a change in standard, it will be unknown whether the interface types are equal or not.
+
+For now, the list of field names and their types are the only contributing factors, but in the future that could change, depending on which "annotations" are supported in ``.idl`` files.
+The "IDL - Interface Definition and Language Mapping" design document\ [2]_ describes which features of the OMG IDL standard are supported by ROS 2.
+If that is extended in the future, then this data structure may need to be updated, and if so the "ROS IDL Hashing Standard" version will also need to be incremented.
+New sanitizing may be needed on the TypeDescription pre-hash procedure, in the case of these new features.
+
+.. TODO::
+
+    Re-audit the supported features from OMG IDL according to the referenced design document, including the @key annotation and how it may impact this for the reference implementation.
+
+Notes:
+
+The type version hash is not sequential and does not imply any rank among versions of the type. That is, given two version hashes of a type, there is no way to tell which is "newer".
+
+Because the hash contains the stated name of the type, differently-named types with otherwise identical descriptions will be mismatched as incompatible.
+This matches existing ROS precedent of strongly-typed interfaces.
+
+The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
+Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
+
+It may be desirable, as a user, to change the version hash of a message even when no field types or names have changed, perhaps due to a change in semantics of existing fields.
+There is no built-in way to do this manual re-versioning.
+However, we suggest the following method which requires no special tooling: provide an extra field within the interface with a name ``bool versionX = true``.
+To manually trigger a hash update, change by increment the name of the field, for example ``bool versionY = true``.
+
+The TypeDescription does not include the serialization format being used, nor does it include the version of the serialization technology.
+This type version hash is for the *description* of the type, and is not meant to be used to determine wire compatibility by itself.
+The type version hash must be considered in context, with the serialization format and version in order to determine wire compatibility.
+
+
+Type Hash Discovery
+-------------------
+
+Hashes are intended to be communicated such that they are available at the time of discovering a topic, before creating subscriptions.
+The hash will be available in the ``rmw_topic_endpoint_info_t`` data structure from discovery.
+
+For DDS implementations of the RMW API, it is recommended but not required to use the USER_DATA QoS policy to send this information.
+
+This discovery-time hash availability allows for validation of type mismatch before ever requesting a subscription.
+
+It can also give subscription-side tooling the opportunity to obtain an appropriate type description for the given hash, if it is not available.
+That point brings us to the final feature of this REP.
+
+Type Description Distribution
+-----------------------------
+
+``type_description_interfaces`` defines a service ``GetTypeDescription``, that will be provided as a builtin service on nodes.
+The service must be optional, but it will be a detail decided by client libraries whether it is enabled or disabled by default.
+
+
+References
+==========
+
+.. http://wiki.ros.org/Topics
+.. REP 2011 Evolving message types
+.. REP 20XX Dynamic pubsub (name TBD)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
