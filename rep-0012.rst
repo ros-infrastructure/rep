@@ -640,7 +640,7 @@ list`_.  The `Docutils project web site`_ has more information.
 References
 ==========
 
-.. [1] REP 1, REP Purpose and Guidelines, Warsaw, Hylton
+.. [1] REP 1, REP Purpose and Guidelines, Conley
    (https://ros.org/reps/rep-0001.html)
 
 
