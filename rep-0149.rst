@@ -508,6 +508,11 @@ Attributes
   the attribute is not specified, the tag again refers to all source files of
   the package, including downloaded source files.
 
+  While the Machine-readable debian/copyright file specification V1.0 allows
+  multiple filename patterns separated by spaces, only one pattern is allowed
+  here. Use multiple license tags if necessary (but first consider
+  restructuring the folder structure of the source files).
+
   If the filename patterns of multiple license tags match a particular file,
   the last tag applies to it - following the logic described in Section 6.9
   of the `Machine-readable debian/copyright file specification V1.0
