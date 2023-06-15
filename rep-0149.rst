@@ -519,6 +519,12 @@ Attributes
   <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
   Consequently, more general tags should be given first.
 
+  Finally note that space characters in the source file paths/names - which
+  should be a very rare case - have to be replaced by a ``?`` in the filename
+  pattern as described at the end of Section 6.9 of the `Machine-readable
+  debian/copyright file specification V1.0
+  <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
+
  ``type="LICENSE-IDENTIFIER-TYPE"`` *(optional)*
 
   The type of license identifier being used in the tag. The type should be one
