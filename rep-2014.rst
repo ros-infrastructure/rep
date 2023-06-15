@@ -42,6 +42,8 @@ Tracing and benchmarking can be defined as follows:
 - `benchmarking`: a method of comparing the performance of various systems by running a common test.
 
 From these definitions, inherently one can determine that both benchmarking and tracing are connected in the sense that the test/benchmark will use a series of measurements for comparison. These measurements will come from tracing probes or other logging mechanisms. In other words, tracing will collect data that will then be fed into a benchmark program for comparison.
+
+
 A quantitative approach
 -----------------------
 Performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. When creating benchmarks, prefer to use realistic data and situations rather than data designed to test one edge case. Follow the quantitative approach [1]_ when designing your architecture.
