@@ -37,11 +37,13 @@ Tracing and benchmarking
 
 Tracing and benchmarking can be defined as follows:
 
-- `tracing`: logging (partial) execution information while the system is running. `tracing` is used to understand what goes on in a running software system. 
+- `tracing`: logging (partial) execution information while the system is running. `tracing` is used to understand what goes on in running software systems. 
 
 - `benchmarking`: a method of comparing the performance of various systems by running a common test.
 
 From these definitions, inherently one can determine that both benchmarking and tracing are connected in the sense that the test/benchmark will use a series of measurements for comparison. These measurements will come from tracing probes or other logging mechanisms. In other words, tracing will collect data that will then be fed into a benchmark program for comparison.
+
+
 A quantitative approach
 -----------------------
 Performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. When creating benchmarks, prefer to use realistic data and situations rather than data designed to test one edge case. Follow the quantitative approach [1]_ when designing your architecture.
@@ -54,7 +56,6 @@ There're different types of benchmarking approaches, specially when related to p
 - `Functional performance testing`: Functional performance is the measurable performance of the system’s functions which the user can experience. For example, in a motion planning algorithm, measures could include items like the ratio the algorithm gets the motion plan right.
   
 - `Non-functional performance testing`: The measurable performance of those aspects that don't belong to the system's functions. In the motion planning example, the latency the planner, the memory consumption, the CPU usage, etc.
-
 
 - `Black-box performance testing`: Measures performance by eliminating the layers above the *layer-of-interest* and replacing those with a specific test application that stimulates the layer-of-interest in the way you need it. This allows to gather the measurement data right inside your specific test application. The acquisition of the data (the probe) resides inside the test application. A major design constraint in such a test is that you have to eliminate the “application” in order to test the system. Otherwise, the real application and the test application would likely interfere.
 
