@@ -37,7 +37,7 @@ Tracing and benchmarking
 
 Tracing and benchmarking can be defined as follows:
 
-- `tracing`: logging (partial) execution information while the system is running. `tracing` is used to understand what goes on in a running software system. 
+- `tracing`: logging (partial) execution information while the system is running. `tracing` is used to understand what goes on in running software systems. 
 
 - `benchmarking`: a method of comparing the performance of various systems by running a common test.
 
