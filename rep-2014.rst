@@ -32,7 +32,16 @@ Value for stakeholders:
 
 The guidelines in here are intended to be a living document that can be updated as new information becomes available.
 
+Tracing and benchmarking
+^^^^^^^^^^^^^^^^^^^^^^^^
 
+Tracing and benchmarking can be defined as follows:
+
+- `tracing`: logging (partial) execution information while the system is running. `tracing` is used to understand what goes on in a running software system. 
+
+- `benchmarking`: a method of comparing the performance of various systems by running a common test.
+
+From these definitions, inherently one can determine that both benchmarking and tracing are connected in the sense that the test/benchmark will use a series of measurements for comparison. These measurements will come from tracing probes or other logging mechanisms. In other words, tracing will collect data that will then be fed into a benchmark program for comparison.
 A quantitative approach
 -----------------------
 Performance must be studied with real examples and measurements on real robotic computations, rather than simply as a collection of definitions, designs and/or marketing actions. When creating benchmarks, prefer to use realistic data and situations rather than data designed to test one edge case. Follow the quantitative approach [1]_ when designing your architecture.
@@ -122,8 +131,6 @@ Tracing and benchmarking can be defined as follows:
 From these definitions, inherently one can determine that both benchmarking and tracing are connected in the sense that the test/benchmark will use a series of measurements for comparison. These measurements will come from tracing probes or other logging mechanisms. In other words, tracing will collect data that will then be fed into a benchmark program for comparison.
 
 
-
-
 Prior work
 ----------
 There're various past efforts in the robotics community to benchmark ROS robotic systems. The following are some of the most representative ones:
@@ -210,7 +217,7 @@ The following diagram shows the proposed methodology for benchmarking performanc
 Reference implementation and recommendations
 ============================================
 
-The reader is referred to `ros2_tracing <https://github.com/ros2/ros2_tracing>`_ and `LTTng <https://lttng.org/>`_ to familiarize herself with the tools and the methodology of collecting and analyzing performance data. In addition, [3]_ and [4]_ present comprehensive descriptions of the `ros2_tracing <https://github.com/ros2/ros2_tracing>`_ tools and the `LTTng <https://lttng.org/>`_ infrastructure.
+The reader is referred to `ros2_tracing <https://github.com/ros2/ros2_tracing>`_ and `LTTng <https://lttng.org/>`_ to familiarize themselves with the tools and the methodology of collecting and analyzing performance data. In addition, [3]_ and [4]_ present comprehensive descriptions of the `ros2_tracing <https://github.com/ros2/ros2_tracing>`_ tools and the `LTTng <https://lttng.org/>`_ infrastructure.
 
 Reference implementations complying with the recommendations of this REP can be found in literature for applications like perception and mapping [5]_, hardware acceleration [6]_ [7]_ or self-driving mobility [8]_. A particular example of interest for the reader is the instrumentation of the `image_pipeline <https://github.com/ros-perception/image_pipeline/tree/humble/>`_ ROS 2 package [12]_, which is a set of nodes for processing image data in ROS 2. The `image_pipeline <https://github.com/ros-perception/image_pipeline/tree/humble/>`_ package has been instrumented with LTTng probes available in the ROS 2 `Humble` release, which results in various perception Components (e.g. `RectifyNode <https://github.com/ros-perception/image_pipeline/blob/ros2/image_proc/src/rectify.cpp#L82/>`_ *Component*) leveraging intrumentation which if enabled, can help trace the computational graph information flow of a ROS 2 application using such Component. The results of benchmarking the performance of `image_pipeline <https://github.com/ros-perception/image_pipeline/tree/humble/>`_ are available in [13]_ and launch scripts to both trace and analyze perception graphs available in [14]_.
 
