@@ -1,11 +1,11 @@
 REP: 2014
 Title: Benchmarking performance in ROS 2
-Author: Víctor Mayoral-Vilches <victor@accelerationrobotics.com>, Ingo Lütkebohle <Ingo.Luetkebohle@de.bosch.com>, Christophe Bédard <bedard.christophe@gmail.com>
+Author: Víctor Mayoral-Vilches <victor@accelerationrobotics.com>, Ingo Lütkebohle <Ingo.Luetkebohle@de.bosch.com>, Christophe Bédard <bedard.christophe@gmail.com>, Rayza Araújo <araujorayza@gmail.com> 
 Status: Draft
 Type: Informational
 Content-Type: text/x-rst
 Created: 29-Sept-2022
-Post-History: 05-Nov-2022
+Post-History: 15-June-2023
 
 
 Abstract
