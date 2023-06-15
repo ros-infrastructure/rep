@@ -91,6 +91,25 @@ Graphically depicted:
              Black-Box                            Grey-box
 
 
+
+        Probe      Probe     Probe             Probe                     Probe
+        +          +          +       +-------+                          |
+        |          |          |       |                                  |
+    +-----------------------------+   | +-----------------------------+  |
+    |   |          |          |   |   | |                             |  |
+    |   | +-----------------+ |   |   | |                             |  |
+    |   | |        v        | |   |   | |                             |  |
+    |   | |                 | |   |   | |                             |  |
+    |   +->     Function    +<+   |   +>+                             +<-+
+    |     |                 |     |     |                             |
+    |     +-----------------+     |     |                             |
+    |      System under test      |     |       System under test     |
+    +-----------------------------+     +-----------------------------+
+
+
+                Transparent                           Opaque
+
+
 Tracing and benchmarking
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
