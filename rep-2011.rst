@@ -13,13 +13,14 @@ Abstract
 
 This REP proposes patterns and approaches for evolving message, service, and action ROS interface types over time.
 
-The proposed patterns use the existing default serialization technology, i.e. CDR, in combination with new tooling to detect when types have changes and new tooling to convert between versions.
+The proposed patterns use the existing default serialization technology, i.e. CDR, in combination with new tooling to detect when types have changed and new tooling to convert between versions.
 However, it should be possible to use features provided by different, perhaps future, serialization technologies in addition to the approaches proposed in this REP.
 
 Specifically, this REP proposes that we provide tooling to convert from old versions of types to newer versions of types on demand, using user-defined transfer functions.
 This approach is a good way to achieve backwards compatibility in messages over long periods of time and in a variety of scenarios, e.g. over the wire, converting bag files, or in specialized tools.
 
 This approach does not rely on specific features of the serialization technology and instead relies on the ability to communicate the full type descriptions on the wire, beyond their name and version, and use that description to introspect the values of it at runtime using reflection.
+That feature set is described in detail in REP-2016\ [#rep2016]_.
 
 This approach can be used in conjunction with serialization technology specific features like optional fields, inheritance, etc., but it works even with the simplest serialization technologies.
 This is true so long as we have the ability to introspect the messages at runtime without prior knowledge of the type description, which is a feature we also need for generic introspection tools like ``rosbag2`` and ``ros2 topic echo``.
@@ -1291,7 +1292,7 @@ Supporting Feature Development:
 
 - TypeDescription Message:
 
-  - [ ] Define and place the TypeDescription.msg Message type in a package
+  - [x] Define and place the TypeDescription.msg Message type in a package
 
 - Enforced Type Versioning:
 
@@ -1398,6 +1399,9 @@ Tooling Development:
 
 References
 ==========
+
+.. [#rep2016] REP 2016: ROS 2 Interface Type Descriptions
+   (https://www.ros.org/reps/rep-2016.html)
 
 .. [1] DDS-XTYPES 1.3
    (https://www.omg.org/spec/DDS-XTypes/1.3/About-DDS-XTypes/)
