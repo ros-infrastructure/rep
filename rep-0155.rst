@@ -326,41 +326,41 @@ created (eg ``/humans/faces/bf3d/``).
 The following subtopics MAY then be available, depending on available
 detectors:
 
-=================== ==================================== ======== ========================
-Name                Message type                         Required Description
-=================== ==================================== ======== ========================
-``/roi``            ``sensor_msgs/RegionOfInterest``        x     Region of the face in
-                                                                  the source image
-``/cropped``        ``sensor_msgs/Image``                   x     Cropped face image, if 
-                                                                  necessary scaled, 
-                                                                  centered and 0-padded 
-                                                                  to match the
-                                                                  ``/humans/faces/width``
-                                                                  and
-                                                                  ``/humans/faces/height``
-                                                                  ROS parameters
-``/aligned``         ``sensor_msgs/Image``                        Aligned (eg, the two 
-                                                                  eyes are horizontally 
-                                                                  aligned) version of the
-                                                                  cropped face, with same 
-                                                                  resolution as
-                                                                  ``/cropped``
-``/frontalized``     ``sensor_msgs/Image``                        Frontalized version of
-                                                                  the cropped face, with
-                                                                  same resolution as
-                                                                  ``/cropped``
-``/landmarks``      ``hri_msgs/FacialLandmarks``                  2D facial landmarks
-                                                                  extracted from the face
-``/facs``           ``hri_msgs/FacialActionUnits``                The presence and
-                                                                  intensity of facial
-                                                                  action units found in 
-                                                                  the face
-``/expression``     ``hri_msgs/Expression``                       The expression
-                                                                  recognised from the
-                                                                  face
-``/softbiometrics`` ``hri_msgs/SoftBiometrics``                   Detected age and gender
-                                                                  of the person
-=================== ==================================== ======== ========================
+=================== ========================================= ======== ========================
+Name                Message type                              Required Description
+=================== ========================================= ======== ========================
+``/roi``            ``hri_msgs/NormalizedRegionOfInterest2D``    x     Region of the face in
+                                                                       the source image
+``/cropped``        ``sensor_msgs/Image``                        x     Cropped face image, if 
+                                                                       necessary scaled, 
+                                                                       centered and 0-padded 
+                                                                       to match the
+                                                                       ``/humans/faces/width``
+                                                                       and
+                                                                       ``/humans/faces/height``
+                                                                       ROS parameters
+``/aligned``         ``sensor_msgs/Image``                             Aligned (eg, the two 
+                                                                       eyes are horizontally 
+                                                                       aligned) version of the
+                                                                       cropped face, with same 
+                                                                       resolution as
+                                                                       ``/cropped``
+``/frontalized``     ``sensor_msgs/Image``                             Frontalized version of
+                                                                       the cropped face, with
+                                                                       same resolution as
+                                                                       ``/cropped``
+``/landmarks``      ``hri_msgs/FacialLandmarks``                       2D facial landmarks
+                                                                       extracted from the face
+``/facs``           ``hri_msgs/FacialActionUnits``                     The presence and
+                                                                       intensity of facial
+                                                                       action units found in 
+                                                                       the face
+``/expression``     ``hri_msgs/Expression``                            The expression
+                                                                       recognised from the
+                                                                       face
+``/softbiometrics`` ``hri_msgs/SoftBiometrics``                        Detected age and gender
+                                                                       of the person
+=================== ========================================= ======== ========================
 
 Bodies
 ------
@@ -373,23 +373,23 @@ created.
 The following subtopics MAY then be available, depending on available
 detectors:
 
-================= ==================================== ======== ========================
-Name              Message type                         Required Description
-================= ==================================== ======== ========================
-``/roi``          ``sensor_msgs/RegionOfInterest``        x     Region of the whole body
-                                                                body in the source image
-``/cropped``      ``sensor_msgs/Image``                   x     Cropped body image
-``/skeleton2d``   ``hri_msgs/Skeleton2D``                       The 2D points of the
-                                                                the detected skeleton
-``/joint_states`` ``sensor_msgs/JointState``                    The joint state of the 
-                                                                human body, following
-                                                                the `Kinematic Model 
-                                                                of the Human`_
-``/posture``      ``hri_msgs/BodyPosture``                      Recognised body posture
-                                                                (eg standing, sitting)
-``/gesture``      ``hri_msgs/Gesture``                          Recognised symbolic 
-                                                                gesture (eg waving)
-================= ==================================== ======== ========================
+================= ========================================= ======== ========================
+Name              Message type                              Required Description
+================= ========================================= ======== ========================
+``/roi``          ``hri_msgs/NormalizedRegionOfInterest2D``    x     Region of the whole body
+                                                                     body in the source image
+``/cropped``      ``sensor_msgs/Image``                        x     Cropped body image
+``/skeleton2d``   ``hri_msgs/Skeleton2D``                            The 2D points of the
+                                                                     the detected skeleton
+``/joint_states`` ``sensor_msgs/JointState``                         The joint state of the 
+                                                                     human body, following
+                                                                     the `Kinematic Model 
+                                                                     of the Human`_
+``/posture``      ``hri_msgs/BodyPosture``                           Recognised body posture
+                                                                     (eg standing, sitting)
+``/gesture``      ``hri_msgs/Gesture``                               Recognised symbolic 
+                                                                     gesture (eg waving)
+================= ========================================= ======== ========================
 
 3D body poses SHOULD be exposed via TF frames.
 This is discussed in
@@ -497,9 +497,9 @@ effectively advertises and publishes onto the following topics:
 .. code::
 
    > rostopic list
-   /humans/faces/23bd5/roi     # sensor_msgs/RegionOfInterest
+   /humans/faces/23bd5/roi     # hri_msgs/NormalizedRegionOfInterest2D
    /humans/faces/23bd5/cropped # sensor_msgs/Image
-   /humans/faces/b092e/roi     # sensor_msgs/RegionOfInterest
+   /humans/faces/b092e/roi     # hri_msgs/NormalizedRegionOfInterest2D
    /humans/faces/b092e/cropped # sensor_msgs/Image
 
 .. note:: The IDs (in this example, ``23bd5`` and ``b092e``) are arbitrary, as
@@ -532,7 +532,7 @@ It detects one body:
    > rostopic list
    /humans/faces/23bd5/...
    /humans/faces/b092e/...
-   /humans/bodies/67dd1/roi     # sensor_msgs/RegionOfInterest
+   /humans/bodies/67dd1/roi     # hri_msgs/NormalizedRegionOfInterest2D
    /humans/bodies/67dd1/cropped # sensor_msgs/Image
 
 In addition, you start a 2D/3D pose estimator ``your_skeleton_estimator_node``.
