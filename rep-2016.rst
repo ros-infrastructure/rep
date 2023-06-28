@@ -20,34 +20,40 @@ Alongside the description format, this REP also defines a hashing algorithm to c
 Motivation
 ==========
 
-ROS 1 clients provided an MD5 sum from msg files to check for matching definitions.
+ROS 1 clients provided an MD5 sum from msg files to check for matching definitions, as well as full message definitions in connection headers.
+ROS 2 before Iron did not provide any comparable capabilities.
+This REP proposes a set of standards to be implemented in ROS 2 that allow users to easily
+
+- detect mismatches in message types between nodes
+- get access to the complete type description of types being used, including from remote nodes
 
 Terminology
 ===========
 
+TODO: formatting
+
 Type Source - original text used to define a type
 Type Description - a data structure representating a parsed Type Source, which removes irrelevant data such as comments, and will be equal regardless of whether the source was msg, IDL, or otherwise.
 RIHS (ROS Interface Hashing Standard) - a versioned specification for producing a hash value for a Type Description
-
+type_description_interfaces - the new package defined to contain the Type Description data structures
 
 Specification
 =============
 
-In order to communicate and compare types, Type Description Interfaces are defined to contain type information.
+In order to communicate and compare types, a Type Description data structure is defined to contain type information in a common format.
 To detect and enforce type version mismatches, and communicate information about type descriptions compactly, a way to uniquely identify types is required.
-This proposal uses a hash of the type's description for this purpose.
+For this purpose a hash of the Type Description, or Type Hash, is used.
+The Type Hash specification, covered below, defines a common algorithm that guarantees cross-implementation consistency.
 
 
-Type Description Interfaces
----------------------------
+Type Description
+----------------
 
-A Type Description must be produced in a stable way such that it is not changed by trivial differences that do not impact compatibility.
+A Type Description must be produced such that it is stable across consistent meaning, even with trivial changes to source text.
 The interface description source provided by the user, which may be a ``.msg``, ``.idl`` or other file type, is parsed into the TypeDescription object as an intermediate representation.
-This way, types coming from two sources that have the same stated name and have the same information will be given the same description, even if they are defined using sources that do not have identical text.
-The description should only contain information needed for programmatic reasons.
-Thus the representation should include:
+This way, types coming from two sources that have the same stated name and have the same information will be given the same description, even if they are defined using sources in differing specification languages.
 
-This representation includes:
+Thus the representation includes:
 
 - the package, namespace, and type name, for example `sensor_msgs/msg/Image`
 - a list of field names and types
@@ -97,10 +103,11 @@ This matches existing ROS precedent of strongly-typed interfaces.
 The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
 Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
 
-It may be desirable, as a user, to change the version hash of a message even when no field types or names have changed, perhaps due to a change in semantics of existing fields.
-There is no built-in way to do this manual re-versioning.
-However, we suggest the following method which requires no special tooling: provide an extra field within the interface with a name ``bool versionX = true``.
-To manually trigger a hash update, change by increment the name of the field, for example ``bool versionY = true``.
+.. note::
+    A message provider may desire to change the version hash of a message even when no field types or names have changed, perhaps due to a change in semantics of existing fields.
+    There is explicitly no built-in provision for this case.
+    We suggest the following method - provide an extra field within the interface with a name like ``bool versionX = true``.
+    To trigger a hash update, increment the name of this special field, for example to ``bool versionY = true``.
 
 The TypeDescription does not include the serialization format being used, nor does it include the version of the serialization technology.
 This type version hash is for the *description* of the type, and is not meant to be used to determine wire compatibility by itself.
@@ -117,8 +124,8 @@ For DDS implementations of the RMW API, it is recommended but not required to us
 
 This discovery-time hash availability allows for validation of type mismatch before ever requesting a subscription.
 
-It can also give subscription-side tooling the opportunity to obtain an appropriate type description for the given hash, if it is not available.
-That point brings us to the final feature of this REP.
+It can also give subscription-side tooling the opportunity to obtain the type description for the given hash.
+
 
 Type Description Distribution
 -----------------------------
@@ -127,12 +134,18 @@ Type Description Distribution
 The service must be optional, but it will be a detail decided by client libraries whether it is enabled or disabled by default.
 
 
+Supporting Tooling
+==================
+
+- ros2 topic info -v (done - TODO more info)
+- ros2 interface show (TODO implement)
+
 References
 ==========
 
 .. http://wiki.ros.org/Topics
-.. REP 2011 Evolving message types
-.. REP 20XX Dynamic pubsub (name TBD)
+.. REP 2011 Evolving message types (TODO link)
+.. REP 20XX Dynamic pubsub (name TBD - TODO)
 
 Copyright
 =========

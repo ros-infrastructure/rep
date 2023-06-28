@@ -141,15 +141,11 @@ The proposal is to provide tooling to help users:
 
 In order to do this, this proposal describes how ROS 2 can be changed to support these tools by:
 
-- enforcing type compatibility by version
+- Using REP-2016 Type Description features to
 
-  - by providing type version hashes, and
-  - making it possible to see what versions of types are being used by other endpoints, and
-  - warning users when type enforcement is preventing two endpoints from communicating
-
-- providing access to the complete type description of types being used
-
-  - and making it possible to access the type description from nodes remotely
+  - detect type mismatches
+  - warn users when type enforcement is preventing two endpoints from communicating
+  - access type descriptions from nodes remotely
 
 - making it possible to publish and subscribe to topics using just the type description
 
@@ -161,8 +157,7 @@ This Specification section covers the conceptual overview in more detail, then d
 Conceptual Overview
 -------------------
 
-Users will be able to calculate the "type version hash" for an interface (e.g. a message, service, or action) using the ``ros2 interface hash <package_name> <interface_name>`` command.
-This hash is also used by ROS 2 to determine if the same type name but different type versions are being used on the same topic, so that a warning may be logged that the endpoints that do not match may not communicate.
+The REP-2016 Type Hash for an interface is used by ROS 2 to determine if the same type name but different type versions are being used on the same topic, so that a warning may be logged that endpoints that do not match may not communicate.
 
 .. note::
 
@@ -223,7 +218,7 @@ It will continue to do this until it reaches the desired type version or it fail
                     │                                 │
                     └─────────────────────────────────┘
 
-Once the set of necessary transfer functions has been identified, the ROS graph can be changed to have one side of the topic be remapped onto a new topic name which indicates it is of a different version that what is desired, and then the transfer function can be run as a component node which subscribes to one version of the message, performs the conversion using the chain of transfer functions, and then publishes the other version of the message.
+Once the set of necessary transfer functions has been identified, the ROS graph can be changed to have one side of the topic be remapped onto a new topic name which indicates it is of a different version than what is desired, and then the transfer function can be run as a component node which subscribes to one version of the message, performs the conversion using the chain of transfer functions, then publishes the other version of the message.
 Tools will assist the user in making these remappings and running the necessary component nodes with the appropriate configurations, either from their launch file or from the command line.
 
 .. TODO::
@@ -238,10 +233,9 @@ Once the mismatched messages are flowing through the transfer functions, communi
     Services, since they are not sensitive to the many-to-many (many publisher) issue, unlike Topics, and because they do not have as many QoS settings that apply to them, they can probably have transfer functions that are plugins, rather than separate component nodes that repeat the service call, like the ros1_bridge.
     Actions will be a combination of topics and services, but will have other considerations in the tooling.
 
-In order to support this vision, three missing features will need to be added into ROS 2 (which were also mentioned in the introduction):
+In order to support this vision, these features will have been added into ROS 2 (which were also mentioned in the introduction):
 
 - enforcing type compatibility by version
-- providing access to the complete type description of types being used
 - making it possible to publish and subscribe to topics using just the type description
 
 These features are described in the following sections.
@@ -249,73 +243,10 @@ These features are described in the following sections.
 Type Version Enforcement
 ------------------------
 
-In order to detect and enforce type version mismatches, as well as communicate information about type descriptions compactly, a way to uniquely identify versions is required.
-This proposal uses a hash of the type's description for this purpose.
-
-
-Type Version Hash
-^^^^^^^^^^^^^^^^^
-
-The hash must be calculated in a stable way such that it is not changed by trivial differences that do not impact serialization compatibility.
-The hash must also be able to be calculated at runtime from information received on the wire.
-This allows subscribers to validate the received TypeDescriptions against advertised hashes, and allows dynamic publishers to invent new types and advertise their hash programmatically.
-The interface description source provided by the user, which may be a ``.msg``, ``.idl`` or other file type, is parsed into the TypeDescription object as an intermediate representation.
-This way, types coming from two sources that have the same stated name and are wire compatible will be given the same hash, even if they are defined using source text that is not exactly equal.
-The hash must only be computed using fields that affect communication compatibility.  Thus the representation should include:
-
-This representation includes:
-
-- the package, namespace, and type name, for example `sensor_msgs/msg/Image`
-- a list of field names and types
-- a list of all recursively referenced types
-- no field default values
-- no comments
-
-Finally, the resulting filled data structure must be represented in a platform-independent format, rather than running the hash function on the in-memory native type representation.
-Different languages, architectures, or compilers will produce different in-memory representations, and the hash must be consistently calculable in different contexts.
-
-The resulting data structure is hashed using SHA-256, resulting in a 256-bit (32-byte) hash value which is also generally known as a "message digest".
-This hash is paired with a type version hash standard version, which we will call the "ROS IDL Hashing Standard" or "RIHS", the first version of which will be ``RIHS01``.
-RIHS Version 00 is reserved for "Invalid" / "unset", and the RIHS version is limited by this specification to a maximum value of 255.
-RIHS hash values must have a well-defined UTF-8 string representation for human readability and for passing over string-only communication channels.
-The prefix of a well-formed RIHS string will always be ``RIHSXX_``, where ``X`` is one hexadecimal digit, followed by the version-dependent string representation of the hash value.
-For ``RIHS01``, the hash value is 64 hexadecimal digits representing the 256-bit message digest, leading to a known ``RIHS01`` string length of 71.
-
-This versioning allows the tooling to know if a hash mismatch is due to a change in this standard (how hash is computed) or due to a difference in the interface types themselves.
-In the case of a change in standard, it will be unknown whether the interface types are equal or not.
-
-For now, the list of field names and their types are the only contributing factors, but in the future that could change, depending on which "annotations" are supported in ``.idl`` files.
-The "IDL - Interface Definition and Language Mapping" design document\ [2]_ describes which features of the OMG IDL standard are supported by ROS 2.
-If that is extended in the future, then this data structure may need to be updated, and if so the "ROS IDL Hashing Standard" version will also need to be incremented.
-New sanitizing may be needed on the TypeDescription pre-hash procedure, in the case of these new features.
-
-.. TODO::
-
-    Re-audit the supported features from OMG IDL according to the referenced design document, including the @key annotation and how it may impact this for the reference implementation.
-
-Notes:
-
-The type version hash is not sequential and does not imply any rank among versions of the type. That is, given two version hashes of a type, there is no way to tell which is "newer".
-
-Because the hash contains the stated name of the type, differently-named types with otherwise identical descriptions will be mismatched as incompatible.
-This matches existing ROS precedent of strongly-typed interfaces.
-
-The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
-Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
-
-It may be desirable, as a user, to change the version hash of a message even when no field types or names have changed, perhaps due to a change in semantics of existing fields.
-There is no built-in way to do this manual re-versioning.
-However, we suggest the following method which requires no special tooling: provide an extra field within the interface with a name ``bool versionX = true``.
-To manually trigger a hash update, change by increment the name of the field, for example ``bool versionY = true``.
-
-The TypeDescription does not include the serialization format being used, nor does it include the version of the serialization technology.
-This type version hash is for the *description* of the type, and is not meant to be used to determine wire compatibility by itself.
-The type version hash must be considered in context, with the serialization format and version in order to determine wire compatibility.
-
 Enforcing Type Version
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The type version hash may be used as an additional constraint to determine if two endpoints (publishers and subscriptions) on a topic should communicate.
+The Type Hash may be used as an additional constraint to determine if two endpoints (publishers and subscriptions) on a topic should communicate.
 Again, whether or not it is used will depend on the underlying middleware and how it determines if types are compatible between endpoints.
 Simpler middlewares will not do anything other than check that the type names match, in which case the version hash will likely be used.
 However, in more sophisticated middlewares type compatibility can be determined using more complex rules and by looking at the type descriptions themselves, and in those cases the type version hash may not be used to determine matching.
