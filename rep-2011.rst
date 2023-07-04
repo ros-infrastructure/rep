@@ -7,7 +7,6 @@ Content-Type: text/x-rst
 Created: 30-Nov-2021
 Post-History:
 
-
 Abstract
 ========
 
@@ -129,6 +128,7 @@ Terminology
 
 TODO
 
+- "type version"
 
 Specification
 =============
@@ -157,12 +157,12 @@ This Specification section covers the conceptual overview in more detail, then d
 Conceptual Overview
 -------------------
 
-The REP-2016 Type Hash for an interface is used by ROS 2 to determine if the same type name but different type versions are being used on the same topic, so that a warning may be logged that endpoints that do not match may not communicate.
+The REP-2016 Type Hash for an interface is used by ROS 2 to determine if the same type name with different type versions are being used on the same topic, so that a warning may be logged that endpoints that do not match may not communicate.
 
 .. note::
 
     An exception to this rule is that if the underlying middleware has more sophisticated rules for matching types, for example the type has been extended with an optional field, then they may still match
-    In that case, ROS 2 will defer to the middleware and not produce warnings when the type version hashes do not match.
+    In that case, ROS 2 will defer to the middleware and not produce warnings when the type hashes do not match.
     Instead, ROS 2 will rely on the middleware to notify it when two endpoints do not match based on their types not being compatible, so that a warning can be produced.
 
 When a mismatch is detected, the user can use user-defined or automatically generated generic "transfer functions" to convert between versions of the type until it is in the type version they wish to send or receive.
@@ -248,38 +248,38 @@ Enforcing Type Version
 
 The Type Hash may be used as an additional constraint to determine if two endpoints (publishers and subscriptions) on a topic should communicate.
 Again, whether or not it is used will depend on the underlying middleware and how it determines if types are compatible between endpoints.
-Simpler middlewares will not do anything other than check that the type names match, in which case the version hash will likely be used.
-However, in more sophisticated middlewares type compatibility can be determined using more complex rules and by looking at the type descriptions themselves, and in those cases the type version hash may not be used to determine matching.
+Simpler middlewares may not do anything other than check that the type names match, in which case the hash will likely used as an extra comparison to determine compatibility.
+However, in more sophisticated middlewares type compatibility can be determined using more complex rules and by looking at the type descriptions themselves, and in those cases the type hash may not be used to determine matching.
 
 When creating a publisher or subscription, the caller normally provides:
 
 - a topic name,
 - QoS settings, and
-- a topic type
+- a topic type name
 
-Where the topic type is represented as a string and is automatically deduced based on the type given to the function that creates the entity.
+Where the topic type name is represented as a string and is automatically deduced based on the type given to the function that creates the entity.
 The type may be passed as a template parameter in C++ or as an argument to the function in Python.
 
-For example, creating a publisher for the C++ type ``std_msgs::msg::String`` using ``rclcpp`` may result in a topic type like the string ``std_msgs/msg/String``.
+For example, creating a publisher for the C++ type ``std_msgs::msg::String`` using ``rclcpp`` may result in a topic type name ``"std_msgs/msg/String"``.
 
 All of the above items are used by the middleware to determine if two endpoints should communicate or not, and this REP proposes that the type version be added to this list of provided information.
 
 Nothing needs to change from the user's perspective, as the type version can be extracted automatically based on the topic type given, either at the ``rcl`` layer or in the ``rmw`` implementation itself.
 That is to say, how users create things like publishers and subscription should not need to change, no matter which programming language is being used.
 
-However, the type version hash would become something that the ``rmw`` implementation is provided and aware of in the course of creating a publisher or subscription.
+However, the type hash would become something that the ``rmw`` implementation is provided and aware of in the course of creating a publisher or subscription.
 The decision of whether or not to use that information to enforce type compatibility would be left to the middleware, rather than implementing it as logic in ``rcl`` or other packages above the ``rmw`` API.
 
 The method for implementing the detection and enforcement of type version mismatches is left up to the middleware.
-Some middlewares will have tools to handle this without this new type version hash and others will implement something like what would be possible in the ``rcl`` and above layers using the type version hash.
+Some middlewares will have tools to handle this without the type hash and others will implement something like what would be possible in the ``rcl`` and above layers using the type hash.
 By keeping this a detail of the ``rmw`` implementation, we allow the ``rmw`` implementations to make optimizations where they can.
 
 Recommended Strategy for Enforcing that Type Versions Match
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If the middleware has a feature to handle type compatibility already, as is the case with DDS-XTypes which is discussed later, then that can be used to enforce type safety, and then the type version hash would only be used for debugging and for storing in recordings.
+If the middleware has a feature to handle type compatibility already, as is the case with DDS-XTypes which is discussed later, then that can be used to enforce type safety, and then the type hash would only be used for debugging and for storing in recordings.
 
-However, if the middleware lacks this kind of feature, then the recommended strategy for accomplishing this in the ``rmw`` implementation is to simply concatenate the type name and the type version hash with double underscores and then use that as the type name given to the underlying middleware.
+However, if the middleware lacks this kind of feature, then the recommended strategy for accomplishing this in the ``rmw`` implementation is to simply concatenate the type name and the type hash with double underscores and then use that as the type name given to the underlying middleware.
 For example, a type name using this approach may look like this:
 
 .. code::
@@ -288,7 +288,7 @@ For example, a type name using this approach may look like this:
 
 This has the benefit of "just working" for most middlewares which at least match based on the name of the type, and it is simple, requiring no further custom hooks into the middleware's discovery or matchmaking process.
 
-However, one downside with this approach is that it makes interoperation between ROS 2 and the "native" middleware more difficult, as appending the version hash to the type name is just "one more thing" that you have to contend with when trying to connect non-ROS endpoints to a ROS graph.
+However, one downside with this approach is that it makes interoperation between ROS 2 and the "native" middleware more difficult, as appending the type hash to the type name is just "one more thing" that you have to contend with when trying to connect non-ROS endpoints to a ROS graph.
 
 Alternative Strategy for Enforcing that Type Versions Match
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -300,7 +300,7 @@ However, in order to increase compatibility between rmw implementations, it is r
 
 This recommendation is particularly useful in the case where a DDS based ROS 2 endpoint is talking to another DDS-XTypes based ROS 2 endpoint.
 The DDS-XTypes based endpoint then has a chance to "gracefully degrade" to interoperate with the basic DDS based ROS 2 endpoint.
-This would not be the case if the DDS-XTypes based ROS 2 endpoint did not include the type version hash in the type name, as is suggested with the recommended strategy.
+This would not be the case if the DDS-XTypes based ROS 2 endpoint did not include the type hash in the type name, as is suggested with the recommended strategy.
 
 .. TODO::
 
@@ -314,25 +314,10 @@ One potential downside to delegating type matching to the rmw implementation is 
 If ROS 2 is to provide users a warning that two endpoints will not communicate due to their types not matching, it requires there to be a way for the middleware to notify the ROS layer when a topic is not matched due to the type incompatibility.
 As some of the following sections describe, it might be that the rules by which the middleware decides on type compatibility are unknown to ROS 2, and so the middleware has to indicate when matches are and are not made.
 
-If the middleware just uses the type name to determine compatibility, then the rmw implementation can just check the type version hash, and if they do not match between endpoints then the rmw implementation can notify ROS 2, and a warning can be produced.
+If the middleware just uses the type name to determine compatibility, then the rmw implementation can compare type hashes, and if they do not match between endpoints then the rmw implementation can notify ROS 2, and a warning can be produced.
 
 Either way, to facilitate this notice, the ``rmw_event_type_t`` shall be extended to include a new event called ``RMW_EVENT_OFFERED_TYPE_INCOMPATIBLE``.
 Related functions and structures will also be updated so that the event can be associated with specific endpoints.
-
-.. TODO::
-
-    It's not clear how we will do this just now, since existing "QoS events" lack a way to communicate this information, I (wjwwood) think.
-
-Accessing the Type Version Hash
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For debugging and introspection, the type version hash will be accessible via the ROS graph API, by extending the ``rmw_topic_endpoint_info_t`` struct, and related types and functions, to include the type version hash, ``topic_type_version_hash``, as a string.
-It should be along side the ``topic_type`` string in that struct, but the ``topic_type`` field should not include the concatenated type version hash, even if the recommended approach is used.
-Instead the type name and version hash should be separated and placed in the fields separately.
-
-This information should be transmitted as part of the discovery process.
-
-This field can be optionally an empty string, in order to support interaction with older versions of ROS where this feature was not yet implemented, but it should be provided if at all possible.
 
 Notes for Implementing the Recommended Strategy with DDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -340,172 +325,14 @@ Notes for Implementing the Recommended Strategy with DDS
 The DDS standard provides an ``on_inconsistent_topic()`` method on the ``ParticipantListener`` class as a callback function which is called when an ``INCONSISTENT_TOPIC`` event is detected.
 This event occurs when the topic type does not match between endpoints, and can be used for this purpose, but at the time of writing (July 2022), this feature is not supported across all of the DDS vendors that can be used by ROS 2.
 
-Sending of the type version hash during discovery should be done using the ``USER_DATA`` QoS setting, even if the type version hash is not used for determining type compatibility, and then provided to the user-space code through the ``rmw_topic_endpoint_info_t`` struct.
-
 Interactions with DDS-XTypes or Similar Implicit Middleware Features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When using DDS-Xtypes type compatibility is determined through sophisticated and configurable rules, allowing for things like extensible types, optional fields, implicit conversions, and even inheritance.
-Which of these features is supported for use with ROS is out of scope with this REP, but if any of them are in use, then it may be possible for two endpoints to match and communicate even if their ROS 2 type version hashes do not match.
+When using DDS-Xtypes, type compatibility is determined through sophisticated and configurable rules, allowing for things like extensible types, optional fields, implicit conversions, and even inheritance.
+Which of these features is supported for use with ROS is out of scope with this REP, but if any of them are in use, then it may be possible for two endpoints to match and communicate even if their ROS 2 type hashes do not match.
 
 In this situation the middleware is responsible for communicating to the rmw layer when an endpoint will not be matched due to type incompatibility.
 The ``INCONSISTENT_TOPIC`` event in DDS applies for DDS-XTypes as well, and should be useful in fulfilling this requirement.
-
-Type Description Distribution
------------------------------
-
-For some use cases the type version hash is insufficient and instead the full type description is required.
-
-One of those use cases, which is also described in this REP, is "Run-Time Interface Reflection", which is the ability to introspect the contents of a message at runtime when the description for that message, or that version of that message, was unavailable at compile time.
-In this use case the type description is used to interpret the serialized data dynamically.
-
-Another use case, which is not covered in this REP, is using the type description in tooling to either display the type description to the user or to include it in recordings.
-
-In either case, where the type description comes from doesn't really matter, and so, for example, it could be looked up on the local filesystem or read from a rosbag file.
-However, in practice, the correct type description may not be found locally, especially in cases where you have different versions of messages in the same system, e.g.:
-
-- because it's on another computer, or
-- because it is from a different distribution of ROS, or
-- because it was built in a different workspace, or
-- because the application has not been restarted since recompiling a change to the type being used
-
-In any case, it is useful to have a mechanism to convey the type descriptions from the source of the data to other nodes, which we describe here as "type description distribution".
-
-Furthermore, this feature should be agnostic to the underlying middleware and serialization library, as two endpoints may not have the same rmw implementation, or the data may have been serialized to a different format in the case of playback of a recording.
-
-Sending the Type Description
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Type descriptions will be provided by a ROS Service called ``~/_get_type_description``, which will be offered by each node.
-There will be a single ROS Service per node, regardless of the number of publishers or subscriptions on that node.
-
-This service may be optional, for example being enabled or disabled when creating the ROS Node.
-
-.. TODO::
-
-    How can we detect when a remote node is not offering this service?
-    It's difficult to differentiate between "the Service has not been created yet, but will be" and "the Service will never be created".
-    Should we use a ROS Parameter to indicate this?
-    But then what if remote access to Parameters (another optional Service) is disabled?
-    Perhaps we need a "services offered" list which is part of the Node metadata, which is sent for each node in the rmw implementation, but that's out of scope for this REP.
-
-A service request to this ROS Service will comprise of the type name and the type version hash, which is distributed during discovery of endpoints and will be accessible through the ROS Graph API, as described in previous sections.
-The ROS Service server will respond with the type description and any necessary metadata needed to do Run-Time Interface Reflection.
-This service is not expected to be called frequently, and is likely to only occur when new topic or service endpoints are created, and even then, only if the endpoint type hashes do not match.
-
-.. TODO::
-
-    Should each endpoint be asked about their type/version pair or should we assume that the type/version pair guarantees a unique type description and therefore reuse past queries?
-    (wjwwood) I am leaning towards assuming the type name and type version hash combo as being a unique identifier.
-
-Type Description Contents and Format
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The response sent by the ROS Service server will contain a combination of the original ``idl`` or ``msg`` file's content, as well as any necessary information to serialize and deserialize the raw message buffers sent on the topic.
-The response will contain a version of the description that contains comments from the original type description, as those might be relevant to interpreting the semantic meaning of the message fields.
-
-Additionally, the response could include the serialization library used, its version, or any other helpful information from the original producer of the data.
-
-.. TODO::
-
-    What happens if the message consumer doesn't have access to the serialization library stated in the meta-type?
-    (wjwwood) It depends on what you're doing with the response. If you are going to subscribe to a remote endpoint, then I think we just refuse to create the subscription, as communication will not work, and there's a basic assumption that if you're going to communicate with an endpoint then you are using the same or compatible rmw implementations, which includes the serialization technology. The purpose of this section and ROS Service is to provide the information, not to ensure communication can happen.
-
-The ROS 2 message that defines the type description must be able to describe any message type, including itself, and since it is describing the message format, it should work independently from any serialization technologies used.
-This "meta-type description" message would then be used to communicate the structure of the type as part of the "get type description" service response.
-The final form of these interfaces should be found in the reference implementation, but such a Service interface might look like this:
-
-.. code::
-
-    string type_name
-    string type_version_hash
-    ---
-    # True if the type description information is available and populated in the response
-    bool successful
-    # Empty if 'successful' was true, otherwise contains details on why it failed
-    string failure_reason
-
-    # The idl or msg file name
-    string type_description_raw_file_name
-    # The idl or msg file, with comments and whitespace
-    # The file extension and/or the contents can be used to determine the format
-    string type_description_raw
-    # The parsed type description which can be used programmatically
-    TypeDescription type_description
-
-    # Key-value pairs of extra information.
-    string[] extra_information_keys
-    string[] extra_information_values
-
-.. TODO::
-
-    (wjwwood) I propose we use key-value string pairs for the extra information, but I am hoping for discussion on this point.
-    This type is sensitive to changes, since changes to it will be hard to roll out, and may need manual versioning to handle.
-    We could also consider bounding the strings and sequences of strings, so the message could be "bounded", which is nice for safety and embedded systems.
-
-Again, the final form of these interfaces should be referenced from the reference implementation, but the ``TypeDescription`` message type might look something like this:
-
-.. code::
-
-    IndividualTypeDescription type_description
-    IndividualTypeDescription[] referenced_type_descriptions
-
-And the ``IndividualTypeDescription`` type:
-
-.. code::
-
-    string type_name
-    Field[] fields
-
-And the ``Field`` type:
-
-.. code::
-
-    FIELD_TYPE_NESTED_TYPE = 0
-    FIELD_TYPE_INT = 1
-    FIELD_TYPE_DOUBLE = 2
-    # ... and so on
-    FIELD_TYPE_INT_ARRAY = ...
-    FIELD_TYPE_INT_BOUNDED_SEQUENCE = ...
-    FIELD_TYPE_INT_SEQUENCE = ...
-    # ... and so on
-
-    string field_name
-    uint8_t field_type
-    uint64_t field_array_size  # Only for Arrays and Bounded Sequences
-    string nested_type_name  # Only for FIELD_TYPE_NESTED_TYPE
-
-These examples of the interfaces just give an idea of the structure but perhaps do not yet consider some other complications like field annotations or other as yet unconsidered features we want to support.
-
-.. TODO::
-
-    (wjwwood) Add text about how to handle Service types, which are formed as a Request and a Response part, each of which is kind of like a Message.
-    We could just treat the Request and Response separately, or we could extend this scheme to include explicit support for Services.
-    Since Actions are composed of Topics and Services, it is less so impacted, but we could similarly consider officially supporting them in this scheme.
-
-Versioning the ``TypeDescription`` Message Type
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Given that the type description message interface has to be generic enough to support anything described in the ROS interfaces, there will be a need to add or remove fields over time in the type description message itself.
-This should be done in such a way that the fields are tick-tocked and deprecated properly, possibly by having explicitly named versions of this interface, e.g. ``TypeDescriptionV1`` and ``TypeDescriptionV2`` and so on.
-
-Implementation in the ``rcl`` Layer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The implementation of the type description distribution feature will be made in the ``rcl`` layer as opposed to the ``rmw`` layer to take advantage of the abstraction away from the middleware and to allow for compatibility with the client libraries.
-
-A hook will be added to ``rcl_node_init()`` to initialize the type description distribution service with the appropriate ``rcl_service_XXX()`` functions.
-This hook should also keep a map of published and subscribed types which will be populated on each initialization of a publisher or subscription in the respective ``rcl_publisher_init()`` and ``rcl_subscription_init()`` function calls.
-The passed ``rosidl_message_type_support_t`` in the init call can be used to obtain the relevant information, alongside any new methods added to support type version hashing.
-
-There will be an option to opt-out of creating this service, and a way to start and stop the service after node creation as well.
-
-.. TODO::
-
-    (wjwwood) A thought just occurred to me, which is that we could maybe have "lazy" Service Servers, which watch for any Service Clients to come up on their Service name and when they see it, they could start a Service Server.
-    The benefit of this is that when we're not using this feature (or other features like Parameter get/set Services), then we don't waste resources creating them, but if you know the node name and the corresponding Service name that it should have a server on, you could cause it to be activated by trying to use it.
-    The problem with this would be that you cannot browse the Service servers because they wouldn't advertise until requested, but for "well know service names" that might not be such a problem.
-    I guess the other problem would be there might be a slight delay the first time you go to use the service, but that might be a worthy trade-off too.
 
 Run-Time Interface Reflection
 -----------------------------
@@ -513,7 +340,7 @@ Run-Time Interface Reflection
 Run-Time Interface Reflection allows access to the data in the fields of a serialized message buffer when given:
 
 - the serialized message as a ``rmw_serialized_message_t``, basically just an array of bytes as a ``rcutils_uint8_array_t``,
-- the message's type description, e.g. received from the aforementioned "type description distribution" or from a bag file, and
+- the message's type description, e.g. received from "type description distribution" or from a bag file, and
 - the serialization format, name and version, which was used to create the serialized message, e.g. ``XCDR2`` for ``Extended CDR encoding version 2``
 
 From these inputs, we should be able to access the fields of the message from the serialized message buffer using some programmatic interface, which allows you to:
@@ -531,7 +358,7 @@ From these inputs, we should be able to access the fields of the message from th
       serialization_format ─┘   └───────────────────────────────┘
 
 Given that the scope of inputs and expected outputs is so limited, this feature should ideally be implemented as a separate package, e.g. ``rcl_serialization``, that can be called independently by any downstream packages that might need Run-Time Interface Reflection, e.g. introspection tools, rosbag transport, etc.
-This feature can then be combined with the ability to detect type mismatches and obtain type descriptions in the previous two sections to facilitate communication between nodes of otherwise incompatible types.
+This feature can then be combined with the ability to detect type mismatches and obtain type descriptions to facilitate communication between nodes of otherwise incompatible types.
 
 Additionally, it is important to note that this feature is distinct from ROS 2's existing "dynamic" type support (``rosidl_typesupport_introspection_c`` and ``rosidl_typesupport_introspection_cpp``).
 The ``rosidl_typesupport_introspection_c*`` generators generate code at compile time for known types that provides reflection for those types.
@@ -612,21 +439,6 @@ This section will describe a vision of what is possible with some new tools, but
 That is to say, after this REP is accepted, tools described in this section may continue to evolve and improve, and even more tools not described here may be added to enable more things.
 As always, consider the latest documentation for the various pieces of the reference implementation to get the most accurate details.
 
-Tools for Interacting with Type Version Hashes and Type Descriptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ros2 command line tools, and the APIs that support them, should be updated to provide access to the type version hash where ever the type name is currently available and the type version description on-demand as well.
-For example:
-
-- ``ros2 interface`` should be extended with a way to calculate the version hash for a type
-- ``ros2 topic info`` should include the type version hash used by each endpoint
-- ``ros2 topic info --verbose`` should include the type description used by each endpoint
-- a new command to compare the types used by two endpoints, e.g. ``ros2 topic compare <topic name> <endpoint1 GUID> <endpoint2 GUID>``
-- ``ros2 service ...`` commands should also be extended in this way
-- ``ros2 action ...`` commands should also be extended in this way
-
-Again this list should not be considered prescriptive or exhaustive, but gives an idea of what should change.
-
 Notifying Users when Types Do Not Match
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -634,7 +446,7 @@ There should be a warning to users when two endpoints (publisher/subscription or
 This warning should be a console logging message, but it should also be possible for the user to get a callback in their own application when this occurs.
 How this should happen in the API is described in the Type Version Enforcement section, and it uses the "QoS Event" part of the API.
 
-The warning should include important information, like the GUID of the endpoints involved, the type name(s) and type version hash(es), and of course the topic name.
+The warning should include important information, like the GUID of the endpoints involved, the type name(s) and type hash(es), and of course the topic name.
 These pieces of information can then be used by the user, with the above mentioned changes to the command line tools, to investigate what is happening and why the types do not match.
 The warning may even suggest how to compare the types using the previously described ``ros2 topic compare`` command-line tool.
 
@@ -647,7 +459,7 @@ This will help the user know if they need to write a transfer function or check 
 
 This tool might look something like this:
 
-- ``ros2 interface convertible --from-remote-node <node name> <type name> <type version hash> --to-local-type <type name> <type version hash>``
+- ``ros2 interface convertible --from-remote-node <node name> <type name> <type hash> --to-local-type <type name> <type hash>``
 
 This tool would query the type description from a remote node, and compare it to the type description of the second type version found locally.
 If the two types can be converted without writing any code, then this tool would indicate that on the ``stdout`` and by return code.
@@ -696,7 +508,7 @@ The transfer function API for C++ may look something like this:
     void
     my_transfer_function(
         const DynamicMessage & input,
-        const MessageInfo & input_info,  // type name/version hash, etc.
+        const MessageInfo & input_info,  // type name/hash, etc.
         DynamicMessage & output,
         const MessageInfo & output_info)
     {
@@ -732,7 +544,7 @@ This tool would query the ``ament_index`` and list the available transfer functi
 The tool might look like this:
 
 - ``ros2 interface transfer_functions list``
-- ``ros2 interface transfer_functions info <type name> <version hash 1> <version hash 2>``
+- ``ros2 interface transfer_functions info <type name> <hash 1> <hash 2>``
 
 The tool might also have options to filter based on the type name, package name providing the type, package name providing the transfer function (not necessarily the same as the package which provides the type itself), etc.
 
@@ -827,15 +639,6 @@ Type Version Enforcement
 Alternatives
 ^^^^^^^^^^^^
 
-Use Type Hash from Middleware, e.g. from DDS-XTypes
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Type hash can be obtained by the native middleware api. For example, with fastDDS, the type hash can be obtained with ``TypeIdentifier->equivalence_hash()`` during the ``on_type_discovery()`` callback. the rmw layer can choose to use the provided hash to impose the aforementioned type enforcement.
-
-.. TODO::
-
-    (wjwwood) this needs to be cleaned up
-
 Evolving Message Definition with Extensible Type
 """"""""""""""""""""""""""""""""""""""""""""""""
 
@@ -862,210 +665,16 @@ Furthermore, an initial test evolving messages with FastDDS, Cyclone, and Connex
 Handle Detection of Version Mismatch "Above" rmw Layer
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-We can choose to utilize ``USER_DATA`` QoS to distribute the message version during discovery phase.
-The message version for each participant will then be accessible across all available nodes. By getting the version hash through ``user_data`` via the ``rmw`` layer, similar type version matching can be detected.
+We can choose to utilize ``USER_DATA`` QoS to distribute the type hash during the discovery phase.
+The type hash for each participant will then be accessible across all available nodes. By getting the hash through ``user_data`` via the ``rmw`` layer, similar type version matching can be detected.
 
 Prevent Communication of Mismatched Versions "Above" rmw Layer
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 TODO
 
-Type Description Distribution
+Run-Time Interface Reflection
 -----------------------------
-
-Using a Single ROS Service per Node
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The node that is publishing the data must already have access to the correct type description, at the correct version, in order to publish it, and therefore it is natural to get the data from that node.
-Similarly, a subscribing node also knows what type they are wanting to receive, both in name and version, and therefore it is again natural to get that information from the subscribing node.
-The type description for a given type, at a given version, could have been retrieved from other places, e.g. a centralized database, but the other alternatives considered would have had to take care to ensure that it had the right version of the message, which is not the case for the node publishing the data.
-
-Because the interface for getting a type description is generic, it is not necessary to have this interface on a per entity, i.e. publisher, subscription, etc, basis, but instead to offer the ROS Service on a per node basis to reduce the number of ROS Services.
-Therefore, the specification dictates that the type description is distributed by single ROS Service for each individual node.
-
-There were also multiple alternatives for how to get this information from each node, but the use of a single ROS Service was selected because the task of requesting the type description from a node is well suited to a request-response style ROS Service.
-Some of the alternatives offered other benefits, but using a ROS Service introduced the fewest dependencies, feature-wise, while accomplishing the task.
-
-.. TODO::
-
-    cite the above, https://en.wikipedia.org/wiki/Request%E2%80%93response
-
-Combining the Raw and Parsed Type Description in the Service Response
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The contents of the "get type description" service response should include information that supports both aforementioned use cases (i.e. tools and Run-Time Interface Reflection).
-These use cases have orthogonal interests, with the former requiring human-readable descriptions, and the latter preferring machine-readable descriptions.
-
-Furthermore, the type description should be useful even across middlewares and serialization libraries and that makes it especially important to send at least the original inputs to the "type support pipeline" (i.e. the process of taking user-defined types and generating all supporting code).
-In this case, because the "type support pipeline" is a lossy process, there is a need to ensure that enough information is sent to completely reproduce the original definition of the type, and therefore it makes sense to just send the original ``idl`` or ``msg`` file.
-
-At the same time, it is useful to send information with the original description that makes it easier to process data at the receiving end, as it is often not trivial to get to the "parsed" version of the type description from the original text description.
-
-Finally, while there could be an argument for sending a losslessly compressed version of the message file, the expected low frequency of queries to the type description service incurs a negligible overhead that heavily reduces the benefit.
-
-Implementing in ``rcl`` versus ``rmw``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-While it is true that implementing the type description distribution on the ``rmw`` layer would allow for much lower level optimization, removing the layer of abstraction avoids having to implement this feature in each rmw implementation.
-
-Given that the potential gains from optimization will be small due to how infrequently the service is expected to be called, this added development overhead was determined to not be worth it.
-Instead the design prefers to have a unified implementation of this feature in ``rcl`` so it is agnostic to any middleware implementations and client libraries.
-
-Nested ``TypeDescription`` Example
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``TypeDescription`` message type shown above also supports the complete description of a type that contains other types (a nested type), up to an arbitrary level of nesting.
-Consider the following example:
-
-.. code::
-
-  # A.msg
-  B b
-  C c
-
-  # B.msg
-  bool b_bool
-
-  # C.msg
-  D d
-
-  # D.msg
-  bool d_bool
-
-The corresponding ``TypeDescription`` for ``A.msg`` will be as follows, with the referenced type descriptions accessible as ``IndividualTypeDescription`` types in the ``referenced_type_descriptions`` field of ``A``:
-
-.. code::
-
-  # A: TypeDescription
-  type_description: A_IndividualTypeDescription
-  referenced_type_descriptions: [B_IndividualTypeDescription,
-                                 C_IndividualTypeDescription,
-                                 D_IndividualTypeDescription]
-
-Note that the type description for ``A`` itself is found in the ``type_description`` field instead of the ``referenced_type_descriptions`` field.
-Additionally, in the case where a type description contains no referenced types (i.e., when it has no fields, or all of its fields are primitive types), the ``referenced_type_descriptions`` array will be empty.
-
-.. code::
-
-  # A: IndividualTypeDescription
-  type_name: "A"
-  fields: [A_b_Field, A_c_Field]
-
-  # B: IndividualTypeDescription
-  type_name: "B"
-  fields: [B_b_bool_Field]
-
-  # C: IndividualTypeDescription
-  type_name: "C"
-  fields: [C_d_Field]
-
-  # D: IndividualTypeDescription
-  type_name: "D"
-  fields: [D_d_bool_Field]
-
-With the corresponding ``Field`` fields:
-
-.. code::
-
-  # A_b_Field
-  field_type: 0
-  field_name: "b"
-  nested_type_name: "B"
-
-  # A_c_Field
-  field_type: 0
-  field_name: "c"
-  nested_type_name: "C"
-
-  # B_b_bool_Field
-  field_type: 9         # Suppose 9 corresponds to a boolean field
-  field_name: "b_bool"
-  nested_type_name: ""  # Empty if primitive type
-
-  # C_d_Field
-  field_type: 0
-  field_name: "d"
-  nested_type_name: "D"
-
-  # D_d_bool_Field
-  field_type: 9
-  field_name: "d"
-  nested_type_name: ""
-
-In order to handle the type of a nested type such as ``A``, the receiver can use the ``referenced_type_descriptions`` array as a lookup table keyed by the value of ``Field.nested_type_name`` or ``IndividualTypeDescription.type_name`` (which will be identical for a given type) to obtain the type information of a referenced type.
-This type handling process can also support any recursive level of nesting (e.g. while handling A, C is encountered as a nested type, C can then be looked up using the top level ``referenced_type_descriptions`` array).
-
-Alternatives
-^^^^^^^^^^^^
-
-Other Providers of Type Description
-"""""""""""""""""""""""""""""""""""
-
-Several other candidate strategies for distributing the type descriptions were considered but ultimately discarded for one or more reasons like: causing a strong dependency on a particular middleware or a third-party technology, difficulties with resolving the message type description locally, difficulties with finding the correct entity to query, or causing network throughput issues.
-
-These are some of the candidates that were considered, and the reasons for their rejection:
-
-- Store the type description as a ROS parameter
-   * Causes a mass of parameter event messages being sent at once on init, worsening the network initialization problem
-- Store the type description on a centralized node per machine
-   * Helps reduce network bandwidth, but makes it non-trivial to find the correct centralized node to query, and introduces issues of resolving the local message package, such as when nodes are started from different sourced workspaces.
-- Send type description alongside discovery with middlewares
-   * Works very well if supported, but is only supported by some DDS implementations (which support XTypes or some other way to attach discovery metadata), but causes a strong dependency on DDS.
-- Send type description using a different network protocol
-   * Introduces additional third-party dependencies separate from ROS and the middleware.
-
-Alternative Type Description Contents and Format
-""""""""""""""""""""""""""""""""""""""""""""""""
-
-A combination of the original ``idl`` / ``msg`` file and any other information needed for serialization and deserialization being sent allows for one to cover the weaknesses of the other.
-Specifically, given that certain use-cases (e.g., ``rosbag``) might encounter situations where consumers of a message are using a different middleware or serialization scheme the message was serialized with, it becomes extremely important to send enough information to both reconstruct the type support, and also allow the message fields to be accessed in a human readable fashion to aid in the writing of transfer functions.
-As such, it is not a viable option to only send one or the other.
-
-Additionally, the option to add a configuration option to choose what contents to receive from the service server was disregarded due to how infrequently the type description query is expected to be called.
-
-As for the format of the type description, using the ROS interfaces to describe the type, as opposed to an alternative format like XML, JSON, or something like the TypeObject defined by DDS-XTypes, makes it easier to embed in the ROS Service response.
-It also prevents unnecessary coupling with third-party specifications that could be subject to change and reduces the formats that need to be considered on the receiving end of the ROS Service call.
-
-Representing Fields as An Array of Field Types
-""""""""""""""""""""""""""""""""""""""""""""""
-
-The use of an array of ``Field`` messages was balanced against using two arrays in the ``IndividualTypeDescription`` type to describe the field types and field names instead, e.g.:
-
-.. code::
-
-  # Rejected IndividualTypeDescription Variants
-
-  # String variant
-  string type_name
-  string field_types[]
-  string field_names[]
-
-  # uint8_t Variant
-  string type_name
-  uint8_t field_types[]
-  string field_names[]
-
-The string variant was rejected because using strings to represent primitive types wastes space, and will lead to increased bandwidth usage during the discovery and type distribution process.
-The uint8_t variant was rejected because uint8_t enums are insufficiently expressive to support nested message types.
-
-The use of the ``Field`` type, with a ``nested_type_name`` field that defaults to an empty string mitigates the space issue while allowing for support of nested message types.
-Furthermore, it allows the fields to be described in a single array, which is easier to iterate through and also reduces the chances of any errors from mismatching the array lengths.
-
-Using an Array to Store Referenced Types
-""""""""""""""""""""""""""""""""""""""""
-
-Some alternatives to using an array of type descriptions to store referenced types in a nested type were considered, including:
-
-- Storing the referenced types inside the individual type descriptions and accessing them by traversing the type description tree recursively instead of using a lookup table.
-
-  - Rejected because the IDL spec does not allow for a type description to store itself, and also because it could possibly introduce duplicate, redundant type descriptions in the tree, using up unnecessary space.
-
-- Sending referenced types in a separate service call or message.
-
-  - Rejected because needing to collate all of the referenced types on the receiver end introduces additional implementation complexity, and also increases network bandwidth with all the separate calls that must be made.
-
-Run-Time Interface Reflect
---------------------------
 
 TODO
 
@@ -1221,23 +830,7 @@ Feature Progress
 
 Supporting Feature Development:
 
-- TypeDescription Message:
-
-  - [x] Define and place the TypeDescription.msg Message type in a package
-
-- Enforced Type Versioning:
-
-  - [ ] Create library to calculate version hash from message files
-  - [ ] Create library to calculate version hash from service files
-  - [ ] Create library to calculate version hash from action files
-  - [ ] Create command-line tool to show the version hash of an interface
-
-  - [ ] Add topic type version hash to the "graph" API
-  - [ ] Implement delivery of type version hash during discovery:
-
-    - [ ] rmw_fastrtps_cpp
-    - [ ] rmw_cyclonedds_cpp
-    - [ ] rmw_connextdds
+- Type Version Enforcement
 
   - [ ] Add rmw API for notifying user when a topic endpoint was not matched due to type mismatch
 
@@ -1258,11 +851,6 @@ Supporting Feature Development:
     - [ ] rmw_fastrtps_cpp
     - [ ] rmw_cyclonedds_cpp
     - [ ] rmw_connextdds
-
-- Type Description Distribution:
-
-  - [ ] Define and place the GetTypeDescription.srv Service type in a package
-  - [ ] Implement the "get type description" service in the rcl layer
 
 - Run-time Interface Reflection:
 
@@ -1309,9 +897,6 @@ Supporting Feature Development:
 
 Tooling Development:
 
-- [ ] Command-line tools for interacting with type version hashes
-- [ ] Add a default warning to users when a topic has mismatched types (by type or version)
-
 - [ ] Command-line tool for determining if two versions of a type are convertible
 
 - [ ] CMake and C++ APIs for writing transfer functions, including usage documentation
@@ -1322,10 +907,8 @@ Tooling Development:
 
 - [ ] Integration with rosbag2
 
-  - [ ] Record the type version hash, TypeDescription, and other metadata into bags
-  - [ ] Use recorded metadata to create subscriptions without needing the type to be built locally
+  - [ ] Use recorded type description metadata to create subscriptions without needing the type to be built locally
   - [ ] Use recorded metadata to create publishers from descriptions in bag
-  - [ ] Provide a method to playback/update old bag files that do not have type descriptions stored
 
 
 References
