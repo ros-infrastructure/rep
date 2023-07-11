@@ -439,10 +439,6 @@ Tooling
 The ros2 command line tools, and the APIs that support them, should be updated to provide access to the type version hash where ever the type name is currently available and the type version description on-demand as well.
 For example:
 
-- ros2 topic info -v (done - TODO more info)
-- ros2 interface show (TODO implement)
-
-
 - ``ros2 interface`` should be extended with a way to print the hash for an interface type
 - ``ros2 topic info --versbose`` should include the type version hash used by each endpoint
 - ``ros2 node`` should be extended with a way to print exact definitions for its used types, if its type description service is available
