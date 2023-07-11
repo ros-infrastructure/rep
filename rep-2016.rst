@@ -11,39 +11,45 @@ Post-History:
 Abstract
 ========
 
-This REP proposes a standard format for the communication of ROS 2 interface types, along with tooling to support their use.
+This REP proposes a standard format for communicating the structure of ROS 2 interface types, as well as tooling to support the use of these descriptions.
 
-It provides a ROS 2 interface type that can contain these descriptions, runtime data structures, and a universally reproducible serialization method.
-Alongside the description format, this REP also defines a hashing algorithm to create standardized hashes of type descriptions, to quickly detect type mismatch during discovery.
+It provides a ROS 2 interface type that can contain descriptions of types, runtime data structures, and a universally reproducible serialization method.
+Alongside the description format, a standard hashing algorithm is also defined to create compact reperentations of type descriptions, to quickly transmit and detect type mismatch during discovery.
 
 
 Motivation
 ==========
 
 ROS 1 clients provided an MD5 sum from msg files to check for matching definitions, as well as full message definitions in connection headers.
-ROS 2 before Iron did not provide any comparable capabilities.
-This REP proposes a set of standards to be implemented in ROS 2 that allow users to easily
+This REP proposes to match the goal of those features with a set of standards to that allow users to easily
 
 - detect mismatches in message types between nodes
-- get access to the complete type description of types being used, including from remote nodes
+- get access to the complete description of types being used, including from remote nodes
+
+One part of this motivation is for correctness of existing applications.
+When a message type is updated, a different communicating node may begin to receive messages it does not actually understand.
+A second part of the motivation is to expand capabilities of the ROS 2 system to work with descriptions of types programmatically.
+This REP will not go into detail on those supported use cases, they are discussed in more detail in REP-2011\ [#rep2011]_.
+
 
 Terminology
 ===========
 
-TODO: formatting
+Some terms used in this document, which will be described in much more detail in the specification:
 
-Type Source - original text used to define a type
-Type Description - a data structure representating a parsed Type Source, which removes irrelevant data such as comments, and will be equal regardless of whether the source was msg, IDL, or otherwise.
-RIHS (ROS Interface Hashing Standard) - a versioned specification for producing a hash value for a Type Description
-type_description_interfaces - the new package defined to contain the Type Description data structures
+- **ROS 2 Interface** or **Interface Type** - a ROS 2 message, service, or action, as described in \ [#interfaces]_.
+- **Type Source** - the original text provided by author to define an interface type, such as a ``.msg`` or ``.idl`` file.
+- **Type Description** - a data structure representating a parsed type source, which will be equal regardless of source format such as ``.msg`` or ``.idl`` if the described type is the same.
+- **Type Hash** - a compact identifier for a type description that is expected to be unique
+- **RIHS (ROS Interface Hashing Standard)** - a versioned specification for producing a hash value for a type description
+
 
 Specification
 =============
 
-In order to communicate and compare types, a Type Description data structure is defined to contain type information in a common format.
-To detect and enforce type version mismatches, and communicate information about type descriptions compactly, a way to uniquely identify types is required.
-For this purpose a hash of the Type Description, or Type Hash, is used.
-The Type Hash specification, covered below, defines a Type Description serialization and hashing algorithm that guarantees cross-implementation consistency.
+In order to represent, communicate and compare types, a Type Description data structure is defined.
+To communicate information about type descriptions compactly and detect type mismatches, we use a Type Hash.
+The Type Hash specification defines a Type Description serialization and hashing algorithm that guarantees cross-implementation consistency.
 
 
 Type Description
@@ -60,29 +66,172 @@ Thus the representation includes:
 - a list of all recursively referenced types
 - no comments
 
+Note that the reference implementation is provided in the package ``type_description_interfaces``\ [#tdi_pkg]_.
+The structure is discussed here in concept, but the implementation is the source of exact truth for ROS releases.
+
+The ``TypeDescription`` message type looks like:
+
+.. code::
+
+    IndividualTypeDescription type_description
+    IndividualTypeDescription[] referenced_type_descriptions
+
+And the ``IndividualTypeDescription`` type:
+
+.. code::
+
+    string type_name
+    Field[] fields
+
+And the ``Field`` type:
+
+.. code::
+
+    FIELD_TYPE_NESTED_TYPE = 0
+    FIELD_TYPE_INT = 1
+    FIELD_TYPE_DOUBLE = 2
+    # ... and so on
+    FIELD_TYPE_INT_ARRAY = ...
+    FIELD_TYPE_INT_BOUNDED_SEQUENCE = ...
+    FIELD_TYPE_INT_SEQUENCE = ...
+    # ... and so on
+
+    string field_name
+    uint8_t field_type
+    uint64_t field_array_size  # Only for Arrays and Bounded Sequences
+    string nested_type_name  # Only for FIELD_TYPE_NESTED_TYPE
+
+These interfaces perhaps do not yet consider some other complications like field annotations or other as yet unconsidered features we want to support.
+
+
+Describing Services and Actions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS 2 Services and Actions are considered "aggregate interfaces", in that they compose several "sub-interfaces" into a more complex type.
+A Service is defined using two Messages - a Request and a Reponse.
+An Action is defined using three Messages - a Goal, Feedback, and a Result.
+These definitions from the user are then expanded into the more derived utilized by communications.
+Because these full structures affect interoperability, the full description as used by ROS 2 should be represented to accurately describe the types, rather than just the inputs.
+To represent these types, we consider them to simply be types with these members as fields.
+
+As of ROS 2 Iron, Services contain
+
+- a Request message as defined in input
+- a Response message as defined in input
+- an Event message, as defined in REP-2012 Service Introspection\ [#rep2012]_.
+
+Therefore the implicit intermediary output looks like:
+
+.. code::
+
+    ServiceType_Request request_message
+    ServiceType_Response response_message
+    ServiceType_Event event_message
+
+And Actions contain
+
+- a Goal message as defined in input
+- a Result message as defined in input
+- a Feedback message as defined in input
+- a SetGoal service, derived
+- a GetResult service, derived
+- a FeedbackMessage, derived
+
+Therefore their implicit intermediary output looks like:
+
+.. code::
+
+    ActionType_Goal goal
+    ActionType_Result result
+    ActionType_Feedback feedback
+    ActionType_SendGoalService send_goal_service
+    ActionType_GetResultService get_result_service
+    ActionType_FeedbackMessage feedback_message
+
+
+While this method is simple and therefore recommended, it is worth noting that it has the following drawback:
+A message defined explicitly with those above field types and names would have an identical description to a Service or Action, even though they are different category of interfaces.
+However, this case is fairly contrived and in practice an application will already know what interface category it is trying to interact with.
+
+Given this approach, the ``type_description_interfaces`` provides no special accommodation for Services and Actions, leaving the transform into a representable type to code generation.
+The reference implementation for this derivation is in ``rosidl_generator_type_description``\ [#td_gen]_.
+
+Versioning the ``TypeDescription`` Message Type
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Given that the type description message interface has to be generic enough to support anything described in the ROS interfaces, there will be a need to add or remove fields over time in the type description message itself.
+This should be done in such a way that the fields are tick-tocked and deprecated properly.
+It is recommended to do this by having explicitly named versions of this interface, e.g. ``TypeDescriptionV2``, ``TypeDescriptionV3`` and so on.
+The initial version is named without a version identifier.
+Revisions may be inevitable, but there should be a default preference against modifying, to keep the number of these versions to a minimum.
+
+``TypeDescription`` Self-Describing Loop Problem
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This section covers an implementation detail rather than a goal-oriented design decision, but is worth covering as it represents a significant difficulty.
+
+The ``TypeDescription`` messages are defined as just another ROS interface type, using all the same tooling.
+This means that its data structures are not available yet, during build time, to describe itself and other interface packages.
+The final decision to support this is a checked-in mirror of the generated type structs, provided in ``rosidl_runtime_c``, for use by C (used by Python) and C++ code generation.
+This decision incurs overhead and possibility for human error, if the interfaces are ever updated, as the runtime structs must be also updated with new generated code.
+To support this, infrastructure will have been added to automatically perform the updates, and check that they are updated properly in PR reviews.
+
+A few other options were considered but ultimately all were deemed too convoluted to follow even for those familiar with the ``rosidl`` type pipeline.
 
 Type Hash
 ---------
 
-The hash must also be able to be calculated at runtime from information received on the wire.
-The hash must only be computed using fields that affect communication compatibility.
-Thus the hash excludes one aspect of Type Descriptions: it omits default values.
-This is because default values for fields are only used by the writer of a packet, the recipient always receives some value in the field and can read it, thus defaults cannot affect compatibility.
+Hash Requirements
+^^^^^^^^^^^^^^^^^
 
+The following requirements are set for type hashes.
+
+Hashes for local types be available to client libraries without computation, thus must be precalculated at build time.
+
+The hash must be able to be calculated at runtime from information received on the wire.
 This allows subscribers to validate the received TypeDescriptions against advertised hashes, and allows dynamic publishers to invent new types and advertise their hash programmatically.
+
+The hash must only be computed using fields that affect communication compatibility, so that trivial changes do not change the hash
+Thus the hash excludes one aspect of Type Descriptions: it omits field default values.
+This is because default values for fields are only used by the writer of a packet, the recipient always receives some value in the field and can read it, thus defaults cannot affect compatibility.
+It also omits all other non-programmatic contents such as comments
 
 Finally, the resulting filled data structure must be represented in a platform-independent format, rather than running the hash function on the in-memory native type representation.
 Different languages, architectures, or compilers will produce different in-memory representations, and the hash must be consistently calculable in different contexts.
 
-The resulting data structure is hashed using SHA-256, resulting in a 256-bit (32-byte) hash value which is also generally known as a "message digest".
-This hash is paired with a type version hash standard version, which we will call the "ROS IDL Hashing Standard" or "RIHS", the first version of which will be ``RIHS01``.
-RIHS Version 00 is reserved for "Invalid" / "unset", and the RIHS version is limited by this specification to a maximum value of 255.
+Representation for Hashing
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``RIHS01`` uses a JSON-serialized representation of the Type Description contents.
+This representation is not intended to be used by humans, and therefore is kept as compact as possible by omitting line breaks and therefore indentation.
+JSON was chosen as a ubiquitously available format with simple implementation.
+
+The serialized output must be byte-for-byte identical to ensure matching hash output.
+``RIHS01`` has two separate implementations that together form its specification by their agreement.
+These two reference implementations can be found in:
+
+- ``rosidl_generator_type_description``
+- ``rcl``
+
+The JSON serialization must pay attention to certain aspects that even a JSON Schema can't represent:
+
+- Whitespace management, including newlines and spaces between commas, colons, etc
+- Sorting ``referenced_type_descriptions`` in a consistent manner (probably alphabetically by type name)
+
+However, to handle everything else, the reference implementation does provide a ``jsonschema`` file that other implementatations can use.
+
+Hashing Method
+^^^^^^^^^^^^^^
+
+The resulting representation is hashed using SHA-256, resulting in a 256-bit (32-byte) hash value which is also generally known as a "message digest".
+This hash is paired with a hashing standard version, which we will call the "ROS IDL Hashing Standard" or "RIHS", the first version of which will be ``RIHS01``.
+RIHS Version 0 is reserved to mean "invalid" or "unset", and the RIHS version is limited by this specification to a maximum value of 255.
 RIHS hash values must have a well-defined UTF-8 string representation for human readability and for passing over string-only communication channels.
 The prefix of a well-formed RIHS string will always be ``RIHSXX_``, where ``X`` is one hexadecimal digit, followed by the version-dependent string representation of the hash value.
-For ``RIHS01``, the hash value is 64 hexadecimal digits representing the 256-bit message digest, leading to a known ``RIHS01`` string length of 71.
+For ``RIHS01``, the hash value is 64 hexadecimal digits representing the 256-bit message digest, leading to a fixed ``RIHS01`` string length of 71.
 
-This versioning allows the tooling to know if a hash mismatch is due to a change in this standard (how hash is computed) or due to a difference in the interface types themselves.
-In the case of a change in standard, it will be unknown whether the interface types are equal or not.
+This versioning allows the tooling to know if a hash mismatch is due to a change in how the hash computed or due to a difference in the information content.
+In the case of a new RIHS version, meaning a change in computation method, it will be unknown whether the interface types are equal or not without full description comparison.
 
 For now, the list of field names and their types are the only contributing factors, but in the future that could change, depending on which "annotations" are supported in ``.idl`` files.
 The "IDL - Interface Definition and Language Mapping" design document\ [2]_ describes which features of the OMG IDL standard are supported by ROS 2.
@@ -95,23 +244,21 @@ New sanitizing may be needed on the TypeDescription pre-hash procedure, in the c
 
 Notes:
 
-The type version hash is not sequential and does not imply any rank among versions of the type. That is, given two version hashes of a type, there is no way to tell which is "newer".
+The type hash is not sequential and does not imply any rank among versions of the type.
+That is, given two hashes of a type, there is no way to tell which is "newer".
 
-Because the hash contains the stated name of the type, differently-named types with otherwise identical descriptions will be mismatched as incompatible.
+Because the hash contains the stated name of the type, differently-named types with otherwise identical descriptions will receive different hashes, and therefore be mismatched as incompatible.
 This matches existing ROS precedent of strongly-typed interfaces.
-
-The type version hash can only be used to determine if type versions are equal and if there exists a chain of transfer functions that can convert between them.
-Because of this, when a change to a type is made, it may or may not be necessary to write transfer functions in both directions depending on how the interface is used.
 
 .. note::
     A message provider may desire to change the version hash of a message even when no field types or names have changed, perhaps due to a change in semantics of existing fields.
     There is explicitly no built-in provision for this case.
     We suggest the following method - provide an extra field within the interface with a name like ``bool versionX = true``.
-    To trigger a hash update, increment the name of this special field, for example to ``bool versionY = true``.
+    To trigger a hash update, increment the name of this special versioning field, for example to ``bool versionY = true``.
 
 The TypeDescription does not include the serialization format being used, nor does it include the version of the serialization technology.
-This type version hash is for the *description* of the type, and is not meant to be used to determine wire compatibility by itself.
-The type version hash must be considered in context, with the serialization format and version in order to determine wire compatibility.
+This type hash is for the *description* of the type, and is not meant to be used to determine wire compatibility by itself.
+The type hash must be considered in context, with the serialization format and version in order to determine wire compatibility.
 
 
 Type Hash Discovery
@@ -147,169 +294,147 @@ While this usage can be implementation-specific, consistency will allow for comm
 Type Description Distribution
 -----------------------------
 
-For some use cases the type version hash is insufficient and instead the full type description is required.
+For some use cases the type hash is insufficient and instead the full type description is required.
 
-One of those use cases, which is also described in this REP, is "Run-Time Interface Reflection", which is the ability to introspect the contents of a message at runtime when the description for that message, or that version of that message, was unavailable at compile time.
+One of those use cases is "Run-Time Interface Reflection", which is the ability to introspect the contents of a message at runtime when the description for that message, or that version of that message, was unavailable at compile time.
 In this use case the type description is used to interpret the serialized data dynamically.
+Another use case is using the type description in tooling to either display the type description to the user or to include it in recordings.
+Neither of these cases are covered in detail in this REP.
 
-Another use case, which is not covered in this REP, is using the type description in tooling to either display the type description to the user or to include it in recordings.
-
-In either case, where the type description comes from doesn't really matter, and so, for example, it could be looked up on the local filesystem or read from a rosbag file.
-However, in practice, the correct type description may not be found locally, especially in cases where you have different versions of messages in the same system, e.g.:
+In any case, where the type description comes from doesn't matter, and so, for example, it could be looked up on the local filesystem or read from a rosbag file.
+However, the correct type description may not be available locally, especially in cases where you have different versions of messages in the same system, e.g.:
 
 - because it's on another computer, or
 - because it is from a different distribution of ROS, or
 - because it was built in a different workspace, or
 - because the application has not been restarted since recompiling a change to the type being used
 
-In any case, it is useful to have a mechanism to convey the type descriptions from the source of the data to other nodes, which we describe here as "type description distribution".
+It is useful to have a mechanism to convey the type descriptions from the source of the data to other nodes, which is described here as "type description distribution".
 
 Furthermore, this feature should be agnostic to the underlying middleware and serialization library, as two endpoints may not have the same rmw implementation, or the data may have been serialized to a different format in the case of playback of a recording.
 
 Sending the Type Description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Type descriptions will be provided by a ROS Service called ``~/_get_type_description``, which will be offered by each node.
+
+Type descriptions will be provided by a ROS Service called ``~/get_type_description``, which will be offered by each node.
 There will be a single ROS Service per node, regardless of the number of publishers or subscriptions on that node.
 
-This service may be optional, for example being enabled or disabled when creating the ROS Node.
+The type of this service is defined in ``type_description_interfaces`` as ``GetTypeDescription``.
+
+The service must be optional, but it will be a detail decided by each client library whether it is enabled or disabled by default.
+This REP recommends that the default client libraries ``rclcpp`` and ``rclpy`` enable the service by a boolean Parameter named ``start_type_description_service``.
 
 .. TODO::
 
     How can we detect when a remote node is not offering this service?
     It's difficult to differentiate between "the Service has not been created yet, but will be" and "the Service will never be created".
-    Should we use a ROS Parameter to indicate this?
-    But then what if remote access to Parameters (another optional Service) is disabled?
+    In the recommended approach, it is enabled via a parameter, but what if remote access to Parameters (another optional Service) is disabled?
     Perhaps we need a "services offered" list which is part of the Node metadata, which is sent for each node in the rmw implementation, but that's out of scope for this REP.
 
-A service request to this ROS Service will comprise of the type name and the type version hash, which is distributed during discovery of endpoints and will be accessible through the ROS Graph API, as described in previous sections.
-The ROS Service server will respond with the type description and any necessary metadata needed to do Run-Time Interface Reflection.
+A service request to this ROS Service will comprise of the type name and the type hash, which is distributed during discovery of endpoints and will be accessible through the ROS Graph API, as described previously.
+The ROS Service server will respond with the type description and optionally the original raw sources used to define the type.
 This service is not expected to be called frequently, and is likely to only occur when new topic or service endpoints are created, and even then, only if the endpoint type hashes do not match.
-
-.. TODO::
-
-    Should each endpoint be asked about their type/version pair or should we assume that the type/version pair guarantees a unique type description and therefore reuse past queries?
-    (wjwwood) I am leaning towards assuming the type name and type version hash combo as being a unique identifier.
+It is expected that a name and hash pair uniquely represent a type, so an end tool such as rosbag can only make a single query per type, rather than per topic or publisher, further reducing the number of likely calls.
+Given the SHA-256 implementation of RIHS01, the possibility of hash collision is so low as to be practically considered 0 and disregarded.
 
 Type Description Contents and Format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The response sent by the ROS Service server will contain a combination of the original ``idl`` or ``msg`` file's content, as well as any necessary information to serialize and deserialize the raw message buffers sent on the topic.
-The response will contain a version of the description that contains comments from the original type description, as those might be relevant to interpreting the semantic meaning of the message fields.
+The response sent by the ROS Service server wll contain the type description.
+Optionally, this response will also contain the original ``idl`` or ``msg`` file contents, as those might be relevant to interpreting the semantic meaning of the message fields.
 
-Additionally, the response could include the serialization library used, its version, or any other helpful information from the original producer of the data.
-
-.. TODO::
-
-    What happens if the message consumer doesn't have access to the serialization library stated in the meta-type?
-    (wjwwood) It depends on what you're doing with the response. If you are going to subscribe to a remote endpoint, then I think we just refuse to create the subscription, as communication will not work, and there's a basic assumption that if you're going to communicate with an endpoint then you are using the same or compatible rmw implementations, which includes the serialization technology. The purpose of this section and ROS Service is to provide the information, not to ensure communication can happen.
+This service does not contain any information about the serialization format or other middleware details.
+The purpose of this section and the ROS Service is to provide information about the type, not to ensure full information required for wire communication.
 
 The ROS 2 message that defines the type description must be able to describe any message type, including itself, and since it is describing the message format, it should work independently from any serialization technologies used.
-This "meta-type description" message would then be used to communicate the structure of the type as part of the "get type description" service response.
-The final form of these interfaces should be found in the reference implementation, but such a Service interface might look like this:
+This "meta-type description" message is used to communicate the structure of the type as part of the ``GetTypeDescription`` service response.
+The final form of these interfaces should be found in the reference implementation, but such a Service looks like this:
 
 .. code::
 
+    # ROS interface type name, in PACKAGE/NAMESPACE/TYPENAME format.
     string type_name
-    string type_version_hash
+
+    # REP-2011 RIHS hash string.
+    string type_hash
+
+    # Whether to return the original idl/msg/etc. source file(s) in the response.
+    bool include_type_sources true
     ---
-    # True if the type description information is available and populated in the response
+    # True if the type description information is available and populated in the response.
+    # If false, all other fields except `failure_reason` are considered undefined.
     bool successful
-    # Empty if 'successful' was true, otherwise contains details on why it failed
+    # If `successful` is false, contains a reason for failure.
+    # If `successful` is true, this is left empty.
     string failure_reason
 
-    # The idl or msg file name
-    string type_description_raw_file_name
-    # The idl or msg file, with comments and whitespace
-    # The file extension and/or the contents can be used to determine the format
-    string type_description_raw
-    # The parsed type description which can be used programmatically
+    # The parsed type description which can be used programmatically.
     TypeDescription type_description
 
+    # A list containing the interface definition source text of the requested type,
+    # plus all types it recursively depends on.
+    # Each source text is a copy of the original contents of the
+    # .msg, .srv, .action, .idl, or other file if it exists, including comments and whitespace.
+    # Sources can be matched with IndividualTypeDescriptions by their `type_name`.
+    # The `encoding` field of each entry informs how to interpret its contents.
+    TypeSource[] type_sources
+
     # Key-value pairs of extra information.
-    string[] extra_information_keys
-    string[] extra_information_values
+    KeyValue[] extra_information
 
-.. TODO::
 
-    (wjwwood) I propose we use key-value string pairs for the extra information, but I am hoping for discussion on this point.
-    This type is sensitive to changes, since changes to it will be hard to roll out, and may need manual versioning to handle.
-    We could also consider bounding the strings and sequences of strings, so the message could be "bounded", which is nice for safety and embedded systems.
-
-Again, the final form of these interfaces should be referenced from the reference implementation, but the ``TypeDescription`` message type might look something like this:
+Where ``TypeSource`` looks like:
 
 .. code::
 
-    IndividualTypeDescription type_description
-    IndividualTypeDescription[] referenced_type_descriptions
+    # Represents the original source of a ROS 2 interface definition.
 
-And the ``IndividualTypeDescription`` type:
-
-.. code::
-
+    # ROS interface type name, in PACKAGE/NAMESPACE/TYPENAME format.
     string type_name
-    Field[] fields
 
-And the ``Field`` type:
+    # The type of the original source file, typically matching the file extension.
+    # Well-known encodings: "idl", "msg", "srv", "action", "dynamic", "implicit".
+    # "dynamic" specifies a type created programmatically by a user, thus having no source.
+    # "implicit" specifies a type created automatically as a subtype of a
+    # complex type (service or action) - such as the request message for a service.
+    # Implicit types will have no contents, the full source will be available on the parent srv/action.
+    string encoding
+
+    # Dumped contents of the interface definition source file.
+    # If `encoding` is "dynamic" or "implicit", this field will be empty.
+    string raw_file_contents
+
+
+And ``KeyValue`` is a simple:
 
 .. code::
 
-    FIELD_TYPE_NESTED_TYPE = 0
-    FIELD_TYPE_INT = 1
-    FIELD_TYPE_DOUBLE = 2
-    # ... and so on
-    FIELD_TYPE_INT_ARRAY = ...
-    FIELD_TYPE_INT_BOUNDED_SEQUENCE = ...
-    FIELD_TYPE_INT_SEQUENCE = ...
-    # ... and so on
+  # Represents an arbitrary key-value pair for application-specific information.
 
-    string field_name
-    uint8_t field_type
-    uint64_t field_array_size  # Only for Arrays and Bounded Sequences
-    string nested_type_name  # Only for FIELD_TYPE_NESTED_TYPE
+  string key
+  string value
 
-These examples of the interfaces just give an idea of the structure but perhaps do not yet consider some other complications like field annotations or other as yet unconsidered features we want to support.
 
-.. TODO::
+This ``KeyValue[] extra_information`` field is provided as a catch-all for any application-specific or extension functionality to this Service, outside the scope of this REP.
 
-    (wjwwood) Add text about how to handle Service types, which are formed as a Request and a Response part, each of which is kind of like a Message.
-    We could just treat the Request and Response separately, or we could extend this scheme to include explicit support for Services.
-    Since Actions are composed of Topics and Services, it is less so impacted, but we could similarly consider officially supporting them in this scheme.
-
-Versioning the ``TypeDescription`` Message Type
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Given that the type description message interface has to be generic enough to support anything described in the ROS interfaces, there will be a need to add or remove fields over time in the type description message itself.
-This should be done in such a way that the fields are tick-tocked and deprecated properly, possibly by having explicitly named versions of this interface, e.g. ``TypeDescriptionV1`` and ``TypeDescriptionV2`` and so on.
 
 Implementation in the ``rcl`` Layer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The implementation of the type description distribution feature will be made in the ``rcl`` layer as opposed to the ``rmw`` layer to take advantage of the abstraction away from the middleware and to allow for compatibility with the client libraries.
 
-A hook will be added to ``rcl_node_init()`` to initialize the type description distribution service with the appropriate ``rcl_service_XXX()`` functions.
+An API will be provided to initialize the type description distribution service with the appropriate ``rcl_service_XXX()`` functions.
 This hook should also keep a map of published and subscribed types which will be populated on each initialization of a publisher or subscription in the respective ``rcl_publisher_init()`` and ``rcl_subscription_init()`` function calls.
-The passed ``rosidl_message_type_support_t`` in the init call can be used to obtain the relevant information, alongside any new methods added to support type version hashing.
+The passed ``rosidl_XXX_type_support_t`` structs in these ``init`` calls can be used to obtain the relevant information, alongside any new methods added to support type hashing.
 
-There will be an option to opt-out of creating this service, and a way to start and stop the service after node creation as well.
-
-.. TODO::
-
-    (wjwwood) A thought just occurred to me, which is that we could maybe have "lazy" Service Servers, which watch for any Service Clients to come up on their Service name and when they see it, they could start a Service Server.
-    The benefit of this is that when we're not using this feature (or other features like Parameter get/set Services), then we don't waste resources creating them, but if you know the node name and the corresponding Service name that it should have a server on, you could cause it to be activated by trying to use it.
-    The problem with this would be that you cannot browse the Service servers because they wouldn't advertise until requested, but for "well know service names" that might not be such a problem.
-    I guess the other problem would be there might be a slight delay the first time you go to use the service, but that might be a worthy trade-off too.
-
-
-Type Description Distribution
------------------------------
-
-``type_description_interfaces`` defines a service ``GetTypeDescription``, that will be provided as a builtin service on nodes.
-The service must be optional, but it will be a detail decided by client libraries whether it is enabled or disabled by default.
+The service will not be started automatically, and must be initialized by client libraries according to their implementation of enabling the service.
+The client library should then also call the provided API to shutdown the service on shutdown.
+``rclcpp`` and ``rclpy`` will implement these calls and act as reference implementations of usage.
 
 
 Tooling
-=======
+-------
 
 The ros2 command line tools, and the APIs that support them, should be updated to provide access to the type version hash where ever the type name is currently available and the type version description on-demand as well.
 For example:
@@ -318,19 +443,14 @@ For example:
 - ros2 interface show (TODO implement)
 
 
-- ``ros2 interface`` should be extended with a way to calculate the version hash for a type
-- ``ros2 topic info`` should include the type version hash used by each endpoint
-- ``ros2 topic info --verbose`` should include the type description used by each endpoint
-- a new command to compare the types used by two endpoints, e.g. ``ros2 topic compare <topic name> <endpoint1 GUID> <endpoint2 GUID>``
+- ``ros2 interface`` should be extended with a way to print the hash for an interface type
+- ``ros2 topic info --versbose`` should include the type version hash used by each endpoint
+- ``ros2 node`` should be extended with a way to print exact definitions for its used types, if its type description service is available
 - ``ros2 service ...`` commands should also be extended in this way
 - ``ros2 action ...`` commands should also be extended in this way
 
-Again this list should not be considered prescriptive or exhaustive, but gives an idea of what should change.
+Again this list should not be considered prescriptive or exhaustive, but gives an idea of recommended tooling.
 
-Backwards Compatibility
-=======================
-
-TODO
 
 Rationale
 =========
@@ -340,8 +460,50 @@ This section layse out further reasoning for why certain conclusions were reache
 
 Type Hashing
 ------------
-TODO - RIHS hashing algorithms (sha1, md5)
-TODO - RIHS string representations (eg base64 (simplicity in conversion, human readability), pure binary (null terminators))
+
+RIHS Type Description Serialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A serialization method had to be chosen to guarantee consistent hashing across implementations and machines.
+
+One alternative could have been the CDR serialization provided by DDS middlewares, but this was rejected because
+
+- few implementations exist for diverse languages such as Python and Javascript, both of which environments are considered as users of the type hashing functionality
+- build-time calculation was desired _before_ generating the code for specific RMW implementations
+
+YAML was rejected as less available, given that JSON is built in to the Python standard libaries and is first-class in Javascript.
+The C implementation actually uses ``libyaml``, leaning on the fact that YAML is a superset of JSON, and uses an output configuration that outputs plain JSON.
+
+RIHS Hashing Algorithm
+^^^^^^^^^^^^^^^^^^^^^^
+
+MD5 and SHA1 were both considered as algorithms for the RIHS01 hashing function.
+
+Both of these algorithms have been deprecated in security use due to demonstrated attacks.
+While type description hashing does not have security ramifications, the mere presence of those algorithms was mentioned in discussion to be a red flag in some organizations.
+Therefore, to avoid any complaint, they were ruled out.
+This does result in a more resource intensive hashing implementation, both for computation and for size.
+The trade off was deemed worthwhile.
+
+
+RIHS String Representation
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following alternative RIHS01 string representations were considered.
+
+Pure binary.
+Don't use any character set, just send a string of bytes, ``RIHS01_<32 bytes of data>``.
+This would have a fixed size of 7 + 32 = 39 bytes, saving space over the 71 chosen.
+However, these would not be human readable and would require special handling to print and parse.
+The existing ``USER_DATA`` implementations are null-terminated, and type hashes can contain zero-bytes, breaking existing string reading.
+
+Base64.
+This would take 7 + 44 = 53 bytes, also saving space.
+However, type hashes are represented in memory as bytes, so the conversion does incurr a computation cost.
+This representation is also less readable.
+
+While it didn't make much of a difference, the simpler and more human-readable implementation of a plain hex string was chosen.
+It was decided that the extra couple dozen bytes was worth the tradeoff.
 
 Type Description Distribution
 -----------------------------
@@ -349,9 +511,12 @@ Type Description Distribution
 Using a Single ROS Service per Node
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The node that is publishing the data must already have access to the correct type description, at the correct version, in order to publish it, and therefore it is natural to get the data from that node.
+ROS 1 contained full type descriptions in its connection headers, but this decision was a result of the central Master node design.
+With the ROS 2 fully-distributed design, it was decided that the full description would add too much network overhead to system startup, given that most cases will not need the data.
+
+A node that is publishing the data must already have access to the correct type description, at the correct version, in order to publish it, and therefore it is natural to get the data from that node.
 Similarly, a subscribing node also knows what type they are wanting to receive, both in name and version, and therefore it is again natural to get that information from the subscribing node.
-The type description for a given type, at a given version, could have been retrieved from other places, e.g. a centralized database, but the other alternatives considered would have had to take care to ensure that it had the right version of the message, which is not the case for the node publishing the data.
+The type description for a given type, at a given version, could have been retrieved from other places, e.g. a centralized database, but the other alternatives considered would have had to take care to ensure that it had the right version of the message, whereas the node doing the communicating definitely knows the types it is using.
 
 Because the interface for getting a type description is generic, it is not necessary to have this interface on a per entity, i.e. publisher, subscription, etc, basis, but instead to offer the ROS Service on a per node basis to reduce the number of ROS Services.
 Therefore, the specification dictates that the type description is distributed by single ROS Service for each individual node.
@@ -359,18 +524,15 @@ Therefore, the specification dictates that the type description is distributed b
 There were also multiple alternatives for how to get this information from each node, but the use of a single ROS Service was selected because the task of requesting the type description from a node is well suited to a request-response style ROS Service.
 Some of the alternatives offered other benefits, but using a ROS Service introduced the fewest dependencies, feature-wise, while accomplishing the task.
 
-.. TODO::
 
-    cite the above, https://en.wikipedia.org/wiki/Request%E2%80%93response
+Combining the Parsed Type Description and Raw Sources in the Service Response
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Combining the Raw and Parsed Type Description in the Service Response
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The contents of the "get type description" service response should include information that supports both aforementioned use cases (i.e. tools and Run-Time Interface Reflection).
+The contents of the ``GetTypeDescription`` service response should include information that supports mentioned use cases (i.e. developer tooling and Run-Time Interface Reflection).
 These use cases have orthogonal interests, with the former requiring human-readable descriptions, and the latter preferring machine-readable descriptions.
 
 Furthermore, the type description should be useful even across middlewares and serialization libraries and that makes it especially important to send at least the original inputs to the "type support pipeline" (i.e. the process of taking user-defined types and generating all supporting code).
-In this case, because the "type support pipeline" is a lossy process, there is a need to ensure that enough information is sent to completely reproduce the original definition of the type, and therefore it makes sense to just send the original ``idl`` or ``msg`` file.
+In this case, because the "type support pipeline" is a lossy process, there is a need to ensure that enough information is sent to completely reproduce the original definition of the type, and therefore it makes sense to send the original ``idl`` or ``msg`` file.
 
 At the same time, it is useful to send information with the original description that makes it easier to process data at the receiving end, as it is often not trivial to get to the "parsed" version of the type description from the original text description.
 
@@ -537,45 +699,29 @@ Some alternatives to using an array of type descriptions to store referenced typ
 
   - Rejected because needing to collate all of the referenced types on the receiver end introduces additional implementation complexity, and also increases network bandwidth with all the separate calls that must be made.
 
+Backwards Compatibility
+=======================
 
-Development Progress
-====================
+Discovery
+---------
 
-TODO - remove this section for final merge
-
-- Type Descriptions:
-
-  - [x] Define and place the TypeDescription.msg Message type in a package
-  - [ ] Create library to calculate version hash from parsed types
-
-- Type Description Distribution:
-
-  - [ ] Add topic type hash to the "graph" API
-  - [ ] Define and place the GetTypeDescription.srv Service type in a package
-  - [ ] Implement the "get type description" service in the rcl layer
-  - [ ] Implement delivery of type version hash during discovery:
-
-    - [ ] rmw_fastrtps_cpp
-    - [ ] rmw_cyclonedds_cpp
-    - [ ] rmw_connextdds
-
-- Tooling
-
-  - [ ] Create command-line tool to show the version hash of an interface
-  - [ ] Command-line tools for interacting with type version hashes
-  - [ ] Add a default warning to users when a topic has mismatched types (by type or version)
-
-  - [ ] Integration with rosbag2
-
-    - [ ] Record the Type Hash and Type Description into bags
-    - [ ] Provide a method to playback/update old bag files that do not have type information stored
+The recommended DDS implementation for type hash discovery adds the type hash in a new previously-unused key, therefore it will be ignored by prior ROS distributions.
+This leaves discovery unaffected for backwards compatibility.
 
 References
 ==========
 
-.. http://wiki.ros.org/Topics
-.. REP 2011 Evolving message types (TODO link)
-.. REP 20XX Dynamic pubsub (name TBD - TODO)
+.. [#rep2011] REP 2011: Evolving Message Types (final link TBD)
+   (https://github.com/ros-infrastructure/rep/pull/358)
+
+.. [#interfaces] ROS Interfaces
+   (https://docs.ros.org/en/rolling/Concepts/Basic/About-Interfaces.html?highlight=interface)
+
+.. [#tdi_pkg] ``type_description_interfaces``
+   (https://index.ros.org/p/type_description_interfaces/#rolling)
+
+.. [#td_gen] ``rosidl_generator_type_description``
+   (https://index.ros.org/p/rosidl_generator_type_description/#rolling)
 
 Copyright
 =========
