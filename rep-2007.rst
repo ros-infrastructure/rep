@@ -20,7 +20,7 @@ Motivation
 The primary reason for this change is to improve the developer's experience working with ROS 2.
 Currently, developers often write code to convert a ROS interface into another custom data structure for use in their programs.
 This can be trivial, in the case accessing the ``data`` field in ``std_msgs::msg::String``;
-or more involved such as when converting OpenCV's ``cv::Map`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
+or more involved such as when converting OpenCV's ``cv::Mat`` to ROS's ``sensor_msgs/msg/Image`` type [1]_.
 Such conversions are additional work for the programmer and are potential sources of errors.
 
 An additional reason for this change is performance.
