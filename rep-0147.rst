@@ -211,7 +211,7 @@ The datatype is not timestamped or externally referenced as it is not intended t
         float64 y
         float64 z
 
-The command is a body relative set of accelerations in linear and angular space.
+The command is a body relative set of velocities in linear and angular space.
 This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
 A pure ``Twist`` based inteface could be provided for backwards compatability as well.
 It was chosen to diverge here since this is a much more powerful inteface for the vehicles and does not require all commands to be reverse calculated for the instantaneous attitude of the vehicle.
