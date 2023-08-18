@@ -1,11 +1,11 @@
-REP: 9999
+REP: 2017
 Title: Thread attributes configuration support in rcl
 Author: Masaaki Ueno, Koichi Oyama, Shoji Morita <s-morita@esol.co.jp>
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Jul-2023
-Post-History: 01-Aug-2023
+Post-History: 18-Aug-2023
 
 
 Abstract
