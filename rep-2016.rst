@@ -1,7 +1,7 @@
 REP: 2016
 Title: ROS 2 Interface Type Descriptions - Representation, Hashing, Discovery and Distribution
 Author: Emerson Knapp
-Status: Active
+Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 13-Jun-2023
