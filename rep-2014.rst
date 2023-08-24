@@ -1,7 +1,7 @@
 REP: 2014
 Title: Benchmarking performance in ROS 2
-Author: Víctor Mayoral-Vilches <victor@accelerationrobotics.com>, Ingo Lütkebohle <Ingo.Luetkebohle@de.bosch.com>, Christophe Bédard <bedard.christophe@gmail.com>, Rayza Araújo <araujorayza@gmail.com> 
-Status: Draft
+Author: Víctor Mayoral-Vilches <victor@accelerationrobotics.com>, Ingo Lütkebohle <Ingo.Luetkebohle@de.bosch.com>, Christophe Bédard <bedard.christophe@gmail.com>, Rayza Araújo <araujorayza@gmail.com>
+Status: Rejected
 Type: Informational
 Content-Type: text/x-rst
 Created: 29-Sept-2022
@@ -43,7 +43,7 @@ Approaches to benchmark performance
 There're different types of benchmarking approaches, specially when related to performance. The following definitions clarify the most popular terms inspired by [2]_:
 
 - `Functional performance testing`: Functional performance is the measurable performance of the system’s functions which the user can experience. For example, in a motion planning algorithm, measures could include items like the ratio the algorithm gets the motion plan right.
-  
+
 - `Non-functional performance testing`: The measurable performance of those aspects that don't belong to the system's functions. In the motion planning example, the latency the planner, the memory consumption, the CPU usage, etc.
 
 - `Black-box performance testing`: Measures performance by eliminating the layers above the *layer-of-interest* and replacing those with a specific test application that stimulates the layer-of-interest in the way you need it. This allows to gather the measurement data right inside your specific test application. The acquisition of the data (the probe) resides inside the test application. A major design constraint in such a test is that you have to eliminate the “application” in order to test the system. Otherwise, the real application and the test application would likely interfere.
@@ -114,7 +114,7 @@ Tracing and benchmarking
 
 Tracing and benchmarking can be defined as follows:
 
-- `tracing`: logging (partial) execution information while the system is running. `tracing` is used to understand what goes on in a running software system. 
+- `tracing`: logging (partial) execution information while the system is running. `tracing` is used to understand what goes on in a running software system.
 
 - `benchmarking`: a method of comparing the performance of various systems by running a common test.
 
@@ -163,7 +163,7 @@ Robots are deterministic machines and their performance should be understood by 
 
 - **memory**: the amount of short-term data (not to be confused with storage) required while executing a given task.
 
-These metrics can help determine performance characteristics of a robotic system. Of most relevance for robotic systems we often encounter the *real-time* and *determinism* characteristics defined as follows: 
+These metrics can help determine performance characteristics of a robotic system. Of most relevance for robotic systems we often encounter the *real-time* and *determinism* characteristics defined as follows:
 
 - **real-time**: ability of completing a task's computations while meeting time deadlines
 - **determinism**: that the same external or internal event leads to the same system behavior, with executions in the same order, each time.
@@ -185,7 +185,7 @@ The following diagram shows the proposed methodology for benchmarking performanc
 
 ::
 
-                                                                
+
                                                 +--------------+
                     +----------------+  rebuild |              |
                     |                +---------->              |
@@ -249,7 +249,7 @@ References and Footnotes
 .. [13] Case study: accelerating ROS 2 perception
     https://github.com/ros-acceleration/community/issues/20#issuecomment-1047570391
 
-.. [14] acceleration_examples. ROS 2 package examples demonstrating the use of hardware acceleration. 
+.. [14] acceleration_examples. ROS 2 package examples demonstrating the use of hardware acceleration.
     https://github.com/ros-acceleration/acceleration_examples
 
 
