@@ -14,7 +14,7 @@ Abstract
 This REP proposes a standard format for communicating the structure of ROS 2 interface types, as well as tooling to support the use of these descriptions.
 
 It provides a ROS 2 interface type that can contain descriptions of types, runtime data structures, and a universally reproducible serialization method.
-Alongside the description format, a standard hashing algorithm is also defined to create compact reperentations of type descriptions, to quickly transmit and detect type mismatch during discovery.
+Alongside the description format, a standard hashing algorithm is also defined to create compact representations of type descriptions, to quickly transmit and detect type mismatch during discovery.
 
 
 Motivation
@@ -29,7 +29,7 @@ This REP proposes to match the goal of those features with a set of standards to
 One part of this motivation is for correctness of existing applications.
 When a message type is updated, a different communicating node may begin to receive messages it does not actually understand.
 A second part of the motivation is to expand capabilities of the ROS 2 system to work with descriptions of types programmatically.
-This REP will not go into detail on those supported use cases, they are discussed in more detail in REP-2011\ [#rep2011]_.
+This REP will not go into detail on those supported use cases, they are discussed in more detail in REP-2011 [#rep2011]_.
 
 
 Terminology
@@ -37,9 +37,9 @@ Terminology
 
 Some terms used in this document, which will be described in much more detail in the specification:
 
-- **ROS 2 Interface** or **Interface Type** - a ROS 2 message, service, or action, as described in \ [#interfaces]_.
+- **ROS 2 Interface** or **Interface Type** - a ROS 2 message, service, or action, as described in [#interfaces]_.
 - **Type Source** - the original text provided by author to define an interface type, such as a ``.msg`` or ``.idl`` file.
-- **Type Description** - a data structure representating a parsed type source, which will be equal regardless of source format such as ``.msg`` or ``.idl`` if the described type is the same.
+- **Type Description** - a data structure representing a parsed type source, which will be equal regardless of source format such as ``.msg`` or ``.idl`` if the described type is the same.
 - **Type Hash** - a compact identifier for a type description that is expected to be unique
 - **RIHS (ROS Interface Hashing Standard)** - a versioned specification for producing a hash value for a type description
 
@@ -55,8 +55,8 @@ The Type Hash specification defines a Type Description serialization and hashing
 Type Description
 ----------------
 
-A Type Description must be produced such that it is stable across consistent meaning, even with trivial changes to source text.
-The interface description source provided by the user, which may be a ``.msg``, ``.idl`` or other file type, is parsed into the TypeDescription object as an intermediate representation.
+A Type Description must be produced such that it is stable across consistent meaning, even with trivial changes to Type Source.
+The interface description source provided by the user, which may be a ``.msg``, ``.idl`` or other file type, is parsed into the Type Description object as an intermediate representation.
 This way, types coming from two sources that have the same stated name and have the same information will be given the same description, even if they are defined using sources in differing specification languages.
 
 Thus the representation includes:
@@ -66,7 +66,7 @@ Thus the representation includes:
 - a list of all recursively referenced types
 - no comments
 
-Note that the reference implementation is provided in the package ``type_description_interfaces``\ [#tdi_pkg]_.
+Note that the reference implementation is provided in the package ``type_description_interfaces`` [#tdi_pkg]_.
 The structure is discussed here in concept, but the implementation is the source of exact truth for ROS releases.
 
 The ``TypeDescription`` message type looks like:
@@ -108,7 +108,7 @@ Describing Services and Actions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ROS 2 Services and Actions are considered "aggregate interfaces", in that they compose several "sub-interfaces" into a more complex type.
-A Service is defined using two Messages - a Request and a Reponse.
+A Service is defined using two Messages - a Request and a Response.
 An Action is defined using three Messages - a Goal, Feedback, and a Result.
 These definitions from the user are then expanded into the more derived utilized by communications.
 Because these full structures affect interoperability, the full description as used by ROS 2 should be represented to accurately describe the types, rather than just the inputs.
@@ -118,7 +118,7 @@ As of ROS 2 Iron, Services contain
 
 - a Request message as defined in input
 - a Response message as defined in input
-- an Event message, as defined in REP-2012 Service Introspection\ [#rep2012]_.
+- an Event message, as defined in REP-2012 Service Introspection [#rep2012]_.
 
 Therefore the implicit intermediary output looks like:
 
@@ -154,7 +154,7 @@ A message defined explicitly with those above field types and names would have a
 However, this case is fairly contrived and in practice an application will already know what interface category it is trying to interact with.
 
 Given this approach, the ``type_description_interfaces`` provides no special accommodation for Services and Actions, leaving the transform into a representable type to code generation.
-The reference implementation for this derivation is in ``rosidl_generator_type_description``\ [#td_gen]_.
+The reference implementation for this derivation is in ``rosidl_generator_type_description`` [#td_gen]_.
 
 Versioning the ``TypeDescription`` Message Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -218,7 +218,7 @@ The JSON serialization must pay attention to certain aspects that even a JSON Sc
 - Whitespace management, including newlines and spaces between commas, colons, etc
 - Sorting ``referenced_type_descriptions`` in a consistent manner (probably alphabetically by type name)
 
-However, to handle everything else, the reference implementation does provide a ``jsonschema`` file that other implementatations can use.
+However, to handle everything else, the reference implementation does provide a ``jsonschema`` file that other implementations can use.
 
 Hashing Method
 ^^^^^^^^^^^^^^
@@ -234,13 +234,10 @@ This versioning allows the tooling to know if a hash mismatch is due to a change
 In the case of a new RIHS version, meaning a change in computation method, it will be unknown whether the interface types are equal or not without full description comparison.
 
 For now, the list of field names and their types are the only contributing factors, but in the future that could change, depending on which "annotations" are supported in ``.idl`` files.
-The "IDL - Interface Definition and Language Mapping" design document\ [2]_ describes which features of the OMG IDL standard are supported by ROS 2.
+The "IDL - Interface Definition and Language Mapping" design document [#interface_definition]_ describes which features of the OMG IDL standard are supported by ROS 2.
 If that is extended in the future, then this data structure may need to be updated, and if so the "ROS IDL Hashing Standard" version will also need to be incremented.
 New sanitizing may be needed on the TypeDescription pre-hash procedure, in the case of these new features.
 
-.. TODO::
-
-    Re-audit the supported features from OMG IDL according to the referenced design document, including the @key annotation and how it may impact this for the reference implementation.
 
 Notes:
 
@@ -286,6 +283,7 @@ While ``USER_DATA`` accepts arbitrary binary data, ROS 2 implementations so far 
 Keys in this scheme are purely alphanumeric, so the recommended key is ``typehash``.
 
 .. code::
+
   typehash=RIHS01_XXXXXXXX;
 
 While this usage can be implementation-specific, consistency will allow for communication across DDS-RMW implementations.
@@ -325,12 +323,6 @@ The type of this service is defined in ``type_description_interfaces`` as ``GetT
 The service must be optional, but it will be a detail decided by each client library whether it is enabled or disabled by default.
 This REP recommends that the default client libraries ``rclcpp`` and ``rclpy`` enable the service by a boolean Parameter named ``start_type_description_service``.
 
-.. TODO::
-
-    How can we detect when a remote node is not offering this service?
-    It's difficult to differentiate between "the Service has not been created yet, but will be" and "the Service will never be created".
-    In the recommended approach, it is enabled via a parameter, but what if remote access to Parameters (another optional Service) is disabled?
-    Perhaps we need a "services offered" list which is part of the Node metadata, which is sent for each node in the rmw implementation, but that's out of scope for this REP.
 
 A service request to this ROS Service will comprise of the type name and the type hash, which is distributed during discovery of endpoints and will be accessible through the ROS Graph API, as described previously.
 The ROS Service server will respond with the type description and optionally the original raw sources used to define the type.
@@ -440,7 +432,7 @@ The ros2 command line tools, and the APIs that support them, should be updated t
 For example:
 
 - ``ros2 interface`` should be extended with a way to print the hash for an interface type
-- ``ros2 topic info --versbose`` should include the type version hash used by each endpoint
+- ``ros2 topic info --verbose`` should include the type version hash used by each endpoint
 - ``ros2 node`` should be extended with a way to print exact definitions for its used types, if its type description service is available
 - ``ros2 service ...`` commands should also be extended in this way
 - ``ros2 action ...`` commands should also be extended in this way
@@ -452,7 +444,7 @@ Rationale
 =========
 
 The above document lays out the specific recommendations of this REP, as reached after discussion and iteration.
-This section layse out further reasoning for why certain conclusions were reached, including alternatives that were considered.
+This section lays out further reasoning for why certain conclusions were reached, including alternatives that were considered.
 
 Type Hashing
 ------------
@@ -467,7 +459,7 @@ One alternative could have been the CDR serialization provided by DDS middleware
 - few implementations exist for diverse languages such as Python and Javascript, both of which environments are considered as users of the type hashing functionality
 - build-time calculation was desired _before_ generating the code for specific RMW implementations
 
-YAML was rejected as less available, given that JSON is built in to the Python standard libaries and is first-class in Javascript.
+YAML was rejected as less available, given that JSON is built in to the Python standard libraries and is first-class in Javascript.
 The C implementation actually uses ``libyaml``, leaning on the fact that YAML is a superset of JSON, and uses an output configuration that outputs plain JSON.
 
 RIHS Hashing Algorithm
@@ -495,7 +487,7 @@ The existing ``USER_DATA`` implementations are null-terminated, and type hashes 
 
 Base64.
 This would take 7 + 44 = 53 bytes, also saving space.
-However, type hashes are represented in memory as bytes, so the conversion does incurr a computation cost.
+However, type hashes are represented in memory as bytes, so the conversion does incur a computation cost.
 This representation is also less readable.
 
 While it didn't make much of a difference, the simpler and more human-readable implementation of a plain hex string was chosen.
@@ -710,6 +702,9 @@ References
 .. [#rep2011] REP 2011: Evolving Message Types (final link TBD)
    (https://github.com/ros-infrastructure/rep/pull/358)
 
+.. [#rep2012] REP 2012: Service introspection (final link TBD)
+   (https://github.com/ros-infrastructure/rep/pull/360)
+
 .. [#interfaces] ROS Interfaces
    (https://docs.ros.org/en/rolling/Concepts/Basic/About-Interfaces.html?highlight=interface)
 
@@ -718,6 +713,9 @@ References
 
 .. [#td_gen] ``rosidl_generator_type_description``
    (https://index.ros.org/p/rosidl_generator_type_description/#rolling)
+
+.. [#interface_definition] IDL Interface Definition
+   (http://design.ros2.org/articles/idl_interface_definition.html)
 
 Copyright
 =========
