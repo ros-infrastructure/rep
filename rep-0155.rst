@@ -98,6 +98,9 @@ These four identifiers are not mutually exclusive, and depending on the
 requirements of the application, the available sensing capabilities, and the
 position/behaviour of the humans, only some might be available for a given
 person, at a given time.
+The identifiers are attached to ROS messages through the special header
+`hri_msgs/IdHeader` which extend the traditional ROS `Header` with an `id`
+field.
 
 Person Identifier
 -----------------
@@ -245,8 +248,8 @@ Common Parameters
   published under ``/humans/faces/XYZ/cropped``, ``/humans/faces/XYZ/aligned``
   and ``/humans/faces/XYZ/frontalized``
 - ``/humans/faces/height`` (default: 128): height in pixels of the cropped
-  faces published under ``/humans/faces/XYZ/cropped``,
-  ``/humans/faces/XYZ/aligned`` and ``/humans/faces/XYZ/frontalized``
+  faces published under ``/humans/faces/cropped``,
+  ``/humans/faces/aligned`` and ``/humans/faces/frontalized``
 - ``/human_description_<bodyID>``: URDF models of detected humans.
   See Section `Kinematic Model of the Human`_ for details.
 - ``/humans/match_threshold`` (``float``, default: 0.5): the minimum level of
@@ -274,11 +277,9 @@ for all HRI-related topics:
   - ``/humans/persons``
   - ``/humans/interactions``
 
-3. the first four (``/faces``, ``/bodies``, ``/voices``, ``/persons``) expose
-   one sub-namespace per face, body, voice, person detected, named after the
-   corresponding ID (for instance, ``/humans/faces/bd34a/``).
-   In addition, they expose a topic ``/tracked`` (of type ``hri_msgs/IdsList``)
-   where the list of currently tracked faces/bodies/voices/persons is published;
+3. the first four (``/faces``, ``/bodies``, ``/voices``, ``/persons``) expose a
+   topic ``/tracked`` (of type ``hri_msgs/IdsList``) where the list of currently
+   tracked faces/bodies/voices/persons is published;
 4. matches between faces/bodies/voices/persons are published on the 
    ``/humans/candidate_matches`` topic, as explained in Section `Identifier
    matching`_;
@@ -288,26 +289,6 @@ for all HRI-related topics:
 
 .. note:: the ``hri_msgs`` messages are defined in the `hri_msgs
    <https://github.com/ros4hri/hri_msgs>`_ repository.
-
-.. note:: The slightly unconvential structure of topics (with one namespace per
-   face, body, person, etc.) enables modular pipelines.
-
-   For instance, a face detector might publish cropped images of detected faces
-   under ``/humans/faces/face_1/cropped``, ``/humans/faces/face_2/cropped``,
-   etc.
-
-   Then, depending on the application, an additional facial expression
-   recognizer might be needed as well.
-   For each detected face, that node would subscribe to the corresponding
-   `/cropped` topic and publish its results under
-   ``/humans/faces/face_1/expression``, ``/humans/faces/face_2/expression``,
-   etc., augmenting the available information about each face in a modular way.
-
-   Such modularity would not be easily possible if we had chosen to publish
-   instead a generic ``Face`` message, as a single node would have had first to
-   fuse all possible information about faces.
-
-   See the `Illustrative Example`_ below for a complete example.
 
 .. note:: `libhri <https://github.com/ros4hri/libhri>`_ can be used to hide away
    the complexity of tracking new persons/faces/bodies/voices. It automatically
@@ -320,47 +301,47 @@ Faces
 The list of currently detected faces (list of face IDs) is published
 under ``/humans/faces/tracked`` (as a ``hri_msgs/IdsList`` message).
 
-For each detected face, a namespace ``/humans/faces/<faceID>/`` is
-created (eg ``/humans/faces/bf3d/``).
+Messages published under any other ``/humans/faces/...`` subtopic MUST include
+a `hri_msgs/IdHeader` field with the corresponding face ID.
 
 The following subtopics MAY then be available, depending on available
 detectors:
 
-=================== ==================================== ======== ========================
-Name                Message type                         Required Description
-=================== ==================================== ======== ========================
-``/roi``            ``sensor_msgs/RegionOfInterest``        x     Region of the face in
-                                                                  the source image
-``/cropped``        ``sensor_msgs/Image``                   x     Cropped face image, if 
-                                                                  necessary scaled, 
-                                                                  centered and 0-padded 
-                                                                  to match the
-                                                                  ``/humans/faces/width``
-                                                                  and
-                                                                  ``/humans/faces/height``
-                                                                  ROS parameters
-``/aligned``         ``sensor_msgs/Image``                        Aligned (eg, the two 
-                                                                  eyes are horizontally 
-                                                                  aligned) version of the
-                                                                  cropped face, with same 
-                                                                  resolution as
-                                                                  ``/cropped``
-``/frontalized``     ``sensor_msgs/Image``                        Frontalized version of
-                                                                  the cropped face, with
-                                                                  same resolution as
-                                                                  ``/cropped``
-``/landmarks``      ``hri_msgs/FacialLandmarks``                  2D facial landmarks
-                                                                  extracted from the face
-``/facs``           ``hri_msgs/FacialActionUnits``                The presence and
-                                                                  intensity of facial
-                                                                  action units found in 
-                                                                  the face
-``/expression``     ``hri_msgs/Expression``                       The expression
-                                                                  recognised from the
-                                                                  face
-``/softbiometrics`` ``hri_msgs/SoftBiometrics``                   Detected age and gender
-                                                                  of the person
-=================== ==================================== ======== ========================
+=================== ========================================= ======== ========================
+Name                Message type                              Required Description
+=================== ========================================= ======== ========================
+``/roi``            ``hri_msgs/NormalizedRegionOfInterest2D``    x     Region of the face in
+                                                                       the source image
+``/cropped``        ``hri_msgs/ImageIdStamped``                  x     Cropped face image, if 
+                                                                       necessary scaled, 
+                                                                       centered and 0-padded 
+                                                                       to match the
+                                                                       ``/humans/faces/width``
+                                                                       and
+                                                                       ``/humans/faces/height``
+                                                                       ROS parameters
+``/aligned``        ``hri_msgs/ImageIdStamped``                        Aligned (eg, the two 
+                                                                       eyes are horizontally 
+                                                                       aligned) version of the
+                                                                       cropped face, with same 
+                                                                       resolution as
+                                                                       ``/cropped``
+``/frontalized``    ``hri_msgs/ImageIdStamped``                        Frontalized version of
+                                                                       the cropped face, with
+                                                                       same resolution as
+                                                                       ``/cropped``
+``/landmarks``      ``hri_msgs/FacialLandmarks``                       2D facial landmarks
+                                                                       extracted from the face
+``/facs``           ``hri_msgs/FacialActionUnits``                     The presence and
+                                                                       intensity of facial
+                                                                       action units found in 
+                                                                       the face
+``/expression``     ``hri_msgs/Expression``                            The expression
+                                                                       recognised from the
+                                                                       face
+``/softbiometrics`` ``hri_msgs/SoftBiometrics``                        Detected age and gender
+                                                                       of the person
+=================== ========================================= ======== ========================
 
 Bodies
 ------
@@ -368,28 +349,29 @@ Bodies
 The list of currently detected bodies (list of body IDs) is published
 under ``/humans/bodies/tracked`` (as a ``hri_msgs/IdsList`` message).
 
-For each detected body, a namespace ``/humans/bodies/<bodyID>/`` is
-created.
+Messages published under any other ``/humans/bodies/...`` subtopic MUST include
+a `hri_msgs/IdHeader` field with the corresponding body ID.
+
 The following subtopics MAY then be available, depending on available
 detectors:
 
-================= ==================================== ======== ========================
-Name              Message type                         Required Description
-================= ==================================== ======== ========================
-``/roi``          ``sensor_msgs/RegionOfInterest``        x     Region of the whole body
-                                                                body in the source image
-``/cropped``      ``sensor_msgs/Image``                   x     Cropped body image
-``/skeleton2d``   ``hri_msgs/Skeleton2D``                       The 2D points of the
-                                                                the detected skeleton
-``/joint_states`` ``sensor_msgs/JointState``                    The joint state of the 
-                                                                human body, following
-                                                                the `Kinematic Model 
-                                                                of the Human`_
-``/posture``      ``hri_msgs/BodyPosture``                      Recognised body posture
-                                                                (eg standing, sitting)
-``/gesture``      ``hri_msgs/Gesture``                          Recognised symbolic 
-                                                                gesture (eg waving)
-================= ==================================== ======== ========================
+================= ========================================= ======== ========================
+Name              Message type                              Required Description
+================= ========================================= ======== ========================
+``/roi``          ``hri_msgs/NormalizedRegionOfInterest2D``    x     Region of the whole body
+                                                                     body in the source image
+``/cropped``      ``hri_msgs/ImageIdStamped``                  x     Cropped body image
+``/skeleton2d``   ``hri_msgs/Skeleton2D``                            The 2D points of the
+                                                                     the detected skeleton
+``/joint_states`` ``hri_msgs/JointStateIdStamped``                   The joint state of the 
+                                                                     human body, following
+                                                                     the `Kinematic Model 
+                                                                     of the Human`_
+``/posture``      ``hri_msgs/BodyPosture``                           Recognised body posture
+                                                                     (eg standing, sitting)
+``/gesture``      ``hri_msgs/Gesture``                               Recognised symbolic 
+                                                                     gesture (eg waving)
+================= ========================================= ======== ========================
 
 3D body poses SHOULD be exposed via TF frames.
 This is discussed in
@@ -401,8 +383,8 @@ Voices
 The list of currently detected voices (list of voice IDs) is published
 under ``/humans/voices/tracked`` (as a ``hri_msgs/IdsList`` message).
 
-For each detected voice, a namespace ``/humans/voices/<voiceID>/`` is
-created.
+Messages published under any other ``/humans/voices/...`` subtopic MUST include
+a `hri_msgs/IdHeader` field with the corresponding voice ID.
 
 The following subtopics MAY then be available, depending on available
 detectors:
@@ -410,12 +392,12 @@ detectors:
 ================ ==================================== ======== ========================
 Name             Message type                         Required Description
 ================ ==================================== ======== ========================
-``/audio``       ``audio_common_msgs/AudioData``         x     Separated audio stream
+``/audio``       ``hri_msgs/AudioDataIdStamped``         x     Separated audio stream
                                                                for this voice
 ``/features``    ``hri_msgs/AudioFeatures``                    INTERSPEECH’09 Emotion
                                                                challenge [4]_
                                                                low-level audio features
-``/is_speaking`` ``std_msgs/Bool``                             Whether or not speech is 
+``/is_speaking`` ``hri_msgs/BoolIdStamped``                    Whether or not speech is 
                                                                recognised from this 
                                                                voice
 ``/speech``      ``hri_msgs/LiveSpeech``                       The live stream of speech
@@ -433,8 +415,9 @@ The list of known persons (either actively tracked, or known but not tracked
 anymore) is published under ``/humans/persons/known`` (as a ``hri_msgs/IdsList``
 message).
 
-For each detected person, a namespace ``/humans/persons/<personID>/`` is
-created.
+Messages published under any other ``/humans/persons/...`` subtopic MUST include
+a `hri_msgs/IdHeader` field with the corresponding person ID.
+
 
 The following subtopics MAY then be available, depending on available
 detectors, and whether or not the person has yet been matched to a face/body/voice:
@@ -442,31 +425,31 @@ detectors, and whether or not the person has yet been matched to a face/body/voi
 ======================== ==================================== ======== ========================
 Name                     Message type                         Required Description
 ======================== ==================================== ======== ========================
-``/anonymous``           ``std_msgs/Bool``                     x       If true, the person is
-                         (latched)                                     *anonymous*, ie has
+``/anonymous``           ``std_msgs/BoolIdStamped``            x       If true, the person is
+                                                                       *anonymous*, ie has
                                                                        not yet been identified,
                                                                        and has not been issued
                                                                        a permanent ID
-``/face_id``             ``std_msgs/String``                           Face matched to that
-                         (latched)                                     person (if any)
-``/body_id``             ``std_msgs/String``                           Body matched to that
-                         (latched)                                     person (if any)
-``/voice_id``            ``std_msgs/String``                           Voice matched to that
-                         (latched)                                     person (if any)
-``/alias``               ``std_msgs/String``                           If this person has been
-                         (latched)                                     merged with another, 
+``/face_id``             ``hri_msgs/StringIdStamped``                  Face matched to that
+                                                                       person (if any)
+``/body_id``             ``hri_msgs/StringIdStamped``                  Body matched to that
+                                                                       person (if any)
+``/voice_id``            ``hri_msgs/StringIdStamped``                  Voice matched to that
+                                                                       person (if any)
+``/alias``               ``hri_msgs/StringIdStamped``                  If this person has been
+                                                                       merged with another, 
                                                                        this topic contains the
                                                                        person ID of the new 
                                                                        person
 ``/engagement_status``   ``hri_msgs/EngagementLevel``                  Engagement status of the
                                                                        person with the robot
-``/location_confidence`` ``std_msgs/Float32``                          Location confidence; 1
+``/location_confidence`` ``hri_msgs/Float32IdStamped``                 Location confidence; 1
                                                                        means *person currently
                                                                        seen*, 0 means *person
                                                                        location unknown*. See
                                                                        `Person Frame`_
-``/name``                ``std_msgs/String``                           Name, if known
-``/native_language``     ``std_msgs/String``                           IETF language codes like
+``/name``                ``hri_msgs/StringIdStamped``                  Name, if known
+``/native_language``     ``hri_msgs/StringIdStamped``                  IETF language codes like
                                                                        EN_gb, if known
 ======================== ==================================== ======== ========================
 
@@ -489,86 +472,149 @@ Illustrative Example
 --------------------
 
 You run a node ``your_face_detector_node``.
-This node detects two faces, and
-publishes the corresponding regions of interest and cropped faces.
-The node
-effectively advertises and publishes onto the following topics:
+This node detects two faces ``rpu6k`` and ``bd4gf``, and publishes the
+corresponding regions of interest and cropped faces.
+The node effectively advertises and publishes onto the following topics:
 
 .. code::
 
-   > rostopic list
-   /humans/faces/23bd5/roi     # sensor_msgs/RegionOfInterest
-   /humans/faces/23bd5/cropped # sensor_msgs/Image
-   /humans/faces/b092e/roi     # sensor_msgs/RegionOfInterest
-   /humans/faces/b092e/cropped # sensor_msgs/Image
+   > rostopic echo /humans/faces/roi  # hri_msgs/NormalizedRegionOfInterest2D
+   header: 
+     header: 
+       seq: 1
+       stamp: 
+         secs: 1547854412
+         nsecs:    125447
+       frame_id: "camera"
+     id: "rpu6k"
+     xmin: 0.2
+   ymin: 0.12
+   xmax: 0.25
+   ymax: 0.11
+   c: 0.7
+   ---
+   header: 
+     header: 
+       seq: 2
+       stamp: 
+         secs: 1547854335
+         nsecs:   5658377
+       frame_id: "camera"
+     id: "bd4gf"
+   xmin: 0.81
+   ymin: 0.62
+   xmax: 0.88
+   ymax: 0.66
+   c: 0.69
+   ---
 
-.. note:: The IDs (in this example, ``23bd5`` and ``b092e``) are arbitrary, as
+   > rostopic echo /humans/faces/cropped   # hri_msgs/ImageIdStamped
+   header: 
+     header: 
+       seq: 1
+       stamp: 
+         secs: 1547854412
+         nsecs:    125447
+       frame_id: "camera"
+     id: "rpu6k"
+   image: 
+     height: 128
+     width: 128
+     ...
+     data: [...]
+   ---
+   header: 
+     header: 
+       seq: 2
+       stamp: 
+         secs: 1547854335
+         nsecs:   5658377
+       frame_id: "camera"
+     id: "bd4gf"
+   image: 
+     height: 128
+     width: 128
+     ...
+     data: [...]
+   ---
+
+.. note:: The IDs (in this example, ``rpu6k`` and ``bd4gf``) are arbitrary, as
    long as they are unique.
-   However, for practical reasons, it is recommended to keep them reasonably
+   For practical reasons, it is recommended to keep them reasonably
    short.
 
 You start an additional node to recognise expressions:
 ``your_expression_classifier_node``.
 The node subscribes to the
-``/humans/faces/<faceID>/cropped`` topics and publishes expressions for each
-faces under the same namespace:
+``/humans/faces/cropped`` topics and publishes expressions for each
+faces with the same face ID:
 
 .. code::
 
-   > rostopic list
-   /humans/faces/23bd5/roi
-   /humans/faces/23bd5/cropped
-   /humans/faces/23bd5/expression # hri_msgs/Expression
-   /humans/faces/b092e/roi
-   /humans/faces/b092e/cropped
-   /humans/faces/b092e/expression # hri_msgs/Expression
+   > rostopic echo /humans/faces/expression # hri_msgs/Expression
+   header: 
+     header: 
+       seq: 0
+       stamp: 
+         secs: 1547854412
+         nsecs: 8627489
+       frame_id: "camera"
+     id: "rpu6k"
+   expression: "happy"
+   valence: 0.0
+   arousal: 0.0
+   confidence: 0.92
+   ---
+   header: 
+     header: 
+       seq: 0
+       stamp: 
+         secs: 1547854335
+         nsecs:   6869312
+       frame_id: "camera"
+     id: "bd4gf"
+   expression: "confused"
+   valence: 0.0
+   arousal: 0.0
+   confidence: 0.92
+   ---
+   
 
 
 You then launch ``your_body_tracker_node``.
-It detects one body:
+It detects one body, ``n7r2k``, and published the corresponding region of
+interest and cropped image under ``/humans/bodies/roi`` and
+``/humans/bodies/cropped`` respectively.
+
+In addition, you start a 2D/3D pose estimator ``your_skeleton_estimator_node``
+which subscribes to ``/humans/bodies/cropped``.
+The 2D skeleton are then published under ``/humans/bodies/skeleton2d``, and the 3D
+skeleton is published as a joint state under ``/humans/bodies/joint_states``.
+The joint state can then be converted into TF frames using eg a URDF model of
+the human, alongside ``hri_state_publisher``:
 
 .. code::
 
-   > rostopic list
-   /humans/faces/23bd5/...
-   /humans/faces/b092e/...
-   /humans/bodies/67dd1/roi     # sensor_msgs/RegionOfInterest
-   /humans/bodies/67dd1/cropped # sensor_msgs/Image
-
-In addition, you start a 2D/3D pose estimator ``your_skeleton_estimator_node``.
-The 2D skeleton can be published under the same body namespace, and the 3D
-skeleton is published as a joint state.
-The joint state can then be converted
-into TF frames using eg a URDF model of the human, alongside a
-``robot_state_publisher``:
-
-.. code::
-
-   > rostopic list
-   /humans/faces/23bd5/...
-   /humans/faces/b092e/...
-   /humans/bodies/67dd1/roi
-   /humans/bodies/67dd1/cropped
-   /humans/bodies/67dd1/skeleton2d # hri_msgs/Skeleton2D
-   /humans/bodies/67dd1/joint_states # sensor_msgs/JointState
-
-
-   > xacro ws/human_description/urdf/human-tpl.xacro id:=67dd1 height:=1.7 > body-67dd1.urdf
-   > rosparam set human_description_67dd1 -t body-67dd1.urdf
-   > rosrun robot_state_publisher robot_state_publisher joint_states:=/humans/bodies/67dd1/joint_states robot_description:=human_description_67dd1
+   > xacro ws/human_description/urdf/human-tpl.xacro id:=n7r2k height:=1.7 > body-id-1.urdf
+   > rosparam set human_description_n7r2k -t body-id-1.urdf
+   > rosrun hri_state_publisher hri_state_publisher
 
 .. note:: In this example, we manually generate the URDF model of the human,
-   load it to the ROS parameter server, and start a ``robot_state_publisher``.
+   and load it to the ROS parameter server.
    In practice, this should be done programmatically everytime a new body is
    detected.
 
+.. note:: ``hri_state_publisher`` is a node very similar to
+   ``robot_state_publisher``: it runs forward kinematic to compute the cartesian
+   TF frames of the human bodies from their joint state and URDF kinematic
+   model.
 
 So far, faces and bodies are detected, but they are not yet 'unified' as a
 person.
 
-First, we need a stable way to associate a face to a person.
-This would typically require a node for facial recognition.  Such a node would
-subscribe to each of the detected faces' ``/cropped`` subtopics, and publish
+First, we need a stable way to associate a face to a person.  This would
+typically require a node for facial recognition.  Such a node would subscribe to
+the detected faces published under ``/humans/faces/cropped``, and publish
 *candidate matches* on the ``/humans/candidate_matches`` topic, using a
 ``hri_msgs/IdsMatch`` message.
 For instance:
@@ -576,32 +622,37 @@ For instance:
 .. code::
 
   > rostopic echo /humans/candidate_matches
-  face_id: "23bd5"
+  face_id: "bd4gf"
   body_id: ''
   voice_id: ''
-  person_id: "76c0c"
+  person_id: "c7b0c"
   confidence: 0.73
   ---
 
-In that example, the person ID ``76c0c`` is created and assigned by the face
+In that example, the person ID ``c7b0c`` is created and assigned by the face
 recognition node itself.
 
 Finally, you would need a ``your_person_manager_node`` to publish the
-``/humans/persons/76c0c/`` subtopics based on the candidate matches:
+``/humans/persons/`` subtopics based on the candidate matches:
 
 .. code::
 
-   > rostopic list
-   /humans/faces/23bd5/...
-   /humans/faces/b092e/...
-   /humans/bodies/67dd1/...
-   /humans/persons/76c0c/face_id
+   > rostopic echo /humans/persons/face_id
+   header: 
+     header: 
+       seq: 34
+       stamp: 
+         secs: 1547854413
+         nsecs:    215477
+       frame_id: ''
+     id: "c7b0c"
+   data: "bd4gf"
+   ---
 
-In this simple example, only the ``/face_id`` subtopic would be advertised (with a
-latched message pointing to the face ID ``23bd5``).
-In practice, additional
-information could be gathered by the ``your_person_manager_node`` to expose eg
-soft biometrics, engagement, etc.
+In this simple example, only the ``/face_id`` subtopic might be advertised.
+In practice, additional information could be gathered by the
+``your_person_manager_node`` to expose eg engagement
+(``/humans/persons/engagement_status``), names (``/humans/persons/name``), etc.
 Similarly, the association between the person
 and its body would have to be performed by a dedicated node.
 
