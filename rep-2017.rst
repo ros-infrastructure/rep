@@ -1,11 +1,11 @@
 REP: 2017
 Title: Thread attributes configuration support in rcl
-Author: Masaaki Ueno, Koichi Oyama, Shoji Morita <s-morita@esol.co.jp>
+Author: Masaaki Ueno <m-ueno@esol.co.jp>, Koichi Oyama <v-oyama7385@esol.co.jp>, Shoji Morita <s-morita@esol.co.jp>
 Status: Draft
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Jul-2023
-Post-History: 18-Aug-2023
+Post-History: 06-Oct-2023
 
 
 Abstract
@@ -17,36 +17,88 @@ This REP proposed a feature of the ros client library (rcl) to accept the thread
 Motivation
 ==========
 
-The configuration and setting of thread attributes for ROS 2 executor threads are essential for controlling computational resources and meeting real-time requirements, which are typically mandatory for robot systems.
+The configuration and setting of thread attributes for ROS 2 executors' threads are essential for controlling computational resources and meeting real-time requirements, which are typically mandatory for robot systems.
 
-These attributes are particularly critical for embedded robot systems that lack redundant resources, as they aid in optimizing CPU resource utilization.
-
-However, currently, there is a lack of infrastructure to configure and set thread attributes for the threads used by the ROS 2 executors.  As a result, specific code tailored to each target environment must be implemented.  The implementation not only requires significant effort but poses some obstacles to continuous integration applied to the systems with multiple execution environments.
+However, currently, there is a lack of infrastructure to configure and set thread attributes for the threads used by the ROS 2 executors.  As a result, we have to hard-code the thread attribute settings and implement thread control procedures in each application separately.  This approach may not only demand a certain effort to maintain multiple implementations for each runtime environment but also pose challenges in ensuring consistent functionality across various platforms.
 
 Having an infrastructure that configures thread attributes for ROS 2 executor through command line parameters, environment variables, and/or files eliminates the need for additional implementation in each environment and simplifies the deployment process across multiple environments without requiring code modifications.
 
-The purpose of this REP is to propose a feature to the ros client library that allows it to accept thread attributes, store them internally, and provide interfaces to pass them to upper language bindings (e.g., rclcpp, rclpy, or future ones).  By incorporating this feature and enabling language bindings to read the thread attributes, ROS 2 can effectively adopt them for real-time systems or environments that require strict CPU resource optimization, eliminating the need for code modifications in each specific environment.
+To have such an infrastructure, we have to make enhancements below.
+::
+
+                        +--------------------------------------+ *-------------*
+                        | Language bindings layer (e.g. rclcpp)| | [5] Thread  |
+                        | +--------------+ +---------------+   | | Control     |
+                        | | Applications | |  Executors    |   | | (e.g.       |
+                        | +---*------------------------*---+   | | enhanced    |
+                        |     | [4] I/F extension to   |       | | thread      |
+                        |     | use passed thread      |       | | control     |
+                        |     | attributes             |       | | class for   |
+                        |     *----------^-------------*       | | C++ )       |
+                        |                |                     | |             |
+                        +----------------+---------------------+ |             |
+                                         ^                       |             |
+                                         |                       |             |
+                              *----------+-------------*         |             |
+                              | [3] I/F to pass thread |         |             |
+                              | attributes to language |         |             |
+                              | bindings               |         |             |
+                              *----------+-------------*         |             |
+                                         |                       |             |
+                        +----------------+---------------------+ |             |
+                        |        rcl     |                     | |             |
+ *--------------------* |     *----------+-------------*       | |             |
+ | [1] I/F to pass    | |     | [2] System abstraction |       | |             |
+ | thread attributes  +-+---->+ for thread attributes  |       | |             |
+ | to ROS 2 process   | |     |                        |       | |             |
+ *--------------------* |     *------------------------*       | |             |
+                        +--------------------------------------+ *-------------*
+
+..
+    We may have to create another REP to describe the whole story of the thread attribution control feature for the ROS 2 platform.
+
+The items to be enhanced are those marked with asterisks.
+
+This REP covers [1] - [3] and proposes a feature for the rcl that allows it to receive thread attributes, store them internally, and provide interfaces to pass them to higher-level language bindings (e.g., rclcpp, rclpy, or future ones).
+
+Regarding the REP related to [4], it explains how applications and executors in the language binding layer utilize thread attributes as follows:
+
+[Applications]
+
+* Applications retrieve thread attributes from rcl and pass one of them to the executor's constructor.  The executor then configures the thread(s) accordingly.
+
+* Applications can provide hint(s) to the executor's constructor to guide it in selecting an appropriate thread attribute and configuring the thread(s) accordingly.
+
+[Executors]
+
+*  When no thread attribute(s) or hint(s) are provided, the executor searches for a reserved thread name indicating the desired attribute for the executor.  If it finds such a name, it configures the thread(s) to use the specified attribute.
+
+Regarding the REP related to [5], it introduces a thread-controlling feature used by executors described in C++.
+
+Both [4] and [5] are primarily based on rclcpp(C++).  However, these concepts can be applied to other language bindings.
 
 Specification
 =============
 
-This chapter provides the interface specifications depicted as [Parameter configuration] and [Language binding] below.
+This chapter provides the interface specifications depicted as [Parameter configuration] and [Language bindings] below.
 
 ::
 
-                              +-----------+ +------------+
-                              |   rclcpp  | |   rclpy    | ...
-                              +-----^-----+ +-----^------+
-                                    |             |
-                               ...[Language bindgings]...
-                                    |             |
-                              +-----+-------------+-----------+
-    ------Env. variable ------>                               |
-    [Parameter configuration] |             rcl               |
-    -- Cmd line parameters --->                               |
-                              |                               |
-                              +-------------------------------+
-
+                              +----------------------+ +----------+
+                              |         rclcpp       | |   rclpy  | ...
+                              |+-----------+ +------+| |          |
+                              || executors | | apps || |          |
+                              |+-----------+ +------+| |          |
+                              +-----^----------------+ +---^------+
+                                    |                      |
+                                   ...[Language bindgings]...
+                                    |                      |
+                              +-----+----------------------+------+
+    ------Env. variable ------>                                   |
+    [Parameter configuration] |              rcl                  |
+    -- Cmd line parameters --->                                   |
+                              |                                   |
+                              +-----------------------------------+
 
 Parameter configuration
 -----------------------
@@ -124,15 +176,15 @@ Using the provided keys, users should create an array of the thread attribute pa
 
     - priority: 20
       name: thread-1
-      core_affinity: 0
+      core_affinity: [0,1,2]
       scheduling_policy: RR
     - priority: 30
       name: thread-2
-      core_affinity: 1
+      core_affinity: [3]
       scheduling_policy: FIFO
     - priority: 40
       name: thread-3
-      core_affinity: 2
+      core_affinity: [4,5]
       scheduling_policy: OTHER
 
 Language bindings
@@ -168,10 +220,22 @@ The "rcutils_thread_attrs_t" above data structure holds the thread attributes wi
 
 .. code-block:: C++
 
+  typedef struct rcutils_thread_core_affinity_s
+  {
+    // Array for bit pattern of core affinity
+    uint8_t * set;
+    // Bit count in the set
+    size_t core_count;
+    // Allocator used to allocate the set
+    rcutils_allocator_t allocator;
+  } rcutils_thread_core_affinity_t;
+
+.. code-block:: C++
+
   typedef struct rcutils_thread_attr_s
   {
     /// Thread core affinity
-    int core_affinity;
+    rcutils_thread_core_affinity_t core_affinity;
     /// Thread scheduling policy.
     rcutils_thread_scheduling_policy_t scheduling_policy;
     /// Thread priority.
@@ -234,7 +298,6 @@ The following interfaces are provided to manipulate the data structure in the la
   Parameters:
     [out] thread_attrs    The list of thread attributes to be initialized.
     [in]  allocator       The memory allocator to be used.
-    [in]  capacity        The initial capacity of the list of thread attributes.
   Return value:
     RCUTILS_RET_OK
                 if the structure was initialized successfully, or
@@ -279,13 +342,13 @@ The following interfaces are provided to manipulate the data structure in the la
 
   rcutils_ret_t rcutils_thread_attrs_add_attr(rcutils_thread_attrs_t * thread_attrs,
                     rcutils_thread_scheduling_policy_t sched_policy,
-                    int core_affinity,
+                    rcutils_thread_core_affinity_t const * core_affinity,
                     int priority,
                     char const * name);
   Brief:
     Adds a thread attribute to the list of thread attributes.
   Parameters:
-    [inout] thread_attrs    The list of thread attributes to add a thread attribute to.
+    [in,out] thread_attrs    The list of thread attributes to add a thread attribute to.
     [in]    sched_policy    The thread scheduling policy of the adding attribute.
     [in]    core_affinity   The thread core affinity of the adding attribute.
     [in]    priority        The thread priority of the adding attribute.
@@ -310,7 +373,7 @@ According to the document about the parameter [#REF-3]_, it is associated with n
 Being implemented in the rcl, not in language bindings
 ------------------------------------------------------
 
-According to the document about the Client libraries [#REF-4]_, every language bindings have their own thread model.  But, the thread attributes are OS-specific, not language.  So, treating the thread attributes in the rcl commonly used by the language bindings is natural and effort-saving.
+According to the document about the Client libraries [#REF-4]_, every language binding has its own thread model.  But, the thread attributes are OS-specific, not language.  So, treating the thread attributes in the rcl commonly used by the language bindings is natural and effort-saving.
 
 Backward Compatibility
 ======================
@@ -320,7 +383,7 @@ To ensure backward compatibility of a newly suggested interface, the future cont
 *Preservation of Existing Keys and Types:*
 
 * It is essential not to delete any existing keys from the interface.
-* Similarly, the types of existing keys should not be changed. (e.g., remain 'priority' to accept integer)
+* Similarly, the types of existing keys should not be changed.  (e.g., remain 'priority' to accept integer)
 
 *Retention of Existing 'scheduling_policy' Options:*
 
