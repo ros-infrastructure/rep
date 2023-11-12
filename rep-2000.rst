@@ -1106,8 +1106,6 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_connextdds           | RTI Connext            | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
-| rmw_zenoh                | Eclipse Zenoh          | Tier 1        | All platforms              | All Architectures              |
-+--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS      | Tier 2        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
