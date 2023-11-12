@@ -1161,8 +1161,6 @@ Dependency Requirements:
 +----------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | Gurum DDS      |              4.2.0              |                                N/A                                |
 +----------------+----------------+----------------+----------+---------------+------------------+---------------------+
-| Zenoh          |                                        0.10.0-rc                                                    |
-+----------------+----------------+----------------+----------+---------------+------------------+---------------------+
 
 " * " means that this is not the upstream version (available on the official Operating System repositories) but a package distributed by OSRF or the community (package built and distributed on custom repositories).
 
