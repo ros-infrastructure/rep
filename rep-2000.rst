@@ -1072,7 +1072,7 @@ Build System Support:
 - setuptools
 
 Jazzy Jalisco (May 2024 - May 2029)
---------------------------------------
+-----------------------------------
 
 Targeted platforms:
 
