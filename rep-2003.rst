@@ -52,7 +52,6 @@ Why Not Specify Later Stage Sensor QoS Settings
 There exist numerous requirements and uses of pre-processed sensor data.
 It would be presumptuous of this REP to equally treat data transmissions in safety critical or best-effort pipelines.
 
-
 Backward Compatibility
 =======================
 
