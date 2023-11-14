@@ -26,6 +26,8 @@ Map clients are also expected to receive maps over a reliable transient-local to
 
 This specification does not prescribe any particular map representation but rather applies to all shared map representations, including but not limited to: occupancy grids, feature maps and dense representations.
 
+This specification does not enforce QoS settings for map-like data for collision avoidance or planning, such as cost grids, which may have their own unique operating context and needs. This specification applies only to maps and environmental models, both complete and with partial updates.
+
 Sensor Driver Quality of Service
 --------------------------------
 
