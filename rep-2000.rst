@@ -1118,7 +1118,7 @@ References and Footnotes
 .. [11] Humble ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/humble/ros2.repos)
 .. [12] Iron ROS 2 Repos File
-   (https://github.com/ros2/ros2/blob/rolling/ros2.repos)
+   (https://github.com/ros2/ros2/blob/iron/ros2.repos)
 
 Copyright
 =========
