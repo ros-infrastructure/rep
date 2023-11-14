@@ -1,6 +1,6 @@
 REP: 2000
 Title: ROS 2 Releases and Target Platforms
-Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>, Audrow Nash <audrow@openrobotics.org>, Geoffrey Biggs <geoff@openrobotics.org>, Marco A. Gutierrez <marcogg@intrinsic.ai>
+Author: Mikael Arguedas <mikael@openrobotics.org>, Steven! Ragnarok <steven@openrobotics.org>, Dirk Thomas <dthomas@openrobotics.org>, Audrow Nash <audrow@openrobotics.org>, Geoffrey Biggs <geoff@openrobotics.org>, Marco A. Gutierrez <marcogg@marcogg.com>
 Status: Active
 Type: Informational
 Content-Type: text/x-rst
@@ -1130,8 +1130,6 @@ Dependency Requirements:
 | CMake          |      3.27.7    |     3.22.0     |  3.20.2  |    3.14.4     |      3.25.1      | 3.22.3 / 3.16.5***  |
 +----------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | EmPY           |      3.3.4     |     3.3.2      |   3.3.4  |                     3.3.4                              |
-+----------------+----------------+----------------+----------+---------------+------------------+---------------------+
-| Gazebo-classic |    11.x.x*     |       N/A      |   N/A    |    11.x.x     |      11.x.x*     |         N/A         |
 +----------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | Gazebo         |    Harmonic*   |       N/A      |   N/A    |   Harmonic*   |     Harmonic*    |         N/A         |
 +----------------+----------------+----------------+----------+---------------+------------------+---------------------+
