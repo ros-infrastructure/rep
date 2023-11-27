@@ -44,7 +44,7 @@ Why Specify QoS Settings
 ------------------------
 
 Unlike ROS 1, ROS 2's QoS settings chosen by an application can affect the ability for data to be transmitted from a publisher to a subscriber.
-The may exist publisher and subscriber QoS combinations that will not transmit data from one node to another, even while composed in a single process.
+There may exist publisher and subscriber QoS combinations that will not transmit data from one node to another, even while composed in a single process.
 By specifying QoS settings for common interfaces, the aim is to ensure all sensor data and map sources can be interchangable with each other at run-time.
 This resolves subtle user issues of new sensor and map data sources not being communicated due to QoS incompatibilities leading some to believe a driver or package is not functioning.
 
