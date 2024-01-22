@@ -71,7 +71,7 @@ Regarding the REP related to [4], it explains how applications and executors in 
 
 [Executors]
 
-*  When no thread attribute(s) or hint(s) are provided, the executor searches for a reserved thread name indicating the desired attribute for the executor.  If it finds such a name, it configures the thread(s) to use the specified attribute.
+*  When no thread attribute(s) or hint(s) are provided, the executor searches for a reserved tag indicating the desired attribute for the executor.  If it finds such a tag, it configures the thread(s) to use the specified attribute.
 
 Regarding the REP related to [5], it introduces a thread-controlling feature used by executors described in C++.
 
@@ -109,7 +109,7 @@ The interface offers two methods to pass these parameters: through environment v
 
 The thread attribute parameters consist of these items for each thread, as below.
 
-* Thread name
+* Search tag for the thread attribute parameters
 * Core affinity
 * Scheduling policy
 * Priority
@@ -150,7 +150,7 @@ Users should describe the thread attribute parameters in the YAML format having 
 .. code-block:: YAML
 
   priority:          Integer value expressing the priority of the thread
-  name:              String value representing the name of the thread
+  tag:               String value used as a hint (or hints) to retrieve this set of parameters in application code or executors.
   core_affinity:     Integer value used to decide the core on which the thread should run
   scheduling_policy: String value specifying the desired scheduling policy for the thread
 
@@ -175,15 +175,15 @@ Using the provided keys, users should create an array of the thread attribute pa
 .. code-block:: YAML
 
     - priority: 20
-      name: thread-1
+      tag: attr-1
       core_affinity: [0,1,2]
       scheduling_policy: RR
     - priority: 30
-      name: thread-2
+      tag: attr-2
       core_affinity: [3]
       scheduling_policy: FIFO
     - priority: 40
-      name: thread-3
+      tag: attr-3
       core_affinity: [4,5]
       scheduling_policy: OTHER
 
@@ -240,8 +240,8 @@ The "rcutils_thread_attrs_t" above data structure holds the thread attributes wi
     rcutils_thread_scheduling_policy_t scheduling_policy;
     /// Thread priority.
     int priority;
-    /// Thread name
-    char const * name;
+    /// Thread attribute tag
+    char const * tag;
   } rcutils_thread_attr_t;
 
 .. code-block:: C++
@@ -344,7 +344,7 @@ The following interfaces are provided to manipulate the data structure in the la
                     rcutils_thread_scheduling_policy_t sched_policy,
                     rcutils_thread_core_affinity_t const * core_affinity,
                     int priority,
-                    char const * name);
+                    char const * tag);
   Brief:
     Adds a thread attribute to the list of thread attributes.
   Parameters:
@@ -352,7 +352,7 @@ The following interfaces are provided to manipulate the data structure in the la
     [in]    sched_policy    The thread scheduling policy of the adding attribute.
     [in]    core_affinity   The thread core affinity of the adding attribute.
     [in]    priority        The thread priority of the adding attribute.
-    [in]    name            The thread name of the adding attribute.
+    [in]    tag             The thread attribute tag of adding attribute
   Return value:
     RCUTILS_RET_OK  if the thread attribute was successfully added, or
     RCUTILS_RET_INVALID_ARGUMENT
