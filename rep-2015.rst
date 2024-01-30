@@ -93,7 +93,7 @@ Proposal
 We want to keep the current keystore structure as much as possible, as this will enable to keep all the current implementations regarding the enclave management and the CLI features that help setting up the keystore.
 No changes should be needed to systems that do not use the PKCS#11 scheme.
 
-The problem then is how to let the RMW implementation when we want to use a ``file`` URI and when a ``pkcs11`` URI; and how to provide the values of these URIs (i.e., the file path in the case of ``file`` and the token name in the case of ``pkcs11``).
+The problem then is how to let the RMW implementation know when we want to use a ``file`` URI and when a ``pkcs11`` URI; and how to provide the values of these URIs (i.e., the file path in the case of ``file`` and the token name in the case of ``pkcs11``).
 
 This can be solved if we allow for the key and certificate files in the enclave to have ``.pem`` or ``.p11`` extensions.
 Files with ``.p11`` will contain the PKCS#11 URI instead of the actual document data.
