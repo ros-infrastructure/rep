@@ -59,7 +59,7 @@ These messages definitions were used to help define this set.
  - mavros_msgs [#mavros]_
  - nav_msgs [#nav_msgs]_
  - trajectory_msgs [#trajectory_msgs]_
-
+ - as2_msgs [#as2_msgs]_
 
 
 Reference Abstractions
@@ -190,7 +190,7 @@ Rate Interface
 
 The message to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
 This is the standard way to command ROS vehicles.
-The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
+The datatype is not intended to be used in an open loop control system.
 
 * Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
 * Topic: ``command_velocity``
@@ -212,10 +212,10 @@ The datatype is not timestamped or externally referenced as it is not intended t
         float64 z
 
 The command is a body relative set of velocities in linear and angular space.
-This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
+This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by some ground robots.
 A pure ``Twist`` based inteface could be provided for backwards compatability as well.
 It was chosen to diverge here since this is a much more powerful inteface for the vehicles and does not require all commands to be reverse calculated for the instantaneous attitude of the vehicle.
-
+Furthermore, the timestamp field allows for improved timeout behavior due to stale command data.
 
 This is replacing ``mav_msgs/AttitudeThrust`` [#attitudethrust]_ and ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_.
 
@@ -223,8 +223,8 @@ Acceleration Interface
 ,,,,,,,,,,,,,,,,,,,,,,
 
 
-The message to send a velocity command is ``geometry_msgs/Twist`` [#twiststamped]_.
-The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
+The message to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
+The datatype is not intended to be used in an open loop control system.
 
 * Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
 * Topic: ``command_acceleration``
@@ -263,7 +263,7 @@ This is the standard message used throughout ROS systems already, many modules a
 However there are many use cases for aerial vehicles when the estimation of the acceleration is important.
 So an additional message will be defined which provides acceleration in addition to position and velocity already defined.
 This additional message will be published in parallel.
-For backwards compatibility all systems will publish both.
+For backwards compatibility all systems should publish both.
 
 * Datatype: ``nav_msgs/Odometry`` [#odometry]_
 * Topic: ``odom``
@@ -273,7 +273,7 @@ For backwards compatibility all systems will publish both.
   # This represents an estimate of a position and velocity in free space.
   # The pose in this message should be specified in the coordinate frame given by header.frame_id.
   # The twist in this message should be specified in the coordinate frame given by the child_frame_id
-  Header header
+  std_msgs/Header header
   string child_frame_id
   geometry_msgs/PoseWithCovariance pose
   geometry_msgs/TwistWithCovariance twist
@@ -286,7 +286,7 @@ For backwards compatibility all systems will publish both.
   # This represents an estimate of a position, velocity, and acceleration in free space.
   # The pose in this message should be specified in the coordinate frame given by header.frame_id.
   # The twist and acceleration in this message should be specified in the coordinate frame given by the child_frame_id
-  Header header
+  std_msgs/Header header
   string child_frame_id
   geometry_msgs/PoseWithCovariance pose
   geometry_msgs/TwistWithCovariance twist
@@ -312,22 +312,22 @@ A standard way to communicate goals will also be important following the mavlink
   uint8 FRAME_GLOBAL_TERRAIN_ALT = 11
 
   uint16 type_mask
-  uint16 IGNORE_LATITUDE = 1	# Position ignore flags
-  uint16 IGNORE_LONGITUDE = 2
-  uint16 IGNORE_ALTITUDE = 4
-  uint16 IGNORE_VX = 8	# Velocity vector ignore flags
-  uint16 IGNORE_VY = 16
-  uint16 IGNORE_VZ = 32
-  uint16 IGNORE_AFX = 64	# Acceleration/Force vector ignore flags
-  uint16 IGNORE_AFY = 128
-  uint16 IGNORE_AFZ = 256
-  uint16 FORCE = 512	# Force in af vector flag
-  uint16 IGNORE_YAW = 1024
-  uint16 IGNORE_YAW_RATE = 2048
+  uint16 TYPE_MASK_IGNORE_LATITUDE = 1	# Position ignore flags
+  uint16 TYPE_MASK_IGNORE_LONGITUDE = 2
+  uint16 TYPE_MASK_IGNORE_ALTITUDE = 4
+  uint16 TYPE_MASK_IGNORE_VX = 8	# Velocity vector ignore flags
+  uint16 TYPE_MASK_IGNORE_VY = 16
+  uint16 TYPE_MASK_IGNORE_VZ = 32
+  uint16 TYPE_MASK_IGNORE_AFX = 64	# Acceleration/Force vector ignore flags
+  uint16 TYPE_MASK_IGNORE_AFY = 128
+  uint16 TYPE_MASK_IGNORE_AFZ = 256
+  uint16 TYPE_MASK_FORCE = 512	# Force in af vector flag
+  uint16 TYPE_MASK_IGNORE_YAW = 1024
+  uint16 TYPE_MASK_IGNORE_YAW_RATE = 2048
 
   float64 latitude
   float64 longitude
-  float32 altitude	# in meters, AMSL or above terrain
+  float32 altitude	# in meters, AMSL or above terrain depending on coordinate_frame value
   geometry_msgs/Twist velocity
   geometry_msgs/Twist acceleration_or_force
   float32 yaw
@@ -888,6 +888,9 @@ References
 
 .. [#mavros] mavros
    (http://wiki.ros.org/mavros)
+
+.. [#as2_msgs] as2_msgs
+   (https://github.com/aerostack2/aerostack2/tree/main/as2_msgs)
 
 .. [#roscopter] roscopter
    (https://code.google.com/p/roscopter/)
