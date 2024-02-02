@@ -311,18 +311,18 @@ A standard way to communicate goals will also be important following the mavlink
   uint8 FRAME_GLOBAL_TERRAIN_ALT = 11
 
   uint16 type_mask
-  uint16 TYPE_MASK_IGNORE_LATITUDE = 1	# Position ignore flags
-  uint16 TYPE_MASK_IGNORE_LONGITUDE = 2
-  uint16 TYPE_MASK_IGNORE_ALTITUDE = 4
-  uint16 TYPE_MASK_IGNORE_VX = 8	# Velocity vector ignore flags
-  uint16 TYPE_MASK_IGNORE_VY = 16
-  uint16 TYPE_MASK_IGNORE_VZ = 32
-  uint16 TYPE_MASK_IGNORE_AFX = 64	# Acceleration/Force vector ignore flags
-  uint16 TYPE_MASK_IGNORE_AFY = 128
-  uint16 TYPE_MASK_IGNORE_AFZ = 256
-  uint16 TYPE_MASK_FORCE = 512	# Force in af vector flag
-  uint16 TYPE_MASK_IGNORE_YAW = 1024
-  uint16 TYPE_MASK_IGNORE_YAW_RATE = 2048
+  uint16 IGNORE_LATITUDE = 1	# Position ignore flags
+  uint16 IGNORE_LONGITUDE = 2
+  uint16 IGNORE_ALTITUDE = 4
+  uint16 IGNORE_VX = 8	# Velocity vector ignore flags
+  uint16 IGNORE_VY = 16
+  uint16 IGNORE_VZ = 32
+  uint16 IGNORE_AFX = 64	# Acceleration/Force vector ignore flags
+  uint16 IGNORE_AFY = 128
+  uint16 IGNORE_AFZ = 256
+  uint16 FORCE = 512	# Force in af vector flag
+  uint16 IGNORE_YAW = 1024
+  uint16 IGNORE_YAW_RATE = 2048
 
   float64 latitude
   float64 longitude
