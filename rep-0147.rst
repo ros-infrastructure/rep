@@ -59,8 +59,6 @@ These messages definitions were used to help define this set.
  - mavros_msgs [#mavros]_
  - nav_msgs [#nav_msgs]_
  - trajectory_msgs [#trajectory_msgs]_
- - as2_msgs [#as2_msgs]_
-
 
 Reference Abstractions
 ======================
@@ -889,9 +887,6 @@ References
 
 .. [#mavros] mavros
    (http://wiki.ros.org/mavros)
-
-.. [#as2_msgs] as2_msgs
-   (https://github.com/aerostack2/aerostack2/tree/main/as2_msgs)
 
 .. [#roscopter] roscopter
    (https://code.google.com/p/roscopter/)
