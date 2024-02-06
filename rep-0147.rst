@@ -47,7 +47,7 @@ There are also a lot of interfaces already well developed from other domains whi
 This REP seeks to also integrate as many of those reusable interfaces as well to provide the greatest compatibilty with those other domains.
 
 Other interface definitions
-==========================
+===========================
 
 There are a lot of messages already defined.
 These messages definitions were used to help define this set.
