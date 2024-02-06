@@ -46,8 +46,8 @@ This will allow much better collaboration between projects and allow a reduction
 There are also a lot of interfaces already well developed from other domains which can be brought into the aerial vehicle domain.
 This REP seeks to also integrate as many of those reusable interfaces as well to provide the greatest compatibilty with those other domains.
 
-Other interface defintions
-==========================
+Other interface definitions
+===========================
 
 There are a lot of messages already defined.
 These messages definitions were used to help define this set.
@@ -59,8 +59,6 @@ These messages definitions were used to help define this set.
  - mavros_msgs [#mavros]_
  - nav_msgs [#nav_msgs]_
  - trajectory_msgs [#trajectory_msgs]_
-
-
 
 Reference Abstractions
 ======================
@@ -74,6 +72,7 @@ Control Abstractions
 --------------------
 
 For controlling an aerial vehicle we will use the following terms for the interfaces.
+
 
 .. raw:: html
 
@@ -149,7 +148,7 @@ Trajectory Control Interface
 For sending trajectories in 3D space there already exists a message used for free space planning.
 This message used is ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_ and is actively used by planning frameworks already.
 
-This message is not the most straight forward to parse as it has a lot of optional fields which increases the complexity and requires consistent labelling and filling.
+This message is not the most straight forward to parse as it has a lot of optional fields which increases the complexity and requires consistent labeling and filling.
 The complexity of the message parsing is traded off against supporting a relatively compact representations.
 
 * Datatype: ``trajectory_msgs/MultiDOFJointTrajectory`` [#multidoftraj]_
@@ -190,7 +189,7 @@ Rate Interface
 
 The message to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
 This is the standard way to command ROS vehicles.
-The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
+The datatype is not intended to be used in an open loop control system.
 
 * Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
 * Topic: ``command_velocity``
@@ -212,10 +211,10 @@ The datatype is not timestamped or externally referenced as it is not intended t
         float64 z
 
 The command is a body relative set of velocities in linear and angular space.
-This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by ground robots.
-A pure ``Twist`` based inteface could be provided for backwards compatability as well.
+This diverges from the common ``geometry_msgs/Twist`` [#twist]_ used by some ground robots.
+A pure ``Twist`` based interface could be provided for backwards compatibility as well.
 It was chosen to diverge here since this is a much more powerful inteface for the vehicles and does not require all commands to be reverse calculated for the instantaneous attitude of the vehicle.
-
+Furthermore, the timestamp field allows for improved timeout behavior due to stale command data.
 
 This is replacing ``mav_msgs/AttitudeThrust`` [#attitudethrust]_ and ``mav_msgs/RollPitchYawrateThrust`` [#rpythrust]_.
 
@@ -223,8 +222,8 @@ Acceleration Interface
 ,,,,,,,,,,,,,,,,,,,,,,
 
 
-The message to send a velocity command is ``geometry_msgs/Twist`` [#twiststamped]_.
-The datatype is not timestamped or externally referenced as it is not intended to be used in an open loop control system.
+The message to send a velocity command is ``geometry_msgs/TwistStamped`` [#twiststamped]_.
+The datatype is not intended to be used in an open loop control system.
 
 * Datatype: ``geometry_msgs/TwistStamped`` [#twiststamped]_
 * Topic: ``command_acceleration``
@@ -263,7 +262,7 @@ This is the standard message used throughout ROS systems already, many modules a
 However there are many use cases for aerial vehicles when the estimation of the acceleration is important.
 So an additional message will be defined which provides acceleration in addition to position and velocity already defined.
 This additional message will be published in parallel.
-For backwards compatibility all systems will publish both.
+For backwards compatibility all systems should publish both.
 
 * Datatype: ``nav_msgs/Odometry`` [#odometry]_
 * Topic: ``odom``
@@ -273,7 +272,7 @@ For backwards compatibility all systems will publish both.
   # This represents an estimate of a position and velocity in free space.
   # The pose in this message should be specified in the coordinate frame given by header.frame_id.
   # The twist in this message should be specified in the coordinate frame given by the child_frame_id
-  Header header
+  std_msgs/Header header
   string child_frame_id
   geometry_msgs/PoseWithCovariance pose
   geometry_msgs/TwistWithCovariance twist
@@ -286,7 +285,7 @@ For backwards compatibility all systems will publish both.
   # This represents an estimate of a position, velocity, and acceleration in free space.
   # The pose in this message should be specified in the coordinate frame given by header.frame_id.
   # The twist and acceleration in this message should be specified in the coordinate frame given by the child_frame_id
-  Header header
+  std_msgs/Header header
   string child_frame_id
   geometry_msgs/PoseWithCovariance pose
   geometry_msgs/TwistWithCovariance twist
@@ -327,7 +326,7 @@ A standard way to communicate goals will also be important following the mavlink
 
   float64 latitude
   float64 longitude
-  float32 altitude	# in meters, AMSL or above terrain
+  float32 altitude	# in meters, AMSL or above terrain depending on coordinate_frame value
   geometry_msgs/Twist velocity
   geometry_msgs/Twist acceleration_or_force
   float32 yaw
@@ -364,7 +363,7 @@ Missions
 Currently there are quite a few varieties of missions data formats that are available.
 The most prominent is the mavlink mission protocol. [#mavlinkmission]_
 These missions are heavily used and often customized.
-A ROS equivalent could be defined but the current mission protocol is both relatively complicated and only provides relatively simple primative constructs with which to compose a mission.
+A ROS equivalent could be defined but the current mission protocol is both relatively complicated and only provides relatively simple primitive constructs with which to compose a mission.
 It is expected that mission planners can dynamically construct lower level controls for the vehicle that can then be executed upon by the vehicle controller.
 The simplest of these mission planners would generate a target waypoint for the vehicle to fly to and send a new one when there's a new position to fly to.
 A slightly more complex flight mission might send a series of waypoints which the vehicle will follow until the end.
@@ -416,7 +415,7 @@ Flight Modes
 
 Drones have quite a few flight modes. For example the PX4 Flight Modes number between 9 and 12 for different configurations. [#px4flight]_
 Many of these different modes are modifying which user inputs are used and/or how they are interpreted.
-For working with ROS it is expected that the user inputs will be modulated and recieved through the ROS system and that the system will be in control the whole time including implementing fallback and recovery behaviors.
+For working with ROS it is expected that the user inputs will be modulated and received through the ROS system and that the system will be in control the whole time including implementing fallback and recovery behaviors.
 Without the need for these extra modes we will reduce the state diagram significantly.
 The autopilot itself is expected to be in Offboard control mode for most configurations using ROS.
 In theory all of the states could be eliminated and the arming, takeoff, landing, and return to land logic could be fully implemented, but we will keep those states which are related to safety system already implemented.
@@ -646,7 +645,7 @@ Custom Waypoint Logic
 ---------------------
 
 This is mostly encoding specific messages related to autopilot implementation behaviors.
-It is recommended to be caputred by a generic waypoint communicated on a specific topic or service instead of as a dedicated message.
+It is recommended to be captured by a generic waypoint communicated on a specific topic or service instead of as a dedicated message.
 
 - ``SET_HOME_POSITION``
 - ``HOME_POSITION``
@@ -688,20 +687,20 @@ Related mavlink messages include:
 Time
 ----
 
-It is recommended to use the stadard ROS time abstraction.
+It is recommended to use the standard ROS time abstraction.
 
 - ``SYSTEM_TIME``
 
 Connectivity Checks
 -------------------
 
-There are many capabilities of DDS to check for livelyness and heartbeats built into the communication layer that can be leveraged.
+There are many capabilities of DDS to check for liveliness and heartbeats built into the communication layer that can be leveraged.
 Also the ``bond`` libraries from ROS1 have heartbeat logic.
 
 - ``PING``
 - ``HEARTBEAT``
 
-It is recommended that acknowlegement of message receipt be embedded into the communication layer using the reilable transport and callbacks if the message does not arrive.
+It is recommended that acknowledgment of message receipt be embedded into the communication layer using the reliable transport and callbacks if the message does not arrive.
 
 - ``COMMAND_ACK``
 
@@ -805,7 +804,7 @@ This is a specific message for displaying into a HUD, it’s aggregating and dup
 Component specific debug Messages
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-This is a debug/status message that’s specific to the current estimator desing. The parameters are not right for a particle filter based estimator or another style of implementation.
+This is a debug/status message that’s specific to the current estimator design. The parameters are not right for a particle filter based estimator or another style of implementation.
 
 - ``ESTIMATOR_STATUS``
 
@@ -817,8 +816,8 @@ These are messages that can share the state of controllers but is only valid for
 Mission Management
 ,,,,,,,,,,,,,,,,,,
 
-The current mission definitions are a basic set of primative behaviors.
-They are a significant subset of the capabilities of vehicles and those primatives should not be built into a next generation abstraction for drones.
+The current mission definitions are a basic set of primitive behaviors.
+They are a significant subset of the capabilities of vehicles and those primitives should not be built into a next generation abstraction for drones.
 However that’s not to say that the mission concept should be eliminated.
 Going forward the current mission structure is easy for operators to think about and that should be retained, but instead of considering the missions a standard interface for the drones.
 They should be parsed and simply generate the REP 147 compliant trajectory that the drone can follow.
