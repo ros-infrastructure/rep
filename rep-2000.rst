@@ -1015,7 +1015,7 @@ Dependency Requirements:
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | EmPY        |      3.3.4     |     3.3.2      |   3.3.4  |                     3.3.2                              |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
-| Gazebo      |    11.x.x*     |       N/A      |   N/A    |    11.x.x     |      11.x.x*     |         N/A         |
+| Gazebo †    |    11.x.x*     |       N/A      |   N/A    |    11.x.x     |      11.x.x*     |         N/A         |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
 | Ignition    |    Fortress*   |       N/A      |   N/A    |   Fortress*   |     Fortress*    |         N/A         |
 +-------------+----------------+----------------+----------+---------------+------------------+---------------------+
@@ -1051,6 +1051,8 @@ Dependency Requirements:
 " ** " means that the dependency may see multiple version changes, because the dependency uses a package manager that continually updates the dependency without a stable API.
 
 " \*** " webOS OSE provides this different version.
+
+" † " Gazebo Classic is end-of-life and will not be supported in Ubuntu Nobel. Users are encouraged to upgrade to a modern Gazebo.release.
 
 This document only captures the version at the first release of a ROS distribution and will not be updated as the dependencies move forward.
 These versions are thus a low watermark.
