@@ -1,4 +1,3 @@
-#!/usr/bin/env python2.5
 """Auto-generate REP 0 (REP index).
 
 Generating the REP index is a multi-step process.  To begin, you must first
