@@ -70,9 +70,9 @@ DTD = ('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"\n'
        '                      "http://www.w3.org/TR/REC-html40/loose.dtd">')
 
 fixpat = re.compile(
-    "((https?|ftp):[-_a-zA-Z0-9/.+~:?#$=&,]+)|(rep-\d+(.rst)?)|"
-    "(RFC[- ]?(?P<rfcnum>\d+))|"
-    "(REP\s+(?P<repnum>\d+))|"
+    r"((https?|ftp):[-_a-zA-Z0-9/.+~:?#$=&,]+)|(rep-\d+(.rst)?)|"
+    r"(RFC[- ]?(?P<rfcnum>\d+))|"
+    r"(REP\s+(?P<repnum>\d+))|"
     ".")
 
 EMPTYSTRING = ''
@@ -220,7 +220,7 @@ def fixfile(inpath, input_lines, outfile):
     for k, v in header:
         if k.lower() in ('author', 'discussions-to'):
             mailtos = []
-            for part in re.split(',\s*', v):
+            for part in re.split(r',\s*', v):
                 if '@' in part:
                     realname, addr = parseaddr(part)
                     if k.lower() == 'discussions-to':
@@ -236,7 +236,7 @@ def fixfile(inpath, input_lines, outfile):
             v = COMMASPACE.join(mailtos)
         elif k.lower() in ('replaces', 'replaced-by', 'requires'):
             otherreps = ''
-            for otherrep in re.split(',?\s+', v):
+            for otherrep in re.split(r',?\s+', v):
                 otherrep = int(otherrep)
                 otherreps += '<a href="rep-%04d.html">%i</a> ' % (otherrep,
                                                                   otherrep)

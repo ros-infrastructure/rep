@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import xmlschema
 
 format1 = xmlschema.XMLSchema('xsd/package_format1.xsd')

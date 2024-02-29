@@ -26,8 +26,8 @@ xsdvalid:
 	$(PYTHON) xsdValid.py
 
 clean:
-	-rm *.html
-	-rm rep-0000.rst
+	-rm -f *.html
+	-rm -f rep-0000.rst
 
 upload: all
 	rsync -r README.txt *.html mermaid.js css rep-0000.rst $(SUBDIRS) rosbot@ros.osuosl.org:/var/www/www.ros.org/reps
