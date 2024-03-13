@@ -1145,6 +1145,37 @@ contained schema file like this:
   </font>
 
 
+Design Decisions
+================
+
+This section documents important decisions taken in the design of the package
+manifest format and summarizes discussions on the corresponding pull requests
+and in the ROS 2 TSC:
+
+  * Extensions to ``license`` tag (accepted by ROS 2 TSC on 15 June 2023):
+      * New optional attribute ``type`` is introduced to specify whether the
+        license name used in the tag follows the SPDX standard or is freeform.
+        For the time being, to avoid huge number of errors from legacy packages,
+        the default value is ``freeform`` and not ``spdx``. However, awareness
+        for importance of using standardized license names shall be increased
+        in the community. Furthermore, a corresponding linter warning shall be
+        implemented.
+      * For the ``source-files`` attribute two alternatives were discussed:
+        (1) Single attribute following directly the specification of the
+        ``Files`` field in the `Machine-readable debian/copyright file specification V1.0
+        <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
+        The filename patterns syntax specified in this standard is in parts
+        rather unusual in the ROS context, in particular the use of space as
+        separator.
+        (2) Introduce own syntax for the specification of file sets using
+        additional (nested) XML tags.
+        To keep translation of the ``source-files`` attribute to the copyright
+        file as simple and transparent as possible, the first alternative is
+        chosen, with the restriction that multiple filename patterns separated
+        by spacse are not allowed in the attribute value. Instead, multiple
+        ``license`` tags have to be used in this rare case.
+
+
 References
 ==========
 
