@@ -1172,7 +1172,7 @@ and in the ROS 2 TSC:
         To keep translation of the ``source-files`` attribute to the copyright
         file as simple and transparent as possible, the first alternative is
         chosen, with the restriction that multiple filename patterns separated
-        by spacse are not allowed in the attribute value. Instead, multiple
+        by spaces are not allowed in the attribute value. Instead, multiple
         ``license`` tags have to be used in this rare case.
 
 
