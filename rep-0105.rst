@@ -18,9 +18,9 @@ coordinate frames of mobile platforms used with ROS.
 Motivation
 ==========
 
-Developers of drivers, models, and libraries need a share convention
+Developers of drivers, models, and libraries need a shared convention
 for coordinate frames in order to better integrate and re-use software
-components. Shared conventions for coordinate frames provides a
+components. Shared conventions for coordinate frames provide a
 specification for developers creating drivers and models for mobile
 bases. Similarly, developers creating libraries and applications can
 more easily use their software with a variety of mobile bases that are
@@ -85,7 +85,7 @@ acting.
 **Map Conventions**
 
 Map coordinate frames can either be referenced globally or to an application specific position.
-A example of an application specific positioning might be Mean Sea Level [#MSL]_ according to EGM1996 [#EGM96]_ such that the z position in the map frame is equivalent to meters above sea level.
+An example of an application specific positioning might be Mean Sea Level [#MSL]_ according to EGM1996 [#EGM96]_ such that the z position in the map frame is equivalent to meters above sea level.
 Whatever the choice is the most important part is that the choice of reference position is clearly documented for users to avoid confusion.
 
 When defining coordinate frames with respect to a global reference like the earth:
@@ -106,7 +106,7 @@ The conventions above are strongly recommended for unstructured environments.
 **Map Conventions in Structured Environments**
 
 In structured environments aligning the map with the environment may be more useful.
-An example structured environment such as an office building interior, which is commonly rectilinear and have limited global localization methods, aligning the map with building is recommended especially if the building layout is known apriori.
+An example of a structured environment is an office building interior, which is commonly rectilinear and has limited global localization methods, where aligning the map with the building is recommended especially if the building layout is known apriori.
 Similarly in an indoor environment it is recommended to align the map at floor level.
 In the case that you are operating on multiple floors it may make sense to have multiple coordinate frames, one for each floor.
 
@@ -170,7 +170,7 @@ The basic topology should stay the same, however it is fine to insert additional
 **Pressure Altitude**
 
 An example of a potential additional coordinate frame is one to represent pressure altitude for flying vehicles.
-Pressure altitude is an approximation of altitude based on a shared estimate of the atmospheric barometric pressure. [#pressure_altitude]_
+Pressure altitude is an approximation of altitude based on a shared estimate of the atmospheric barometric pressure [#pressure_altitude]_ .
 In flying applications pressure altitude can be measured precisely using just a barometric altimeter.
 It may drift in time like odometry but will only drift vertically.
 To be useful a ``pressure_altitude`` frame could be inserted between the inertially consistent ``odom`` frame and the ``map`` frame.
@@ -215,7 +215,7 @@ this information to broadcast the transform from ``map`` to ``odom``.
 
 The transform from ``earth`` to ``map`` is statically published and
 configured by the choice of map frame. If not specifically configured
-a fallback position is to use the initial position of the vehicle as
+a fallback option is to use the initial position of the vehicle as
 the origin of the map frame.
 If the map is not georeferenced so as to support a simple static transform the localization module can follow the same procedure as for publishing the estimated offset from the ``map`` to the ``odom`` frame to publish the transform from ``earth`` to ``map`` frame.
 
@@ -227,7 +227,7 @@ In an outdoor context map coordinate frame is a euclidian approximation of a vic
 In an indoor context this can be transitioning between two buildings where each has a prior map in which you are navigating or the robot is on a new floor of a building.
 
 It is the responsibility of the localization frame authority to reparent the ``odom`` frame appropriately when moving between maps.
-The common implementation of computing the ``map`` to ``odom`` frame as the results of subtracting the ``odom`` to ``base_link`` from the localization fix ``map`` to ``base_link`` will take care of this implicitly when the choice of which ``map`` frame changes.
+The common implementation of computing the ``map`` to ``odom`` frame as the results of subtracting the ``odom`` to ``base_link`` from the localization fix ``map`` to ``base_link`` will take care of this implicitly when the choice of the ``map`` frame changes.
 
 **odom Frame Consistency**
 
@@ -245,7 +245,7 @@ If the vehicle travels a long enough distance that the distance from the ``odom`
 This is especially true of 32-bit floating point data used in things like pointclouds.
 If distances on this order are encountered a systematic reset of the ``odom`` frame origin may be required.
 If centimeter level accuracy is required the maximum distance to the ``odom`` frame is approximately 83km. [#floating_point]_
-There is not a standard solution to this, systems with this issue will need to work around it.
+There is not a standard solution to this; systems with this issue will need to work around it.
 Potential solutions include additional coordinate frames in which to persist obstacle data or to store obstacle data, or using higher precision.
 
 Exceptions
@@ -280,3 +280,4 @@ Copyright
 =========
 
 This document has been placed in the public domain.
+
