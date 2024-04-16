@@ -868,7 +868,7 @@ Simulation
 
   - simulation:
       extends:  [ros_base]
-      packages: [ros_ign_bridge, ros_ign_gazebo, ros_ign_image, ros_ign_interfaces]
+      packages: [ros_gz_bridge, ros_gz_sim, ros_gz_image, ros_gz_interfaces]
 
 Desktop Full
 """"""""""""
@@ -877,7 +877,7 @@ Desktop Full
 
   - desktop_full:
       extends:  [desktop]
-      packages: [perception, simulation, ros_ign_gazebo_demos]
+      packages: [perception, simulation, ros_gz_sim_demos]
 
 
 ROS Distribution Independent (September 2022 - Ongoing)
