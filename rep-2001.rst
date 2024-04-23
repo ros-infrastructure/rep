@@ -904,7 +904,8 @@ Dev Tools
   - ros-dev-tools:
       extends:  [ros-build-essential]
       packages: [python3-bloom, python3-colcon-common-extensions,
-                 python3-rosdep, python3-vcstool, wget]
+                 python3-colcon-mixin, python3-rosdep,
+                 python3-vcstool, wget]
 
 
 
