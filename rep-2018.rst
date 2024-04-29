@@ -1,0 +1,159 @@
+REP: 2018
+Title: Action Introspection and rosbag2 Action Record/Replay Support
+Author: Tomoya Fujita <Tomoya.Fujita@sony.com>, Barry Xu <Barry.Xu@sony.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 29-Apr-2024
+Post-History: 03-May-2024
+
+Abstract
+========
+
+This REP proposes a feature to introspect ROS actions during runtime.
+The feature allows users to remotely monitor action communication and enables rosbag2 to record/replay the action messages.
+
+
+Terminology
+===========
+
+:ServiceRequest:
+  A ROS service request.
+:ServiceResponse:
+  A ROS service response.
+:ServiceServer:
+  A ROS service server.
+  Accepts requests from clients and sends responses.
+:ServiceClient:
+  A ROS service client.
+  Sends requests to servers and receives responses.
+
+:SendGoalRequest:
+  A ROS action goal request.
+:SendGoalResponse:
+  A ROS action goal response.
+:CancelGoalRequest:
+  A ROS action goal cancel request.
+:CancelGoalResponse:
+  A ROS action goal cancel response.
+:GetResultRequest:
+  A ROS action goal result request.
+:GetResultResponse:
+  A ROS action goal result response.
+:GoalStatus:
+  A ROS action topic for goal status.
+:GoalFeedback:
+  A ROS action topic for goal feedback.
+:ActionServer:
+  A ROS action server.
+  Accepts goal requests from action clients, then executes the action process.
+:ActionClient:
+  A ROS action client.
+  Sends goal requests to action server and receives goal result.
+
+
+Motivation
+==========
+
+There are 2 primary motivation for this proposal.
+
+- To make it easier for users to externally validate that actions are operating as expected.
+- To enhance ``rosbag2`` debug utility to record and play action messaegs and services. 
+
+Drawing an analogy to ROS topics and services, there exist tools and libraries for "echoing" and recording messages sent over a topic, and this REP proposes the same kind of capabilities for actions.
+
+Specifically, the capability to introspect action topic messages and service requests/responses that are sent to and from action servers and clients.
+Being able to remotely monitor actions allows users to more effectively troubleshoot issues in a ROS system.
+For example, users can monitor the action feedback and status, verify requests are being sent and received by an action client and server during runtime.
+In addition to introspection, user can record and replay action messages and service requests/responses to validate their content later on.
+
+This REP targets to complete core feature ``Action Intropesction`` and ``rosbag2`` command line interface to record and play the action mesages and services from the bag file.
+
+
+Specification
+=============
+
+Publishing Service Events from Action
+-------------------------------------
+
+- Code Generation for service event based on action file.
+- Timestamp
+- Goal ID, Client ID and Sequence Number for global identification
+
+Introspection Configuration
+---------------------------
+
+- Introspection configuration to ActionClient and ActionServer
+
+
+``ros2bag`` Command Line Interfaces
+-----------------------------------
+
+- `GenericActionClient`
+- `ros2 action echo <action_name>` with example.
+- `ros2 bag record <action_name>` and `ros2 bag play --send-action-requests <action_name>`
+- `ros2 bag info <bag_file_name>` how to display the bag information?
+
+
+Backwards Compatibility
+=======================
+
+The addition of ``Action Introspection`` and ``rosbag2 action support`` should not impact existing logic.
+As an opt-in feature, users should not incur additional overhead by default.
+
+
+References
+==========
+
+.. [1] ROS 2 interfaces
+   (https://docs.ros.org/en/rolling/Concepts/About-ROS-Interfaces.html)
+
+.. [2] Service Introspection
+   (https://github.com/ros2/ros2_documentation/blob/rolling/source/Tutorials/Demos/Service-Introspection.rst)
+
+.. [3] ROS 2 Action Design
+   (https://design.ros2.org/articles/actions.html)
+
+.. [4] ROS 2 rosbag2 service record and replay
+   (https://github.com/ros2/rosbag2/blob/rolling/docs/design/rosbag2_record_replay_service.md)
+
+.. [5] rmw
+   (https://github.com/ros2/rmw)
+
+.. [6] rcl
+   (https://github.com/ros2/rcl)
+
+.. [7] rcl_interfaces
+   (https://github.com/ros2/rcl_interfaces)
+
+.. [8] rclcpp
+   (https://github.com/ros2/rclcpp)
+
+.. [9] rclpy
+   (https://github.com/ros2/rclpy)
+
+.. [10] rosbag2
+   (https://github.com/ros2/rosbag2)
+
+
+Discussions
+-----------
+
+* Action Introspection and Record/Play Support
+  (https://github.com/ros2/ros2/issues/1543)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
