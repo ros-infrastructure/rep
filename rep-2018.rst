@@ -93,7 +93,7 @@ There are ``status`` and ``feedback`` topics that are hidden, usually user canno
 
   .. code-block::
 
-    # ros2 topic list --include-hidden-topics
+    $ ros2 topic list --include-hidden-topics
     /fibonacci/_action/feedback
     /fibonacci/_action/status
 
@@ -107,7 +107,7 @@ There are ``send_goal``, ``cancel_goal`` and ``get_result`` hidden services, use
 
   .. code-block::
 
-    # ros2 service list --include-hidden-services
+    $ ros2 service list --include-hidden-services
     /fibonacci/_action/cancel_goal
     /fibonacci/_action/get_result
     /fibonacci/_action/send_goal
@@ -151,10 +151,10 @@ We can confirm that ``Goal ID`` is already implemented in ``status`` and ``feedb
 
   .. code-block::
 
-    # ros2 topic echo /fibonacci/_action/status --flow-style
+    $ ros2 topic echo /fibonacci/_action/status --flow-style
     status_list: [{goal_info: {goal_id: {uuid: [167, 14, 74, 213, 14, 241, 184, 187, 149, 34, 75, 132, 131, 137, 240, 15]}, stamp: {sec: 1714523443, nanosec: 875421940}}, status: 4}, {goal_info: {goal_id: {uuid: [59, 26, 199, 67, 217, 28, 132, 19, 148, 141, 105, 10, 13, 6, 56, 38]}, stamp: {sec: 1714523453, nanosec: 719698899}}, status: 2}]
 
-    # ros2 topic echo /fibonacci/_action/feedback --flow-style
+    $ ros2 topic echo /fibonacci/_action/feedback --flow-style
     goal_id:
       uuid: [31, 144, 125, 69, 26, 78, 96, 190, 125, 26, 24, 44, 222, 174, 204, 97]
     feedback:
@@ -164,7 +164,7 @@ For service events from action, it expects the following information as an examp
 
   .. code-block::
 
-    # ros2 service echo /fibonacci/_action/send_goal
+    $ ros2 service echo /fibonacci/_action/send_goal
     info:
       event_type: REQUEST_RECEIVED
       stamp:
@@ -244,17 +244,215 @@ For service events from action, it expects the following information as an examp
 Command Line Interfaces
 -----------------------
 
-ros2 action echo
-^^^^^^^^^^^^^^^^
+``ros2 action echo``
+^^^^^^^^^^^^^^^^^^^^
 
-ros2 bag record <action>
-^^^^^^^^^^^^^^^^^^^^^^^^
+The existing ``ros2 action`` command line tool will be extended with an ``echo`` sub-command to print the action communication.
+This internally subscribes 2 hidden topic (``feedback`` and ``status``) and 3 service event topics (``send_goal``, ``cancel_goal`` and ``get_result`` services) in default to print them.
 
-Generic Action Client
-^^^^^^^^^^^^^^^^^^^^^
+An example ``ros2 action echo`` call may look like the following:
 
-ros2 bag play <action>
-^^^^^^^^^^^^^^^^^^^^^^
+.. code-block::
+
+  $ ros2 action echo /fibonnaci
+  -----------------------
+  interface: FEEDBACK_TOPIC
+  stamp:
+    sec: 1234
+    nanosec: 000000000
+  goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  feedback:
+    sequence: 0.1.2.3.4.5
+  -----------------------
+  interface: STATUS_TOPIC
+  stamp:
+    sec: 1234
+    nanosec: 111111111
+  goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  status: 2
+  -----------------------
+  interface: GOAL_SERVICE
+  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+  stamp:
+    sec: 1234
+    nanosec: 222222222
+  client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
+  sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+    goal:
+      order: 10
+  response: []
+  -----------------------
+  interface: GOAL_SERVICE
+  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+  stamp:
+    sec: 1234
+    nanosec: 333333333
+  client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
+  sequence_number: 1
+  request: []
+  response:
+    accepted: true
+  -----------------------
+  interface: RESULT_SERVICE
+  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+  stamp:
+    sec: 1234
+    nanosec: 444444444
+  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+  sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  response: []
+  -----------------------
+  interface: RESULT_SERVICE
+  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+  stamp:
+    sec: 1234
+    nanosec: 555555555
+  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+  sequence_number: 1
+  request: []
+  response:
+    status: 4
+    result:
+      sequence: 0 1 1 2 3 5 8 13 21 34 55
+  -----------------------
+  interface: CANCEL_SERVICE
+  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+  stamp:
+    sec: 1234
+    nanosec: 666666666
+  client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
+  sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  response: []
+  -----------------------
+  interface: CANCEL_SERVICE
+  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+  stamp:
+    sec: 1234
+    nanosec: 777777777
+  client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
+  sequence_number: 1
+  request: []
+  response:
+    return_code: 0 (CANCELING)
+    goals_canceling: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  -----------------------
+
+There should be optinal arguments to monotor the specific interface types.
+This option can be useful to exclude interfaces in the action, so that user can monitor what only needs to be checked.
+
+  $ ros2 action echo /fibonnaci --interfaces "FEEDBACK_TOPIC,RESULT_SERVICE"
+  -----------------------
+  interface: FEEDBACK_TOPIC
+  stamp:
+    sec: 1234
+    nanosec: 000000000
+  goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  feedback:
+    sequence: 0.1.2.3.4.5
+  -----------------------
+  interface: RESULT_SERVICE
+  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+  stamp:
+    sec: 1234
+    nanosec: 444444444
+  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+  sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  response: []
+  -----------------------
+  interface: RESULT_SERVICE
+  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+  stamp:
+    sec: 1234
+    nanosec: 555555555
+  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+  sequence_number: 1
+  request: []
+  response:
+    status: 4
+    result:
+      sequence: 0 1 1 2 3 5 8 13 21 34 55
+  -----------------------
+
+
+``ros2 bag record <action>``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The existing tool `rosbag2 <https://github.com/ros2/rosbag2>`_ can be also extended with ``Action Introspection`` to record the action communication data into bag files.
+
+  .. code-block::
+
+    $ ros2 bag record --actions <action_names>
+
+This can record the action communcation in the bag file aligned with topics and services.
+
+Recorded action data can be printed like following.
+
+  .. code-block::
+
+    $ ros2 bag ros2 bag info <bag_folder_name> -v
+
+    Files:             <bag_name>.mcap
+    Bag size:          39.9 KiB
+    Storage id:        mcap
+    ROS Distro:        rolling
+    Duration:          4.835s
+    Start:             Mar 18 2024 16:42:14.323 (1710805334.323)
+    End:               Mar 18 2024 16:42:19.159 (1710805339.159)
+    Messages:          39
+    Topic information: Topic: /events/write_split | Type: rosbag2_interfaces/msg/WriteSplitEvent | Count: 0 | Serialization Format: cdr
+                      Topic: /parameter_events | Type: rcl_interfaces/msg/ParameterEvent | Count: 0 | Serialization Format: cdr
+                      Topic: /rosout | Type: rcl_interfaces/msg/Log | Count: 39 | Serialization Format: cdr
+    Service:           1
+    Service information: Service: /add_two_ints | Type: example_interfaces/srv/AddTwoInts | Request Count: 20 | Response Count: 22 | Serialization Format: cdr
+    Action:            2
+    Action information:
+      Action: /fibonacci | Type: action_tutorials_interfaces/action/Fibonacci | Topics: 2 | Services: 3 | Serialization Format: cdr
+        Topic: feedback | Count: 1
+        Topic: status | Count: 10
+        Service: send_goal | Request Count: 10 | Response Count: 10
+        Service: cancel_goal | Request Count: 1 | Response Count: 1
+        Service: get_result | Request Count: 5 | Response Count: 4
+      Action: /other | Type: other_action_interfaces/action/Other | Topics: 2 | Services: 3 | Serialization Format: cdr
+        Topic: feedback | Count: 2
+        Topic: status | Count: 20
+        Service: send_goal | Request Count: 20 | Response Count: 20
+        Service: cancel_goal | Request Count: 2 | Response Count: 2
+        Service: get_result | Request Count: 5 | Response Count: 4
+
+``ros2 bag play <action>``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+`rosbag2 <https://github.com/ros2/rosbag2>`_ can also provide the capability to replay action data from the bag file, which is similar with `rosbag2 replay service <https://github.com/ros2/rosbag2/blob/rolling/docs/design/rosbag2_record_replay_service.md>`_.
+This is useful to simulate the action client behavior from the stored bag file, that can allow users to debug and monitor the action servers.
+
+For being able to play the data as action client, it needs to introduce the new class like ``GenericActionClient`` similar with `GenericClient <https://github.com/ros2/rclcpp/blob/rolling/rclcpp/include/rclcpp/generic_client.hpp>`_.
+``rosbag2`` internally creates generic action client to deduce the action type from the bag file, and then sends the action requests to the action servers.
+
+
+Feature Progress
+================
+
+Most elements of this proposal have been verified with PoC codes.
+
+Progress on the implementation is being tracked on GitHub at `ros2/ros2#1543 <https://github.com/ros2/ros2/issues/1543>`_.
+
+
+Possible Future Enhancement
+===========================
+
+``Action Introspection`` brings user to be able to see action communication using command line tools or recorded data.
+This will be useful for user especially debugging and collecting data at runtime environment without inserting debuging code.
+
+On the other hand, it would be complicated to monitor ``Service Introspection`` and ``Action Introspection`` information with using ``ros2 action echo``, ``ros2 service echo`` and ``ros2 bag info`` command line interfaces. 
+It would be really helpful to have GUI base tool to see those data at runtime or from bag file, so that users can determine communication among services and actions with a breif look.
 
 
 Backwards Compatibility
@@ -296,6 +494,9 @@ References
 
 .. [10] rosbag2
    (https://github.com/ros2/rosbag2)
+
+.. [11] ros2cli
+   (https://github.com/ros2/ros2cli)
 
 
 Discussions
