@@ -112,7 +112,7 @@ There are ``send_goal``, ``cancel_goal`` and ``get_result`` hidden services, use
     /fibonacci/_action/get_result
     /fibonacci/_action/send_goal
 
-It can enable `Service Introspection <https://github.com/ros-infrastructure/rep/pull/360>` _ for those hidden services, so that those services publish service event messages to the hidden topic ``/ACTION_NAME//SERVICE_NAME/_service_event``, where ``ACTION_NAMR`` and ``SERVICE_NAME`` are the fully-qualified name of the service.
+It can enable `Service Introspection <https://github.com/ros-infrastructure/rep/pull/360>` _ for those hidden services, so that those services publish service event messages to the hidden topic ``/ACTION_NAME//SERVICE_NAME/_service_event``, where ``ACTION_NAME`` and ``SERVICE_NAME`` are the fully-qualified name of the service.
 
 Service Event Code Generation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -343,7 +343,7 @@ An example ``ros2 action echo`` call may look like the following:
     goals_canceling: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
   -----------------------
 
-There should be optinal arguments to monotor the specific interface types.
+There should be optional arguments to monitor the specific interface types.
 This option can be useful to exclude interfaces in the action, so that user can monitor what only needs to be checked.
 
   $ ros2 action echo /fibonnaci --interfaces "FEEDBACK_TOPIC,RESULT_SERVICE"
@@ -391,7 +391,7 @@ The existing tool `rosbag2 <https://github.com/ros2/rosbag2>`_ can be also exten
 
     $ ros2 bag record --actions <action_names>
 
-This can record the action communcation in the bag file aligned with topics and services.
+This can record the action communication in the bag file aligned with topics and services.
 
 Recorded action data can be printed like following.
 
@@ -452,7 +452,7 @@ Possible Future Enhancement
 This will be useful for user especially debugging and collecting data at runtime environment without inserting debuging code.
 
 On the other hand, it would be complicated to monitor ``Service Introspection`` and ``Action Introspection`` information with using ``ros2 action echo``, ``ros2 service echo`` and ``ros2 bag info`` command line interfaces. 
-It would be really helpful to have GUI base tool to see those data at runtime or from bag file, so that users can determine communication among services and actions with a breif look.
+It would be really helpful to have GUI base tool to see those data at runtime or from bag file, so that users can determine communication among services and actions with a brief look.
 
 
 Backwards Compatibility
