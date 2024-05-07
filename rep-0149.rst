@@ -5,7 +5,7 @@ Status: Final
 Type: Standards Track
 Content-Type: text/x-rst
 Created: 11-Oct-2017
-Post-History: 02-Jan-2018, 31-Aug-2020
+Post-History: 02-Jan-2018, 31-Aug-2020, 14-Apr-2022
 
 Outline
 =======
@@ -346,8 +346,8 @@ Example
     </description>
     <maintainer email="someone@example.com">Someone</maintainer>
 
-    <license>BSD</license>
-    <license file="LICENSE">LGPL</license>
+    <license file="LICENSE" type="spdx">BSD-3-Clause</license>
+    <license source-files="include/my_package/linear_math/*">Zlib</license>
 
     <url type="website">http://wiki.ros.org/my_package</url>
     <url type="repository">http://www.github.com/my_org/my_package</url>
@@ -465,28 +465,17 @@ Example
 <license> (multiple, but at least one)
 --------------------------------------
 
-Name of license for this package, e.g. BSD, GPL, LGPL.  In order to
-assist machine readability, only include the license name in this tag.
-For multiple licenses multiple separate tags must be used.  A package
-will have multiple licenses if different source files have different
-licenses.  Every license occurring in the source files should have
-a corresponding ``<license>`` tag.  For any explanatory text about
-licensing caveats, please use the ``<description>`` tag.
+Name of license for this package or selected files of this package, e.g.,
+``BSD-3-Clause``, ``GPL-3.0-or-later``, ``Apache-2.0``. In order to assist
+machine readability, it is strongly recommended to use `SPDX license
+identifiers <https://spdx.org/licenses/>`_ in this tag and to document
+the use of SPDX by the ``type`` attribute.
 
-Most common open-source licenses are described on the
-`OSI website <http://www.opensource.org/licenses/alphabetical>`_.
-
-Commonly used license strings:
-
- - Apache-2.0
- - BSD
- - Boost Software License
- - GPLv2
- - GPLv3
- - LGPLv2.1
- - LGPLv3
- - MIT
- - Mozilla Public License Version 1.1
+In the rare case that a package (or selected source files of the package)
+are licensed under multiple alternative licenses, the identifiers can be
+combined by ``or`` as described in Section 7.2 of the `Machine-readable
+debian/copyright file specification V1.0
+<https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
 
 Attributes
 ''''''''''
@@ -505,9 +494,59 @@ Attributes
   
     "You must give any other recipients of the Work or Derivative Works a copy of this License"
 
+ ``source-files="FILENAME-PATTERN"`` *(optional)*
+
+  A filename pattern using the simplified shell glob syntax specified in
+  Section 6.9 of the `Machine-readable debian/copyright file specification V1.0
+  <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_ and
+  relative to the ``package.xml`` file.
+
+  The filename pattern specifies the source files this license information
+  refers to. The value ``source-files="*"`` refers to all source files of the
+  package, including source files that are downloaded automatically during the
+  build process - for example in the case of so-called *vendor packages*. If
+  the attribute is not specified, the tag again refers to all source files of
+  the package, including downloaded source files.
+
+  While the Machine-readable debian/copyright file specification V1.0 allows
+  multiple filename patterns separated by spaces, only one pattern is allowed
+  here. Use multiple license tags if necessary (but first consider
+  restructuring the folder structure of the source files).
+
+  If the filename patterns of multiple license tags match a particular file,
+  the last tag applies to it - following the logic described in Section 6.9
+  of the `Machine-readable debian/copyright file specification V1.0
+  <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
+  Consequently, more general tags should be given first.
+
+  Finally note that space characters in the source file paths/names - which
+  should be a very rare case - have to be replaced by a ``?`` in the filename
+  pattern as described at the end of Section 6.9 of the `Machine-readable
+  debian/copyright file specification V1.0
+  <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
+
+ ``type="LICENSE-IDENTIFIER-TYPE"`` *(optional)*
+
+  The type of license identifier being used in the tag. The type should be one
+  of the following identifiers: ``freeform`` (default) or ``spdx``.
+
   .. raw:: html
 
     </font>
+
+Notes
+'''''
+
+The license information given in the license tags has to be consistent
+with the information given in the license headers of the source files.
+This may be checked by suitable linting tools.
+
+Furthermore, by the license tags in the ``package.xml`` file and the
+copyright information obtained from the license headers of the source files
+(e.g., using ``licensecheck --copyright``)
+a copyright file according to the `Machine-readable debian/copyright file
+specification V1.0 <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_
+for binary versions of this package can be created automatically.
 
 <url> (multiple)
 ----------------
@@ -1104,6 +1143,37 @@ contained schema file like this:
 .. raw:: html
 
   </font>
+
+
+Design Decisions
+================
+
+This section documents important decisions taken in the design of the package
+manifest format and summarizes discussions on the corresponding pull requests
+and in the ROS 2 TSC:
+
+  * Extensions to ``license`` tag (accepted by ROS 2 TSC on 15 June 2023):
+      * New optional attribute ``type`` is introduced to specify whether the
+        license name used in the tag follows the SPDX standard or is freeform.
+        For the time being, to avoid huge number of errors from legacy packages,
+        the default value is ``freeform`` and not ``spdx``. However, awareness
+        for importance of using standardized license names shall be increased
+        in the community. Furthermore, a corresponding linter warning shall be
+        implemented.
+      * For the ``source-files`` attribute two alternatives were discussed:
+        (1) Single attribute following directly the specification of the
+        ``Files`` field in the `Machine-readable debian/copyright file specification V1.0
+        <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>`_.
+        The filename patterns syntax specified in this standard is in parts
+        rather unusual in the ROS context, in particular the use of space as
+        separator.
+        (2) Introduce own syntax for the specification of file sets using
+        additional (nested) XML tags.
+        To keep translation of the ``source-files`` attribute to the copyright
+        file as simple and transparent as possible, the first alternative is
+        chosen, with the restriction that multiple filename patterns separated
+        by spaces are not allowed in the attribute value. Instead, multiple
+        ``license`` tags have to be used in this rare case.
 
 
 References
