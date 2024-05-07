@@ -1001,7 +1001,7 @@ For example a Tier 1 middleware implementation on a Tier 2 platform can only rec
 Minimum language requirements:
 
 - C++17
-- Python 3.10
+- Python 3.8
 
 
 Dependency Requirements:
@@ -1117,7 +1117,7 @@ For example a Tier 1 middleware implementation on a Tier 2 platform can only rec
 Minimum language requirements:
 
 - C++17
-- Python 3.9
+- Python 3.8
 
 
 Dependency Requirements:
