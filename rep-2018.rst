@@ -272,12 +272,13 @@ An example ``ros2 action echo`` call may look like the following:
   status: 2
   -----------------------
   interface: GOAL_SERVICE
-  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
-  stamp:
-    sec: 1234
-    nanosec: 222222222
-  client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
-  sequence_number: 1
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 222222222
+    client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
+    sequence_number: 1
   request:
     goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
     goal:
@@ -285,34 +286,37 @@ An example ``ros2 action echo`` call may look like the following:
   response: []
   -----------------------
   interface: GOAL_SERVICE
-  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
-  stamp:
-    sec: 1234
-    nanosec: 333333333
-  client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
-  sequence_number: 1
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 333333333
+    client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
+    sequence_number: 1
   request: []
   response:
     accepted: true
   -----------------------
   interface: RESULT_SERVICE
-  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
-  stamp:
-    sec: 1234
-    nanosec: 444444444
-  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
-  sequence_number: 1
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 444444444
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
   request:
     goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
   response: []
   -----------------------
   interface: RESULT_SERVICE
-  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
-  stamp:
-    sec: 1234
-    nanosec: 555555555
-  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
-  sequence_number: 1
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 555555555
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
   request: []
   response:
     status: 4
@@ -320,23 +324,25 @@ An example ``ros2 action echo`` call may look like the following:
       sequence: 0 1 1 2 3 5 8 13 21 34 55
   -----------------------
   interface: CANCEL_SERVICE
-  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
-  stamp:
-    sec: 1234
-    nanosec: 666666666
-  client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
-  sequence_number: 1
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 666666666
+    client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
+    sequence_number: 1
   request:
     goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
   response: []
   -----------------------
   interface: CANCEL_SERVICE
-  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
-  stamp:
-    sec: 1234
-    nanosec: 777777777
-  client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
-  sequence_number: 1
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 777777777
+    client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
+    sequence_number: 1
   request: []
   response:
     return_code: 0 (CANCELING)
@@ -357,23 +363,25 @@ This option can be useful to exclude interfaces in the action, so that user can 
     sequence: 0.1.2.3.4.5
   -----------------------
   interface: RESULT_SERVICE
-  event_type: REQUEST_RECEIVED (or REQUEST_SENT)
-  stamp:
-    sec: 1234
-    nanosec: 444444444
-  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
-  sequence_number: 1
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 444444444
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
   request:
     goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
   response: []
   -----------------------
   interface: RESULT_SERVICE
-  event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
-  stamp:
-    sec: 1234
-    nanosec: 555555555
-  client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
-  sequence_number: 1
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 555555555
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
   request: []
   response:
     status: 4
