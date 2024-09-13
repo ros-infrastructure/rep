@@ -356,7 +356,7 @@ Take caution integrating GPS data and terrain data as they frequently use differ
 The orientation field follows REP 103's [#REP103]_ recommendation. The orientation is the transform from the 
 local tangent plane [#ltpc]_ to the body frame.
 
-A vehicle flying facing east will have a unit identity quaternion for its orientation.
+A vehicle in level flight facing east will have a unit identity quaternion for its orientation.
 
 x,y,z=0, w=1
 
