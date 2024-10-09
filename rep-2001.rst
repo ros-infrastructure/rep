@@ -925,12 +925,11 @@ Desktop
 
   - desktop:
       extends:  [ros_base]
-      packages: [action_tutorials_cpp, action_tutorials_interfaces,
-                 action_tutorials_py, angles, composition,
-                 demo_nodes_cpp, demo_nodes_cpp_native,
-                 demo_nodes_py, depthimage_to_laserscan,
-                 dummy_map_server, dummy_robot_bringup,
-                 dummy_sensors,
+      packages: [action_tutorials_cpp, action_tutorials_py,
+                 angles, composition, demo_nodes_cpp,
+                 demo_nodes_cpp_native, demo_nodes_py,
+                 depthimage_to_laserscan, dummy_map_server,
+                 dummy_robot_bringup, dummy_sensors,
                  examples_rclcpp_minimal_action_client,
                  examples_rclcpp_minimal_action_server,
                  examples_rclcpp_minimal_client,
