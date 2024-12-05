@@ -1296,6 +1296,7 @@ Package manager use for dependencies:
 Build System Support:
 
 - ament_cmake
+- cargo
 - cmake
 - setuptools
 
