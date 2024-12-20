@@ -229,7 +229,7 @@ class REP(object):
         author_list = []
         for regex in (angled, paren, simple):
             # Watch out for commas separating multiple names.
-            regex += u'(,\s*)?'
+            regex += r'(,\s*)?'
             for match in re.finditer(regex, data):
                 # Watch out for suffixes like 'Jr.' when they are
                 # comma-separated from the name and thus cause issues when

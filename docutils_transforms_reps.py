@@ -113,7 +113,7 @@ class Headers(Transform):
             elif name in ('replaces', 'replaced-by', 'requires'):
                 newbody = []
                 space = nodes.Text(' ')
-                for refrep in re.split(',?\s+', body.astext()):
+                for refrep in re.split(r',?\s+', body.astext()):
                     repno = int(refrep)
                     newbody.append(nodes.reference(
                         refrep, refrep,
