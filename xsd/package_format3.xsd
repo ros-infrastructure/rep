@@ -67,17 +67,26 @@
         <xs:element name="name" minOccurs="1" maxOccurs="1">
           <xs:annotation>
             <xs:documentation>
+              The package name must start with a letter and contain only
+              lowercase alphabetic, numeric, or underscore characters.
               The package name should be unique within the ROS community.
               It may differ from the folder name into which it is checked out,
               but that is not recommended.
-              It must start with a lower-case letter and consist of only
-              lower-case letters, numbers and underscores.
-              It must not have two consecutive underscores.
+
+              The following recommended exemptions apply, which are optional
+              for implementations:
+              - Dashes may be permitted in package names. This is to support
+                maintaining a consistent dependency name when transitioning back
+                and forth between a system dependency and in-workspace package,
+                since many rosdep keys contain dashes (inherited from the
+                Debian/Ubuntu name).
+              - In support of some legacy packages, capital letters may also be
+                accepted in the package name, with a validation warning.
             </xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:token">
-              <xs:pattern value="[a-z](_?[a-z0-9]+)*"/>
+              <xs:pattern value="[a-zA-Z]([_-]?[0-9a-zA-Z]+)*"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
