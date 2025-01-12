@@ -168,12 +168,15 @@ There are many ways to represent rotations. The preferred order is listed below,
     default.  
 
 By the right hand rule, the yaw component of orientation increases as the child frame
-rotates counter-clockwise, and for geographic poses, yaw is zero when pointing east.
+rotates counter-clockwise.
+For geographic poses, yaw is zero when pointing east, and is thus 90 degrees when the 
+vehicle is facing north.
 
-This requires special mention only because it differs from a traditional compass bearing,
+This requires special mention only because it differs from a traditional `compass bearing`_,
 which is zero when pointing north and increments clockwise. Hardware drivers should make
 the appropriate transformations before publishing standard ROS messages.
 
+.. _compass bearing: https://en.wikipedia.org/wiki/Bearing_(navigation)
 
 Covariance Representation
 -------------------------
@@ -206,7 +209,6 @@ References
 
 .. [1] Bureau International des Poids et Mesures
    (http://www.bipm.org/en/home/)
-
 
 Copyright
 =========
