@@ -282,6 +282,11 @@ All items on the list for the next distro should already be released into the ro
     * `eProsima/Micro-XRCE-DDS-Client <https://github.com/eProsima/Micro-XRCE-DDS-Client>`_	
     * `eProsima/Micro-XRCE-DDS-Gen <https://github.com/eProsima/Micro-XRCE-DDS-Gen>`_	
 
+  * Zenoh
+
+    * `rmw_zenoh_cpp/rmw_zenoh_cpp <https://index.ros.org/p/rmw_zenoh_cpp/>`_
+    * `rmw_zenoh_cpp/zenoh_cpp_vendor <https://index.ros.org/p/zenoh_cpp_vendor/>`_	
+
 * Client libraries
 
   * `rcl/rcl <https://index.ros.org/p/rcl/>`_
