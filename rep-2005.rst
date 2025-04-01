@@ -267,11 +267,10 @@ All items on the list for the next distro should already be released into the ro
   * FastRTPS
 
     * `fastcdr/fastcdr <https://index.ros.org/p/fastcdr/>`_
-    * `fastrtps/fastrtps <https://index.ros.org/p/fastrtps/>`_
+    * `fastdds/fastdds <https://index.ros.org/p/fastdds/>`_
     * `rmw_fastrtps/rmw_fastrtps_cpp <https://index.ros.org/p/rmw_fastrtps_cpp/>`_
     * `rmw_fastrtps/rmw_fastrtps_dynamic_cpp <https://index.ros.org/p/rmw_fastrtps_dynamic_cpp/>`_
     * `rmw_fastrtps/rmw_fastrtps_shared_cpp <https://index.ros.org/p/rmw_fastrtps_shared_cpp/>`_
-    * `rosidl_typesupport_fastrtps/fastrtps_cmake_module <https://index.ros.org/p/fastrtps_cmake_module/>`_
     * `rosidl_typesupport_fastrtps/rosidl_typesupport_fastrtps_c <https://index.ros.org/p/rosidl_typesupport_fastrtps_c/>`_
     * `rosidl_typesupport_fastrtps/rosidl_typesupport_fastrtps_cpp <https://index.ros.org/p/rosidl_typesupport_fastrtps_cpp/>`_
 
