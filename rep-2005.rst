@@ -160,7 +160,10 @@ All items on the list for the next distro should already be released into the ro
   * `ros-infrastructure/superflore <https://github.com/ros-infrastructure/superflore>`_ *(not a ROS package)*
   * `ros/meta-ros <https://github.com/ros/meta-ros>`_ *(not a ROS package)*
   * `ament_cmake_ros/ament_cmake_ros <https://index.ros.org/p/ament_cmake_ros/>`_
+  * `ament_cmake_ros/ament_cmake_ros_core <https://index.ros.org/p/ament_cmake_ros_core/>`_
   * `ament_cmake_ros/domain_coordinator <https://index.ros.org/p/domain_coordinator/>`_
+  * `ament_cmake_ros/rmw_test_fixture <https://index.ros.org/p/rmw_test_fixture/>`_
+  * `ament_cmake_ros/rmw_test_fixuture_implementation <https://index.ros.org/p/rmw_test_fixture_implementation/>`_
 
 * Third party packages
 
@@ -281,6 +284,11 @@ All items on the list for the next distro should already be released into the ro
     * `eProsima/Micro-XRCE-DDS-Agent <https://github.com/eProsima/Micro-XRCE-DDS-Agent>`_	
     * `eProsima/Micro-XRCE-DDS-Client <https://github.com/eProsima/Micro-XRCE-DDS-Client>`_	
     * `eProsima/Micro-XRCE-DDS-Gen <https://github.com/eProsima/Micro-XRCE-DDS-Gen>`_	
+
+  * Zenoh
+
+    * `rmw_zenoh_cpp/rmw_zenoh_cpp <https://index.ros.org/p/rmw_zenoh_cpp/>`_
+    * `rmw_zenoh_cpp/zenoh_cpp_vendor <https://index.ros.org/p/zenoh_cpp_vendor/>`_	
 
 * Client libraries
 
