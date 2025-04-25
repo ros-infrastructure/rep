@@ -1,0 +1,32 @@
+REP: 2136
+Title: Dependencies on Third Party Packages in ROS 2
+Author: Michael Carroll <mjcarroll@intrinsic.ai>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 24-July-2024
+Post-History: 24-July-2024
+
+Abstract
+========
+
+This REP forms the recommendation for how to manage dependencies on non-ROS third-party packages. Specifically, this REP aims to provide recommendations on how to modify and package a dependency as well as when to create a vendored third-party package to be released in a ROS distribution, in the event that the third party package cannot be released in a ROS distribution agnostic manner.
+
+Motivation
+==========
+
+In this context, a third-party package is a software package that exists outside of the ROS ecosystem, is used by packages in the ROS ecosystem, but is not released widely as a system dependency. There are a few scenarios where this may happen:
+
+* A package is not available from package managers on all supported platforms.
+* Versions are inconsistent across package managers on all supported platforms.
+* A package is distributed via PPA or alternative packaging mechanism.
+* A package is only provided from source repositories.
+
+There are additional constraints when distributing ROS packages (either source or binary) that are intended to be used by downstream users:
+
+* In order for a ROS package to be supported on all supported platforms, all dependencies of that package must be available through that platform’s package manager or via other ROS packages in the distribution.
+* In order for a ROS package to be released as a binary via the buildfarm, all dependencies of that package must be available from either upstream Ubuntu or via other ROS packages in the distribution.
+
+
+Available Solutions
+===================
