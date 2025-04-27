@@ -1,0 +1,138 @@
+REP: 2013
+Title: ROS 2 Client Library Integration
+Author: Steven! Ragnarok <steven@openrobotics.org>
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 21-Sep-2022
+Post-History: 21-Sep-2022
+
+
+Abstract
+========
+
+This REP documents the plan and implementation for incorporating support for the Rust language in ROS 2.
+This support requires changes in build tools such as colcon, ros development tools like rosdep, and release tools like bloom, as well as additions to the packaged configurations of ROS 2 interface packages and the standard set of rosidl generators.
+This REP was prompted by questions raised on ROS Discourse [1]_ regarding incorporating third-party client libraries into the ROS 2 core.
+
+Rust[2]_ is a programming language which has a strong interest in the ROS community.
+Rust projects have been active in the ROS community since 2018.
+TODO ros2-rust, r2r, etc
+
+This REP focuses on ros2_rust[3]_, specifically the rosidl_generator_rs, rosidl_runtime_rs, and rclrs packages.
+
+
+Developer workstation usage
+===========================
+
+ros2_rust includes setup instructions for building ros2_rust.
+These instructions require the use of two colcon extensions not currently distributed with ros-dev-tools by default: ``colcon-cargo`` and ``colcon-ros-cargo`` as well as the ``cargo-ament-build`` extension for Rust's cargo build system.
+Additional system dependencies are also required as installed by ``rosdep`` (TODO: nuclearsandwich) these are not currently installed via rosdep and we should correct that prior to publication)
+
+
+Integration and Infrastructure
+==============================
+
+The ROS build infrastructure, including the ROS 2 build farm, does not currently support building Rust packages.
+There are several aspects to that support which we will try to summarize here.
+
+rosidl pipeline
+^^^^^^^^^^^^^^^
+
+TODO link out to documentation describing the idl pipeline in a way that is accurate and succinct.
+Message packages in ROS contain generated code (and potentially libraries compiled from that generated code) for supported languages to directly interact with message fields.
+The rosidl pipeline handles the process of generating language specific code for working with each supported runtime and typesupport.
+Generating and distributing code for a rosidl runtime on the ROS build farm requires the rosidl generator and typesupport packages to be available when message packages are built.
+Interface packages must declare build dependencies on rosidl_default_generators for expected functionality to work.
+Bloom currently inserts build dependencies on rosidl static typesupport packages appropriate to each platform and rosdistro.
+
+package build types
+^^^^^^^^^^^^^^^^^^^
+
+The colcon build tool has an extension system for discovering and analyzing packages which includes detecting how the package must be built.
+For ROS packages, this discovery is augmented by reading the ``package.xml`` contents including the ``<export><build_type/></export>`` field.
+These build types are also used by other tools in the ROS ecosystem, most notably bloom, to generate appropriate packaging metadata for various platforms.
+
+colcon
+^^^^^^
+
+colcon is the recommended build tool for ROS 2.
+It is highly extensible and support for nearly all package build types is provided by extensions rather than built into colcon core.
+Support for most build types is also separated into base support and ros-specific support so that colcon can be used with that build type with or without ROS.
+The prime examples here are colcon-cmake [4]_ and colcon-ros-cmake [5]_ which provide general support for CMake packages and some ROS specific behavior which builds on the existing CMake support.
+
+The ros2-rust team has already created colcon extensions supporting the use of cargo-based Rust packages in a colcon workspace.
+
+colcon-cargo and crates.io
+--------------------------
+
+The current versions of these tools allow the mix of package dependencies from crates.io, the Rust package registry, and the local workspace through the use of underlying cargo features.
+
+rosdep
+^^^^^^
+
+If your client library is associated with a language-specific package manager, it can be useful to support that language specific package manager in rosdep.
+In order for a package to be released on the ROS build farm, all of its dependencies must be satisifed either in the ROS distribution directly (sometimes referred to as vendoring) or available from the platform package manager.
+However, it is still useful to have rosdep support while packages are being developed and to support community members who may be working on packages that do not need to be released on the ROS build farm.
+
+
+bloom
+^^^^^
+
+When building binary packages we convert ROS package metadata into metadata for each target platform's specific packaging infrastructure.
+As a result, a pre-requisite to supporting client library packages in ROS is supporting the target language and library ecosystem in ROS 2's supported platforms.
+Bloom templates supporting the new build type associated with the client library language must be added to generate platform packaging infrastructure for use on the ROS build farm.
+
+At the moment, bloom is also responsible for injecting certain dependencies (such as typesupport and idl pipeline dependencies) into packages containing idl.
+Changes to the injected packages may be required in order to support additional client libraries or typesupports.
+
+ros_buildfarm
+^^^^^^^^^^^^^
+
+If everything else has been set up successfully, no additional changes should be required in the ros_buildfarm project since it uses the information generated by bloom for packaging jobs, and runs development, PR, and CI jobs with colcon.
+
+Languages and ecosystems
+========================
+
+  * C and C++ with CMake
+  * python and PyPI
+  * C and C++ with Meson
+  * Rust and Crates
+
+Alternative approaches
+======================
+
+  * document the existing gradle, node, and rust approaches
+
+References
+==========
+
+.. [1] Process for third-party client libraries to be incorporated into the core ROS 2 distribution
+   (https://discourse.ros.org/t/process-for-third-party-client-libraries-to-be-incorporated-into-the-core-ros-2-distribution/27325/)
+
+.. [2] Rust programming language web site
+   (https://www.rust-lang.org)
+
+.. [3] ros2_rust project on GitHub
+   (https://github.com/ros2-rust/ros2_rust)
+
+.. [4] colcon-cmake project on GitHub
+   (https://github.com/colcon/colcon-cmake)
+
+.. [5] colcon-ros-cmake project on GitHub
+   (https://github.com/colcon/colcon-ros-cmake)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
