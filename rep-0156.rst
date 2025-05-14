@@ -1,0 +1,109 @@
+REP: 156
+Title: Coordinate Frames for Marine Robots
+Author: Evan Palmer, Mabel Zhang
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 18-March-2024
+Post-History: 18-March-2024
+
+
+Abstract
+========
+
+This REP specifies the coordinate frame conventions that should be applied to
+marine robots used with ROS.
+
+Rationale
+=========
+
+The maritime industry has standardized notation [1] that differs from the
+conventions documented in REP 103 [2].
+This REP extends REP 103 [2] and REP 105 [3] to include maritime notation in an
+effort to improve interoperability across marine robotics projects that
+implement either convention.
+
+Specification
+=============
+
+Axis Orientation
+----------------
+
+In relation to a body, the maritime standard [1] is
+
+* x forward
+* y starboard
+* z down
+
+For short-range Cartesian representations of geographic locations, the maritime
+standard [1] is:
+
+* x north
+* y east
+* z down
+
+Projects that implement the maritime standard [1] should comply with REP 103 [2]
+by appending the suffix ``_fsd`` to the relevant body-fixed frames and the
+suffix ``_ned`` to the relevant short-range Cartesian frames.
+
+Coordinate Frames
+-----------------
+
+Marine robotics projects should default to the coordinate frame convention
+documented in REP 105 [3].
+For instances where the maritime standard [1] is needed, secondary suffix frames
+should be defined.
+
+Relationship between Frames
+---------------------------
+
+The relationship between the primary and secondary suffix frames yields the
+following tree representation:
+
+.. raw:: html
+
+  <div class="mermaid" style="font-family:'Lucida Console', monospace">
+  %% Example diagram
+  graph LR
+    O(odom) --> B(base_link)
+    B --> BM(base_link_fsd)
+    M(map) --> O
+    O --> OM(odom_ned)
+    E(earth) --> M
+    M --> MM(map_ned)
+
+  </div>
+
+Compliance
+==========
+
+This REP depends on and is compliant with REP 103 [2] and REP 105 [3].
+
+References
+==========
+
+.. [1] Society of Naval Architects and Marine Engineers, "Nomenclature for
+   Treating the Motion of a Submerged Body Through a Fluid", 1950.
+   (https://www.sname.org/node/2005)
+
+.. [2] REP 103, Standard Units of Measure and Coordinate Conventions
+   (http://www.ros.org/reps/rep-0103.html)
+
+.. [3] REP 105, Coordinate Frames for Mobile Platforms
+   (http://www.ros.org/reps/rep-0105.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
