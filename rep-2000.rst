@@ -1310,7 +1310,7 @@ Rolling Ridley (June 2020 - Ongoing)
 Rolling Ridley is a rolling development distribution of ROS 2 as described in REP-2002 [8]_.
 
 The target platform for Rolling Ridley will update as new upstream distributions are selected for ROS 2 development.
-As of May 2024, Rolling Ridley targets the same platforms as ROS 2 Jazzy Jalisco.
+As of May 2025, Rolling Ridley targets the same platforms as ROS 2 Kilted Kaiju.
 
 
 Motivation
