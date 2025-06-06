@@ -281,7 +281,7 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 | Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                  |
 +==========================+=====================+===============+=============================+================================+
-|  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures              |
+|  rmw_fastrtps_cpp*       | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures              |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 |  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64 |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
@@ -291,6 +291,8 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
 |  rmw_connext_dynamic_cpp | RTI Connext         | Tier 2        | All platforms except Debian | All architectures except arm64 |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -393,7 +395,7 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                        |
 +==========================+=====================+===============+=============================+======================================+
-|  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
+|  rmw_fastrtps_cpp*       | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 |  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
 |                          |                     |               | and OpenEmbedded            |                                      |
@@ -405,6 +407,8 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -512,7 +516,7 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | Middleware Library       | Middleware Provider | Support Level | Platforms                   | Architectures                        |
 +==========================+=====================+===============+=============================+======================================+
-|  rmw_fastrtps_cpp        | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
+|  rmw_fastrtps_cpp*       | eProsima Fast-RTPS  | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 |  rmw_connext_cpp         | RTI Connext         | Tier 1        | All Platforms except Debian | All Architectures except arm64/arm32 |
 |                          |                     |               | and OpenEmbedded            |                                      |
@@ -524,6 +528,8 @@ Middleware Implementation Support:
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_fastrtps_dynamic_cpp | eProsima Fast-RTPS  | Tier 2        | All Platforms               | All Architectures                    |
 +--------------------------+---------------------+---------------+-----------------------------+--------------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -632,7 +638,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
 | Middleware Library       | Middleware Provider    | Support Level | Platforms                   | Architectures                        |
 +==========================+========================+===============+=============================+======================================+
-| rmw_fastrtps_cpp         | eProsima Fast-RTPS     | Tier 1        | All Platforms               | All Architectures                    |
+| rmw_fastrtps_cpp*        | eProsima Fast-RTPS     | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms               | All Architectures                    |
 +--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
@@ -643,6 +649,8 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows          | All Architectures except arm32       |
 +--------------------------+------------------------+---------------+-----------------------------+--------------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -751,7 +759,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  |
 +==========================+========================+===============+============================+================================+
-| rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms              | All Architectures              |
+| rmw_cyclonedds_cpp*      | Eclipse Cyclone DDS    | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
@@ -761,6 +769,8 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -868,7 +878,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  |
 +==========================+========================+===============+============================+================================+
-| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
+| rmw_fastrtps_cpp*        | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
@@ -878,6 +888,8 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -984,7 +996,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  |
 +==========================+========================+===============+============================+================================+
-| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
+| rmw_fastrtps_cpp*        | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
@@ -994,6 +1006,8 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -1100,7 +1114,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  |
 +==========================+========================+===============+============================+================================+
-| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
+| rmw_fastrtps_cpp*        | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_cyclonedds_cpp       | Eclipse Cyclone DDS    | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
@@ -1110,6 +1124,8 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
@@ -1214,7 +1230,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  |
 +==========================+========================+===============+============================+================================+
-| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
+| rmw_fastrtps_cpp*        | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_connextdds           | RTI Connext            | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
@@ -1226,6 +1242,8 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+
+
+" * " means default RMW implementation.
 
 Middleware implementation support is dependent upon the platform support tier.
 For example a Tier 1 middleware implementation on a Tier 2 platform can only receive Tier 2 support.
