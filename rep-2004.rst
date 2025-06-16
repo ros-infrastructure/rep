@@ -778,7 +778,7 @@ If this is too onerous, then it's recommended to split lower quality packages ou
 Reference Implementation
 ========================
 
-The `ROS 2 Developer Guide <https://index.ros.org/doc/ros2/Contributing/Developer-Guide/>`_ describes the policies we implement to achieve Quality Level 1 for ROS Core packages.
+The `ROS 2 Developer Guide <https://docs.ros.org/en/kilted/The-ROS2-Project/Contributing/Developer-Guide.html>`_ describes the policies we implement to achieve Quality Level 1 for ROS Core packages.
 
 The `rcutils package's quality declaration <https://github.com/ros2/rcutils/blob/4157542d6320091cef715115d587625fd926500b/QUALITY_DECLARATION.md>`_ is one example of the conditions of this REP in practice on a non-trivial package.
 
