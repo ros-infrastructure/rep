@@ -1,0 +1,530 @@
+REP: 2018
+Title: Action Introspection and rosbag2 Action Record/Replay Support
+Author: Tomoya Fujita <Tomoya.Fujita@sony.com>, Barry Xu <Barry.Xu@sony.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 29-Apr-2024
+Post-History: 03-May-2024
+
+Abstract
+========
+
+This REP proposes a feature to introspect ROS actions during runtime.
+The feature allows users to remotely monitor action communication and enables ``rosbag2`` to record/replay the action messages.
+
+
+Terminology
+===========
+
+:ServiceServer:
+  A ROS service server.
+  Accepts requests from clients and sends responses.
+:ServiceClient:
+  A ROS service client.
+  Sends requests to servers and receives responses.
+:ServiceRequest:
+  A ROS service request.
+:ServiceResponse:
+  A ROS service response.
+
+:ActionServer:
+  A ROS action server.
+  Accepts goal requests from action clients, then executes the action process.
+:ActionClient:
+  A ROS action client.
+  Sends goal requests to action server and receives goal result.
+
+:FeedbackTopic:
+  A ROS action feedback published by action server to action client.
+:StatusTopic:
+  A ROS action status published by action server to action client.
+:SendGoalService:
+  A ROS action goal service, action client requests the goal to action server.
+:CancelGoalService:
+  A ROS action cancel service, action client requests to cancel the goal to action server.
+:ResultService:
+  A ROS action result service, action client requests the goal result to action server.
+
+:SendGoalRequest:
+  A ROS action goal request.
+:SendGoalResponse:
+  A ROS action goal response.
+:CancelGoalRequest:
+  A ROS action goal cancel request.
+:CancelGoalResponse:
+  A ROS action goal cancel response.
+:GetResultRequest:
+  A ROS action goal result request.
+:GetResultResponse:
+  A ROS action goal result response.
+:GoalStatus:
+  A ROS action topic for goal status.
+:GoalFeedback:
+  A ROS action topic for goal feedback.
+
+
+Motivation
+==========
+
+There are 2 primary motivation for this proposal.
+
+- To make it easier for users to externally validate that actions are operating as expected.
+- To enhance ``rosbag2`` debug capability to record, display and play action messages and services. 
+
+Drawing an analogy to ROS topics and services, there exist tools and libraries for "echoing" and recording messages sent over a topic, and this REP proposes the same kind of capabilities for actions.
+
+Specifically, the capability to introspect action topic messages and service requests/responses that are sent to and from action servers and clients.
+Being able to remotely monitor actions allows users to more effectively troubleshoot issues in a ROS system.
+For example, users can monitor the action feedback and status, verify requests are being sent and received by an action client and server during runtime.
+In addition to introspection, user can record and replay action messages and service requests/responses to validate their content later on.
+
+This REP targets to complete core feature ``Action Introspection`` and ``rosbag2`` command line interface to record and play the action messages and services from the bag file.
+
+
+Specification
+=============
+
+Subscribe Hidden Topics
+-----------------------
+
+As described in `ROS 2 Action Design <https://design.ros2.org/articles/actions.html>`_, ROS 2 actin creates 2 topics for a single action.
+There are ``status`` and ``feedback`` topics that are hidden, usually user cannot see those topics but it can take advantage of these hidden topics.
+
+  .. code-block::
+
+    $ ros2 topic list --include-hidden-topics
+    /fibonacci/_action/feedback
+    /fibonacci/_action/status
+
+It can subscribe these ``status`` and ``feedback`` hidden topics to get the messages between action server and clients.
+
+Publishing Service Events from Action
+-------------------------------------
+
+ROS 2 action also creates 3 services for a single action.
+There are ``send_goal``, ``cancel_goal`` and ``get_result`` hidden services, user cannot see those hidden services but it can also take advantage of these hidden services.
+
+  .. code-block::
+
+    $ ros2 service list --include-hidden-services
+    /fibonacci/_action/cancel_goal
+    /fibonacci/_action/get_result
+    /fibonacci/_action/send_goal
+
+It can enable `Service Introspection <https://github.com/ros-infrastructure/rep/pull/360>`_ for those hidden services, so that those services publish service event messages to the hidden topic ``/ACTION_NAME/SERVICE_NAME/_service_event``, where ``ACTION_NAME`` and ``SERVICE_NAME`` are the fully-qualified name of the service.
+
+Service Event Code Generation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS 2 action is composed of topics and services, those message and service types are auto-generated from ``.action`` file.
+To publish service events for each service, service event message types need to be extended with ``ServiceEventInfo.msg`` as designed by `Service Introspection <https://github.com/ros-infrastructure/rep/pull/360>`_.
+
+During `Service Introspection <https://github.com/ros-infrastructure/rep/pull/360>`_ development, `Generate Service Event Messages <https://github.com/ros2/rosidl/pull/700>`_ extends rosidl code generation that includes ``.action`` files.
+So service event messages for actions can be already supported.
+
+Enable Action Introspection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``Action Introspection`` should be configured and enabled by user application to action server and client.
+
+The API will allow user application to:
+
+- Disable ``Action Introspection`` completely, that disables service introspection under this action accordingly.
+- Enable the sending of only metadata to service events
+- Enable the sending of metadata and service contents to service events
+
+By default, the service event publishing feature is off for all action clients and all servers so users do not pay for a feature they do not plan to use.
+Furthermore, node authors may opt-in by default or disable the ``Action Introspection`` feature altogether as they see fit.
+
+Global Unique Identification
+----------------------------
+
+ROS action servers likely have multiple clients, and multiple goals can be processed concurrently with multiple executor threads.
+This means that ``Action Introspection`` messages and service events must be identified by global unique identification, otherwise it cannot distinguish ``Action Introspection`` messages or service events from multiple action clients or goals.
+
+In ROS action, there is goal identification called ``Goal ID`` (Universally Unique Identifier) for each goal generated by action client.
+Besides, `Service Introspection <https://github.com/ros-infrastructure/rep/pull/360>`_ integrates service client unique identification and sequence number in each service event messages.
+With these identification, it can tell the messages and service events belong to which action clients and goals.
+
+We can confirm that ``Goal ID`` is already implemented in ``status`` and ``feedback`` hidden topics.
+
+  .. code-block::
+
+    $ ros2 topic echo /fibonacci/_action/status --flow-style
+    status_list: [{goal_info: {goal_id: {uuid: [167, 14, 74, 213, 14, 241, 184, 187, 149, 34, 75, 132, 131, 137, 240, 15]}, stamp: {sec: 1714523443, nanosec: 875421940}}, status: 4}, {goal_info: {goal_id: {uuid: [59, 26, 199, 67, 217, 28, 132, 19, 148, 141, 105, 10, 13, 6, 56, 38]}, stamp: {sec: 1714523453, nanosec: 719698899}}, status: 2}]
+
+    $ ros2 topic echo /fibonacci/_action/feedback --flow-style
+    goal_id:
+      uuid: [31, 144, 125, 69, 26, 78, 96, 190, 125, 26, 24, 44, 222, 174, 204, 97]
+    feedback:
+      partial_sequence: [0, 1, 1, 2, 3, 5, 8, 13]
+
+For service events from action, it expects the following information as an example of ``send_goal`` service event.
+
+  .. code-block::
+
+    $ ros2 service echo /fibonacci/_action/send_goal
+    info:
+      event_type: REQUEST_RECEIVED
+      stamp:
+        sec: 1712028030
+        nanosec: 438418323
+      client_gid:
+      - 1
+      - 15
+      - 235
+      - 125
+      - 18
+      - 60
+      - 122
+      - 134
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 20
+      - 4
+      sequence_number: 1
+    request:
+    - goal_id:
+        uuid:
+        - 70
+        - 17
+        - 1
+        - 106
+        - 45
+        - 127
+        - 246
+        - 136
+        - 120
+        - 153
+        - 93
+        - 175
+        - 94
+        - 104
+        - 37
+        - 200
+      goal:
+        order: 10
+    response: []
+    ---
+    info:
+      event_type: RESPONSE_SENT
+      stamp:
+        sec: 1712028030
+        nanosec: 438885688
+      client_gid:
+      - 1
+      - 15
+      - 235
+      - 125
+      - 18
+      - 60
+      - 122
+      - 134
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 20
+      - 4
+      sequence_number: 1
+    request: []
+    response:
+    - accepted: true
+      stamp:
+        sec: 0
+        nanosec: 0
+
+Command Line Interfaces
+-----------------------
+
+``ros2 action echo``
+^^^^^^^^^^^^^^^^^^^^
+
+The existing ``ros2 action`` command line tool will be extended with an ``echo`` sub-command to print the action communication.
+This internally subscribes 2 hidden topic (``feedback`` and ``status``) and 3 service event topics (``send_goal``, ``cancel_goal`` and ``get_result`` services) in default to print them.
+
+An example ``ros2 action echo`` call may look like the following:
+
+.. code-block::
+
+  $ ros2 action echo /fibonnaci
+  -----------------------
+  interface: FEEDBACK_TOPIC
+  stamp:
+    sec: 1234
+    nanosec: 000000000
+  goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  feedback:
+    sequence: 0.1.2.3.4.5
+  -----------------------
+  interface: STATUS_TOPIC
+  stamp:
+    sec: 1234
+    nanosec: 111111111
+  goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  status: 2
+  -----------------------
+  interface: GOAL_SERVICE
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 222222222
+    client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
+    sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+    goal:
+      order: 10
+  response: []
+  -----------------------
+  interface: GOAL_SERVICE
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 333333333
+    client_gid: aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa.aa
+    sequence_number: 1
+  request: []
+  response:
+    accepted: true
+  -----------------------
+  interface: RESULT_SERVICE
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 444444444
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  response: []
+  -----------------------
+  interface: RESULT_SERVICE
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 555555555
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
+  request: []
+  response:
+    status: 4
+    result:
+      sequence: 0 1 1 2 3 5 8 13 21 34 55
+  -----------------------
+  interface: CANCEL_SERVICE
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 666666666
+    client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
+    sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  response: []
+  -----------------------
+  interface: CANCEL_SERVICE
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 777777777
+    client_gid: cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc.cc
+    sequence_number: 1
+  request: []
+  response:
+    return_code: 0 (CANCELING)
+    goals_canceling: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  -----------------------
+
+There should be optional arguments to monitor the specific interface types.
+This option can be useful to exclude interfaces in the action, so that user can monitor what only needs to be checked.
+
+  $ ros2 action echo /fibonnaci --interfaces "FEEDBACK_TOPIC,RESULT_SERVICE"
+  -----------------------
+  interface: FEEDBACK_TOPIC
+  stamp:
+    sec: 1234
+    nanosec: 000000000
+  goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  feedback:
+    sequence: 0.1.2.3.4.5
+  -----------------------
+  interface: RESULT_SERVICE
+  info:
+    event_type: REQUEST_RECEIVED (or REQUEST_SENT)
+    stamp:
+      sec: 1234
+      nanosec: 444444444
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
+  request:
+    goal_id: 12.34.56.78.90.ab.cd.ef.fe.dc.ba.09.87.65.43.21
+  response: []
+  -----------------------
+  interface: RESULT_SERVICE
+  info:
+    event_type: RESPONSE_SENT (or RESPONSE_RECEIVED)
+    stamp:
+      sec: 1234
+      nanosec: 555555555
+    client_gid: bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb.bb
+    sequence_number: 1
+  request: []
+  response:
+    status: 4
+    result:
+      sequence: 0 1 1 2 3 5 8 13 21 34 55
+  -----------------------
+
+
+``ros2 bag record <action>``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The existing tool `rosbag2 <https://github.com/ros2/rosbag2>`_ can be also extended with ``Action Introspection`` to record the action communication data into bag files.
+
+  .. code-block::
+
+    $ ros2 bag record --actions <action_names>
+
+This can record the action communication in the bag file aligned with topics and services.
+
+Recorded action data can be printed like following.
+
+  .. code-block::
+
+    $ ros2 bag ros2 bag info <bag_folder_name> -v
+
+    Files:             <bag_name>.mcap
+    Bag size:          39.9 KiB
+    Storage id:        mcap
+    ROS Distro:        rolling
+    Duration:          4.835s
+    Start:             Mar 18 2024 16:42:14.323 (1710805334.323)
+    End:               Mar 18 2024 16:42:19.159 (1710805339.159)
+    Messages:          39
+    Topic information: Topic: /events/write_split | Type: rosbag2_interfaces/msg/WriteSplitEvent | Count: 0 | Serialization Format: cdr
+                      Topic: /parameter_events | Type: rcl_interfaces/msg/ParameterEvent | Count: 0 | Serialization Format: cdr
+                      Topic: /rosout | Type: rcl_interfaces/msg/Log | Count: 39 | Serialization Format: cdr
+    Service:           1
+    Service information: Service: /add_two_ints | Type: example_interfaces/srv/AddTwoInts | Request Count: 20 | Response Count: 22 | Serialization Format: cdr
+    Action:            2
+    Action information:
+      Action: /fibonacci | Type: action_tutorials_interfaces/action/Fibonacci | Topics: 2 | Services: 3 | Serialization Format: cdr
+        Topic: feedback | Count: 1
+        Topic: status | Count: 10
+        Service: send_goal | Request Count: 10 | Response Count: 10
+        Service: cancel_goal | Request Count: 1 | Response Count: 1
+        Service: get_result | Request Count: 5 | Response Count: 4
+      Action: /other | Type: other_action_interfaces/action/Other | Topics: 2 | Services: 3 | Serialization Format: cdr
+        Topic: feedback | Count: 2
+        Topic: status | Count: 20
+        Service: send_goal | Request Count: 20 | Response Count: 20
+        Service: cancel_goal | Request Count: 2 | Response Count: 2
+        Service: get_result | Request Count: 5 | Response Count: 4
+
+``ros2 bag play <action>``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+`rosbag2 <https://github.com/ros2/rosbag2>`_ can also provide the capability to replay action data from the bag file, which is similar with `rosbag2 replay service <https://github.com/ros2/rosbag2/blob/rolling/docs/design/rosbag2_record_replay_service.md>`_.
+This is useful to simulate the action client behavior from the stored bag file, that can allow users to debug and monitor the action servers.
+
+For being able to play the data as action client, it needs to introduce the new class like ``GenericActionClient`` similar with `GenericClient <https://github.com/ros2/rclcpp/blob/rolling/rclcpp/include/rclcpp/generic_client.hpp>`_.
+``rosbag2`` internally creates generic action client to deduce the action type from the bag file, and then sends the action requests to the action servers.
+
+
+Feature Progress
+================
+
+Most elements of this proposal have been verified with PoC codes.
+
+Progress on the implementation is being tracked on GitHub at `ros2/ros2#1543 <https://github.com/ros2/ros2/issues/1543>`_.
+
+
+Possible Future Enhancement
+===========================
+
+``Action Introspection`` brings user to be able to see action communication using command line tools or recorded data.
+This will be useful for user especially debugging and collecting data at runtime environment without inserting debuging code.
+
+On the other hand, it would be complicated to monitor ``Service Introspection`` and ``Action Introspection`` information with using ``ros2 action echo``, ``ros2 service echo`` and ``ros2 bag info`` command line interfaces. 
+It would be really helpful to have GUI base tool to see those data at runtime or from bag file, so that users can determine communication among services and actions with a brief look.
+
+
+Backwards Compatibility
+=======================
+
+The addition of ``Action Introspection`` and ``rosbag2 action support`` should not impact existing logic.
+As an opt-in feature, users should not incur additional overhead by default.
+
+
+References
+==========
+
+.. [1] ROS 2 interfaces
+   (https://docs.ros.org/en/rolling/Concepts/About-ROS-Interfaces.html)
+
+.. [2] Service Introspection
+   (https://github.com/ros2/ros2_documentation/blob/rolling/source/Tutorials/Demos/Service-Introspection.rst)
+
+.. [3] ROS 2 Action Design
+   (https://design.ros2.org/articles/actions.html)
+
+.. [4] ROS 2 rosbag2 service record and replay
+   (https://github.com/ros2/rosbag2/blob/rolling/docs/design/rosbag2_record_replay_service.md)
+
+.. [5] rmw
+   (https://github.com/ros2/rmw)
+
+.. [6] rcl
+   (https://github.com/ros2/rcl)
+
+.. [7] rcl_interfaces
+   (https://github.com/ros2/rcl_interfaces)
+
+.. [8] rclcpp
+   (https://github.com/ros2/rclcpp)
+
+.. [9] rclpy
+   (https://github.com/ros2/rclpy)
+
+.. [10] rosbag2
+   (https://github.com/ros2/rosbag2)
+
+.. [11] ros2cli
+   (https://github.com/ros2/ros2cli)
+
+
+Discussions
+-----------
+
+* Action Introspection and Record/Play Support
+  (https://github.com/ros2/ros2/issues/1543)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
