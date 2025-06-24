@@ -1205,7 +1205,7 @@ The following indicators show what delivery mechanisms are available for each pl
 
 " [d] " Distribution-specific (Debian, RPM, etc.) packages will be provided for this platform for packages submitted to the rosdistro.
 
-" [a] " Binary releases are provided as a single archive per platform containing all packages in the Jazzy ROS 2 repos file [14]_.
+" [a] " Binary releases are provided as a single archive per platform containing all packages in the Kilted ROS 2 repos file [14]_.
 
 " [s] " Compilation from source.
 
@@ -1355,7 +1355,7 @@ References and Footnotes
 .. [13] Jazzy ROS 2 Repos File
    (https://github.com/ros2/ros2/blob/jazzy/ros2.repos)
 .. [14] Kilted ROS 2 Repos File
-   (https://github.com/ros2/ros2/blob/rolling/ros2.repos)
+   (https://github.com/ros2/ros2/blob/kilted/ros2.repos)
 
 Copyright
 =========
