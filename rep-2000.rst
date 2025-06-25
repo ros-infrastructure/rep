@@ -1206,7 +1206,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+--------------------+
 | Middleware Library       | Middleware Provider    | Support Level | Platforms                  | Architectures                  | Middleware Version |
 +==========================+========================+===============+============================+================================+====================+
-| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              | 2.14.4             |
+| rmw_fastrtps_cpp         | eProsima Fast-DDS      | Tier 1        | All Platforms              | All Architectures              | 3.2.2              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+--------------------+
 | rmw_connextdds           | RTI Connext            | Tier 1        | Ubuntu, Windows, and macOS | All Architectures except arm64 | 7.3.0.0            |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+--------------------+
@@ -1214,7 +1214,7 @@ Middleware Implementation Support:
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+--------------------+
 | rmw_zenoh_cpp            | Eclipse Zenoh          | Tier 1        | All Platforms              | All Architectures              | 1.0.4              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+--------------------+
-| rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS      | Tier 2        | All Platforms              | All Architectures              | 2.14.4             |
+| rmw_fastrtps_dynamic_cpp | eProsima Fast-DDS      | Tier 2        | All Platforms              | All Architectures              | 3.2.2              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+--------------------+
 | rmw_gurumdds_cpp         | GurumNetworks GurumDDS | Tier 3        | Ubuntu and Windows         | All Architectures except arm32 | 4.2.0              |
 +--------------------------+------------------------+---------------+----------------------------+--------------------------------+--------------------+
