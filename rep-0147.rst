@@ -134,7 +134,9 @@ A higher level view of the system uses the following abstraction.
 Coordinate Frames
 =================
 
-It is expected that users of this interface will also follow the coordinate frame conventions layed out in REP 105 [#rep105]_.
+It is expected that users of this interface will also follow the coordinate frame conventions layed out in REP 105 [#REP105]_.
+As mentioned in REP 103 [#REP103]_, if using the NED convention, the frame ID must end in ``_ned``.
+If unspecified, ENU can be assumed.
 
 Proposed Interfaces
 ===================
@@ -340,6 +342,33 @@ To send a series of goals a list of GlobalPositions can be used.
 
   nav_msgs/GlobalPosition[] waypoints
 
+
+Pose Reporting
+------------------
+
+An aerial vehicle can share its geographic pose via ``geographic_msgs/GeoPoseStamped`` [#geoposestamped]_.
+The position coordinates should follow WGS-84 [#wgs84]_.
+
+EGM2008 [#egm]_ can be assumed as the altitude datum unless otherwise stated.
+If and when EGM2020 is released, this REP can be updated.
+Take caution integrating GPS data and terrain data as they frequently use different datums.
+
+The orientation field follows REP 103's [#REP103]_ recommendation. The orientation is the transform from the 
+local tangent plane [#ltpc]_ to the body frame.
+
+A vehicle in level flight facing east will have a unit identity quaternion for its orientation.
+
+x,y,z=0, w=1
+
+.. image:: rep-0147/geopose-default-orientation.png
+
+Remember that per REP 103 [#REP103]_, when the orientation is decomposed to its yaw component,
+this yaw value is NOT equal to the traditional compass bearing.
+
+In the situation that the position is known but orientation it not known, or vise versa, 
+the unknown fields should be populated with ``NaN`` to avoid Null Island [#null_island]_.
+
+TODO add link to ArduPilot test code for orientation.
 
 Currently Unspecified
 ---------------------
@@ -960,6 +989,9 @@ References
 .. [#twiststamped] geometry_msgs/TwistStamped
   (http://docs.ros.org/api/geometry_msgs/html/msg/TwistStamped.html)
 
+.. [#rep103] REP 103: Standard Units of Measure and Coordinate Conventions
+   (http://www.ros.org/reps/rep-0103.html)
+
 .. [#rep105] REP 105: Coordinate Frames for Mobile Platforms
    (http://www.ros.org/reps/rep-0105.html)
 
@@ -978,6 +1010,20 @@ References
 .. [#ss_trigger] ``std_srvs/Trigger``
    (http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html)
 
+.. [#geoposestamped] odometry
+   (https://docs.ros.org/en/api/geographic_msgs/html/msg/GeoPoseStamped.html)
+
+.. [#egm] Earth Gravity Model
+   (https://en.wikipedia.org/wiki/Earth_Gravitational_Model)
+
+.. [#wgs84] WGS 84
+   (https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84)
+
+.. [#ltpc] Local Tangent Plane coordinates
+   (https://en.wikipedia.org/wiki/Local_tangent_plane_coordinates)
+
+.. [#null_island] Null Island
+   (https://en.wikipedia.org/wiki/Null_Island)
 
 Copyright
 =========
