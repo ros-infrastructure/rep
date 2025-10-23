@@ -1,3 +1,7 @@
+Please visit the new repository for Robotics Enhancement Proposals (REPs):
+
+https://github.com/openrobotics/reps
+
 reStructuredText for REPs
 =========================
 
