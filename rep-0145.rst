@@ -53,7 +53,7 @@ Data Reporting
 
 * All data from a sensor should be published with respect to a single consistent sensor frame. If any data is reported in an inconsistent frame of reference relative to the other data, the driver must transform it into the sensor frame before publishing.
 
-* Otherwise, all data should be published by the driver as it is reported by the device. Any subsequent modifications to the data (e.g. filtering, transformations) should be delegated to a downstream consumer of the data [3]_.
+* Otherwise, all data should be published by the driver as it is reported by the device. Any subsequent modifications apart from vendor-specific SDK functionality to the data (e.g. filtering, transformations) should be delegated to a downstream consumer of the data [3]_.
 
 * A prominent note should be made in the driver documentation regarding any internal data manipulation that does not comply with the requirements in this document.
 
@@ -93,26 +93,50 @@ Topics
 
 The following topics are expected to be common to many devices - an IMU device driver is expected to publish at least one. Note that some of these topics may be also published by support libraries, rather than the base driver implementation. All message types below are supplemented with a std_msgs/Header, containing time and coordinate frame information.
 
-
-* `imu/data_raw` (sensor_msgs/Imu)
-
-  - Sensor output grouping accelerometer (`linear_acceleration`) and gyroscope (`angular_velocity`) data.
-
 * `imu/data` (sensor_msgs/Imu)
 
-  - Same as `imu/data_raw`, with an included quaternion orientation estimate (`orientation`).
+  - General consolidated sensor data containing `AngularVelocity`, `Attitude`, and `LinearAcceleration` published at the natural frequency of attitude estimation.
+
+* `imu/angular_velocity` (sensor_msgs/AngularVelocity)
+
+  - Sensor output containing gyroscope data.
+
+* `imu/attitude` (sensor_msgs/Attitude)
+
+  - Sensor output containing information about the attitude estimation.
+
+* `imu/linear_acceleration` (sensor_msgs/LinearAcceleration)
+
+  - The sensor output of the measured linear acceleration.
 
 * `imu/mag` (sensor_msgs/MagneticField)
 
   - Sensor output containing magnetometer data.
 
-
-All message types provide a covariance matrix (see REP 103 [1]_) alongside the data field (`*_covariance`). If the data's covariance is unknown, all elements of the covariance matrix should be set to 0, unless overridden by a parameter. If a data field is unreported, the first element (`0`) of the covariance matrix should be set to `-1`.
+All message types provide a covariance matrix (see REP 103 [1]_) alongside the data field (`*_covariance`). If the data's covariance is unknown, all elements of the covariance matrix should be set to 0, unless overridden by a parameter. If a data field is unreported, the first element (`0`) of the covariance matrix should be set to `NaN`.
+The timestamp for these messages should reflect the best estimate of when the observation was made.
+It is expected that downstream users may want to use data from multiple of these topics.
 
 Namespacing
 '''''''''''
 
-By convention, IMU output topics are pushed down to a local namespace. The primary source of IMU data for a system is published in the `imu` namespace. Additional sources, such as secondary IMUs or unprocessed raw data should be published in alternative `imu_...` local namespaces. IMU driver implementations should take care to allow convenient remapping of the local namespace through a single remap argument (e.g. imu:=imu_raw), rather than separate remap calls for each topic.
+By convention, IMU output topics are pushed down to a local namespace. The primary source of IMU data for a system is published in the `imu` namespace. Additional sources, such as secondary IMUs or unprocessed raw data should be published in alternative `imu_...` local namespaces. IMU driver implementations should take care to allow convenient remapping of the local namespace through a single remap argument (e.g. imu:=imu_raw), rather than separate remap calls for each topic. The following are some standard namespaces to represent certain types of data:
+
+* `imu_raw`
+
+  - Containing topics of raw data
+
+* `imu_unbiased`
+
+  - Containing topics of unbiased data
+
+* `imu_biased`
+
+  - Containing topics of biased data
+
+* `imu_compensated`
+
+  - Containing topics of gravity compensated data
 
 Common Parameters
 -----------------
