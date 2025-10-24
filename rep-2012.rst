@@ -1,0 +1,425 @@
+REP: 2012
+Title: Service Introspection
+Author: Aditya Pande <aditya.pande@openrobotics.org>, Brian Chen <brian.chen@openrobotics.org>, Deepanshu Bansal <deepanshu.bansal@openrobotics.org>, Jacob Perron <jacob@openrobotics.org>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 07-Jun-2022
+Post-History: 20-Jun-2022
+
+Abstract
+========
+
+This REP proposes a feature to introspect ROS services during runtime.
+The feature allows users to remotely monitor service requests and responses.
+
+
+Terminology
+===========
+
+:Request:
+  A ROS service request.
+:Response:
+  A ROS service response.
+:Server:
+  A ROS service server.
+  Accepts requests from clients and sends responses.
+:Client:
+  A ROS service client.
+  Sends requests to servers and receives responses.
+
+Motivation
+==========
+
+The primary motivation for this proposal is to make it easier for users to externally validate that services are operating as expected.
+Drawing an analogy to ROS topics, there exist tools and libraries for "echoing" and recording messages sent over a topic, and this REP proposes the same kind of capabilities for services.
+Specifically, the capability to introspect requests and responses that are sent to and from service servers and clients.
+Being able to remotely monitor services allows users to more effectively troubleshoot issues in a ROS system.
+For example, users could verify requests are being received by a server by employing a command-line tool during runtime.
+Or the user could post-process recorded requests and responses to validate their content.
+
+There are additional features that could leverage this proposal, such as:
+
+- Playback of recorded services (for example, from a rosbag [1]_)
+- Introspection of ROS actions, which are built on services
+- Validation of a live ROS system by referencing a recording from a previous session
+
+Though this proposal focuses on the core feature of introspecting requests and responses, the design is purposely flexible so additional features like those listed above can be implemented in the future.
+
+
+Specification
+=============
+
+Publishing Service Events
+-------------------------
+
+Whenever a request or response is sent or received, a *service event* message will be published to a topic.
+Servers are responsible for publishing a message when they receive a request and when they send a response.
+Likewise, clients are responsible for publishing a message when they send a request and when they receive a response.
+Therefore, we have a total of four possible events:
+
+:Request Sent:
+  Emitted from a client after sending a request to a server.
+:Request Received:
+  Emitted from a server after receiving a request from a client.
+:Response Sent:
+  Emitted from a server after sending a response to a client.
+:Response Received:
+  Emitted from a client after receiving a response from a server.
+
+Event messages shall be published to the hidden topic ``/SERVICE_NAME/_service_event``, where ``SERVICE_NAME`` is the fully-qualified name of the service.
+Both servers and clients will publish events to the same topic.
+Note that this implies that services must have unique names.
+
+By publishing service event messages to predetermined topics, tools and libraries are able to subscribe to these topics to inspect the flow of data between services.
+
+Service Event Definition
+------------------------
+
+For each service definition, ``my/srv/Foo.srv``, a new (hidden) ROS message type is defined, ``my/srv/Foo_Event.msg``, with the ROS IDL specification [2]_:
+
+  .. code-block::
+
+   # Event info
+   # Contains event type, timestamp, and request ID
+   service_msgs/msg/ServiceEventInfo info
+
+   # The actual request content sent or received
+   # This field is only set if the event type is REQUEST_SENT or REQUEST_RECEIVED,
+   # and the introspection feauture is configured to include payload data.
+   my/srv/Foo_Request[<=1] request
+
+   # The actual response content sent or received
+   # This field is only set if the event type is RESPONSE_SENT or RESPONSE_RECEIVED,
+   # and the introspection feauture is configured to include payload data.
+   my/srv/Foo_Response[<=1] response
+
+The reserved underscore character is used in the generated type name to avoid potential collisions with user-defined types.
+
+``service_msgs/msg/ServiceEventInfo.msg`` is defined as,
+
+  .. code-block::
+
+   # Indicates this is a request sent event emitted from a client
+   uint8 REQUEST_SENT      = 0
+
+   # Indicates this is a request received event emitted from a server
+   uint8 REQUEST_RECEIVED  = 1
+
+   # Indicates this is a response sent event emitted from a server
+   uint8 RESPONSE_SENT     = 2
+
+   # Indicates this is a response received event emitted from a client
+   uint8 RESPONSE_RECEIVED = 3
+
+   # The type of event this message represents
+   uint8 event_type
+
+   # Timestamp for when the event occurred (sent or received time)
+   builtin_interfaces/msg/Time stamp
+
+   # Unique identifier for the client that sent the service request
+   # Note, this is only unique for the current session.
+   # The size here has to match the size of rmw_dds_common/msg/Gid,
+   # but unfortunately we cannot use that message directly due to a
+   # circular dependency.
+   char[16] client_gid
+
+   # Sequence number for the request
+   # Combined with the client ID, this creates a unique ID for the service transaction
+   int64 sequence_number
+
+Service event definitions are generated as part of the ``rosidl`` pipeline [3]_.
+
+Timestamp
+^^^^^^^^^
+
+Timestamps represent the time at which the event occurred.
+That is, they are set to the time directly after a request or response is sent or received.
+
+Timestamps shall respect ROS time [4]_.
+This means by default they will be set with wall-time.
+If simulation time is enabled by the node implementing the server or client, then timestamps will get their time from the ``/clock`` topic.
+
+Client ID and sequence number
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Both the client ID and sequence number are provided by the ROS middleware [5]_.
+They can be accessed from ``rcl`` [6]_ when taking a request or response for a service server or client respectively.
+Together they are used to uniquely identify the service transaction (i.e. they uniquely identify a single request-reponse pair).
+
+Example
+^^^^^^^
+
+For example, consider a service ``example_interfaces/srv/AddTwoInts`` defined as follows:
+
+.. code-block::
+
+   int64 a
+   int64 b
+   ---
+   int64 sum
+
+The following (hidden) service event message definition is generated when building the ``example_interfaces`` package:
+
+:example_interfaces/srv/AddTwoInts_Event:
+
+.. code-block::
+
+   rcl_interfaces/msg/ServiceEventInfo info
+
+   example_interfaces/srv/AddTwoInts_Request[<=1] request
+
+   example_interfaces/srv/AddTwoInts_Response[<=1] response
+
+The definition for ``example_interfaces/srv/AddTwoInts_Request`` is,
+
+.. code-block::
+
+   int64 a
+   int64 b
+
+And the definitions for ``example_interfaces/srv/AddTwoInts_Reponse`` is,
+
+.. code-block::
+
+   int64 sum
+
+Configuration
+-------------
+
+Configuration of service introspection features will be done through API calls on a per-client or per-server basis.
+
+The API will allow users to:
+
+- Disable introspection completely
+- Enable the sending of only metadata
+- Enable the sending of metadata and service contents
+
+By default, the event publishing feature is off for all clients and all services so users do not pay for a feature they do not plan to use.
+Furthermore, node authors may opt-in by default or disable the service introspection feature altogether as they see fit.
+
+Quality of Service
+------------------
+
+The service event topics proposed in this REP shall use the default quality of service settings [9]_.
+
+Security
+--------
+
+Enabling service introspection creates more attack surface for an existing ROS system by adding 2*N more topics (where N is the number of services with the feature enabled).
+These topics are vulnerable to undesired actors listening in on service communication or even interfering with parts of the system that may be relying on service events.
+
+Luckily, we can leverage the existing security feature for topics and services in ROS 2 (see SROS 2 [10]_).
+Any existing tooling for aiding users in setting up ROS security should consider the new service event topics introduced by this REP (e.g. NoDL [11]_).
+
+
+Rationale
+=========
+
+The following sections summarize *why* certain design decisions were made and some of the alternatives considered.
+
+Configuring service introspection through API calls
+---------------------------------------------------
+
+There are a few reasons to configure introspection through API calls.
+
+First, enabling or disabling introspection is fundamentally a per-client or per-service action.
+In most scenarios, users probably will not want to enable service introspection on all clients and services at once, as this will greatly increase network traffic.
+
+Next, it makes sense to have users of the rcl client/server API not have to specified arguments that will never be used if they don't enable introspection.
+By having a separate API for this, only API users concerned with enabling the introspection feature need to provide the feature.
+
+Finally, by having a separate API call for introspection, the API behavior ends up being completely orthogonal.
+That is, users can cycle between having introspection off, metadata only, or contents sent, and the system will do the correct thing.
+
+One downside of using APIs for configuration is that there is no obvious way to configure the introspection feature at runtime.
+However, it is easy to hook up the API call to a ROS parameter (say), and control it through that.
+If that turns out to be a popular feature, the implementation can be extended to automatically expose this per-service introspection as a parameter.
+
+Only supporting one service per name
+------------------------------------
+
+It is technically possible to create more than one service with the same name (though not recommended).
+However, this is generally not recommended and may be forbidden in the future.
+Therefore, as far as this REP is concerned, creating multiple services with the same name is undefined behavior.
+
+
+Separate request and response events instead of single service event
+--------------------------------------------------------------------
+
+This REP defines four event types for requests and responses.
+Publishing separate events from client and servers makes it possible to detect situations such as:
+
+* a request was sent by a client, but not received by a server
+* a request was received by a server, but a response was not sent
+
+Alternatively, a single event could have been defined containing both the request and response.
+While this would be convenient for tools to match requests and responses, it would result in duplicate or unused message content.
+
+A second alternative is to define unique request and response event types for clients and services (for a total of four event types and four topics per service).
+However, it's not clear that there is much benefit in the additional types considering the definition of a client request type and service request type would be identical (the same applying to response types).
+
+Define a single event type with serialized data
+-----------------------------------------------
+
+Rather than generating event types in ``rosidl``, we considered defining a single type with type-erased data for the request and/or response, for example,
+
+  .. code-block::
+
+   rcl_interfaces/msg/ServiceEventInfo info
+
+   # The request/response type
+   # e.g. my/srv/Foo_Request
+   string idl_type_name
+
+   # Serialized data
+   byte[] request_or_response
+
+This has the benefit of avoiding additional code generation for each service type and gives us the option to put all service events on one common topic.
+
+The downsides include extra overhead from serializing/deserializing the data and tools having to filter out messages based on the service type or name.
+
+Ultimately, it was decided that having separate event topics per service name would be more useful for tooling and debugging.
+For example, it makes it easier to selectively introspection a subset of services by name.
+
+
+Backwards Compatibility
+=======================
+
+The addition of service introspection should not impact existing logic.
+As an opt-in feature, users should not incur additional overhead by default.
+
+Feature Progress
+================
+
+Most elements of this proposal have been implemented and are currently under review.
+
+Progress on the implementation is being tracked on GitHub at `ros2/ros2#1285 <https://github.com/ros2/ros2/issues/1285>`_.
+
+Other
+=====
+
+
+Tooling
+-------
+
+``ros2 service``
+^^^^^^^^^^^^^^^^
+The existing ``ros2 service`` tool can be extended using an ``echo`` keyword to monitor service events.
+Internally, it would subscribe to the `hidden topics <Publishing Service Events_>`_ and echo them.
+The existing command line parameters for topics can be extended to be used with this ``echo`` verb, along with new
+arguments on to filter message content and analyze delays.
+
+Building on the example with AddTwoInts discussed earlier, an example ``ros2 service echo`` call may look like the following:
+
+.. code-block::
+
+   $ ros2 service echo /add_two_ints
+   -----------------------
+   request_type: REQUEST_SENT
+   stamp: 1.00
+   client_id: 1234
+   sequence_number: 1
+   request:
+      a: 1
+      b: 2
+   -----------------------
+   request_type: REQUEST_RECEIVED
+   stamp: 1.10
+   client_id: 1235
+   sequence_number: 1
+   request:
+      a: 1
+      b: 2
+   -----------------------
+   request_type: RESPONSE_SENT
+   stamp: 1.20
+   client_id: 1235
+   sequence_number: 2
+   request:
+      sum: 3
+   -----------------------
+   request_type: RESPONSE_RECEIVED
+   stamp: 1.30
+   client_id: 1234
+   sequence_number: 2
+   request:
+      sum: 3
+   -----------------------
+
+
+``ros2 bag``
+^^^^^^^^^^^^
+
+``rosbag2`` integration for service introspection will come more or less for free since the request/response events are simply being echoed through ROS 2 publishers.
+Syntactic sugar may be included to enable service introspection and record, e.g. ``ros2 bag record --enable-services``.
+
+Replaying service and client events
+-----------------------------------
+
+The design should support implementation of a tool for "replaying" service and client events.
+For example, tooling may be developed to take the recorded event stream and replay requests and responses back into the ROS network.
+
+
+References
+==========
+
+.. [1] rosbag2
+   (https://github.com/ros2/rosbag2)
+
+.. [2] ROS 2 interfaces
+   (https://docs.ros.org/en/rolling/Concepts/About-ROS-Interfaces.html)
+
+.. [3] ROS IDL pipeline
+   (https://github.com/ros2/rosidl)
+
+.. [4] ROS Time
+   (https://design.ros2.org/articles/clock_and_time.html)
+
+.. [5] RMW
+   (https://github.com/ros2/rmw)
+
+.. [6] rcl
+   (https://github.com/ros2/rcl)
+
+.. [7] YAML parameter file wildcard
+   (https://docs.ros.org/en/rolling/Tutorials/Launch/Using-ROS2-Launch-For-Large-Projects.html#using-wildcards-in-yaml-files)
+
+.. [8] ROS Parameters
+   (https://docs.ros.org/en/foxy/Concepts/About-ROS-2-Parameters.html)
+
+.. [9] Quality of Service Settings
+   (https://docs.ros.org/en/rolling/Concepts/About-Quality-of-Service-Settings.html)
+
+.. [10] SROS 2
+   (https://aliasrobotics.com/files/SROS2.pdf)
+
+.. [11] NoDL
+   (https://github.com/ubuntu-robotics/nodl)
+
+.. [12] Launch ROS
+   (https://github.com/ros2/launch_ros)
+
+
+Discussions
+-----------
+
+* Review of first draft review on GitHub
+  (https://github.com/ros-infrastructure/rep/pull/360)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
