@@ -1,0 +1,422 @@
+REP: 2017
+Title: Thread attributes configuration support in rcl
+Author: Masaaki Ueno <m-ueno@esol.co.jp>, Koichi Oyama <v-oyama7385@esol.co.jp>, Shoji Morita <s-morita@esol.co.jp>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 11-Jul-2023
+Post-History: 06-Oct-2023
+
+
+Abstract
+========
+
+This REP proposed a feature of the ros client library (rcl) to accept the thread attributes, such as priorities, scheduling, and core affinity, which are to be passed to the language bindings like rclcpp.
+
+
+Motivation
+==========
+
+The configuration and setting of thread attributes for ROS 2 executors' threads are essential for controlling computational resources and meeting real-time requirements, which are typically mandatory for robot systems.
+
+However, currently, there is a lack of infrastructure to configure and set thread attributes for the threads used by the ROS 2 executors.  As a result, we have to hard-code the thread attribute settings and implement thread control procedures in each application separately.  This approach may not only demand a certain effort to maintain multiple implementations for each runtime environment but also pose challenges in ensuring consistent functionality across various platforms.
+
+Having an infrastructure that configures thread attributes for ROS 2 executor through command line parameters, environment variables, and/or files eliminates the need for additional implementation in each environment and simplifies the deployment process across multiple environments without requiring code modifications.
+
+To have such an infrastructure, we have to make enhancements below.
+::
+
+                        +--------------------------------------+ *-------------*
+                        | Language bindings layer (e.g. rclcpp)| | [5] Thread  |
+                        | +--------------+ +---------------+   | | Control     |
+                        | | Applications | |  Executors    |   | | (e.g.       |
+                        | +---*------------------------*---+   | | enhanced    |
+                        |     | [4] I/F extension to   |       | | thread      |
+                        |     | use passed thread      |       | | control     |
+                        |     | attributes             |       | | class for   |
+                        |     *----------^-------------*       | | C++ )       |
+                        |                |                     | |             |
+                        +----------------+---------------------+ |             |
+                                         ^                       |             |
+                                         |                       |             |
+                              *----------+-------------*         |             |
+                              | [3] I/F to pass thread |         |             |
+                              | attributes to language |         |             |
+                              | bindings               |         |             |
+                              *----------+-------------*         |             |
+                                         |                       |             |
+                        +----------------+---------------------+ |             |
+                        |        rcl     |                     | |             |
+ *--------------------* |     *----------+-------------*       | |             |
+ | [1] I/F to pass    | |     | [2] System abstraction |       | |             |
+ | thread attributes  +-+---->+ for thread attributes  |       | |             |
+ | to ROS 2 process   | |     |                        |       | |             |
+ *--------------------* |     *------------------------*       | |             |
+                        +--------------------------------------+ *-------------*
+
+..
+    We may have to create another REP to describe the whole story of the thread attribution control feature for the ROS 2 platform.
+
+The items to be enhanced are those marked with asterisks.
+
+This REP covers [1] - [3] and proposes a feature for the rcl that allows it to receive thread attributes, store them internally, and provide interfaces to pass them to higher-level language bindings (e.g., rclcpp, rclpy, or future ones).
+
+Regarding the REP related to [4], it explains how applications and executors in the language binding layer utilize thread attributes as follows:
+
+[Applications]
+
+* Applications retrieve thread attributes from rcl and pass one of them to the executor's constructor.  The executor then configures the thread(s) accordingly.
+
+* Applications can provide hint(s) to the executor's constructor to guide it in selecting an appropriate thread attribute and configuring the thread(s) accordingly.
+
+[Executors]
+
+*  When no thread attribute(s) or hint(s) are provided, the executor searches for a reserved tag indicating the desired attribute for the executor.  If it finds such a tag, it configures the thread(s) to use the specified attribute.
+
+Regarding the REP related to [5], it introduces a thread-controlling feature used by executors described in C++.
+
+Both [4] and [5] are primarily based on rclcpp(C++).  However, these concepts can be applied to other language bindings.
+
+Specification
+=============
+
+This chapter provides the interface specifications depicted as [Parameter configuration] and [Language bindings] below.
+
+::
+
+                              +----------------------+ +----------+
+                              |         rclcpp       | |   rclpy  | ...
+                              |+-----------+ +------+| |          |
+                              || executors | | apps || |          |
+                              |+-----------+ +------+| |          |
+                              +-----^----------------+ +---^------+
+                                    |                      |
+                                   ...[Language bindgings]...
+                                    |                      |
+                              +-----+----------------------+------+
+    ------Env. variable ------>                                   |
+    [Parameter configuration] |              rcl                  |
+    -- Cmd line parameters --->                                   |
+                              |                                   |
+                              +-----------------------------------+
+
+Parameter configuration
+-----------------------
+
+This interface enables robot system integrators to pass a set of thread attribute parameters to the rcl, which internally stores them.  When the language bindings (e.g., rclcpp, rclpy, and so on) need to set their executor's thread attributes, the rcl will provide these parameters.
+
+The interface offers two methods to pass these parameters: through environment variables and command line parameters.  The environment variable option is suitable for system-wide attribute settings, while the command line parameter option is designed for specific process configurations.  Therefore, the environment variable method has a lower priority, and rcl ignores it if parameters are provided via the command line parameter method.
+
+The thread attribute parameters consist of these items for each thread, as below.
+
+* Search tag for the thread attribute parameters
+* Core affinity
+* Scheduling policy
+* Priority
+
+When using the parameter passing feature, users should create an array containing sets of these items as thread attribute parameters for the thread pool used by ROS 2 executors.  The text format that users should comply with for describing parameters is YAML.  Users can choose to pass the parameters either as a string or from a file.
+
+Command line parameter
+''''''''''''''''''''''
+To use the command line parameter method, the users can utilize the following options:
+
+.. code-block:: bash
+
+    --thread-attrs-value=[Thread attribute parameters in YAML format]:
+      This option allows users to directly pass the parameters in YAML format as a command line argument.
+    --thread-attrs-file=[Path for the file including the thread attributes parameters in YAML format]:
+      This option allows users to specify a file path that contains the thread attribute parameters in YAML format.
+
+If multiple options are provided simultaneously, the first option encountered shall take precedence.
+
+Environment variables
+'''''''''''''''''''''
+To use the environment variable method, the user can utilize the following environment variables:
+
+.. code-block:: bash
+
+   ROS_THREAD_ATTRS_VALUE=[Thread attribute parameters in YAML format]:
+     Using this environment variable, users can pass the thread attribute parameters directly in YAML format.
+   ROS_THREAD_ATTRS_FILE=[Path for the file including the thread attributes parameters in YAML format]:
+     Using this environment variable, users can specify a file path that contains the thread attribute parameters in YAML format.
+
+If both are provided simultaneously, the ROS_THREAD_ATTRS_VALUE shall take precedence.
+
+Format of parameters in YAML
+''''''''''''''''''''''''''''
+
+Users should describe the thread attribute parameters in the YAML format having keys below.
+
+.. code-block:: YAML
+
+  priority:          Integer value expressing the priority of the thread
+  tag:               String value used as a hint (or hints) to retrieve this set of parameters in application code or executors.
+  core_affinity:     Integer value used to decide the core on which the thread should run
+  scheduling_policy: String value specifying the desired scheduling policy for the thread
+
+The treatment of these values is environment-specific.  Specifically, for the `schduling_policy,` the following options are imported from the Linux environment and POSIX specification: [#REF-1]_ , [#REF-2]_
+
+.. code-block:: TEXT
+
+  FIFO
+  RR
+  SPORADIC
+  OTHER
+  IDLE
+  BATCH
+  DEADLINE
+
+..
+    Please note that the list above is subject to modification during the review process for this REP.
+    For instance, it may be necessary to include an option specifically designed for extension purposes in a non-POSIX environment.
+
+Using the provided keys, users should create an array of the thread attribute parameters like the one below.
+
+.. code-block:: YAML
+
+    - priority: 20
+      tag: attr-1
+      core_affinity: [0,1,2]
+      scheduling_policy: RR
+    - priority: 30
+      tag: attr-2
+      core_affinity: [3]
+      scheduling_policy: FIFO
+    - priority: 40
+      tag: attr-3
+      core_affinity: [4,5]
+      scheduling_policy: OTHER
+
+Language bindings
+-----------------
+
+The language binding provides an interface to retrieve the thread attribute parameters using the function described below to configure each thread.
+
+.. code-block:: C++
+
+  rcutils_thread_attrs_t * rcl_context_get_thread_attrs(const rcl_context_t * context);
+  Brief:
+    Returns pointer to the thread attribute list.
+  Parameters:
+    [in]  context           The context of the rcl from which the thread attribute list should be retrieved.
+  Return value:
+    A pointer to the thread attribute list if valid.  Otherwise `NULL.`
+
+The "rcutils_thread_attrs_t" above data structure holds the thread attributes with the following members:
+
+.. code-block:: C++
+
+  typedef enum rcutils_thread_scheduling_policy_e
+  {
+    RCUTILS_THREAD_SCHEDULING_POLICY_UNKNOWN  = 0,
+    RCUTILS_THREAD_SCHEDULING_POLICY_FIFO     = 1,
+    RCUTILS_THREAD_SCHEDULING_POLICY_RR       = 2,
+    RCUTILS_THREAD_SCHEDULING_POLICY_SPORADIC = 3,
+    RCUTILS_THREAD_SCHEDULING_POLICY_OTHER    = 4,
+    RCUTILS_THREAD_SCHEDULING_POLICY_IDLE     = 5,
+    RCUTILS_THREAD_SCHEDULING_POLICY_BATCH    = 6,
+    RCUTILS_THREAD_SCHEDULING_POLICY_DEADLINE = 7
+  } rcutils_thread_scheduling_policy_t;
+
+.. code-block:: C++
+
+  typedef struct rcutils_thread_core_affinity_s
+  {
+    // Array for bit pattern of core affinity
+    uint8_t * set;
+    // Bit count in the set
+    size_t core_count;
+    // Allocator used to allocate the set
+    rcutils_allocator_t allocator;
+  } rcutils_thread_core_affinity_t;
+
+.. code-block:: C++
+
+  typedef struct rcutils_thread_attr_s
+  {
+    /// Thread core affinity
+    rcutils_thread_core_affinity_t core_affinity;
+    /// Thread scheduling policy.
+    rcutils_thread_scheduling_policy_t scheduling_policy;
+    /// Thread priority.
+    int priority;
+    /// Thread attribute tag
+    char const * tag;
+  } rcutils_thread_attr_t;
+
+.. code-block:: C++
+
+  typedef struct rcutils_thread_attrs_s
+  {
+    /// Private implementation array.
+    rcutils_thread_attr_t * attributes;
+    /// Number of threads attribute
+    size_t num_attributes;
+    /// Number of threads attribute capacity
+    size_t capacity_attributes;
+    /// Allocator used to allocate objects in this struct
+    rcutils_allocator_t allocator;
+  } rcutils_thread_attrs_t;
+
+The following interfaces are provided to manipulate the data structure in the language binding.
+
+.. code-block:: C++
+
+  rcutils_thread_attrs_t rcutils_get_zero_initialized_thread_attrs(void);
+  Brief:
+    Return a rcutils_thread_attrs_t struct with members initialized to zero value.
+  Return value:
+    A rcutils_thread_attrs_t struct with members initialized to zero value.
+
+.. code-block:: C++
+
+  rcutils_ret_t rcutils_thread_attrs_init(rcutils_thread_attrs_t * thread_attrs,
+                   rcutils_allocator_t allocator);
+  Brief:
+    Initializes a list of thread attributes.
+  Parameters:
+    [out] thread_attrs    The list of thread attributes to be initialized.
+    [in]  allocator       The memory allocator to be used.
+  Return value:
+    RCUTILS_RET_OK
+                if the structure was initialized successfully, or
+    RCUTILS_RET_INVALID_ARGUMENT
+                if any function arguments are invalid, or
+    RCUTILS_RET_BAD_ALLOC
+                if allocating memory failed, or
+    RCUTILS_RET_ERROR
+                an unspecified error occured.
+
+.. code-block:: C++
+
+  rcutils_ret_t rcutils_thread_attrs_init_with_capacity(
+                    rcutils_thread_attrs_t * thread_attrs,
+                    rcutils_allocator_t allocator,
+                    size_t capacity);
+  Brief:
+    Initializes a list of thread attributes with a capacity.
+  Parameters:
+    [out] thread_attrs    The list of thread attributes to be initialized.
+    [in]  allocator       The memory allocator to be used.
+  Return value:
+    RCUTILS_RET_OK
+                if the structure was initialized successfully, or
+    RCUTILS_RET_INVALID_ARGUMENT
+                if any function arguments are invalid, or
+    RCUTILS_RET_BAD_ALLOC
+                if allocating memory failed, or
+    RCUTILS_RET_ERROR
+                an unspecified error occured.
+
+.. code-block:: C++
+
+  rcutils_ret_t rcutils_thread_attrs_fini(rcutils_thread_attrs_t * thread_attrs);
+  Brief:
+    Free the list of thread attributes.
+  Parameters:
+    [in] thread_attrs    The structure to be deallocated.
+  Return value:
+    RCUTILS_RET_OK
+                if the memory was successfully freed, or
+    RCUTILS_RET_INVALID_ARGUMENT
+                if any function arguments are invalid.
+
+.. code-block:: C++
+
+  rcutils_ret_t rcutils_thread_attrs_copy(rcutils_thread_attrs_t const * thread_attrs,
+                    rcutils_thread_attrs_t * out_thread_attrs);
+  Brief:
+    Copies the list of thread attributes.
+  Parameters:
+    [in]  thread_attrs      The source list of thread attributes.
+    [out] out_thread_attrs  The destination location.
+  Return value:
+    RCUTILS_RET_OK
+                if the source list was successfully copied to the destination, or
+    RCUTILS_RET_INVALID_ARGUMENT
+                if function arguments are invalid, or
+    RCUTILS_RET_BAD_ALLOC
+                if allocating memory failed.
+
+.. code-block:: C++
+
+  rcutils_ret_t rcutils_thread_attrs_add_attr(rcutils_thread_attrs_t * thread_attrs,
+                    rcutils_thread_scheduling_policy_t sched_policy,
+                    rcutils_thread_core_affinity_t const * core_affinity,
+                    int priority,
+                    char const * tag);
+  Brief:
+    Adds a thread attribute to the list of thread attributes.
+  Parameters:
+    [in,out] thread_attrs    The list of thread attributes to add a thread attribute to.
+    [in]    sched_policy    The thread scheduling policy of the adding attribute.
+    [in]    core_affinity   The thread core affinity of the adding attribute.
+    [in]    priority        The thread priority of the adding attribute.
+    [in]    tag             The thread attribute tag of adding attribute
+  Return value:
+    RCUTILS_RET_OK  if the thread attribute was successfully added, or
+    RCUTILS_RET_INVALID_ARGUMENT
+                    if any function arguments are invalid, or
+    RCUTILS_RET_BAD_ALLOC
+                    if allocating memory failed, or
+    RCUTILS_RET_ERROR
+                    an unspecified error occured.
+
+Rationale
+=========
+
+Not using ROS parameter infrastructure
+--------------------------------------
+
+According to the document about the parameter [#REF-3]_, it is associated with nodes, not processes.  Events associated with each node are executed by a single executor belonging to the process.  As a result, ROS parameters are not suitable for setting the thread attributes used in the thread pool that executes the node's events altogether.
+
+Being implemented in the rcl, not in language bindings
+------------------------------------------------------
+
+According to the document about the Client libraries [#REF-4]_, every language binding has its own thread model.  But, the thread attributes are OS-specific, not language.  So, treating the thread attributes in the rcl commonly used by the language bindings is natural and effort-saving.
+
+Backward Compatibility
+======================
+
+To ensure backward compatibility of a newly suggested interface, the future contributor must adhere to the following guidelines:
+
+*Preservation of Existing Keys and Types:*
+
+* It is essential not to delete any existing keys from the interface.
+* Similarly, the types of existing keys should not be changed.  (e.g., remain 'priority' to accept integer)
+
+*Retention of Existing 'scheduling_policy' Options:*
+
+* The existing 'scheduling_policy' options should not be removed.
+
+*Preservation of the Semantics for Thread Attributes:*
+
+* The semantics related to each thread attribute, which comprises the existing keys, should remain unchanged.
+
+*Preservation of the Representation of Thread Attributes:*
+
+* The representation of thread attributes as an array should be preserved.
+
+*Preservation of the Existing Interfaces via Command Line Parameters or Environment Variables:*
+
+* Existing interfaces that use command line parameters or environment variables should not be deleted or removed.
+
+References
+==========
+
+.. [#REF-1] sched(7) — Linux manual page
+   https://man7.org/linux/man-pages/man7/sched.7.html
+
+.. [#REF-2] sched.h - execution scheduling
+   https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sched.h.html
+
+.. [#REF-3] Parameters
+   https://docs.ros.org/en/rolling/Concepts/Basic/About-Parameters.html
+
+.. [#REF-4] Client libraries
+   https://docs.ros.org/en/rolling/Concepts/Basic/About-Client-Libraries.html
+
+Copyright
+=========
+
+This document has been placed in the public domain.
